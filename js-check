@@ -1,0 +1,3 @@
+#!/bin/sh
+jshint --exclude node_modules $PWD
+jscs *
