@@ -154,6 +154,28 @@ describe('ServiceLocator', function () {
 			}, Error);
 		});
 
+		it('should return different instances each time',
+			function () {
+				var locator = new ServiceLocator();
+				locator.register('type', function () {}, {});
+
+				var instance1 = locator.resolve('type');
+				var instance2 = locator.resolve('type');
+
+				assert.notEqual(instance1, instance2);
+			});
+
+		it('should return the same instance each time if it is as singleton',
+			function () {
+				var locator = new ServiceLocator();
+				locator.register('type', function () {}, {}, true);
+
+				var instance1 = locator.resolve('type');
+				var instance2 = locator.resolve('type');
+
+				assert.equal(instance1, instance2);
+			});
+
 	});
 
 	describe('#resolveAll', function () {
