@@ -237,4 +237,28 @@ describe('ServiceLocator', function () {
 			}, Error);
 		});
 	});
+
+	describe('#resolveInstance', function () {
+		it('should resolve instance of specified constructor and parameters',
+			function () {
+				var locator = new ServiceLocator();
+				var testArgument = 'testArgumentValue';
+
+				function TestModule() {
+
+				}
+
+				function ModuleToResolve($testType, testArgument) {
+					assert.equal($testType instanceof  TestModule, true);
+					assert.deepEqual(testArgument, testArgument);
+				}
+
+				locator.register('testType', TestModule);
+				var instance = locator.resolveInstance(ModuleToResolve, {
+					testArgument: testArgument
+				});
+
+				assert.equal(instance instanceof ModuleToResolve, true);
+			});
+	});
 });
