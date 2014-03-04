@@ -176,6 +176,14 @@ describe('ServiceLocator', function () {
 				assert.equal(instance1, instance2);
 			});
 
+		it('should resolve unspecified parameters as undefined', function () {
+			var locator = new ServiceLocator();
+			locator.register('type', function (test) {
+				assert.deepEqual(test, undefined);
+			});
+
+			var instance = locator.resolve('type');
+		});
 	});
 
 	describe('#resolveAll', function () {
