@@ -1,0 +1,40 @@
+{
+	"name": "catberry",
+	"version": "0.0.1",
+	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
+	"description": "Framework for web-applications using isomorphic JavaScript above express",
+	"homepage": "https://github.com/pragmadash/catberry",
+	"keywords": ["isomorphic", "framework", "express", "handlebars", "trumpet"],
+	"bugs": {
+		"url": "https://github.com/pragmadash/catberry/issues",
+		"email": "denis.rechkunov@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/pragmadash/catberry.git"
+	},
+	"main": "./index",
+
+	"dependencies": {
+		"trumpet": ">=1.6.3"
+	},
+
+	"devDependencies": {
+		"mocha": ">=1.17.1"
+	},
+
+	"engines": {
+		"node": ">=0.10.26"
+	},
+
+	"scripts": {
+		"test": "echo \"no tests yet\""
+	},
+
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/pragmadash/catberry/blob/master/LICENSE"
+		}
+	]
+}
