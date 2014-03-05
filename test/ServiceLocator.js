@@ -74,6 +74,19 @@ describe('ServiceLocator', function () {
 			});
 	});
 
+	describe('#unregister', function () {
+		it('should remove all registration of specified type', function () {
+			var locator = new ServiceLocator();
+			locator.register('type', function () {});
+			locator.registerInstance('type', {});
+			locator.unregister('type');
+
+			assert.throws(function () {
+				locator.resolve('type');
+			});
+		});
+	});
+
 	describe('#registerInstance', function () {
 		it('should register single instance for type', function () {
 			var locator = new ServiceLocator();
