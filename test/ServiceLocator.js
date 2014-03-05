@@ -74,6 +74,25 @@ describe('ServiceLocator', function () {
 			});
 	});
 
+	describe('#registerInstance', function () {
+		it('should register single instance for type', function () {
+			var locator = new ServiceLocator();
+			var instance = {};
+			var instance2 = {};
+			locator.registerInstance('type', instance);
+			locator.registerInstance('type', instance2);
+			var resolved = locator.resolve('type');
+			var resolved2 = locator.resolve('type');
+			assert.deepEqual(resolved, instance);
+			assert.deepEqual(resolved2, instance);
+
+			var resolvedAll = locator.resolveAll('type');
+			assert.deepEqual(resolvedAll.length, 2);
+			assert.deepEqual(resolvedAll[0], instance);
+			assert.deepEqual(resolvedAll[1], instance2);
+		});
+	});
+
 	describe('#resolve', function () {
 
 		it('should resolve all registered modules', function () {
