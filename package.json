@@ -28,7 +28,7 @@
 	},
 
 	"scripts": {
-		"test": "echo \"no tests yet\""
+		"test": "node_modules/.bin/mocha"
 	},
 
 	"licenses": [
