@@ -145,9 +145,15 @@ describe('ModuleLoader', function () {
 				}
 			}
 			assert.equal(counter, 1, 'Too many placeholders');
-			assert.equal(firstModule.rootPlaceholder instanceof Function,
-				true, 'Root placeholder not found');
-			assert.equal(firstPlaceholders.placeholder1 instanceof Function,
+			assert.equal(firstModule.rootPlaceholder.name, '__index',
+				'Wrong placeholder name');
+			assert.equal(
+				firstModule.rootPlaceholder.template instanceof Function, true,
+				'Root placeholder not found');
+			assert.equal(firstPlaceholders.placeholder1.name, 'placeholder1',
+				'Wrong placeholder name');
+			assert.equal(
+				firstPlaceholders.placeholder1.template instanceof Function,
 				true, 'Placeholder not found');
 
 			var secondPlaceholders = secondModule.placeholders;
@@ -160,10 +166,18 @@ describe('ModuleLoader', function () {
 			}
 			assert.equal(counter, 2, 'Expect 2 placeholders');
 			assert.deepEqual(secondModule.rootPlaceholder, undefined);
-			assert.equal(secondPlaceholders.placeholder2 instanceof Function,
-				true, 'Placeholder not found');
-			assert.equal(secondPlaceholders.placeholder3 instanceof Function,
-				true, 'Placeholder not found');
+			assert.equal(secondPlaceholders.placeholder2.name, 'placeholder2',
+				'Wrong placeholder name');
+			assert.equal(
+				secondPlaceholders.placeholder2.template instanceof Function,
+				true,
+				'Placeholder not found');
+			assert.equal(secondPlaceholders.placeholder3.name, 'placeholder3',
+				'Wrong placeholder name');
+			assert.equal(
+				secondPlaceholders.placeholder3.template instanceof Function,
+				true,
+				'Placeholder not found');
 		});
 	});
 });
