@@ -18,6 +18,7 @@
 	"dependencies": {
 		"trumpet": ">=1.6.3",
 		"handlebars": ">=1.3.0",
+		"log4js": ">=0.6.12",
 		"gulp": ">=3.5.5"
 	},
 
