@@ -43,7 +43,7 @@ var http = require('http'),
 
 // all environments
 app.use(connect.static(publicPath));
-app.use(cat.router);
+app.use(cat.getRouter());
 app.use(connect.errorHandler());
 
 http
