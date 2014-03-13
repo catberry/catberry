@@ -41,17 +41,14 @@ HelloModule.prototype._title = '';
 HelloModule.prototype._logger = null;
 
 HelloModule.prototype.render = function (placeholder, args, callback) {
-	var content;
 	switch (placeholder.name) {
 		case '__index':
 			this._logger.trace('index placeholder render');
-			content = placeholder.template({title: this._title});
-			callback(null, content);
+			callback(null, {title: this._title});
 			break;
 		case 'hello-world':
 			this._logger.trace('hello-world placeholder render');
-			content = placeholder.template({who: args.who });
-			callback(null, content);
+			callback(null, {who: args.who });
 			break;
 		case 'signature':
 			this._logger.trace('signature placeholder render');
@@ -59,14 +56,12 @@ HelloModule.prototype.render = function (placeholder, args, callback) {
 				callback(new Error('No author!'), null);
 				return;
 			}
-			content = placeholder.template({author: args.author });
-			callback(null, content);
+			callback(null, {author: args.author });
 			break;
 		case 'subtitle':
 			this._logger.trace('subtitle placeholder render');
-			content = placeholder.template();
 			setTimeout(function () {
-				callback(null, content);
+				callback(null, {});
 			}, 2000);
 			break;
 		default:
