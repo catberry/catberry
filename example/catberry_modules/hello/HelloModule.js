@@ -40,8 +40,8 @@ function HelloModule($logger, title) {
 HelloModule.prototype._title = '';
 HelloModule.prototype._logger = null;
 
-HelloModule.prototype.render = function (placeholder, args, callback) {
-	switch (placeholder.name) {
+HelloModule.prototype.render = function (placeholderName, args, callback) {
+	switch (placeholderName) {
 		case '__index':
 			this._logger.trace('index placeholder render');
 			callback(null, {title: this._title});
