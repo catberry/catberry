@@ -65,7 +65,9 @@ HelloModule.prototype.render = function (placeholder, args, callback) {
 		case 'subtitle':
 			this._logger.trace('subtitle placeholder render');
 			content = placeholder.template();
-			callback(null, content);
+			setTimeout(function () {
+				callback(null, content);
+			}, 2000);
 			break;
 		default:
 			callback(new Error('No such placeholder'), '');
