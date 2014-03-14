@@ -99,7 +99,9 @@ HelloModule.prototype.submit = function (formName, formObject, callback) {
 };
 ```
 
-* When you properly create a module you can create application using [connect](https://www.npmjs.org/package/connect)
+#### Create an application
+
+When you properly create a module you can create application using [connect](https://www.npmjs.org/package/connect):
 
 ```bash
 npm install connect
@@ -128,3 +130,9 @@ http
 	.createServer(app)
 	.listen(3000);
 ```
+
+####Contrinute
+If you have found a bug, please create pull request with mocha unit-test which reproduces it.
+If you want to propose some improvements just create pull request but please do not forget to use **npm test** and **./js-check** scripts to be sure that you code is awesome.
+
+Denis Rechkunov <denis.rechkunov@gmail.com>
