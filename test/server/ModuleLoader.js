@@ -31,14 +31,18 @@
 'use strict';
 
 var assert = require('assert'),
+	fs = require('fs'),
 	path = require('path'),
 	ServiceLocator = require('../../lib/ServiceLocator'),
 	ModuleLoader = require('../../lib/server/ModuleLoader');
 
+var CASES_DIRECTORY = path.join(__dirname, '..', 'cases',
+	'server', 'ModuleLoader');
+
 function createModuleLoader(caseName) {
-	var path = __dirname + '/../cases/server/ModuleLoader/' + caseName,
+	var fullPath = path.join(CASES_DIRECTORY, caseName),
 		locator = new ServiceLocator(),
-		config = {modulesFolder: path};
+		config = {modulesFolder: fullPath};
 
 	locator.register('serviceLocator', ServiceLocator, null, true);
 	locator.register('logger', require('../mocks/Logger'));
@@ -56,6 +60,18 @@ function checkPath(absolute, expectedRelative) {
 describe('ModuleLoader', function () {
 	describe('#loadModules', function () {
 		it('should skip empty folders', function () {
+			var case1Folder = path.join(CASES_DIRECTORY, 'case1'),
+				emptyFolderPath = path.join(case1Folder, 'emptyFolder');
+
+			// because git does not store empty folders we must create it.
+			if(!fs.existsSync(case1Folder)){
+				fs.mkdirSync(case1Folder);
+			}
+
+			if(!fs.existsSync(emptyFolderPath)){
+				fs.mkdirSync(emptyFolderPath);
+			}
+
 			var moduleLoader = createModuleLoader('case1'),
 				modules = moduleLoader.loadModules(),
 				counter = 0;
