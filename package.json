@@ -1,0 +1,43 @@
+{
+	"name": "catberry",
+	"version": "0.2.0",
+	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
+	"description": "Framework for fast modular web-applications using isomorphic JavaScript which is built as a connect middleware",
+	"homepage": "https://github.com/pragmadash/catberry",
+	"keywords": ["stream", "web", "isomorphic", "framework", "middleware", "connect", "dust", "module"],
+	"bugs": {
+		"url": "https://github.com/pragmadash/catberry/issues",
+		"email": "denis.rechkunov@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/pragmadash/catberry.git"
+	},
+	"main": "./index",
+
+	"dependencies": {
+		"sax": "~0.6.0",
+		"dustjs-linkedin":"~2.3.4",
+		"log4js": "~0.6.12",
+		"gulp": "~3.5.5"
+	},
+
+	"devDependencies": {
+		"mocha": "~1.17.1"
+	},
+
+	"engines": {
+		"node": "~0.10.26"
+	},
+
+	"scripts": {
+		"test": "node_modules/.bin/mocha"
+	},
+
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/pragmadash/catberry/blob/master/LICENSE"
+		}
+	]
+}

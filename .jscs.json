@@ -7,7 +7,6 @@
 	"requireSpacesInFunctionExpression": {
 		"beforeOpeningCurlyBrace": true
 	},
-	"requireMultipleVarDecl": true,
 
 	"disallowSpacesInsideObjectBrackets": true,
 	"disallowSpacesInsideArrayBrackets": true,
