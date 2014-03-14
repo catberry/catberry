@@ -148,12 +148,14 @@ describe('ModuleLoader', function () {
 			assert.equal(firstModule.rootPlaceholder.name, '__index',
 				'Wrong placeholder name');
 			assert.equal(
-				firstModule.rootPlaceholder.template instanceof Function, true,
+				firstModule.rootPlaceholder.getTemplateStream instanceof
+					Function, true,
 				'Root placeholder not found');
 			assert.equal(firstPlaceholders.placeholder1.name, 'placeholder1',
 				'Wrong placeholder name');
 			assert.equal(
-				firstPlaceholders.placeholder1.template instanceof Function,
+				firstPlaceholders.placeholder1.getTemplateStream instanceof
+					Function,
 				true, 'Placeholder not found');
 
 			var secondPlaceholders = secondModule.placeholders;
@@ -169,13 +171,15 @@ describe('ModuleLoader', function () {
 			assert.equal(secondPlaceholders.placeholder2.name, 'placeholder2',
 				'Wrong placeholder name');
 			assert.equal(
-				secondPlaceholders.placeholder2.template instanceof Function,
+				secondPlaceholders.placeholder2.getTemplateStream instanceof
+					Function,
 				true,
 				'Placeholder not found');
 			assert.equal(secondPlaceholders.placeholder3.name, 'placeholder3',
 				'Wrong placeholder name');
 			assert.equal(
-				secondPlaceholders.placeholder3.template instanceof Function,
+				secondPlaceholders.placeholder3.getTemplateStream instanceof
+					Function,
 				true,
 				'Placeholder not found');
 		});
