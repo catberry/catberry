@@ -36,6 +36,8 @@ function TemplateProvider() {
 
 }
 
-TemplateProvider.prototype.load = function (path) {
-	return function compiled() { return path;};
+TemplateProvider.prototype.register = function () {
+};
+
+TemplateProvider.prototype.getStream = function () {
 };
