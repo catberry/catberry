@@ -1,5 +1,5 @@
 #Catberry
-##Web-framework and connect middleware for fast modular back/front-end web-applications based on isomorphic JavaScript and  node.js
+##Web-framework and connect middleware for fast modular back/front-end web-applications based on isomorphic JavaScript and node.js
 Client-side part is still in work.
 
 ###What I've got?
