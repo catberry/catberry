@@ -35,26 +35,30 @@ var assert = require('assert'),
 
 describe('TemplateProvider', function () {
 	describe('#load', function () {
-		it('should properly load and compile template', function () {
-			var provider = new TemplateProvider(),
-				template = provider.load(__dirname +
-					'/../cases/server/TemplateProvider/case1/test.hbs');
+		it('should properly load and compile template', function (done) {
+			var provider = new TemplateProvider();
 
-			assert.equal(template instanceof Function, true,
-				'Template should be a function');
-			var data = {
-					testMessage: 'hello'
-				},
-				rendered = template(data);
+			provider.register('test', __dirname +
+				'/../cases/server/TemplateProvider/case1/test.dust');
 
-			assert.deepEqual(rendered, data.testMessage, 'Wrong render');
+			var templateStream = provider.getStream('test',
+					{testMessage: 'hello'}),
+				rendered = '';
+
+			templateStream.on('data', function (chunk) {
+				rendered += chunk.toString();
+			});
+			templateStream.on('end', function () {
+				assert.deepEqual(rendered, 'hello', 'Wrong render');
+				done();
+			});
 		});
 
 		it('should throw error if template file not found', function () {
 			var provider = new TemplateProvider();
 
 			assert.throws(function () {
-				provider.load('not exist');
+				provider.register('test', 'not exist');
 			});
 		});
 	});
