@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{title}</title>
+    <link rel="stylesheet" type="text/css" href="/style.css"/>
+</head>
+<body>
+<img src="/Catberry.png"/>
+
+<div id="hello_subtitle"/>
+<div id="hello_hello-world"></div>
+</body>
+</html>
