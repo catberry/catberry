@@ -1,6 +1,8 @@
-#Catberry
+#Catberry [![Build Status](https://travis-ci.org/pragmadash/catberry.png?branch=master)](https://travis-ci.org/pragmadash/catberry)
 ##Web-framework and connect middleware for fast modular back/front-end web-applications based on isomorphic JavaScript and node.js
 Client-side part is still in work.
+
+[![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
 ###What I've got?
 * First of all it's fast, because uses own stream-powered page template rendering engine. It means client will start receiving of response data as soon as possible when first chunks of data is ready. While some module does long-time operations your browser will be receiving other resources specified in head of page (scripts, CSS, images).
