@@ -21,19 +21,26 @@
 		"log4js": "~0.6.12",
 		"gulp": "~3.5.5"
 	},
-
 	"devDependencies": {
-		"mocha": "~1.17.1"
+		"mocha": "~1.17.1",
+		"gulp-using": "0.0.1",
+		"gulp-concat": "~2.1.7",
+		"gulp-uglify": "~0.2.1",
+		"gulp-imagemin": "~0.1.5",
+		"gulp-minify-css": "~0.3.0",
+		"gulp-chug": "~0.1.9",
+		"gulp-changed": "~0.2.1",
+		"gulp-rename": "~1.2.0",
+		"gulp-dust": "~0.2.0",
+		"event-stream": "~3.1.0",
+		"gulp-clean": "~0.2.4"
 	},
-
 	"engines": {
 		"node": "~0.10.26"
 	},
-
 	"scripts": {
 		"test": "node_modules/.bin/mocha --recursive"
 	},
-
 	"licenses": [
 		{
 			"type": "MIT",
