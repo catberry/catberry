@@ -246,11 +246,11 @@ describe('ServiceLocator', function () {
 
 				var instances = locator.resolveAll('type');
 				assert.equal(instances.length, 3, 'Wrong instance count');
-				assert.equal(instances[0] instanceof Implementation1, true,
+				assert.equal(instances[0] instanceof Implementation3, true,
 					'Wrong type resolution');
 				assert.equal(instances[1] instanceof Implementation2, true,
 					'Wrong type resolution');
-				assert.equal(instances[2] instanceof Implementation3, true,
+				assert.equal(instances[2] instanceof Implementation1, true,
 					'Wrong type resolution');
 
 			});
