@@ -31,12 +31,17 @@
 'use strict';
 
 var assert = require('assert'),
+	ServiceLocator = require('../../lib/ServiceLocator'),
+	Logger = require('../mocks/Logger'),
 	TemplateProvider = require('../../lib/server/TemplateProvider');
 
 describe('TemplateProvider', function () {
 	describe('#load', function () {
 		it('should properly load and compile template', function (done) {
-			var provider = new TemplateProvider();
+			var locator = new ServiceLocator();
+			locator.register('logger', Logger);
+			
+			var provider = locator.resolveInstance(TemplateProvider);
 
 			provider.register('test', __dirname +
 				'/../cases/server/TemplateProvider/case1/test.dust');
