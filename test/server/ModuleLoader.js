@@ -64,11 +64,11 @@ describe('ModuleLoader', function () {
 				emptyFolderPath = path.join(case1Folder, 'emptyFolder');
 
 			// because git does not store empty folders we must create it.
-			if(!fs.existsSync(case1Folder)){
+			if (!fs.existsSync(case1Folder)) {
 				fs.mkdirSync(case1Folder);
 			}
 
-			if(!fs.existsSync(emptyFolderPath)){
+			if (!fs.existsSync(emptyFolderPath)) {
 				fs.mkdirSync(emptyFolderPath);
 			}
 
