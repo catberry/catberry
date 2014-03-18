@@ -30,40 +30,12 @@
 
 'use strict';
 
-var util = require('util'),
-	BootstrapperBase = require('../BootstrapperBase'),
-	Log4js = require('log4js');
+module.exports = ClientBundleBuilder;
 
-util.inherits(Bootstrapper, BootstrapperBase);
+function ClientBundleBuilder() {
 
-/**
- * Creates new instance of server catberry bootstrapper.
- * @constructor
- */
-function Bootstrapper() {
-	BootstrapperBase.call(this);
 }
 
-/**
- * Configures catberry locator.
- * @param {Object} configObject Config object.
- * @param {ServiceLocator} locator Service locator to configure.
- */
-Bootstrapper.prototype.configure = function (configObject, locator) {
-	locator.register('moduleLoader',
-		require('./ModuleLoader'), configObject, true);
-	locator.register('resourceBuilder',
-		require('./ResourceBuilder'), configObject, true);
-	locator.register('pageRenderer',
-		require('./PageRenderer'), configObject, true);
-	locator.register('requestRouter',
-		require('./RequestRouter'), configObject, true);
-	locator.register('templateProvider',
-		require('./TemplateProvider'), configObject, true);
-	locator.register('clientBundleBuilder',
-		require('./ClientBundleBuilder'), configObject, true);
-	locator.registerInstance('logger', Log4js.getLogger('catberry'));
-	locator.registerInstance('config', configObject);
-};
+ClientBundleBuilder.prototype.build = function () {
 
-module.exports = new Bootstrapper();
+};
