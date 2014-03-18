@@ -39,6 +39,7 @@ var assert = require('assert'),
 	locator = new ServiceLocator();
 
 locator.register('logger', require('../mocks/Logger'));
+locator.register('clientBundleBuilder', require('../mocks/ClientBundleBuilder'));
 locator.register('resourceBuilder', require('../mocks/ResourceBuilder'));
 locator.register('moduleLoader', TestModuleLoader);
 

@@ -4,7 +4,10 @@
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Framework for fast modular web-applications using isomorphic JavaScript which is built as a connect middleware",
 	"homepage": "https://github.com/pragmadash/catberry",
-	"keywords": ["stream", "web", "isomorphic", "framework", "middleware", "connect", "dust", "module"],
+	"keywords": [
+		"stream", "web", "isomorphic", "framework", "middleware", "connect",
+		"dust", "module"
+	],
 	"bugs": {
 		"url": "https://github.com/pragmadash/catberry/issues",
 		"email": "denis.rechkunov@gmail.com"
@@ -16,7 +19,8 @@
 	"main": "./index",
 
 	"dependencies": {
-		"dustjs-linkedin":"~2.3.4",
+		"browserify": "~3.32.1",
+		"dustjs-linkedin": "~2.3.4",
 		"log4js": "~0.6.12",
 		"gulp": "~3.5.5"
 	},
