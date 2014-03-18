@@ -35,7 +35,7 @@ var http = require('http'),
 	publicPath = path.join(__dirname, 'public'),
 	connect = require('connect'),
 	catberry = require('catberry'),
-	cat = catberry({
+	cat = catberry.create({
 		title: 'Catberry example module',
 		publicPath: publicPath
 	}),
