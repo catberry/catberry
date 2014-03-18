@@ -21,6 +21,7 @@
 	"node": true,
 
 	"globals": {
+		"window": true,
 		"describe": true,
 		"it": true
 	}
