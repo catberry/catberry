@@ -42,8 +42,8 @@ var http = require('http'),
 	app = connect();
 
 // all environments
-app.use(connect.static(publicPath));
 app.use(cat.getRouter());
+app.use(connect.static(publicPath));
 app.use(connect.errorHandler());
 
 http
