@@ -128,29 +128,7 @@ describe('ModuleLoader', function () {
 
 			// check assets
 			var firstModule = modules.correctModule1,
-				secondModule = modules.correctModule2,
-				firstAssets = firstModule.assets;
-
-			assert.equal(firstAssets.length, 4,
-				'Not all assets were loaded');
-
-			assert.equal(checkPath(firstAssets[0],
-				'../cases/server/ModuleLoader/case4/correctModule1/assets/file1'
-			), true, 'Wrong path');
-
-			assert.equal(checkPath(firstAssets[1],
-				'../cases/server/ModuleLoader/case4/correctModule1/assets/file2'
-			), true, 'Wrong path');
-
-			assert.equal(checkPath(firstAssets[2],
-				'../cases/server/ModuleLoader/case4' +
-					'/correctModule1/assets/subdirectory/file3'
-			), true, 'Wrong path');
-
-			assert.equal(checkPath(firstAssets[3],
-				'../cases/server/ModuleLoader/case4' +
-					'/correctModule1/assets/subdirectory/subdirectory/file4'
-			), true, 'Wrong path');
+				secondModule = modules.correctModule2;
 
 			// check placeholders
 			var firstPlaceholders = firstModule.placeholders;
