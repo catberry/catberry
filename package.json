@@ -16,6 +16,17 @@
 		"type": "git",
 		"url": "git://github.com/pragmadash/catberry.git"
 	},
+	"contributors": [
+		{
+			"name": "Denis Rechkunov",
+			"email": "denis.rechkunov@gmail.com"
+		},
+		{
+			"name": "Julia Rechkunova",
+			"email": "julia.rechkunova@gmail.com"
+		}
+	],
+
 	"main": "./index",
 	"dependencies": {
 		"browserify": "~3.32.1",
