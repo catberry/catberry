@@ -40,7 +40,7 @@ describe('TemplateProvider', function () {
 		it('should properly load and compile template', function (done) {
 			var locator = new ServiceLocator();
 			locator.register('logger', Logger);
-			
+
 			var provider = locator.resolveInstance(TemplateProvider);
 
 			provider.register('test', __dirname +
