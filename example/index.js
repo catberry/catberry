@@ -30,22 +30,34 @@
 
 'use strict';
 
-var http = require('http'),
-	path = require('path'),
-	publicPath = path.join(__dirname, 'public'),
-	connect = require('connect'),
-	catberry = require('catberry'),
-	cat = catberry.create({
-		title: 'Catberry example module',
-		publicPath: publicPath
-	}),
-	app = connect();
+var catberry = require('catberry');
 
-// all environments
-app.use(cat.getRouter());
-app.use(connect.static(publicPath));
-app.use(connect.errorHandler());
+// catberry builds all required resources on startup
+// and we can easy clean all built resources
+if (process.argv.length === 3 && process.argv[2] === 'clean') {
+	catberry
+		.create()
+		.clean(function () {
+			process.exit(0);
+		});
+} else {
+	var http = require('http'),
+		path = require('path'),
+		publicPath = path.join(__dirname, 'public'),
+		connect = require('connect'),
+		cat = catberry.create({
+			title: 'Catberry example module',
+			publicPath: publicPath,
+			// by default catberry is in debug mode
+			isRelease: process.argv.length === 3 &&
+				process.argv[2] === 'release'
+		}),
+		app = connect();
 
-http
-	.createServer(app)
-	.listen(3000);
+	app.use(cat.getRouter());
+	app.use(connect.static(publicPath));
+	app.use(connect.errorHandler());
+	http
+		.createServer(app)
+		.listen(3000);
+}

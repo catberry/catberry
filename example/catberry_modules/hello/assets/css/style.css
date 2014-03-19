@@ -3,6 +3,8 @@ h1 {
     font-family: Arial, sans-serif;
 }
 
-img {
-    border-width: 0px;
+.logo {
+    background-image:url('/hello/images/Catberry.png');
+    height: 250px;
+    width: 250px;
 }
