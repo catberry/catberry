@@ -30,7 +30,9 @@
 
 'use strict';
 
-var catberry = require('catberry');
+var catberry = require('catberry'),
+	isRelease = process.argv.length === 3 &&
+		process.argv[2] === 'release';
 
 // catberry builds all required resources on startup
 // and we can easy clean all built resources
@@ -49,12 +51,15 @@ if (process.argv.length === 3 && process.argv[2] === 'clean') {
 			title: 'Catberry example module',
 			publicPath: publicPath,
 			// by default catberry is in debug mode
-			isRelease: process.argv.length === 3 &&
-				process.argv[2] === 'release'
+			isRelease: isRelease
 		}),
 		app = connect();
 
+	if (isRelease) {
+		app.use(connect.compress());
+	}
 	app.use(cat.getRouter());
+
 	app.use(connect.static(publicPath));
 	app.use(connect.errorHandler());
 	http
