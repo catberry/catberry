@@ -58,7 +58,7 @@ function checkPath(absolute, expectedRelative) {
 }
 
 describe('ModuleLoader', function () {
-	describe('#loadModules', function () {
+	describe('#getModulesByNames', function () {
 		it('should skip empty folders', function () {
 			var case1Folder = path.join(CASES_DIRECTORY, 'case1'),
 				emptyFolderPath = path.join(case1Folder, 'emptyFolder');
@@ -73,7 +73,7 @@ describe('ModuleLoader', function () {
 			}
 
 			var moduleLoader = createModuleLoader('case1'),
-				modules = moduleLoader.loadModules(),
+				modules = moduleLoader.getModulesByNames(),
 				counter = 0;
 
 			for (var moduleName in modules) {
@@ -89,13 +89,13 @@ describe('ModuleLoader', function () {
 			var moduleLoader = createModuleLoader('case2');
 
 			assert.throws(function () {
-				moduleLoader.loadModules();
+				moduleLoader.getModulesByNames();
 			});
 		});
 
 		it('should skip module folders with wrong module names', function () {
 			var moduleLoader = createModuleLoader('case3'),
-				modules = moduleLoader.loadModules(),
+				modules = moduleLoader.getModulesByNames(),
 				counter = 0;
 
 			for (var moduleName in modules) {
@@ -109,7 +109,7 @@ describe('ModuleLoader', function () {
 
 		it('should properly load correct modules', function () {
 			var moduleLoader = createModuleLoader('case4'),
-				modules = moduleLoader.loadModules(),
+				modules = moduleLoader.getModulesByNames(),
 				counter = 0;
 
 			for (var moduleName in modules) {

@@ -85,7 +85,7 @@ function TestModuleLoader(index) {
 	this._index = index;
 }
 TestModuleLoader.prototype._index = -1;
-TestModuleLoader.prototype.loadModules = function () {
+TestModuleLoader.prototype.getModulesByNames = function () {
 	return {
 		test: {
 			name: 'test',
