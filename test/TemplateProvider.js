@@ -30,31 +30,46 @@
 
 'use strict';
 
-module.exports = TemplateProvider;
+var assert = require('assert'),
+	ServiceLocator = require('../lib/ServiceLocator'),
+	Logger = require('./mocks/Logger'),
+	path = require('path'),
+	fs = require('fs'),
+	TemplateProvider = require('../lib/TemplateProvider');
 
-/**
- * Creates new instance of client template provider.
- * @constructor
- */
-function TemplateProvider() {
+var templatePath = path.join(__dirname,
+	'cases', 'TemplateProvider', 'case1', 'test.compiled');
 
-}
+describe('TemplateProvider', function () {
+	describe('#registerCompiled', function () {
+		it('should properly register compiled template', function (done) {
+			var locator = new ServiceLocator();
+			locator.register('logger', Logger);
 
-/**
- * Registers template by name and compiled source.
- * @param {string} name Name of template.
- * @param {string} compiledTemplate Source of template.
- */
-TemplateProvider.prototype.register = function (name, compiledTemplate) {
-	//TODO register in dust
-};
+			var provider = locator.resolveInstance(TemplateProvider),
+				source = fs.readFileSync(templatePath, {encoding: 'utf8'});
 
-/**
- * Gets rendering stream by template name and data context.
- * @param {string} name Name of template.
- * @param {Object} context Data context.
- * @returns {Stream}
- */
-TemplateProvider.prototype.getStream = function (name, context) {
-	return null;
-};
+			provider.registerCompiled('test', source);
+
+			var templateStream = provider.getStream('test',
+					{testMessage: 'hello'}),
+				rendered = '';
+
+			templateStream.on('data', function (chunk) {
+				rendered += chunk.toString();
+			});
+			templateStream.on('end', function () {
+				assert.deepEqual(rendered, 'hello', 'Wrong render');
+				done();
+			});
+		});
+
+		it('should throw error if template file not found', function () {
+			var provider = new TemplateProvider();
+
+			assert.throws(function () {
+				provider.registerCompiled('test', 'wrong template');
+			});
+		});
+	});
+});
