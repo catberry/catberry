@@ -4,9 +4,6 @@
     <title>{title}</title>
     <link rel="stylesheet" type="text/css" href="/style.css"/>
     <script src="/catberry.js"></script>
-    <script>
-		var catberry = require('catberry');
-    </script>
 </head>
 <body>
 <div class="logo"></div>
