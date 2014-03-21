@@ -191,28 +191,33 @@ function checkCase(caseName, callback) {
 		}
 	};
 
-	pageRenderer1.render(response1, 'test', {}, function () {
-		assert.fail('Unexpected next middleware call');
-	});
+	pageRenderer1.render(response1, {$global: {$pageName: 'test'}},
+		function () {
+			assert.fail('Unexpected next middleware call');
+		});
 
-	pageRenderer2.render(response2, 'test', {}, function () {
-		assert.fail('Unexpected next middleware call');
-	});
+	pageRenderer2.render(response2, {$global: {$pageName: 'test'}},
+		function () {
+			assert.fail('Unexpected next middleware call');
+		});
 
-	pageRenderer3.render(response3, 'test', {}, function (error) {
-		assert.equal(error instanceof Error, true, 'Error expected');
-		nextCounter++;
-	});
+	pageRenderer3.render(response3, {$global: {$pageName: 'test'}},
+		function (error) {
+			assert.equal(error instanceof Error, true, 'Error expected');
+			nextCounter++;
+		});
 
-	pageRenderer4.render(response4, 'test', {}, function (error) {
-		assert.equal(error instanceof Error, true, 'Error expected');
-		nextCounter++;
-	});
+	pageRenderer4.render(response4, {$global: {$pageName: 'test'}},
+		function (error) {
+			assert.equal(error instanceof Error, true, 'Error expected');
+			nextCounter++;
+		});
 
-	pageRenderer5.render(response5, 'test', {}, function () {
-		assert.fail('Unexpected next middleware call');
-		nextCounter++;
-	});
+	pageRenderer5.render(response5, {$global: {$pageName: 'test'}},
+		function () {
+			assert.fail('Unexpected next middleware call');
+			nextCounter++;
+		});
 
 	compareWithExpected(caseName, response1, function (isValid) {
 		assert.deepEqual(isValid, true);
