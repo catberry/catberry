@@ -30,39 +30,27 @@
 
 'use strict';
 
-var catberry = require('catberry'),
-	isRelease = process.argv.length === 3 &&
-		process.argv[2] === 'release';
-
-// catberry builds all required resources on startup
-// and we can easy clean all built resources
-if (process.argv.length === 3 && process.argv[2] === 'clean') {
-	catberry
-		.create()
-		.clean(function () {
-			process.exit(0);
-		});
-} else {
-	var http = require('http'),
-		path = require('path'),
-		publicPath = path.join(__dirname, 'public'),
-		connect = require('connect'),
-		cat = catberry.create({
-			title: 'Catberry example module',
-			publicPath: publicPath,
-			// by default catberry is in debug mode
-			isRelease: isRelease
-		}),
-		app = connect();
-
-	if (isRelease) {
-		app.use(connect.compress());
-	}
-	app.use(cat.getRouter());
-
-	app.use(connect.static(publicPath));
-	app.use(connect.errorHandler());
-	http
-		.createServer(app)
-		.listen(3000);
+// define of require some external module you want use
+// let's inject catberry logger into constructor
+function ExternalModule($logger) {
+	this._logger = $logger;
 }
+ExternalModule.prototype._logger = null;
+// let's add method which will tell us which implementation now used
+ExternalModule.prototype.foo = function () {
+	this._logger.info('Client implementation of External module was loaded');
+};
+
+// create catberry application instance.
+var catberry = require('catberry'),
+	app = catberry.create({
+		title: 'Catberry example module',
+		// by default catberry is in debug mode
+		isRelease: true
+	});
+
+// then you could register your external modules to inject into catberry modules.
+app.locator.register('externalModule', ExternalModule);
+
+// tell catberry to start when HTML document wil be ready
+app.startWhenReady();
