@@ -52,5 +52,5 @@ var catberry = require('catberry'),
 // then you could register your external modules to inject into catberry modules.
 app.locator.register('externalModule', ExternalModule);
 
-// tell catberry to start when HTML document wil be ready
+// tell catberry to start when HTML document will be ready
 app.startWhenReady();
