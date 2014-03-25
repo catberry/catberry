@@ -31,14 +31,14 @@
 'use strict';
 
 var assert = require('assert'),
-	ServiceLocator = require('../lib/ServiceLocator'),
-	Logger = require('./mocks/Logger'),
+	ServiceLocator = require('../../lib/ServiceLocator'),
+	Logger = require('./../mocks/Logger'),
 	path = require('path'),
 	fs = require('fs'),
-	TemplateProvider = require('../lib/TemplateProvider');
+	TemplateProvider = require('../../lib/server/TemplateProvider');
 
-var templatePath = path.join(__dirname,
-	'cases', 'TemplateProvider', 'case1', 'test.compiled');
+var templatePath = path.join(__dirname, '..',
+	'cases', 'server', 'TemplateProvider', 'case1', 'test.compiled');
 
 describe('TemplateProvider', function () {
 	describe('#registerCompiled', function () {
