@@ -29,6 +29,7 @@
 
 	"main": "./index",
 	"dependencies": {
+		"jquery": "~2.1.0",
 		"uglify-js": "~2.4.13",
 		"browserify": "~3.32.1",
 		"dustjs-linkedin": "~2.3.4",
