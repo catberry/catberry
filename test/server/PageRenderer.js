@@ -172,8 +172,7 @@ function getRendererForModule(index) {
 
 function checkCase(caseName, callback) {
 	currentPlaceholders = createPlaceholdersForCase(caseName);
-	var nextCounter = 0,
-		checkCounter = 0,
+	var checkCounter = 0,
 		pageRenderer1 = getRendererForModule(0),
 		pageRenderer2 = getRendererForModule(1),
 		pageRenderer3 = getRendererForModule(2),
@@ -186,7 +185,7 @@ function checkCase(caseName, callback) {
 		response5 = new HttpResponse();
 
 	var callbackInvoker = function () {
-		if (nextCounter === 2 && checkCounter === 5) {
+		if (checkCounter === 5) {
 			callback();
 		}
 	};
@@ -202,21 +201,18 @@ function checkCase(caseName, callback) {
 		});
 
 	pageRenderer3.render(response3, {$pageName: 'test'},
-		function (error) {
-			assert.equal(error instanceof Error, true, 'Error expected');
-			nextCounter++;
+		function () {
+			assert.fail('Unexpected next middleware call');
 		});
 
 	pageRenderer4.render(response4, {$pageName: 'test'},
-		function (error) {
-			assert.equal(error instanceof Error, true, 'Error expected');
-			nextCounter++;
+		function () {
+			assert.fail('Unexpected next middleware call');
 		});
 
 	pageRenderer5.render(response5, {$pageName: 'test'},
 		function () {
 			assert.fail('Unexpected next middleware call');
-			nextCounter++;
 		});
 
 	compareWithExpected(caseName, response1, function (isValid) {
@@ -231,14 +227,16 @@ function checkCase(caseName, callback) {
 		callbackInvoker();
 	});
 
+	// must be error description and stack trace
 	checkIsEmpty(response3, function (isEmpty) {
-		assert.deepEqual(isEmpty, true);
+		assert.deepEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
 
+	// must be error description and stack trace
 	checkIsEmpty(response4, function (isEmpty) {
-		assert.deepEqual(isEmpty, true);
+		assert.deepEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
