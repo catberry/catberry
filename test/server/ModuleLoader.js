@@ -52,11 +52,6 @@ function createModuleLoader(caseName) {
 	return locator.resolveInstance(ModuleLoader, config);
 }
 
-function checkPath(absolute, expectedRelative) {
-	var relative = path.relative(__dirname, absolute);
-	return relative === expectedRelative;
-}
-
 describe('ModuleLoader', function () {
 	describe('#getModulesByNames', function () {
 		it('should skip empty folders', function () {
