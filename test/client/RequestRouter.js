@@ -71,7 +71,7 @@ describe('client/RequestRouter', function () {
 			it('should not catch submit click if input is not inside form',
 				submitHandleCase2);
 			it('should not catch submit click if submitter can not handle it',
-				submitHandleCase2);
+				submitHandleCase3);
 		});
 
 	});
