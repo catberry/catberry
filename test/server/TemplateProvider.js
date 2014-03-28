@@ -40,7 +40,7 @@ var assert = require('assert'),
 var templatePath = path.join(__dirname, '..',
 	'cases', 'server', 'TemplateProvider', 'case1', 'test.compiled');
 
-describe('TemplateProvider', function () {
+describe('server/TemplateProvider', function () {
 	describe('#registerCompiled', function () {
 		it('should properly register compiled template', function (done) {
 			var locator = new ServiceLocator();
