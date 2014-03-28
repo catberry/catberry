@@ -36,7 +36,7 @@ function TemplateProvider() {
 
 }
 
-TemplateProvider.prototype.register = function () {
+TemplateProvider.prototype.registerCompiled = function () {
 };
 
 TemplateProvider.prototype.getStream = function () {
