@@ -248,7 +248,7 @@ function checkCase(caseName, callback) {
 	});
 }
 
-describe('PageRenderer', function () {
+describe('server/PageRenderer', function () {
 	describe('#render', function () {
 		it('should properly render nested placeholders', function (done) {
 			checkCase('case1', function () {
