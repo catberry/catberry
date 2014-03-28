@@ -72,6 +72,8 @@ describe('client/RequestRouter', function () {
 				submitHandleCase2);
 			it('should not catch submit click if submitter can not handle it',
 				submitHandleCase3);
+			it('should not catch submit click if button is disabled',
+				submitHandleCase4);
 		});
 
 	});
@@ -361,6 +363,44 @@ function submitHandleCase3(done) {
 	formSubmitter.once('submit', function () {
 		assert.fail('This event should not be triggered ' +
 			'because submitter can not handle request');
+	});
+
+	jsdom.env({
+		html: '<div id="form"></div>',
+		done: function (errors, window) {
+			prepareWindow(window, locator);
+			var $ = locator.resolve('jQuery');
+			$(function () {
+				window.location.assign('http://local/some');
+				var requestRouter = locator.resolveInstance(RequestRouter);
+				$('#form').html(form);
+				$('input[type="submit"]').trigger('click');
+				setTimeout(function () {
+					done();
+				}, 100);
+			});
+		}
+	});
+}
+
+/**
+ * Handles fourth case, when user clicks disabled submit button
+ * @param {Function} done Mocha done function.
+ */
+function submitHandleCase4(done) {
+	var form = '<form name="write_some" action="/some/?some_arg=value" ' +
+		'data-module="receiver" ' +
+		'data-dependents="some_first&receiver_second">' +
+		'<input type="text" name="text">' +
+		'<input type="submit" value="Submit" disabled>' +
+		'</form>';
+	var locator = createLocator(),
+		formSubmitter = new FormSubmitter(false);
+	locator.registerInstance('formSubmitter', formSubmitter);
+
+	formSubmitter.once('submit', function () {
+		assert.fail('This event should not be triggered ' +
+			'because submit button is disabled');
 	});
 
 	jsdom.env({
