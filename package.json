@@ -44,6 +44,7 @@
 		"gulp-clean": "~0.2.4"
 	},
 	"devDependencies": {
+		"jsdom": "~0.10.3",
 		"mocha": "~1.17.1"
 	},
 	"engines": {
