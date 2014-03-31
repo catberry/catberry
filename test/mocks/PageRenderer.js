@@ -30,4 +30,48 @@
 
 'use strict';
 
-module.exports = require('./lib/server/Bootstrapper');
+module.exports = PageRenderer;
+
+var util = require('util'),
+	EventEmitter = require('events').EventEmitter;
+
+util.inherits(PageRenderer, EventEmitter);
+
+function PageRenderer() {
+	EventEmitter.call(this);
+}
+
+PageRenderer.prototype.render = function (parametersByModules, next) {
+	var self = this;
+	setTimeout(function () {
+		next();
+		self.emit('render', parametersByModules);
+	}, 0);
+};
+
+PageRenderer.prototype.renderModule =
+	function (module, parameters, modulesToRender, rendered, callback) {
+		var self = this;
+		setTimeout(function () {
+			callback();
+			self.emit('renderModule', {
+				module: module,
+				parameters: parameters,
+				modulesToRender: modulesToRender,
+				rendered: rendered
+			});
+		}, 0);
+	};
+
+PageRenderer.prototype.renderPlaceholder =
+	function (placeholder, parameters, rendered, callback) {
+		var self = this;
+		setTimeout(function () {
+			callback();
+			self.emit('renderPlaceholder', {
+				placeholder: placeholder,
+				parameters: parameters,
+				rendered: rendered
+			});
+		}, 0);
+	};

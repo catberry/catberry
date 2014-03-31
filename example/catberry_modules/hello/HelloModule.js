@@ -32,26 +32,56 @@
 
 module.exports = HelloModule;
 
-function HelloModule($logger, title) {
+/**
+ * Creates new instance of example module.
+ * @param {Logger} $logger Injected logger instance.
+ * @param {string} title Injected title value from config object.
+ * @param {ExternalModule} $externalModule Injected instance of ExternalModule
+ * registered in server.js and client.js scripts.
+ * @constructor
+ */
+function HelloModule($logger, title, $externalModule) {
 	this._title = title;
 	this._logger = $logger;
+	$externalModule.foo();
+	$logger.info('HelloModule constructor');
 }
 
+/**
+ * Current title of page.
+ * @type {string}
+ * @private
+ */
 HelloModule.prototype._title = '';
+
+/**
+ * Current logger.
+ * @type {Logger}
+ * @private
+ */
 HelloModule.prototype._logger = null;
 
+/**
+ * Renders data to specified placeholder.
+ * @param {string} placeholderName Name of placeholder to render.
+ * @param {Object} args Set of request arguments specified for this module.
+ * @param {Function} callback Callback to return data for rendering.
+ */
 HelloModule.prototype.render = function (placeholderName, args, callback) {
 	switch (placeholderName) {
 		case '__index':
 			this._logger.trace('index placeholder render');
+			// just render some data using template __index
 			callback(null, {title: this._title});
 			break;
 		case 'hello-world':
 			this._logger.trace('hello-world placeholder render');
+			// again render some data using template hello-world
 			callback(null, {who: args.who });
 			break;
 		case 'signature':
 			this._logger.trace('signature placeholder render');
+			// could check something and pass error
 			if (!args.author) {
 				callback(new Error('No author!'), null);
 				return;
@@ -60,19 +90,22 @@ HelloModule.prototype.render = function (placeholderName, args, callback) {
 			break;
 		case 'subtitle':
 			this._logger.trace('subtitle placeholder render');
+			// could call some async operations, it's ok
 			setTimeout(function () {
 				callback(null, {});
 			}, 2000);
 			break;
 		default:
-			callback(new Error('No such placeholder'), '');
+			// and of course could throw some exceptions directly,
+			// it will be passed to next connect/express middleware
+			throw new Error('No such placeholder');
 	}
 };
 
 HelloModule.prototype.handle = function (eventName, placeholder, callback) {
-
+	// not used yet, but they should be
 };
 
 HelloModule.prototype.submit = function (formName, formObject, callback) {
-
+	// not used yet, but they should be
 };

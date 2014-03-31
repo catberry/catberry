@@ -30,34 +30,14 @@
 
 'use strict';
 
-module.exports = Catberry;
+module.exports = ModuleLoader;
 
-var ServiceLocator = require('./ServiceLocator');
-
-/**
- * Creates new instance of catberry.
- * @constructor
- */
-function Catberry() {
-	this.locator = new ServiceLocator();
-	this.locator.registerInstance('serviceLocator', this.locator);
+function ModuleLoader(modules) {
+	this._modules = modules;
 }
 
-/**
- * Current service locator.
- * @type {ServiceLocator}
- */
-Catberry.prototype.locator = null;
+ModuleLoader.prototype._modules = null;
 
-/**
- * Gets request router instance (connect middle-ware).
- * @returns {Function}
- */
-Catberry.prototype.getRouter = function () {
-	var router = this.locator.resolve('requestRouter');
-	return router ?
-		router.route.bind(router) :
-		function (request, response, next) {
-			next();
-		};
+ModuleLoader.prototype.getModulesByNames = function () {
+	return this._modules;
 };

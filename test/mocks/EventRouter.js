@@ -30,4 +30,17 @@
 
 'use strict';
 
-module.exports = require('./lib/server/Bootstrapper');
+module.exports = EventRouter;
+
+var util = require('util'),
+	EventEmitter = require('events').EventEmitter;
+
+util.inherits(EventRouter, EventEmitter);
+
+function EventRouter() {
+	EventEmitter.call(this);
+}
+
+EventRouter.prototype.route = function (eventName) {
+	this.emit('route', eventName);
+};

@@ -30,4 +30,28 @@
 
 'use strict';
 
-module.exports = require('./lib/server/Bootstrapper');
+module.exports = FormSubmitter;
+
+var util = require('util'),
+	EventEmitter = require('events').EventEmitter;
+
+util.inherits(FormSubmitter, EventEmitter);
+
+function FormSubmitter(canSubmit) {
+	EventEmitter.call(this);
+	this._canSubmit = canSubmit;
+}
+
+FormSubmitter.prototype._canSubmit = false;
+
+FormSubmitter.prototype.submit = function (form, callback) {
+	var self = this;
+	setTimeout(function () {
+		callback();
+		self.emit('submit', form);
+	}, 0);
+};
+
+FormSubmitter.prototype.canSubmit = function () {
+	return this._canSubmit;
+};

@@ -3,11 +3,11 @@
 <head>
     <title>{title}</title>
     <link rel="stylesheet" type="text/css" href="/style.css"/>
+    <script src="/catberry.js"></script>
 </head>
 <body>
-<img src="/Catberry.png"/>
-
-<div id="hello_subtitle"/>
+<div class="logo"></div>
+<div id="hello_subtitle"></div>
 <div id="hello_hello-world"></div>
 </body>
 </html>

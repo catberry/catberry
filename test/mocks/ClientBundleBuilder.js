@@ -30,39 +30,12 @@
 
 'use strict';
 
-module.exports = bootstrapper;
+module.exports = ClientBundleBuilder;
 
-var ServiceLocator = require('./ServiceLocator'),
-	Catberry = require('./Catberry'),
-	log4js = require('log4js'),
-	logger = log4js.getLogger('catberry');
+function ClientBundleBuilder() {
 
-/**
- * Creates new full-configured instance of catberry.
- * @param {Object} config Configuration object.
- * @returns {Catberry}
- */
-function bootstrapper(config) {
-
-	var currentConfig = config || {},
-		catberry = new Catberry();
-
-	// server environment
-	catberry.locator.register('moduleLoader',
-		require('./server/ModuleLoader'), currentConfig, true);
-	catberry.locator.register('resourceBuilder',
-		require('./server/ResourceBuilder'), currentConfig, true);
-	catberry.locator.register('pageRenderer',
-		require('./server/PageRenderer'), currentConfig, true);
-	catberry.locator.register('requestRouter',
-		require('./server/RequestRouter'), currentConfig, true);
-	catberry.locator.register('templateProvider',
-		require('./server/TemplateProvider'), currentConfig, true);
-	catberry.locator.registerInstance('logger', logger);
-	catberry.locator.registerInstance('config', currentConfig);
-
-	// client environment
-	// there is nothing to configure for client-side yet
-
-	return catberry;
 }
+
+ClientBundleBuilder.prototype.build = function () {
+
+};
