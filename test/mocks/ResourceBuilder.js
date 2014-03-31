@@ -32,8 +32,19 @@
 
 module.exports = ResourceBuilder;
 
+var util = require('util'),
+	events = require('events');
+
+util.inherits(ResourceBuilder, events.EventEmitter);
+
 function ResourceBuilder() {
+	events.EventEmitter.call(this);
 }
 
+ResourceBuilder.prototype.clean = function () {
+	this.emit('cleaned');
+};
+
 ResourceBuilder.prototype.buildResources = function () {
+	this.emit('built');
 };

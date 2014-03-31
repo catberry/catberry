@@ -39,6 +39,8 @@ var assert = require('assert'),
 	locator = new ServiceLocator();
 
 locator.register('logger', require('../mocks/Logger'));
+locator.register('clientBundleBuilder',
+	require('../mocks/ClientBundleBuilder'));
 locator.register('resourceBuilder', require('../mocks/ResourceBuilder'));
 locator.register('moduleLoader', TestModuleLoader);
 
@@ -83,7 +85,7 @@ function TestModuleLoader(index) {
 	this._index = index;
 }
 TestModuleLoader.prototype._index = -1;
-TestModuleLoader.prototype.loadModules = function () {
+TestModuleLoader.prototype.getModulesByNames = function () {
 	return {
 		test: {
 			name: 'test',
@@ -170,8 +172,7 @@ function getRendererForModule(index) {
 
 function checkCase(caseName, callback) {
 	currentPlaceholders = createPlaceholdersForCase(caseName);
-	var nextCounter = 0,
-		checkCounter = 0,
+	var checkCounter = 0,
 		pageRenderer1 = getRendererForModule(0),
 		pageRenderer2 = getRendererForModule(1),
 		pageRenderer3 = getRendererForModule(2),
@@ -184,33 +185,35 @@ function checkCase(caseName, callback) {
 		response5 = new HttpResponse();
 
 	var callbackInvoker = function () {
-		if (nextCounter === 2 && checkCounter === 5) {
+		if (checkCounter === 5) {
 			callback();
 		}
 	};
 
-	pageRenderer1.render(response1, 'test', {}, function () {
-		assert.fail('Unexpected next middleware call');
-	});
+	pageRenderer1.render(response1, {$pageName: 'test'},
+		function () {
+			assert.fail('Unexpected next middleware call');
+		});
 
-	pageRenderer2.render(response2, 'test', {}, function () {
-		assert.fail('Unexpected next middleware call');
-	});
+	pageRenderer2.render(response2, {$pageName: 'test'},
+		function () {
+			assert.fail('Unexpected next middleware call');
+		});
 
-	pageRenderer3.render(response3, 'test', {}, function (error) {
-		assert.equal(error instanceof Error, true, 'Error expected');
-		nextCounter++;
-	});
+	pageRenderer3.render(response3, {$pageName: 'test'},
+		function () {
+			assert.fail('Unexpected next middleware call');
+		});
 
-	pageRenderer4.render(response4, 'test', {}, function (error) {
-		assert.equal(error instanceof Error, true, 'Error expected');
-		nextCounter++;
-	});
+	pageRenderer4.render(response4, {$pageName: 'test'},
+		function () {
+			assert.fail('Unexpected next middleware call');
+		});
 
-	pageRenderer5.render(response5, 'test', {}, function () {
-		assert.fail('Unexpected next middleware call');
-		nextCounter++;
-	});
+	pageRenderer5.render(response5, {$pageName: 'test'},
+		function () {
+			assert.fail('Unexpected next middleware call');
+		});
 
 	compareWithExpected(caseName, response1, function (isValid) {
 		assert.deepEqual(isValid, true);
@@ -224,14 +227,16 @@ function checkCase(caseName, callback) {
 		callbackInvoker();
 	});
 
+	// must be error description and stack trace
 	checkIsEmpty(response3, function (isEmpty) {
-		assert.deepEqual(isEmpty, true);
+		assert.deepEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
 
+	// must be error description and stack trace
 	checkIsEmpty(response4, function (isEmpty) {
-		assert.deepEqual(isEmpty, true);
+		assert.deepEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
@@ -243,7 +248,7 @@ function checkCase(caseName, callback) {
 	});
 }
 
-describe('PageRenderer', function () {
+describe('server/PageRenderer', function () {
 	describe('#render', function () {
 		it('should properly render nested placeholders', function (done) {
 			checkCase('case1', function () {

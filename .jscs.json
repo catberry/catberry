@@ -28,7 +28,7 @@
 	],
 	"disallowKeywords": ["with", "let"],
 	"disallowMultipleLineBreaks": true,
-	"disallowKeywordsOnNewLine": ["else", "catch", "while"],
+	"disallowKeywordsOnNewLine": ["else", "catch"],
 	"validateJSDoc": {
 		"checkParamNames": true,
 		"checkRedundantParams": true,

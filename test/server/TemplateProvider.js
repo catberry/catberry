@@ -31,15 +31,25 @@
 'use strict';
 
 var assert = require('assert'),
+	ServiceLocator = require('../../lib/ServiceLocator'),
+	Logger = require('./../mocks/Logger'),
+	path = require('path'),
+	fs = require('fs'),
 	TemplateProvider = require('../../lib/server/TemplateProvider');
 
-describe('TemplateProvider', function () {
-	describe('#load', function () {
-		it('should properly load and compile template', function (done) {
-			var provider = new TemplateProvider();
+var templatePath = path.join(__dirname, '..',
+	'cases', 'server', 'TemplateProvider', 'case1', 'test.compiled');
 
-			provider.register('test', __dirname +
-				'/../cases/server/TemplateProvider/case1/test.dust');
+describe('server/TemplateProvider', function () {
+	describe('#registerCompiled', function () {
+		it('should properly register compiled template', function (done) {
+			var locator = new ServiceLocator();
+			locator.register('logger', Logger);
+
+			var provider = locator.resolveInstance(TemplateProvider),
+				source = fs.readFileSync(templatePath, {encoding: 'utf8'});
+
+			provider.registerCompiled('test', source);
 
 			var templateStream = provider.getStream('test',
 					{testMessage: 'hello'}),
@@ -58,7 +68,7 @@ describe('TemplateProvider', function () {
 			var provider = new TemplateProvider();
 
 			assert.throws(function () {
-				provider.register('test', 'not exist');
+				provider.registerCompiled('test', 'wrong template');
 			});
 		});
 	});

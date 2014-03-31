@@ -4,7 +4,10 @@
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Framework for fast modular web-applications using isomorphic JavaScript which is built as a connect middleware",
 	"homepage": "https://github.com/pragmadash/catberry",
-	"keywords": ["stream", "web", "isomorphic", "framework", "middleware", "connect", "dust", "module"],
+	"keywords": [
+		"stream", "web", "isomorphic", "framework", "middleware", "connect",
+		"dust", "module"
+	],
 	"bugs": {
 		"url": "https://github.com/pragmadash/catberry/issues",
 		"email": "denis.rechkunov@gmail.com"
@@ -13,26 +16,43 @@
 		"type": "git",
 		"url": "git://github.com/pragmadash/catberry.git"
 	},
+	"contributors": [
+		{
+			"name": "Denis Rechkunov",
+			"email": "denis.rechkunov@gmail.com"
+		},
+		{
+			"name": "Julia Rechkunova",
+			"email": "julia.rechkunova@gmail.com"
+		}
+	],
+
 	"main": "./index",
-
 	"dependencies": {
-		"dustjs-linkedin":"~2.3.4",
+		"jquery": "~2.1.0",
+		"uglify-js": "~2.4.13",
+		"browserify": "~3.32.1",
+		"dustjs-linkedin": "~2.3.4",
 		"log4js": "~0.6.12",
-		"gulp": "~3.5.5"
+		"gulp": "~3.5.5",
+		"gulp-concat": "~2.1.7",
+		"gulp-uglify": "~0.2.1",
+		"gulp-imagemin": "~0.1.5",
+		"gulp-minify-css": "~0.3.0",
+		"gulp-dust": "~0.2.0",
+		"event-stream": "~3.1.0",
+		"gulp-clean": "~0.2.4"
 	},
-
 	"devDependencies": {
+		"jsdom": "~0.10.3",
 		"mocha": "~1.17.1"
 	},
-
 	"engines": {
 		"node": "~0.10.26"
 	},
-
 	"scripts": {
 		"test": "node_modules/.bin/mocha --recursive"
 	},
-
 	"licenses": [
 		{
 			"type": "MIT",

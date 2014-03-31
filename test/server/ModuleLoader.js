@@ -52,13 +52,8 @@ function createModuleLoader(caseName) {
 	return locator.resolveInstance(ModuleLoader, config);
 }
 
-function checkPath(absolute, expectedRelative) {
-	var relative = path.relative(__dirname, absolute);
-	return relative === expectedRelative;
-}
-
-describe('ModuleLoader', function () {
-	describe('#loadModules', function () {
+describe('server/ModuleLoader', function () {
+	describe('#getModulesByNames', function () {
 		it('should skip empty folders', function () {
 			var case1Folder = path.join(CASES_DIRECTORY, 'case1'),
 				emptyFolderPath = path.join(case1Folder, 'emptyFolder');
@@ -73,7 +68,7 @@ describe('ModuleLoader', function () {
 			}
 
 			var moduleLoader = createModuleLoader('case1'),
-				modules = moduleLoader.loadModules(),
+				modules = moduleLoader.getModulesByNames(),
 				counter = 0;
 
 			for (var moduleName in modules) {
@@ -89,13 +84,13 @@ describe('ModuleLoader', function () {
 			var moduleLoader = createModuleLoader('case2');
 
 			assert.throws(function () {
-				moduleLoader.loadModules();
+				moduleLoader.getModulesByNames();
 			});
 		});
 
 		it('should skip module folders with wrong module names', function () {
 			var moduleLoader = createModuleLoader('case3'),
-				modules = moduleLoader.loadModules(),
+				modules = moduleLoader.getModulesByNames(),
 				counter = 0;
 
 			for (var moduleName in modules) {
@@ -109,7 +104,7 @@ describe('ModuleLoader', function () {
 
 		it('should properly load correct modules', function () {
 			var moduleLoader = createModuleLoader('case4'),
-				modules = moduleLoader.loadModules(),
+				modules = moduleLoader.getModulesByNames(),
 				counter = 0;
 
 			for (var moduleName in modules) {
@@ -128,29 +123,7 @@ describe('ModuleLoader', function () {
 
 			// check assets
 			var firstModule = modules.correctModule1,
-				secondModule = modules.correctModule2,
-				firstAssets = firstModule.assets;
-
-			assert.equal(firstAssets.length, 4,
-				'Not all assets were loaded');
-
-			assert.equal(checkPath(firstAssets[0],
-				'../cases/server/ModuleLoader/case4/correctModule1/assets/file1'
-			), true, 'Wrong path');
-
-			assert.equal(checkPath(firstAssets[1],
-				'../cases/server/ModuleLoader/case4/correctModule1/assets/file2'
-			), true, 'Wrong path');
-
-			assert.equal(checkPath(firstAssets[2],
-				'../cases/server/ModuleLoader/case4' +
-					'/correctModule1/assets/subdirectory/file3'
-			), true, 'Wrong path');
-
-			assert.equal(checkPath(firstAssets[3],
-				'../cases/server/ModuleLoader/case4' +
-					'/correctModule1/assets/subdirectory/subdirectory/file4'
-			), true, 'Wrong path');
+				secondModule = modules.correctModule2;
 
 			// check placeholders
 			var firstPlaceholders = firstModule.placeholders;
@@ -164,13 +137,13 @@ describe('ModuleLoader', function () {
 			assert.equal(firstModule.rootPlaceholder.name, '__index',
 				'Wrong placeholder name');
 			assert.equal(
-				firstModule.rootPlaceholder.getTemplateStream instanceof
+					firstModule.rootPlaceholder.getTemplateStream instanceof
 					Function, true,
 				'Root placeholder not found');
 			assert.equal(firstPlaceholders.placeholder1.name, 'placeholder1',
 				'Wrong placeholder name');
 			assert.equal(
-				firstPlaceholders.placeholder1.getTemplateStream instanceof
+					firstPlaceholders.placeholder1.getTemplateStream instanceof
 					Function,
 				true, 'Placeholder not found');
 
@@ -187,14 +160,14 @@ describe('ModuleLoader', function () {
 			assert.equal(secondPlaceholders.placeholder2.name, 'placeholder2',
 				'Wrong placeholder name');
 			assert.equal(
-				secondPlaceholders.placeholder2.getTemplateStream instanceof
+					secondPlaceholders.placeholder2.getTemplateStream instanceof
 					Function,
 				true,
 				'Placeholder not found');
 			assert.equal(secondPlaceholders.placeholder3.name, 'placeholder3',
 				'Wrong placeholder name');
 			assert.equal(
-				secondPlaceholders.placeholder3.getTemplateStream instanceof
+					secondPlaceholders.placeholder3.getTemplateStream instanceof
 					Function,
 				true,
 				'Placeholder not found');

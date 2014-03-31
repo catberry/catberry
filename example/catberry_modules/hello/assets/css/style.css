@@ -1,0 +1,10 @@
+h1 {
+    font-size: 24px;
+    font-family: Arial, sans-serif;
+}
+
+.logo {
+    background-image:url('/hello/images/Catberry.png');
+    height: 250px;
+    width: 250px;
+}
