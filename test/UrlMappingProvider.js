@@ -43,21 +43,23 @@ describe('UrlMappingProvider', function () {
 			locator.registerInstance('urlMapper', {
 				expression: /\/test12(.)*/i,
 				map: function (url) {
-					return url + 'test2';
+					url.pathname += 'test2';
+					return url;
 				}
 			});
 			locator.registerInstance('urlMapper', {
 				expression: /\/test1(.)*3/i,
 				map: function (url) {
-					return url + 'test1';
+					url.pathname += 'test1';
+					return url;
 				}
 			});
 
 			var urlMappingProvider = locator.resolveInstance(UrlMappingProvider),
-				mappedUrl1 = urlMappingProvider.map('/test123'),
+				mappedUrl1 = urlMappingProvider.map('http://localhost:3000/test123'),
 				mappedUrl2 = urlMappingProvider.map('/test12');
 
-			assert.deepEqual(mappedUrl1, '/test123test1');
+			assert.deepEqual(mappedUrl1, 'http://localhost:3000/test123test1');
 			assert.deepEqual(mappedUrl2, '/test12test2');
 		});
 
@@ -68,21 +70,23 @@ describe('UrlMappingProvider', function () {
 			locator.registerInstance('urlMapper', {
 				expression: /\/test12(.)*/i,
 				map: function (url) {
-					return url + 'test2';
+					url.pathname += 'test2';
+					return url;
 				}
 			});
 			locator.registerInstance('urlMapper', {
 				expression: /\/test1(.)*3/i,
 				map: function (url) {
-					return url + 'test1';
+					url.pathname += 'test1';
+					return url;
 				}
 			});
 
 			var urlMappingProvider = locator.resolveInstance(UrlMappingProvider),
-				mappedUrl1 = urlMappingProvider.map('/t123'),
+				mappedUrl1 = urlMappingProvider.map('http://localhost:3000/t123'),
 				mappedUrl2 = urlMappingProvider.map('/t12');
 
-			assert.deepEqual(mappedUrl1, '/t123');
+			assert.deepEqual(mappedUrl1, 'http://localhost:3000/t123');
 			assert.deepEqual(mappedUrl2, '/t12');
 		});
 
@@ -92,10 +96,12 @@ describe('UrlMappingProvider', function () {
 				locator.registerInstance('serviceLocator', locator);
 
 				var urlMappingProvider = locator.resolveInstance(UrlMappingProvider),
-					mappedUrl1 = urlMappingProvider.map('/t123'),
-					mappedUrl2 = urlMappingProvider.map('/t12');
+					mappedUrl1 =
+						urlMappingProvider.map('http://localhost:3000/t123'),
+					mappedUrl2 =
+						urlMappingProvider.map('/t12');
 
-				assert.deepEqual(mappedUrl1, '/t123');
+				assert.deepEqual(mappedUrl1, 'http://localhost:3000/t123');
 				assert.deepEqual(mappedUrl2, '/t12');
 			});
 	});
