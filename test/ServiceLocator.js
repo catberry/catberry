@@ -255,12 +255,14 @@ describe('ServiceLocator', function () {
 
 			});
 
-		it('should throw error if specified type was not found', function () {
-			var locator = new ServiceLocator();
-			assert.throws(function () {
-				locator.resolveAll('not exists');
-			}, Error);
-		});
+		it('should return empty array if specified type was not found',
+			function () {
+				var locator = new ServiceLocator(),
+					resolved = locator.resolveAll('not exists');
+
+				assert.deepEqual(resolved instanceof Array, true);
+				assert.deepEqual(resolved.length, 0);
+			});
 
 		it('should throw error if specified type is not a string', function () {
 			var locator = new ServiceLocator();
