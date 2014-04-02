@@ -34,6 +34,8 @@ var assert = require('assert'),
 	jsdom = require('jsdom'),
 	util = require('util'),
 	ServiceLocator = require('../../lib/ServiceLocator'),
+	CookiesManager = require('../../lib/CookiesManager'),
+	StateProvider = require('../../lib/client/StateProvider'),
 	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
 	FormSubmitter = require('../../lib/client/FormSubmitter'),
 	EventEmitter = require('events').EventEmitter,
@@ -90,6 +92,8 @@ function createLocator(config) {
 	locator.register('pageRenderer', PageRenderer, config);
 	locator.register('moduleLoader', ModuleLoader, config);
 	locator.register('urlMappingProvider', UrlMappingProvider, config);
+	locator.register('cookiesManager', CookiesManager, config);
+	locator.register('stateProvider', StateProvider, config);
 	return locator;
 }
 
