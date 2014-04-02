@@ -34,10 +34,11 @@ var assert = require('assert'),
 	jsdom = require('jsdom'),
 	Logger = require('../mocks/Logger'),
 	EventRouter = require('../mocks/EventRouter'),
-	UrlMappingProvider = require('../mocks/UrlMappingProvider'),
 	FormSubmitter = require('../mocks/FormSubmitter'),
 	PageRenderer = require('../mocks/PageRenderer'),
 	ServiceLocator = require('../../lib/ServiceLocator'),
+	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
+	StateProvider = require('../../lib/client/StateProvider'),
 	CookiesManager = require('../../lib/CookiesManager'),
 	RequestRouter = require('../../lib/client/RequestRouter');
 
@@ -89,6 +90,7 @@ function createLocator(config) {
 	locator.register('pageRenderer', PageRenderer, config);
 	locator.register('eventRouter', EventRouter, config);
 	locator.register('formSubmitter', FormSubmitter, config);
+	locator.register('stateProvider', StateProvider, config);
 	locator.register('urlMappingProvider', UrlMappingProvider, config);
 	return locator;
 }
