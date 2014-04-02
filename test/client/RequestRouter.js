@@ -38,6 +38,7 @@ var assert = require('assert'),
 	FormSubmitter = require('../mocks/FormSubmitter'),
 	PageRenderer = require('../mocks/PageRenderer'),
 	ServiceLocator = require('../../lib/ServiceLocator'),
+	CookiesManager = require('../../lib/CookiesManager'),
 	RequestRouter = require('../../lib/client/RequestRouter');
 
 describe('client/RequestRouter', function () {
@@ -84,6 +85,7 @@ function createLocator(config) {
 	var locator = new ServiceLocator();
 	locator.registerInstance('serviceLocator', locator);
 	locator.register('logger', Logger);
+	locator.register('cookiesManager', CookiesManager, config);
 	locator.register('pageRenderer', PageRenderer, config);
 	locator.register('eventRouter', EventRouter, config);
 	locator.register('formSubmitter', FormSubmitter, config);
@@ -216,8 +218,8 @@ function renderHandleCase1(done) {
 		assert.deepEqual(typeof(parameters.second), 'object');
 		assert.deepEqual(parameters.first.value, 'firstValue');
 		assert.deepEqual(parameters.second.value, 'secondValue');
-		assert.deepEqual(parameters.first.$global.global, 'globalValue');
-		assert.deepEqual(parameters.second.$global.global, 'globalValue');
+		assert.deepEqual(parameters.first.global, 'globalValue');
+		assert.deepEqual(parameters.second.global, 'globalValue');
 		assert.deepEqual(currentWindow.location.toString(),
 				'http://local' + link);
 		assert.deepEqual(currentWindow.history.length, 1);
