@@ -190,27 +190,31 @@ function checkCase(caseName, callback) {
 		}
 	};
 
-	pageRenderer1.render(response1, {$pageName: 'test'},
+	var additional = {$pageName: 'test', $global: {}},
+		parameters = Object.create(additional);
+	parameters.$$ = additional;
+
+	pageRenderer1.render(response1, parameters,
 		function () {
 			assert.fail('Unexpected next middleware call');
 		});
 
-	pageRenderer2.render(response2, {$pageName: 'test'},
+	pageRenderer2.render(response2, parameters,
 		function () {
 			assert.fail('Unexpected next middleware call');
 		});
 
-	pageRenderer3.render(response3, {$pageName: 'test'},
+	pageRenderer3.render(response3, parameters,
 		function () {
 			assert.fail('Unexpected next middleware call');
 		});
 
-	pageRenderer4.render(response4, {$pageName: 'test'},
+	pageRenderer4.render(response4, parameters,
 		function () {
 			assert.fail('Unexpected next middleware call');
 		});
 
-	pageRenderer5.render(response5, {$pageName: 'test'},
+	pageRenderer5.render(response5, parameters,
 		function () {
 			assert.fail('Unexpected next middleware call');
 		});
