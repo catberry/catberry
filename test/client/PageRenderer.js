@@ -374,15 +374,16 @@ function renderModuleCase1(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					parameters = {
-						module: {
-							first: 'test3'
-						},
-						module2: {
-							first: 'test2',
-							second: 'test1'
-						}
-					};
+					additional = {$global: {}},
+					parameters = Object.create(additional);
+				parameters.$$ = additional;
+				parameters.module = Object.create(additional.$global);
+				parameters.module.$$ = additional;
+				parameters.module.first = 'test3';
+				parameters.module2 = Object.create(additional.$global);
+				parameters.module2.$$ = additional;
+				parameters.module2.first = 'test2';
+				parameters.module2.second = 'test1';
 
 				pageRenderer.renderModule(modules.module2,
 					parameters, parameters, rendered,
@@ -452,15 +453,16 @@ function renderModuleCase2(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					parameters = {
-						module: {
-							first: 'test3'
-						},
-						module2: {
-							first: 'test2',
-							second: 'test1'
-						}
-					};
+					additional = {$global: {}},
+					parameters = Object.create(additional);
+				parameters.$$ = additional;
+				parameters.module = Object.create(additional.$global);
+				parameters.module.$$ = additional;
+				parameters.module.first = 'test3';
+				parameters.module2 = Object.create(additional.$global);
+				parameters.module2.$$ = additional;
+				parameters.module2.first = 'test2';
+				parameters.module2.second = 'test1';
 
 				pageRenderer.renderModule(modules.module,
 					parameters, parameters, rendered,
@@ -520,15 +522,16 @@ function renderModuleCase3(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					parameters = {
-						module: {
-							first: 'test3'
-						},
-						module2: {
-							first: 'test2',
-							second: 'test1'
-						}
-					};
+					additional = {$global: {}},
+					parameters = Object.create(additional);
+				parameters.$$ = additional;
+				parameters.module = Object.create(additional.$global);
+				parameters.module.$$ = additional;
+				parameters.module.first = 'test3';
+				parameters.module2 = Object.create(additional.$global);
+				parameters.module2.$$ = additional;
+				parameters.module2.first = 'test2';
+				parameters.module2.second = 'test1';
 
 				pageRenderer.renderModule(modules.module,
 					parameters, parameters, rendered,
@@ -586,12 +589,12 @@ function renderCase1(done) {
 			var $ = locator.resolve('jQuery');
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
-					parameters = {
-						$global: {},
-						module: {
-							first: 'test3'
-						}
-					};
+					additional = {$global: {}},
+					parameters = Object.create(additional);
+				parameters.$$ = additional;
+				parameters.module = Object.create(additional.$global);
+				parameters.module.$$ = additional;
+				parameters.module.first = 'test3';
 
 				pageRenderer.render(parameters,
 					function (error) {
@@ -651,14 +654,12 @@ function renderCase2(done) {
 			var $ = locator.resolve('jQuery');
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
-					parameters = {
-						$global: {
-							test: 'test'
-						},
-						module: {
-							first: 'test3'
-						}
-					};
+					additional = {$global: {test: 'test'}},
+					parameters = Object.create(additional);
+				parameters.$$ = additional;
+				parameters.module = Object.create(additional.$global);
+				parameters.module.$$ = additional;
+				parameters.module.first = 'test3';
 
 				pageRenderer.render(parameters,
 					function (error) {
