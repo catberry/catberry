@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{title}</title>
+    <link rel="stylesheet" type="text/css" href="/style.css"/>
+    <script src="/catberry.js"></script>
+</head>
+<body>
+<h1>{helloMessage}</h1>
+<a href="/">Tutorial</a> <a href="/chat">Chat</a> <a href="/about">About</a>
+
+<div id="main_body"></div>
+</body>
+</html>

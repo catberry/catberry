@@ -30,22 +30,31 @@
 
 'use strict';
 
-// require client-side implementation of Chat Service client.
-var ChatServiceClient = require('./lib/client/ChatServiceClient'),
-// create catberry application instance.
-	catberry = require('catberry'),
-	config = {
-		title: 'Catberry example application',
-		helloMessage: 'Meow, I am Catberry and it is my example page',
-		chatHost: 'localhost',
-		chatHostPort: 3000,
-		// by default catberry is in debug mode
-		isRelease: false
+// this file defines rules how URLs in request router will be translated to
+// catberry's module-parameters URL.
+
+module.exports = [
+	{
+		expression: /\/$/,
+		map: function (url) {
+			url.pathname += 'main';
+			return url;
+		}
 	},
-	app = catberry.create(config);
-
-// then you could register your external modules to inject into catberry modules.
-app.locator.register('chatServiceClient', ChatServiceClient, config, true);
-
-// tell catberry to start when HTML document will be ready
-app.startWhenReady();
+	{
+		expression: /\/chat$/i,
+		map: function (url) {
+			url.pathname = '/main';
+			url.search = '?main_tab=chat';
+			return url;
+		}
+	},
+	{
+		expression: /\/about$/i,
+		map: function (url) {
+			url.pathname = '/main';
+			url.search = '?main_tab=about';
+			return url;
+		}
+	}
+];

@@ -30,18 +30,10 @@
 
 'use strict';
 
-// define of require some external module you want use
-// let's inject catberry logger into constructor
-function ExternalModule($logger) {
-	this._logger = $logger;
-}
-ExternalModule.prototype._logger = null;
-// let's add method which will tell us which implementation now used
-ExternalModule.prototype.foo = function () {
-	this._logger.info('Client implementation of External module was loaded');
-};
-
-var catberry = require('catberry'),
+// require server-side implementation of Chat Service client.
+var ChatServiceClient = require('./lib/server/ChatServiceClient'),
+	ChatService = require('./lib/ChatService'),
+	catberry = require('catberry'),
 // it is useful to recognize what is application mode now
 	isRelease = process.argv.length === 3 &&
 		process.argv[2] === 'release';
@@ -61,26 +53,40 @@ if (process.argv.length === 3 && process.argv[2] === 'clean') {
 		path = require('path'),
 		publicPath = path.join(__dirname, 'public'),
 		connect = require('connect'),
-	// create instance of catberry application and pass config to it
-		cat = catberry.create({
-			title: 'Catberry example module',
+		config = {
+			title: 'Catberry example application',
+			helloMessage: 'Meow, I am Catberry and it is my example page',
+			chatHost: 'localhost',
+			chatHostPort: 3000,
 			publicPath: publicPath,
 			// by default catberry is in debug mode
 			isRelease: isRelease
-		}),
+		},
+	// create instance of catberry application and pass config to it
+		cat = catberry.create(config),
 		app = connect();
 
 	// then you could register your external modules to inject into catberry modules.
-	cat.locator.register('externalModule', ExternalModule);
+	cat.locator.register('chatServiceClient', ChatServiceClient, config, true);
 
 	// it is useful to compress response stream in production
 	if (isRelease) {
 		app.use(connect.compress());
 	}
-	// use catberry as connect/express middleware
+
+	app.use(connect.cookieParser())
+	// set session lifetime as one day
+	app.use(connect.session({ secret: 'meow', cookie: {maxAge: 60 * 60 * 24}}));
+
+	// set our chat service as connect middleware
+	var chat = cat.locator.resolveInstance(ChatService, config);
+	app.use(chat.middleware());
+
+	// and use catberry as connect/express middleware too
 	app.use(cat.getMiddleware());
 
 	// all non-handled requests by catberry will be passed to next middleware
+	// like static files
 	app.use(connect.static(publicPath));
 	app.use(connect.errorHandler());
 	http
