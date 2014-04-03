@@ -1,0 +1,8 @@
+#chat_messages, #chat_post {
+    height: 100%;
+    width: 100%;
+}
+
+#chat_post {
+    height: 50px;
+}

@@ -1,0 +1,5 @@
+{#messages}
+    [{time}] {author}: {text}<br/>
+{:else}
+    No messages yet or you should login first :(!
+{/messages}

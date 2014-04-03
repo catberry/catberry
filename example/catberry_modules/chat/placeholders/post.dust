@@ -1,0 +1,9 @@
+{#nickname}
+    <form name="post" data-module="chat" data-dependents="chat_post">
+        Enter text here: <input name="message" type="text">
+        <input type="submit" value="Send">
+    </form>
+    <a href="#quit">Click here to logout</a>
+{:else}
+    <a href="#auth">Click here to login</a>
+{/nickname}
