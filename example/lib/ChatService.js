@@ -134,7 +134,7 @@ ChatService.prototype.startSession = function (urlInfo, request, response) {
 		return;
 	}
 
-	request.session[SESSION_USERNAME_KEY] = encodeURIComponent(nickname);
+	request.session[SESSION_USERNAME_KEY] = nickname;
 	response.end();
 };
 
