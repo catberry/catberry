@@ -53,18 +53,15 @@ if (process.argv.length === 3 && process.argv[2] === 'clean') {
 		path = require('path'),
 		publicPath = path.join(__dirname, 'public'),
 		connect = require('connect'),
-		config = {
-			title: 'Catberry example application',
-			helloMessage: 'Meow, I am Catberry and it is my example page',
-			chatHost: 'localhost',
-			chatHostPort: 3000,
-			publicPath: publicPath,
-			// by default catberry is in debug mode
-			isRelease: isRelease
-		},
+		config = require('./config'),
 	// create instance of catberry application and pass config to it
 		cat = catberry.create(config),
 		app = connect();
+
+	// set up public folder path
+	config.publicPath = publicPath;
+	// by default catberry is in debug mode
+	config.isRelease = isRelease;
 
 	// then you could register your external modules to inject into catberry modules.
 	cat.locator.register('chatServiceClient', ChatServiceClient, config, true);

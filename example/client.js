@@ -34,14 +34,7 @@
 var ChatServiceClient = require('./lib/client/ChatServiceClient'),
 // create catberry application instance.
 	catberry = require('catberry'),
-	config = {
-		title: 'Catberry example application',
-		helloMessage: 'Meow, I am Catberry and it is my example page',
-		chatHost: 'localhost',
-		chatHostPort: 3000,
-		// by default catberry is in debug mode
-		isRelease: false
-	},
+	config = require('./config'),
 	app = catberry.create(config);
 
 // then you could register your external modules to inject into catberry modules.
