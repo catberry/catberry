@@ -244,7 +244,7 @@ ChatService.prototype.postMessage = function (urlInfo, request, response) {
 			}
 
 			self._messages.push({
-				time: new Date(),
+				time: (new Date()).toLocaleString(),
 				author: request.session[SESSION_USERNAME_KEY],
 				text: message
 			});
