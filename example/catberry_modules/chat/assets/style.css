@@ -5,4 +5,17 @@
 
 #chat_post {
     height: 50px;
+    margin-top: 20px;
+}
+
+.message-author {
+    color: #b94a48;
+}
+
+.message-text {
+    color: #363636;
+}
+
+.message-time {
+    color: #888888;
 }
