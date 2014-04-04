@@ -1,5 +1,6 @@
 {#nickname}
-    <form class="message-post-form" name="post" data-module="chat" data-dependents="chat_post">
+    <form class="message-post-form" name="post" data-module="chat"
+          data-dependents="chat_post">
         Enter message below:<br/>
         <input name="message" type="text"><br/>
         <input type="submit" value="Send">
