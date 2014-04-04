@@ -1,8 +1,8 @@
 {#messages}
     <div class="message-item">
-        <span class="message-time">[{time}]</span> <span
-            class="message-author">{author}:</span> <span
-            class="message-text">{text}</span>
+        <span class="message-time">[{time}]</span>
+		<span class="message-author">{author}:</span>
+		<span class="message-text">{text}</span>
     </div>
 {:else}
     No messages yet or you should login first :(!

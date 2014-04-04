@@ -1,6 +1,7 @@
 {#nickname}
-    <form name="post" data-module="chat" data-dependents="chat_post">
-        Enter text here: <input name="message" type="text">
+    <form class="message-post-form" name="post" data-module="chat" data-dependents="chat_post">
+        Enter message below:<br/>
+        <input name="message" type="text"><br/>
         <input type="submit" value="Send">
     </form>
     <a href="#quit">Click here to logout</a>
