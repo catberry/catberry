@@ -1,0 +1,7 @@
+{
+	"title": "Catberry example application",
+	"helloMessage": "Meow, I am Catberry and it is my example page",
+	"chatHost": "palladium.2gis.local",
+	"chatHostPort": 3000,
+	"isRelease": false
+}
