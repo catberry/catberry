@@ -6,9 +6,18 @@
     <script src="/catberry.js"></script>
 </head>
 <body>
-<h1>{helloMessage}</h1>
-<a href="/">Tutorial</a> <a href="/chat">Chat</a> <a href="/about">About</a>
+	<div class="content">
+		<div class="content-background"></div>
+		<div class="content-block">
+			<h1>{helloMessage}</h1>
+			<div class="navigation">
+				<a href="/" class="navigation-link">Tutorial</a>
+				<a href="/chat" class="navigation-link">Chat</a>
+				<a href="/about" class="navigation-link">About</a>
+			</div>
 
-<div id="main_body"></div>
+			<div id="main_body"></div>
+		</div>
+	</div>
 </body>
 </html>
