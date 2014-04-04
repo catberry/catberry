@@ -155,7 +155,13 @@ ChatModule.prototype.submit = function (formName, formObject, callback) {
 		return;
 	}
 
-	this._chat.postMessage(formObject.message, callback);
+	this._chat.postMessage(formObject.message, function (error) {
+		if (error) {
+			window.alert(error);
+		}
+		callback(null);
+	});
+
 };
 
 /**
