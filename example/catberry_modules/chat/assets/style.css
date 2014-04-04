@@ -8,7 +8,7 @@
 }
 
 .message-items {
-    overflow-x: scroll;
+    overflow-y: scroll;
     height: 300px;
 }
 
