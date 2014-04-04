@@ -35,14 +35,14 @@
 
 module.exports = [
 	{
-		expression: /\/$/,
+		expression: /^\/$/,
 		map: function (url) {
 			url.pathname += 'main';
 			return url;
 		}
 	},
 	{
-		expression: /\/chat$/i,
+		expression: /^\/chat$/i,
 		map: function (url) {
 			url.pathname = '/main';
 			url.search = '?main_tab=chat';
@@ -50,7 +50,7 @@ module.exports = [
 		}
 	},
 	{
-		expression: /\/about$/i,
+		expression: /^\/about$/i,
 		map: function (url) {
 			url.pathname = '/main';
 			url.search = '?main_tab=about';
