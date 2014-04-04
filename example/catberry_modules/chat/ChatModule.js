@@ -122,6 +122,7 @@ ChatModule.prototype.handle = function (eventName, callback) {
 	var self = this,
 		handler = function (error) {
 			if (error) {
+				window.alert(error);
 				return;
 			}
 			self._api.requestRefresh(self, 'messages');
