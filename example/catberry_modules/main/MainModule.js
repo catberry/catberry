@@ -126,6 +126,7 @@ MainModule.prototype.submit = function (formName, formObject, callback) {
 MainModule.prototype.bodyRender = function (args, callback) {
 	if (!args.tab) {
 		callback(null, {tutorial: true});
+		return;
 	}
 
 	var data = {};
