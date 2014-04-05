@@ -32,11 +32,7 @@
 
 module.exports = ChatServiceClient;
 
-var http = require('http'),
-	util = require('util'),
-	EventEmitter = require('events').EventEmitter;
-
-util.inherits(ChatServiceClient, EventEmitter);
+var http = require('http');
 
 /**
  * Creates new instance of server-side chat service client.
