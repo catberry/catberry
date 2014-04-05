@@ -41,6 +41,10 @@ function EventRouter() {
 	EventEmitter.call(this);
 }
 
-EventRouter.prototype.route = function (eventName) {
-	this.emit('route', eventName);
+EventRouter.prototype.routeHashChange = function (eventName) {
+	this.emit('routeHashChange', eventName);
+};
+
+EventRouter.prototype.routeEvent = function (eventName) {
+	this.emit('routeEvent', eventName);
 };

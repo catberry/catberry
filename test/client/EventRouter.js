@@ -105,7 +105,7 @@ function routeCase1(done) {
 			'Wrong event name');
 		done();
 	});
-	eventRouter.route('module_testEvent');
+	eventRouter.routeHashChange('module_testEvent');
 }
 
 /**
@@ -131,9 +131,9 @@ function routeCase2(done) {
 				done();
 			});
 		});
-		eventRouter.route('module_testEvent2');
+		eventRouter.routeHashChange('module_testEvent2');
 	});
-	eventRouter.route('module_testEvent1');
+	eventRouter.routeHashChange('module_testEvent1');
 }
 
 /**
@@ -155,9 +155,9 @@ function routeCase3(done) {
 				'Wrong event name');
 			done();
 		});
-		eventRouter.route(undefined);
+		eventRouter.routeHashChange(undefined);
 	});
-	eventRouter.route('module_testEvent1');
+	eventRouter.routeHashChange('module_testEvent1');
 }
 
 /**
@@ -175,7 +175,7 @@ function routeCase4(done) {
 	modules.module2.implementation.once('handle', function () {
 		assert.fail('Should not do anything');
 	});
-	eventRouter.route(undefined);
+	eventRouter.routeHashChange(undefined);
 	setTimeout(done, 100);
 }
 
@@ -204,7 +204,7 @@ function routeCase5(done) {
 			done();
 		}
 	});
-	eventRouter.route('testEvent');
+	eventRouter.routeHashChange('testEvent');
 }
 
 /**
@@ -230,7 +230,7 @@ function routeCase6(done) {
 		});
 		if (++counter === 2) {
 			counter = 0;
-			eventRouter.route('testEvent2');
+			eventRouter.routeHashChange('testEvent2');
 		}
 	});
 	modules.module.implementation.once('handle', function (eventName1) {
@@ -246,10 +246,10 @@ function routeCase6(done) {
 		});
 		if (++counter === 2) {
 			counter = 0;
-			eventRouter.route('testEvent2');
+			eventRouter.routeHashChange('testEvent2');
 		}
 	});
-	eventRouter.route('testEvent1');
+	eventRouter.routeHashChange('testEvent1');
 }
 
 /**
@@ -273,7 +273,7 @@ function routeCase7(done) {
 				done();
 			}
 		});
-		eventRouter.route('module2_testEvent2');
+		eventRouter.routeHashChange('module2_testEvent2');
 	});
 	modules.module.implementation.once('handle', function (eventName1) {
 		assert.deepEqual(eventName1, 'testEvent1',
@@ -286,7 +286,7 @@ function routeCase7(done) {
 				done();
 			}
 		});
-		eventRouter.route('module_testEvent3');
+		eventRouter.routeHashChange('module_testEvent3');
 	});
-	eventRouter.route('testEvent1');
+	eventRouter.routeHashChange('testEvent1');
 }
