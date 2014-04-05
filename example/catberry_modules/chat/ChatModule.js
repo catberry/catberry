@@ -60,9 +60,11 @@ function ChatModule($logger, $moduleApiProvider, $chatServiceClient, $jQuery,
 	this._chatSubtitle = chatSubtitle;
 
 	var self = this;
-	this._chat.on('changed', function () {
-		self._api.requestRefresh(self, 'messages');
-	});
+	if (this._api.whereAmI() === 'browser') {
+		this._chat.on('changed', function () {
+			self._api.requestRefresh(self, 'messages');
+		});
+	}
 }
 
 /**
