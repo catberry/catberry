@@ -30,6 +30,4 @@
 
 'use strict';
 
-// this is module entry script
-// you could to something important here before module will be initialized
-module.exports = require('./HelloModule');
+module.exports = require('./MainModule');
