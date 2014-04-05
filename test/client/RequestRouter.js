@@ -57,6 +57,10 @@ describe('client/RequestRouter', function () {
 				hashHandleCase3
 			);
 		});
+		describe('link event handle', function () {
+			it('should catch link click and raise event if data-event attribute',
+				linkEventHandleCase1);
+		});
 
 		describe('link render', function () {
 			it('should catch link click and request rendering',
@@ -111,7 +115,7 @@ function hashHandleCase1(done) {
 	var locator = createLocator(),
 		eventRouter = new EventRouter();
 	locator.registerInstance('eventRouter', eventRouter);
-	eventRouter.once('route', function (eventName) {
+	eventRouter.once('routeHashChange', function (eventName) {
 		assert.deepEqual(eventName, 'test-hash',
 			'Wrong event name');
 		done();
@@ -138,7 +142,7 @@ function hashHandleCase2(done) {
 	var locator = createLocator(),
 		eventRouter = new EventRouter();
 	locator.registerInstance('eventRouter', eventRouter);
-	eventRouter.once('route', function () {
+	eventRouter.once('routeHashChange', function () {
 		assert.fail('Should not handle this event');
 	});
 
@@ -174,14 +178,15 @@ function hashHandleCase3(done) {
 				window.location.assign('http://local/some');
 				var requestRouter = locator.resolveInstance(RequestRouter);
 
-				eventRouter.once('route', function (eventName) {
+				eventRouter.once('routeHashChange', function (eventName) {
 					assert.deepEqual(eventName, 'test1');
-					eventRouter.once('route', function (eventName) {
+					eventRouter.once('routeHashChange', function (eventName) {
 						assert.deepEqual(eventName, 'test2');
-						eventRouter.once('route', function (eventName) {
-							assert.deepEqual(eventName, null);
-							done();
-						});
+						eventRouter.once('routeHashChange',
+							function (eventName) {
+								assert.deepEqual(eventName, null);
+								done();
+							});
 
 						// at last remove any hash
 						window.location.assign('http://local/some');
@@ -196,6 +201,35 @@ function hashHandleCase3(done) {
 				// first set hash to test1
 				window.location.assign('http://local/some#test1');
 				$(window).trigger('hashchange');
+			});
+		}
+	});
+}
+
+/**
+ * Handles first case, when link click causes event in module.
+ * @param {Function} done Mocha done function.
+ */
+function linkEventHandleCase1(done) {
+	var locator = createLocator(),
+		eventRouter = new EventRouter();
+	locator.registerInstance('eventRouter', eventRouter);
+
+	jsdom.env({
+		html: '<a id="link" data-event="test1"></a>',
+		done: function (errors, window) {
+			prepareWindow(window, locator);
+			var $ = locator.resolve('jQuery');
+			$(function () {
+				window.location.assign('http://local/some');
+				var requestRouter = locator.resolveInstance(RequestRouter);
+
+				eventRouter.once('routeEvent', function (eventName) {
+					assert.deepEqual(eventName, 'test1');
+					done();
+				});
+
+				$('#link').trigger('click');
 			});
 		}
 	});
