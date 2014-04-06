@@ -37,6 +37,8 @@ var util = require('util'),
 
 util.inherits(ChatServiceClient, EventEmitter);
 
+// UHR is a abstract HTTPS request which has the same interface on
+// server-side and client-side but has different optimized implementations.
 /**
  * Creates new instance of client-side chat service client.
  * @param {UHR} $uhr Universal HTTP(S) Request.
