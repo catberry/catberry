@@ -45,13 +45,15 @@
 	},
 	"devDependencies": {
 		"jsdom": "~0.10.3",
-		"mocha": "~1.17.1"
+		"mocha": "~1.17.1",
+		"jscs": "~1.3.0",
+		"jshint": "~2.5.0"
 	},
 	"engines": {
 		"node": "~0.10.26"
 	},
 	"scripts": {
-		"test": "node_modules/.bin/mocha --recursive"
+		"test": "jshint ./ && jscs ./** && mocha --recursive"
 	},
 	"licenses": [
 		{

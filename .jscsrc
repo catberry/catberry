@@ -35,5 +35,5 @@
 		"requireParamTypes": true
 	},
 
-	"excludeFiles": ["node_modules/**"]
+	"excludeFiles": ["./**/node_modules/**", "./node_modules/**"]
 }
