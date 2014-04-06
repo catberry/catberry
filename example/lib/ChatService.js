@@ -48,7 +48,11 @@ var SESSION_USERNAME_KEY = 'chat:username',
 	ERROR_UNAUTHORIZED = 'Please start session with nickname',
 	ERROR_SESSION_MIDDLEWARE = 'Session middleware is not used',
 	ERROR_NICKNAME_REQUIRED = '"nickname" is required parameter',
-	ERROR_LIMIT_TOO_BIG = '"limit" parameter\'s value is too big, max=100';
+	ERROR_LIMIT_TOO_BIG = '"limit" parameter\'s value is too big, max=100',
+	TRACE_USER_STARTS_SESSION = 'User %s starts session',
+	TRACE_USER_ENDS_SESSION = 'User %s ends session',
+	TRACE_USER_POSTS_MESSAGE = 'User %s posts message to chat',
+	TRACE_USER_GETS_MESSAGES = 'User %s gets messages from chat';
 
 util.inherits(ChatService, EventEmitter);
 
@@ -57,12 +61,20 @@ util.inherits(ChatService, EventEmitter);
  * @constructor
  * @extends EventEmitter
  */
-function ChatService() {
+function ChatService($logger) {
 	EventEmitter.call(this);
 	this.setMaxListeners(0);
+	this._logger = $logger;
 	this._messages = [];
 	this._changedTime = (new Date()).getTime();
 }
+
+/**
+ * Current logger.
+ * @type {Logger}
+ * @private
+ */
+ChatService.prototype._logger = null;
 
 /**
  * Returns connect/express middleware for chat service.
@@ -134,6 +146,8 @@ ChatService.prototype.startSession = function (urlInfo, request, response) {
 		return;
 	}
 
+	this._logger.trace(util.format(TRACE_USER_STARTS_SESSION), nickname);
+
 	request.session[SESSION_USERNAME_KEY] = nickname;
 	response.end();
 };
@@ -147,6 +161,9 @@ ChatService.prototype.endSession = function (request, response) {
 	if (!checkSession(request, response)) {
 		return;
 	}
+
+	this._logger.trace(util.format(TRACE_USER_ENDS_SESSION),
+		request.session[SESSION_USERNAME_KEY]);
 
 	request.session[SESSION_USERNAME_KEY] = null;
 	response.end();
@@ -173,6 +190,9 @@ ChatService.prototype.getMessages = function (urlInfo, request, response) {
 		endWithError(response, ERROR_LIMIT_TOO_BIG);
 		return;
 	}
+
+	this._logger.trace(util.format(TRACE_USER_GETS_MESSAGES),
+		request.session[SESSION_USERNAME_KEY]);
 
 	response.writeHead(200, {
 		'Content-Type': 'application/json'
@@ -226,6 +246,9 @@ ChatService.prototype.postMessage = function (urlInfo, request, response) {
 	if (!checkAuthorization(request, response)) {
 		return;
 	}
+
+	this._logger.trace(util.format(TRACE_USER_POSTS_MESSAGE,
+		request.session[SESSION_USERNAME_KEY]));
 
 	var self = this,
 		message = '';

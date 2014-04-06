@@ -135,10 +135,10 @@ ChatModule.prototype.handle = function (eventName, callback) {
 		var nickname = window.prompt(MESSAGE_ENTER_NICKNAME);
 		this._api.clearHash();
 
-		this._chat.startSession(nickname, handler);
+		this._chat.startSession(null, nickname, handler);
 	} else if (eventName === 'quit') {
 		this._api.clearHash();
-		this._chat.endSession(handler);
+		this._chat.endSession(null, handler);
 	} else {
 		callback();
 	}
@@ -157,7 +157,7 @@ ChatModule.prototype.submit = function (formName, formObject, callback) {
 		return;
 	}
 
-	this._chat.postMessage(formObject.message, function (error) {
+	this._chat.postMessage(null, formObject.message, function (error) {
 		if (error) {
 			window.alert(error);
 		}
