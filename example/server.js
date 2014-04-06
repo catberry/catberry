@@ -30,8 +30,7 @@
 
 'use strict';
 
-// require server-side implementation of Chat Service client.
-var ChatServiceClient = require('./lib/server/ChatServiceClient'),
+var ChatServiceClient = require('./lib/ChatServiceClient'),
 	ChatService = require('./lib/ChatService'),
 	catberry = require('catberry'),
 // it is useful to recognize what is application mode now
