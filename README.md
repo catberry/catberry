@@ -135,7 +135,7 @@ http
 
 ####Contribute
 If you have found a bug, please create pull request with mocha unit-test which reproduces it.
-If you want to propose some improvements just create pull request but please do not forget to use **npm test** and **./js-check** scripts to be sure that you code is awesome.
+If you want to propose some improvements just create pull request but please do not forget to use **npm test** to be sure that you code is awesome.
 
 All changes should satisfy this [JavaScript Code Style](https://github.com/pragma-dudes/pragma-develop/wiki/Pragma-Dudes-Code-Style).
 
