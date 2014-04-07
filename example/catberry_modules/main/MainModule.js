@@ -43,21 +43,17 @@ var ERROR_RENDER_NOT_FOUND =
 /**
  * Create new instance of main application module.
  * @param {Logger} $logger To log some messages.
- * @param {string} title Title of main page.
- * @param {string} helloMessage Hello message on top of main page.
+ * @param {config} $config Config object.
  * @param {UHR} $uhr Universal HTTP(S) request.
- * @param {string} staticHost Host name with static content.
- * @param {number} staticPort Port of host with static content.
  * @constructor
  */
-function MainModule($logger, title, helloMessage, $uhr, staticHost,
-	staticPort) {
+function MainModule($logger, $config, $uhr) {
 	this._logger = $logger;
-	this._title = title;
-	this._helloMessage = helloMessage;
+	this._title = $config.title;
+	this._helloMessage = $config.helloMessage;
 	this._uhr = $uhr;
-	this._staticUrl =
-		'http://' + staticHost + ':' + staticPort + '/' + 'main';
+	this._staticUrl = 'http://' + $config.staticHost + ':' +
+		$config.staticPort + '/' + 'main';
 }
 
 /**
