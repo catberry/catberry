@@ -71,7 +71,6 @@ if (process.argv.length === 3 && process.argv[2] === 'clean') {
 	}
 
 	app.use(connect.cookieParser());
-	// set session lifetime as one day
 	app.use(connect.session({secret: 'meow'}));
 
 	// set our chat service as connect middleware
