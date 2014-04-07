@@ -12,6 +12,9 @@ div, h1, body {
 a {
     font-weight: bold;
     color: #0b97c4;
+}
+
+.navigation a {
     margin: 0 10px;
 }
 
@@ -51,4 +54,9 @@ a:visited {
 
 .navigation {
     margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.content-text {
+    text-align: left;
 }
