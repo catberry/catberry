@@ -30,4 +30,4 @@
 
 'use strict';
 
-module.exports = require('./lib/bootstrapper');
+module.exports = require('./lib/server/Bootstrapper');

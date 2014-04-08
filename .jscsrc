@@ -1,0 +1,39 @@
+{
+	"requireCurlyBraces": ["if", "else", "for", "while", "do", "switch"],
+	"requireSpaceAfterKeywords": [
+		"if", "else", "for", "while", "do", "switch", "return", "try",
+		"function"
+	],
+	"requireSpacesInFunctionExpression": {
+		"beforeOpeningCurlyBrace": true
+	},
+
+	"disallowSpacesInsideObjectBrackets": true,
+	"disallowSpacesInsideArrayBrackets": true,
+	"disallowQuotedKeysInObjects": true,
+	"disallowSpaceAfterObjectKeys": true,
+
+	"disallowLeftStickedOperators": [
+		"?", "+", "-", "/", "*", "=", "==", "===", "!=", "!==", ">", ">=", "<",
+		"<="
+	],
+	"disallowRightStickedOperators": [
+		"?", "+", "/", "*", ":", "=", "==", "===", "!=", "!==", ">", ">=", "<",
+		"<="
+	],
+	"requireLeftStickedOperators": [",", "++", "--"],
+	"requireRightStickedOperators": ["!"],
+	"disallowImplicitTypeConversion": [
+		"numeric", "boolean", "binary", "string"
+	],
+	"disallowKeywords": ["with", "let"],
+	"disallowMultipleLineBreaks": true,
+	"disallowKeywordsOnNewLine": ["else", "catch"],
+	"validateJSDoc": {
+		"checkParamNames": true,
+		"checkRedundantParams": true,
+		"requireParamTypes": true
+	},
+
+	"excludeFiles": ["./**/node_modules/**", "./node_modules/**"]
+}
