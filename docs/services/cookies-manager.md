@@ -63,4 +63,4 @@ CookiesManager.prototype.toArray = function () { }
 
 Implementation:
 
-[lib/CookiesManager.js](../lib/CookiesManager.js)
+[lib/CookiesManager.js](../../lib/CookiesManager.js)
