@@ -1,1 +1,4 @@
-<h1>Something about</h1>
+<h1>About Catberry framework</h1>
+<div class="content-text">
+{page|s}
+</div>
