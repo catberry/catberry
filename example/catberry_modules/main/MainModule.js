@@ -43,15 +43,32 @@ var ERROR_RENDER_NOT_FOUND =
 /**
  * Create new instance of main application module.
  * @param {Logger} $logger To log some messages.
- * @param {string} title Title of main page.
- * @param {string} helloMessage Hello message on top of main page.
+ * @param {config} $config Config object.
+ * @param {UHR} $uhr Universal HTTP(S) request.
  * @constructor
  */
-function MainModule($logger, title, helloMessage) {
+function MainModule($logger, $config, $uhr) {
 	this._logger = $logger;
-	this._title = title;
-	this._helloMessage = helloMessage;
+	this._title = $config.title;
+	this._helloMessage = $config.helloMessage;
+	this._uhr = $uhr;
+	this._staticUrl = 'http://' + $config.staticHost + ':' +
+		$config.staticPort + '/' + 'main';
 }
+
+/**
+ * Current URL to host with static content.
+ * @type {string}
+ * @private
+ */
+MainModule.prototype._staticUrl = null;
+
+/**
+ * Current Universal HTTP(S) Request.
+ * @type {UHR}
+ * @private
+ */
+MainModule.prototype._uhr = null;
 
 /**
  * Current instance of logger.
@@ -140,7 +157,15 @@ MainModule.prototype.bodyRender = function (args, callback) {
  * @param {Function} callback Callback on finish.
  */
 MainModule.prototype.tutorialRender = function (args, callback) {
-	callback(null, {});
+	this._uhr.get(this._staticUrl + '/tutorial.html', {},
+		function (error, status, data) {
+			if (error) {
+				callback(error);
+				return;
+			}
+
+			callback(null, {page: data});
+		});
 };
 
 /**
@@ -149,7 +174,15 @@ MainModule.prototype.tutorialRender = function (args, callback) {
  * @param {Function} callback Callback on finish.
  */
 MainModule.prototype.aboutRender = function (args, callback) {
-	callback(null, {});
+	this._uhr.get(this._staticUrl + '/about.html', {},
+		function (error, status, data) {
+			if (error) {
+				callback(error);
+				return;
+			}
+
+			callback(null, {page: data});
+		});
 };
 
 /**
