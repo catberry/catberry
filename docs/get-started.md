@@ -4,7 +4,7 @@ This is a guide about how to start your new Catberry project fast.
 
 The easiest and fastest way to start your new project is to take [example](../example) project as a basis.
 
-All you need to start Catberry application is to set up your Catberry modules. Some scripts to initialize your application are described below.
+All you need to start Catberry application is a set of your Catberry modules. Some scripts to initialize your application are described below.
 
 Typical project structure looks like this:
 
@@ -133,7 +133,7 @@ By default a Catberry application is in Debug mode. To switch it to Release just
 When it is in debug mode:
 
 * Minification of scripts, CSS and images will be skipped.
-* The framework is watching all files. When they changes all changed resources will be rebuilt
+* The framework is watching all files. When they change all changed resources will be rebuilt.
 
 When it is in release mode:
 
