@@ -1,0 +1,9 @@
+{#tutorial}
+    <div id="main_tutorial"></div>
+{/tutorial}
+{#chat}
+    <div id="chat_body"></div>
+{/chat}
+{#about}
+    <div id="main_about"></div>
+{/about}

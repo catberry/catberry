@@ -246,21 +246,23 @@ describe('ServiceLocator', function () {
 
 				var instances = locator.resolveAll('type');
 				assert.equal(instances.length, 3, 'Wrong instance count');
-				assert.equal(instances[0] instanceof Implementation1, true,
+				assert.equal(instances[0] instanceof Implementation3, true,
 					'Wrong type resolution');
 				assert.equal(instances[1] instanceof Implementation2, true,
 					'Wrong type resolution');
-				assert.equal(instances[2] instanceof Implementation3, true,
+				assert.equal(instances[2] instanceof Implementation1, true,
 					'Wrong type resolution');
 
 			});
 
-		it('should throw error if specified type was not found', function () {
-			var locator = new ServiceLocator();
-			assert.throws(function () {
-				locator.resolveAll('not exists');
-			}, Error);
-		});
+		it('should return empty array if specified type was not found',
+			function () {
+				var locator = new ServiceLocator(),
+					resolved = locator.resolveAll('not exists');
+
+				assert.deepEqual(resolved instanceof Array, true);
+				assert.deepEqual(resolved.length, 0);
+			});
 
 		it('should throw error if specified type is not a string', function () {
 			var locator = new ServiceLocator();
