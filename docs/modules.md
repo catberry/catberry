@@ -41,7 +41,7 @@ If you want to see finished application as an example then please proceed to [ex
 
 **Warning**: According reasons above you should use right URL links in HTML and CSS relatively from public folder.
 
-About "client.js", "server.js" and "map.js" files you may read in [Get started guide](get-started.md).
+More details about "client.js", "server.js" and "map.js" files you can find in [Get started guide](get-started.md).
 
 ##index.js
 
@@ -51,7 +51,7 @@ First of all let's talk about "index.js" - this is module initial script which p
 module.exports = require('./ModuleConstructor');
 ```
 
-But you may specify more complex logic here if you wish but remember there is no way to use require dynamically inside any statements and do not use environment-specified objects like "window" or "process" because this code will be executed both at server and browser.
+But you can specify more complex logic here if you wish but remember there is no way to use require dynamically inside any statements and do not use environment-specified objects like "window" or "process" because this code will be executed both at server and browser.
 
 ##Placeholders
 
@@ -62,7 +62,7 @@ There are two reserved names of placeholders:
  1. \_\_index - is used as whole page template and is called "root placeholder"
  2. \_\_error - is used to show user-friendly error messages in blocks which cause error during rendering. It is called "error placeholder"
 
-More details about placeholders you may see below in "render" method description.
+More details about placeholders you can see below in "render" method description.
 
 ##Interface
 Module logic is presented by constructor and its prototype which should have 3 methods described below.
@@ -109,7 +109,7 @@ And module "cat" will receive:
 }
 ```
 
-As you may guess all parameters without module name prefix is global for all modules like "color" in this case.
+As you could guess all parameters without module name prefix is global for all modules like "color" in this case.
 
 One more important thing is "/hello" URL path, it means that main page template will be placeholder called "\_\_index" of module "hello".
 Another words first of all method "render" of module "hello" will be called with placeholder name "\_\_index" then rendered template will be scanned for more placeholder links and render them all.
