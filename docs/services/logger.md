@@ -10,5 +10,5 @@ In browser it is implemented as a very simple logger which writes to browser's c
 
 Implementation:
 
-* Browser: [lib/client/Logger.js](../lib/client/Logger.js)
+* Browser: [lib/client/Logger.js](../../lib/client/Logger.js)
 * Server: [log4js](https://www.npmjs.org/package/log4js)

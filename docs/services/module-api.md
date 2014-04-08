@@ -37,5 +37,5 @@ If you want to see workable example of usage see [example/catberry_modules/chat/
 
 Implementation:
 
-* Browser: [lib/client/ModuleApiProvider.js](../lib/client/ModuleApiProvider.js)
-* Server: [lib/server/ModuleApiProvider.js](../lib/server/ModuleApiProvider.js)
+* Browser: [lib/client/ModuleApiProvider.js](../../lib/client/ModuleApiProvider.js)
+* Server: [lib/server/ModuleApiProvider.js](../../lib/server/ModuleApiProvider.js)
