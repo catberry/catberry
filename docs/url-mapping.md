@@ -1,13 +1,13 @@
 #URL Mapping Engine
 
-First case you might need URL mapping is a massive state description in URL.
-As was told in [Modules Documentation](modules.md) whole state of Catberry application should be described in URL.
+The first case when you might need URL mapping is a massive state description in URL.
+As it was told in [Modules Documentation](modules.md) whole state of Catberry application should be described in URL.
 All [Query String](http://en.wikipedia.org/wiki/Query_string) parameters are parameters for modules and it is obvious that it could cause problem with long and ugly URLs in your application.
-Second case when you might need URL mapping engine is situation when you have some project and decide to rewrite it using Catberry framework but all old URLs should be saved.
+The second case when you might need URL mapping engine is situation when you have some project and decide to rewrite it using Catberry framework but all old URLs should be saved.
 
 ##Usage
 
-It is very easy to use, you just need to put "map.js" in root of your application near client.js and server.js scripts.
+It is really easy to use, you just need to put "map.js" in root of your application near client.js and server.js scripts.
 
 Example of file below:
 
@@ -40,8 +40,8 @@ module.exports = [
 ```
 
 In fact it exports an array of mapper objects.
-Every mapper object has expression which is regular expression actually and map function.
+Every mapper object has an expression which is actually a regular expression and map function.
 Regular expression is used to test URL path component.
 Map function receives parsed URL object with all URL components described [here](http://nodejs.org/api/url.html#url_url) and should change URL components as it is required and return this or new object with new URL components.
 
-**Warning**: If you current URL matches several expressions at the same time the last mapper will be taken (it is stack-organized).
+**Warning**: If your current URL matches several expressions at the same time the last mapper will be taken (it is stack-organized).

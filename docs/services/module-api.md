@@ -2,7 +2,7 @@
 
 Catberry has Module API Provider service registered as "moduleApiProvider" in [Service Locator](../service-locator.md) and accessible via dependency injection.
 
-If your catberry module need to interact with rendering engine or do other module-related stuff it should use this service.
+If your catberry module need to interact with rendering engine or to do other module-related stuff it should use this service.
 
 Currently it has such methods described below:
 
@@ -33,7 +33,7 @@ ModuleApiProvider.prototype.clearHash = function () { }
 ModuleApiProvider.prototype.requestRefresh = function (moduleReference, placeholderName, callback) { }
 ```
 
-If you want to see workable example of usage see [example/catberry_modules/chat/ChatModule.js](../../example/catberry_modules/chat/ChatModule.js).
+If you want to see an example of usage see [example/catberry_modules/chat/ChatModule.js](../../example/catberry_modules/chat/ChatModule.js).
 
 Implementation:
 

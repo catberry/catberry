@@ -6,7 +6,7 @@ Whole architecture of Catberry framework is based on [Service Locator pattern](h
 It means there is only one service locator in one catberry application and all modules are resolved from this locator when you use "getMiddleware" method on server or "startWhenReady" in browser code.
 Before that moment feel free to register your own modules-services to inject it into catberry modules via DI.
 
-In Catberry, definition of type is just a string which used like a argument name in constructors following '$' char.
+In Catberry, definition of type is just a string which used like an argument name in constructors following '$' char.
 
 If your catberry module's constructor will be like following
 
