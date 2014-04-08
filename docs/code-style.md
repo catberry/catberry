@@ -69,7 +69,7 @@ x = +y;
 x = '' + y;
 x = ~s.indexOf('.');
 ```
- * We don't need trailing whitespaces
+ * We don't leave trailing whitespaces
  * We don't use 'with' operator
  * We don't use multiple line breaks
  * Maximum length of line  - 85
