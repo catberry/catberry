@@ -12,9 +12,9 @@ Typical architecture in common case is presented on image below:
 
 ![Catberry Application Architecture](images/smp.png)
 
-You can find example application [here](../example) with architecture is described below:
+You can find example application [here](../example) with architecture that is described below:
 
 ![Example Application Architecture](images/smp-chat.png)
 
-This approach allow your module to be executed at server and browser as well without any additional logic.
+This approach allows your module to be executed at server and browser as well without any additional logic.
 All you need is to use [Universal HTTP Request](services/uhr.md) - this module implements HTTP request logic using jQuery AJAX in browser and http.request at server but has the same interface.
