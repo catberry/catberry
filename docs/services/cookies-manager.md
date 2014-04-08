@@ -5,7 +5,7 @@ Catberry has cookies manager service registered as "cookiesManager" in [Service 
 Purpose of this service to parse cookie string and then add/edit/remove cookie values. After some changes you can export results to cookie string or to array of cookie setups.
 
 When catberry modules receives render request (method render of module was invoked) with whole current application state it receives some service fields.
-Actually when current application state is created new instance of Cookie Manager is passed with it to every module and you can get access to it through "parameters.$$.$cookies" like in this [example](../example/catberry_modules/chat/ChatModule.js#L175).
+Actually when current application state is created new instance of Cookie Manager is passed with it to every module and you can get access to it through "parameters.$$.$cookies" like in this [example](../../example/catberry_modules/chat/ChatModule.js#L175).
 
 **Warning**: Keep in mind that you can not change cookies on server-side inside Catberry modules because when module processes response HTTP headers is sent already. But feel free to edit cookies in browser.
 

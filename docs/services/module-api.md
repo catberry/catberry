@@ -33,7 +33,7 @@ ModuleApiProvider.prototype.clearHash = function () { }
 ModuleApiProvider.prototype.requestRefresh = function (moduleReference, placeholderName, callback) { }
 ```
 
-If you want to see workable example of usage see [example/catberry_modules/chat/ChatModule.js](../example/catberry_modules/ChatModule.js).
+If you want to see workable example of usage see [example/catberry_modules/chat/ChatModule.js](../../example/catberry_modules/ChatModule.js).
 
 Implementation:
 
