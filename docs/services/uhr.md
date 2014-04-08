@@ -94,6 +94,6 @@ Status object looks like this:
 
 Implementation:
 
-* Base: [lib/UHRBase.js](../lib/UHRBase.js)
+* Base: [lib/UHRBase.js](../../lib/UHRBase.js)
 * Browser: [lib/client/UHR.js](../../lib/client/UHR.js)
 * Server: [lib/server/UHR.js](../../lib/server/UHR.js)
