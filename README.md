@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
-![Catberry](https://github.com/pragmadash/catberry/blob/develop/docs/images/logo.png)
+![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/develop/docs/images/logo.png)
 
 ##What is it?
 Catberry is a framework for fast and modular web-applications. Main feature you will get using Catberry is ability to write module once and use it at server and browser without any additional logic, just create module, put it to folder "catberry_modules" and start. Catberry builds client script bundle and re-use your modules in browser automatically providing Single Page Application using browser History API if it is supported.
