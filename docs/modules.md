@@ -34,8 +34,8 @@ If you want to see finished application as an example then please proceed to [ex
 
 * In fact every module is a folder
 * All modules should be placed into "catberry_module" folder
-* Inside every module should be "index.js" file, "placeholders" folder. Also "assets" folder but it is optionally
-* Assets could be CSS files, PNG, JPEG, GIF images, static HTML or JS files
+* Every module should contain "index.js" file, "placeholders" folder. Also "assets" folder but it is optionally
+* Assets can be CSS files, PNG, JPEG, GIF images, static HTML or JS files
 * All assets except CSS will be processed and put to "public" folder in subfolder with module name
 * All CSS files will be concatenated in one style.css and put to public folder
 
@@ -45,7 +45,7 @@ More details about "client.js", "server.js" and "map.js" files you can find in [
 
 ##index.js
 
-First of all let's talk about "index.js" - this is module initial script which probably just returns "Module Constructor".
+First of all let's talk about "index.js" - this is module initial script that probably just returns "Module Constructor".
 
 ```javascript
 module.exports = require('./ModuleConstructor');
@@ -55,7 +55,7 @@ But you can specify more complex logic here if you wish but remember there is no
 
 ##Placeholders
 
-Placeholder is a [dustjs](https://github.com/linkedin/dustjs) template which is used to render module-related blocks on page.
+Placeholder is a [dustjs](https://github.com/linkedin/dustjs) template that is used to render module-related blocks on page.
 
 There are two reserved names of placeholders:
 
@@ -65,14 +65,14 @@ There are two reserved names of placeholders:
 More details about placeholders you can see below in "render" method description.
 
 ##Interface
-Module logic is presented by constructor and its prototype which should have 3 methods described below.
+Module logic is presented by constructor and its prototype that should have 3 methods described below.
 
 ###Render
 render(string, Object, Function(Error, Object)) - placeholder name, current application state and callback for external error handling and to pass data to template engine.
 
 **Warning**: this method is executed both at server and browser and should not use any environment-specified objects like "window" or "process".
 
-If current rendering process meets placeholder link it requests rendering of placeholder inside module which is a parent of placeholder.
+If current rendering process meets placeholder link it requests rendering of placeholder inside module that is a parent of placeholder.
 This method should request required data from service with business logic, create and send data context to callback for template engine.
 
 Placeholder link is any non-self-closed HTML element with special ID like:
@@ -83,7 +83,7 @@ Placeholder link is any non-self-closed HTML element with special ID like:
 
 Rendered content will be placed inside this element.
 
-When stream-based rendering engine meets such div element it call method render of module "moduleName" and pass it "placeholderName" as a first argument.
+When stream-based rendering engine meets such div element it calls method render of module "moduleName" and pass it "placeholderName" as the first argument.
 In this situation current URL is very important because it describes current application state, for example:
 
 ```
@@ -162,7 +162,7 @@ To link form with module you should specify special attributes:
 
 * name - form should have a name to be sent to module
 * data-module - name of module-receiver
-* data-dependents (optional) - list of placeholders joined by '\&' char which depend on data which is submitted by form. These placeholders will be refreshed after form's data is processed.
+* data-dependents (optional) - list of placeholders joined by '\&' char which depend on data that is submitted by form. These placeholders will be refreshed after form's data is processed.
 
 Example of simple form linked with module:
 
