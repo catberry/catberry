@@ -5,8 +5,8 @@
 	"description": "Example application for catberry framework",
 	"homepage": "https://github.com/pragmadash/catberry",
 	"keywords": [
-		"stream", "web", "isomorphic", "framework", "middleware", "connect",
-		"dust", "module"
+		"catberry", "stream", "web", "isomorphic", "framework", "middleware", "connect",
+		"dust", "module", "express"
 	],
 	"bugs": {
 		"url": "https://github.com/pragmadash/catberry/issues",
