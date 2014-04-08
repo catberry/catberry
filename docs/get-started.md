@@ -2,9 +2,9 @@
 
 This is a guide about how to start your new Catberry project fast.
 
-The easiest and fastest way to start your new project is take [example](../example) project as a basis.
+The easiest and fastest way to start your new project is to take [example](../example) project as a basis.
 
-All you need to start Catberry application is set of your Catberry modules and some scripts to initialize your application are described below.
+All you need to start Catberry application is to set up your Catberry modules. Some scripts to initialize your application are described below.
 
 Typical project structure looks like this:
 
@@ -42,18 +42,18 @@ Let's talk about other stuff in your project except "catberry_modules" folder.
 
 ##"lib" folder
 If you developed projects using node.js you might know that "lib" folder is adopted approach to place modules of any application or package.
-Most of packages in npm do so. So it is a best practice for Catberry project too.
+Most of packages in npm do so. So it is the best practice for Catberry project too.
 
 ##"public" folder
 You do not need to create this folder it will be created automatically on application startup.
 This folder is used to publish all module's resources like images, CSS, static HTML files and browser scripts.
-Also when you start Catberry it builds browser script bundle with all Catberry's browser modules and all modules from folder "catberry_modules" then put it to catberry.js file in public folder.
+Also when you start Catberry it builds browser script bundle with all Catberry's browser modules and all modules from folder "catberry_modules" then puts it to catberry.js file in public folder.
 
 **Warning**: Be careful! "public" folder is cleared on every application startup.
 
 ##"client.js" script
 
-This is initial script for browser which should do all initialization stuff.
+This is an initial script for browser that should do all initialization stuff.
 
 For example, chat service application:
 
@@ -71,11 +71,11 @@ app.locator.register('chatServiceClient', ChatServiceClient, config, true);
 app.startWhenReady();
 ```
 
-You need to create Catberry application instance, register external modules (non-catberry modules) into service locator and then invoke "startWhenReady()" method which will start application when DOM is ready.
+You need to create a Catberry application instance, register external modules (non-catberry modules) into service locator and then invoke "startWhenReady()" method which will start application when DOM is ready.
 
 ##"server.js" script
 
-This is initial back-end script which should starts HTTP server using [connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express).
+This is an initial back-end script that should starts HTTP server using [connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express).
 
 For example, the same chat service application:
 
@@ -116,29 +116,29 @@ http
 	.listen(3000);
 ```
 
-You need to create Catberry application instance, register external modules (non-catberry modules) into service locator and then register Catberry application as middleware using "getMiddleware()" method.
+You need to create a Catberry application instance, register external modules (non-catberry modules) into service locator and then register Catberry application as middleware using "getMiddleware()" method.
 
 ##"map.js" script
 
-Is used for URL mapping engine and this file is optional. More details you can read in [URL Mapping Engine Documentation](url-mapping.md).
+Used for URL mapping engine and this file is optional. More details you can read in [URL Mapping Engine Documentation](url-mapping.md).
 
 ##"config.json" file
 
-It is a good practice to put config file in separate file and require the same file in "client.js" and "server.js" scripts.
+It is a good practice to put config file in a separate file and require the same file in "client.js" and "server.js" scripts.
 
 ## Release and Debug mode
 
-By default Catberry application is in Debug mode to switch it to Release just pass config parameter "isRelease: true" when create your Catberry application instance.
+By default a Catberry application is in Debug mode. To switch it to Release just pass config parameter "isRelease: true" when create your Catberry application instance.
 
 When it is in debug mode:
 
-* There is no minification of scripts, CSS and images
-* There is watch on all files and when it changes all changed resources will be rebuilt
+* Minification of scripts, CSS and images will be skipped.
+* The framework is watching all files. When they changes all changed resources will be rebuilt
 
 When it is in release mode:
 
 * All published resources will be minified and optimized
-* There is no any watch on change
+* Files are not being watched to rebuild.
 
 
 You can use isRelease config parameter via dependency injection in any your own module as it is described in [Service Locator Documentation](service-locator.md).
