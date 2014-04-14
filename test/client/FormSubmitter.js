@@ -126,9 +126,9 @@ function submitCase1(done) {
 				var formSubmitter = locator.resolveInstance(FormSubmitter);
 				$('#form').html(form);
 				modules.module.implementation.once('submit', function (data) {
-					assert.deepEqual(data.name, 'write_some',
+					assert.strictEqual(data.name, 'write_some',
 						'Wrong form name');
-					assert.deepEqual(data.object.text, 'test text',
+					assert.strictEqual(data.object.text, 'test text',
 						'Wrong input value');
 				});
 				formSubmitter.submit($('form[name="write_some"]'),
@@ -206,18 +206,18 @@ function submitCase3(done) {
 					'http://local/some?module_param1=test1&module_param2=test2');
 				$('#form').html(form);
 				pageRenderer.on('renderPlaceholder', function (args) {
-					assert.deepEqual(typeof(args.placeholder), 'object',
+					assert.strictEqual(typeof(args.placeholder), 'object',
 						'Placeholder should be object');
-					assert.deepEqual(args.placeholder.moduleName, 'module',
+					assert.strictEqual(args.placeholder.moduleName, 'module',
 						'Wrong module name');
-					assert.deepEqual(args.placeholder.name === 'first' ||
+					assert.strictEqual(args.placeholder.name === 'first' ||
 							args.placeholder.name === 'second', true,
 						'Wrong placeholder name');
-					assert.deepEqual(typeof(args.parameters), 'object',
+					assert.strictEqual(typeof(args.parameters), 'object',
 						'Parameters should be object');
-					assert.deepEqual(args.parameters.module.param1, 'test1',
+					assert.strictEqual(args.parameters.module.param1, 'test1',
 						'Wrong module parameter');
-					assert.deepEqual(args.parameters.module.param2, 'test2',
+					assert.strictEqual(args.parameters.module.param2, 'test2',
 						'Wrong module parameter');
 				});
 				formSubmitter.submit($('form[name="write_some"]'),
@@ -253,7 +253,7 @@ function canSubmitCase1() {
 			$(function () {
 				var formSubmitter = locator.resolveInstance(FormSubmitter);
 				$('#form').html(form);
-				assert.deepEqual(
+				assert.strictEqual(
 					formSubmitter.canSubmit($('form[name="write_some"]')),
 					true);
 
@@ -282,7 +282,7 @@ function canSubmitCase2() {
 			$(function () {
 				var formSubmitter = locator.resolveInstance(FormSubmitter);
 				$('#form').html(form);
-				assert.deepEqual(
+				assert.strictEqual(
 					formSubmitter.canSubmit($('form[name="write_some"]')),
 					false);
 
@@ -311,7 +311,7 @@ function canSubmitCase3() {
 			$(function () {
 				var formSubmitter = locator.resolveInstance(FormSubmitter);
 				$('#form').html(form);
-				assert.deepEqual(
+				assert.strictEqual(
 					formSubmitter.canSubmit($('form[name="write_some"]')),
 					false);
 

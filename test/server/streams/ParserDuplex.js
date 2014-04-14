@@ -62,7 +62,7 @@ describe('server/streams/ParserDuplex', function () {
 				});
 
 				result.on('end', function () {
-					assert.deepEqual(concat, expected, 'Wrong HTML content');
+					assert.strictEqual(concat, expected, 'Wrong HTML content');
 					done();
 				});
 			});
@@ -88,7 +88,7 @@ describe('server/streams/ParserDuplex', function () {
 				});
 
 				result.on('end', function () {
-					assert.deepEqual(concat, expected, 'Wrong HTML content');
+					assert.strictEqual(concat, expected, 'Wrong HTML content');
 					done();
 				});
 			});

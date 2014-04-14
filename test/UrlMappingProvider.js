@@ -59,8 +59,8 @@ describe('UrlMappingProvider', function () {
 				mappedUrl1 = urlMappingProvider.map('http://localhost:3000/test123'),
 				mappedUrl2 = urlMappingProvider.map('/test12');
 
-			assert.deepEqual(mappedUrl1, 'http://localhost:3000/test123test1');
-			assert.deepEqual(mappedUrl2, '/test12test2');
+			assert.strictEqual(mappedUrl1, 'http://localhost:3000/test123test1');
+			assert.strictEqual(mappedUrl2, '/test12test2');
 		});
 
 		it('should return the same url if mapper is not found', function () {
@@ -86,8 +86,8 @@ describe('UrlMappingProvider', function () {
 				mappedUrl1 = urlMappingProvider.map('http://localhost:3000/t123'),
 				mappedUrl2 = urlMappingProvider.map('/t12');
 
-			assert.deepEqual(mappedUrl1, 'http://localhost:3000/t123');
-			assert.deepEqual(mappedUrl2, '/t12');
+			assert.strictEqual(mappedUrl1, 'http://localhost:3000/t123');
+			assert.strictEqual(mappedUrl2, '/t12');
 		});
 
 		it('should return the same url if no one mapper is registered',
@@ -101,8 +101,8 @@ describe('UrlMappingProvider', function () {
 					mappedUrl2 =
 						urlMappingProvider.map('/t12');
 
-				assert.deepEqual(mappedUrl1, 'http://localhost:3000/t123');
-				assert.deepEqual(mappedUrl2, '/t12');
+				assert.strictEqual(mappedUrl1, 'http://localhost:3000/t123');
+				assert.strictEqual(mappedUrl2, '/t12');
 			});
 	});
 });
