@@ -156,7 +156,7 @@ describe('server/ModuleLoader', function () {
 				}
 			}
 			assert.equal(counter, 2, 'Expect 2 placeholders');
-			assert.deepEqual(secondModule.rootPlaceholder, undefined);
+			assert.strictEqual(secondModule.rootPlaceholder, undefined);
 			assert.equal(secondPlaceholders.placeholder2.name, 'placeholder2',
 				'Wrong placeholder name');
 			assert.equal(

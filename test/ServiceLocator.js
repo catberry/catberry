@@ -96,13 +96,13 @@ describe('ServiceLocator', function () {
 			locator.registerInstance('type', instance2);
 			var resolved = locator.resolve('type');
 			var resolved2 = locator.resolve('type');
-			assert.deepEqual(resolved, instance);
-			assert.deepEqual(resolved2, instance);
+			assert.strictEqual(resolved, instance2);
+			assert.strictEqual(resolved2, instance2);
 
 			var resolvedAll = locator.resolveAll('type');
-			assert.deepEqual(resolvedAll.length, 2);
-			assert.deepEqual(resolvedAll[0], instance);
-			assert.deepEqual(resolvedAll[1], instance2);
+			assert.strictEqual(resolvedAll.length, 2);
+			assert.strictEqual(resolvedAll[0], instance2);
+			assert.strictEqual(resolvedAll[1], instance);
 		});
 	});
 
@@ -211,7 +211,7 @@ describe('ServiceLocator', function () {
 		it('should resolve unspecified parameters as undefined', function () {
 			var locator = new ServiceLocator();
 			locator.register('type', function (test) {
-				assert.deepEqual(test, undefined);
+				assert.strictEqual(test, undefined);
 			});
 
 			var instance = locator.resolve('type');
@@ -260,8 +260,8 @@ describe('ServiceLocator', function () {
 				var locator = new ServiceLocator(),
 					resolved = locator.resolveAll('not exists');
 
-				assert.deepEqual(resolved instanceof Array, true);
-				assert.deepEqual(resolved.length, 0);
+				assert.strictEqual(resolved instanceof Array, true);
+				assert.strictEqual(resolved.length, 0);
 			});
 
 		it('should throw error if specified type is not a string', function () {
@@ -284,7 +284,7 @@ describe('ServiceLocator', function () {
 
 				function ModuleToResolve($testType, testArgument) {
 					assert.equal($testType instanceof  TestModule, true);
-					assert.deepEqual(testArgument, testArgument);
+					assert.strictEqual(testArgument, testArgument);
 				}
 
 				locator.register('testType', TestModule);

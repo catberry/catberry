@@ -59,7 +59,7 @@ describe('server/TemplateProvider', function () {
 				rendered += chunk.toString();
 			});
 			templateStream.on('end', function () {
-				assert.deepEqual(rendered, 'hello', 'Wrong render');
+				assert.strictEqual(rendered, 'hello', 'Wrong render');
 				done();
 			});
 		});
