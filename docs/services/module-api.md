@@ -1,6 +1,6 @@
 #Module API provider
 
-Catberry has Module API Provider service registered as "moduleApiProvider" in [Service Locator](../service-locator.md) and accessible via dependency injection.
+Catberry has Module API Provider service registered as "moduleApiProvider" in [Service Locator](https://github.com/pragmadash/catberry-locator/blob/master/README.md) and accessible via dependency injection.
 
 If your catberry module need to interact with rendering engine or to do other module-related stuff it should use this service.
 

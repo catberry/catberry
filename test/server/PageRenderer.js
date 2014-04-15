@@ -34,7 +34,7 @@ var assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
 	HttpResponse = require('../mocks/HttpResponse'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
 	locator = new ServiceLocator();
 

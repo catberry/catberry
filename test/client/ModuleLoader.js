@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	TemplateProvider = require('../mocks/TemplateProvider'),
 	Logger = require('../mocks/Logger'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	ModuleLoader = require('../../lib/client/ModuleLoader');
 
 function Module1() {}

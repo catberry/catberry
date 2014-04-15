@@ -4,7 +4,7 @@
 
 * [About](../README.md)
 * [Get started](get-started.md)
-* [Service Locator](service-locator.md)
+* [Service Locator](https://github.com/pragmadash/catberry-locator/blob/master/README.md)
 	* Standard Catberry services
 		* [Cookies Manager](services/cookies-manager.md)
 		* [UHR (Universal HTTP(S) Request)](services/uhr.md)

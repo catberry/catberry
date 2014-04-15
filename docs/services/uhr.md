@@ -1,6 +1,6 @@
 #UHR (Universal HTTP(S) Request)
 
-Catberry has Universal HTTP(S) Request service registered as "uhr" in [Service Locator](../service-locator.md) and accessible via dependency injection.
+Catberry has Universal HTTP(S) Request service registered as "uhr" in [Service Locator](https://github.com/pragmadash/catberry-locator/blob/master/README.md) and accessible via dependency injection.
 
 It has one interface and different implementations on server and browser.
 

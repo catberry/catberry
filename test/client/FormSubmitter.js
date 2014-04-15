@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	jsdom = require('jsdom'),
 	util = require('util'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	CookiesManager = require('../../lib/CookiesManager'),
 	StateProvider = require('../../lib/client/StateProvider'),
 	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
