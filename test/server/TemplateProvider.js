@@ -31,7 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	Logger = require('./../mocks/Logger'),
 	path = require('path'),
 	fs = require('fs'),

@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	ModuleLoader = require('../../lib/server/ModuleLoader');
 
 var CASES_DIRECTORY = path.join(__dirname, '..', 'cases',

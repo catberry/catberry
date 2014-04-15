@@ -38,7 +38,7 @@ var assert = require('assert'),
 	ModuleLoader = require('../mocks/ModuleLoader'),
 	Logger = require('../mocks/Logger'),
 	PageRenderer = require('../../lib/client/PageRenderer'),
-	ServiceLocator = require('../../lib/ServiceLocator');
+	ServiceLocator = require('catberry-locator');
 
 util.inherits(Module, EventEmitter);
 util.inherits(ModuleWithError, EventEmitter);

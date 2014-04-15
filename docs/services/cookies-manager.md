@@ -1,6 +1,6 @@
 #Cookies Manager
 
-Catberry has a cookies manager service registered as "cookiesManager" in [Service Locator](../service-locator.md) and accessible via dependency injection.
+Catberry has a cookies manager service registered as "cookiesManager" in [Service Locator](https://github.com/pragmadash/catberry-locator/blob/master/README.md) and accessible via dependency injection.
 
 Purpose of this service is to parse cookie string and then add/edit/remove cookie values. After some changes you can export results to cookie string or to array of cookie setups.
 
