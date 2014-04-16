@@ -1,8 +1,8 @@
 {
 	"name": "catberry",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
-	"description": "Framework for fast modular web-applications using isomorphic JavaScript which is built as a connect middleware",
+	"description": "Catberry is a framework for fast and modular web-applications. Main feature you will get using Catberry is ability to write module once and use it at server and browser without any additional logic, just create module, put it to folder catberry_modules and start",
 	"homepage": "https://github.com/pragmadash/catberry",
 	"keywords": [
 		"stream", "web", "isomorphic", "framework", "middleware", "connect",
@@ -29,6 +29,7 @@
 
 	"main": "./index",
 	"dependencies": {
+		"catberry-locator": "~0.4.0",
 		"jquery": "~2.1.0",
 		"uglify-js": "~2.4.13",
 		"browserify": "~3.32.1",

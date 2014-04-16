@@ -31,7 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	Logger = require('./../mocks/Logger'),
 	path = require('path'),
 	fs = require('fs'),
@@ -59,7 +59,7 @@ describe('server/TemplateProvider', function () {
 				rendered += chunk.toString();
 			});
 			templateStream.on('end', function () {
-				assert.deepEqual(rendered, 'hello', 'Wrong render');
+				assert.strictEqual(rendered, 'hello', 'Wrong render');
 				done();
 			});
 		});

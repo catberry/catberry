@@ -34,7 +34,7 @@ var assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
 	HttpResponse = require('../mocks/HttpResponse'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
 	locator = new ServiceLocator();
 
@@ -220,33 +220,33 @@ function checkCase(caseName, callback) {
 		});
 
 	compareWithExpected(caseName, response1, function (isValid) {
-		assert.deepEqual(isValid, true);
+		assert.strictEqual(isValid, true);
 		checkCounter++;
 		callbackInvoker();
 	});
 
 	checkIsEmpty(response2, function (isEmpty) {
-		assert.deepEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, true);
 		checkCounter++;
 		callbackInvoker();
 	});
 
 	// must be error description and stack trace
 	checkIsEmpty(response3, function (isEmpty) {
-		assert.deepEqual(isEmpty, false);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
 
 	// must be error description and stack trace
 	checkIsEmpty(response4, function (isEmpty) {
-		assert.deepEqual(isEmpty, false);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
 
 	checkIsEmpty(response5, function (isEmpty) {
-		assert.deepEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, true);
 		checkCounter++;
 		callbackInvoker();
 	});
