@@ -35,7 +35,7 @@ var assert = require('assert'),
 	Logger = require('../mocks/Logger'),
 	EventRouter = require('../../lib/client/EventRouter'),
 	EventEmitter = require('events').EventEmitter,
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	ModuleLoader = require('../mocks/ModuleLoader');
 
 util.inherits(Module, EventEmitter);
@@ -101,7 +101,7 @@ function routeCase1(done) {
 		assert.fail('Second module should not receive anything');
 	});
 	modules.module.implementation.once('handle', function (eventName) {
-		assert.deepEqual(eventName, 'testEvent',
+		assert.strictEqual(eventName, 'testEvent',
 			'Wrong event name');
 		done();
 	});
@@ -120,13 +120,13 @@ function routeCase2(done) {
 		assert.fail('Second module should not receive anything');
 	});
 	modules.module.implementation.once('handle', function (eventName1) {
-		assert.deepEqual(eventName1, 'testEvent1',
+		assert.strictEqual(eventName1, 'testEvent1',
 			'Wrong event name');
 		modules.module.implementation.once('handle', function (eventName2) {
-			assert.deepEqual(eventName2, '!testEvent1',
+			assert.strictEqual(eventName2, '!testEvent1',
 				'Wrong event name');
 			modules.module.implementation.once('handle', function (eventName3) {
-				assert.deepEqual(eventName3, 'testEvent2',
+				assert.strictEqual(eventName3, 'testEvent2',
 					'Wrong event name');
 				done();
 			});
@@ -148,10 +148,10 @@ function routeCase3(done) {
 		assert.fail('Second module should not receive anything');
 	});
 	modules.module.implementation.once('handle', function (eventName1) {
-		assert.deepEqual(eventName1, 'testEvent1',
+		assert.strictEqual(eventName1, 'testEvent1',
 			'Wrong event name');
 		modules.module.implementation.once('handle', function (eventName2) {
-			assert.deepEqual(eventName2, '!testEvent1',
+			assert.strictEqual(eventName2, '!testEvent1',
 				'Wrong event name');
 			done();
 		});
@@ -191,14 +191,14 @@ function routeCase5(done) {
 		counter = 0;
 
 	modules.module2.implementation.once('handle', function (eventName) {
-		assert.deepEqual(eventName, 'testEvent',
+		assert.strictEqual(eventName, 'testEvent',
 			'Wrong event name');
 		if (++counter === 2) {
 			done();
 		}
 	});
 	modules.module.implementation.once('handle', function (eventName) {
-		assert.deepEqual(eventName, 'testEvent',
+		assert.strictEqual(eventName, 'testEvent',
 			'Wrong event name');
 		if (++counter === 2) {
 			done();
@@ -219,10 +219,10 @@ function routeCase6(done) {
 		counter = 0;
 
 	modules.module2.implementation.once('handle', function (eventName1) {
-		assert.deepEqual(eventName1, 'testEvent1',
+		assert.strictEqual(eventName1, 'testEvent1',
 			'Wrong event name');
 		modules.module2.implementation.once('handle', function (eventName2) {
-			assert.deepEqual(eventName2, '!testEvent1',
+			assert.strictEqual(eventName2, '!testEvent1',
 				'Wrong event name');
 			if (++counter === 2) {
 				done();
@@ -234,10 +234,10 @@ function routeCase6(done) {
 		}
 	});
 	modules.module.implementation.once('handle', function (eventName1) {
-		assert.deepEqual(eventName1, 'testEvent1',
+		assert.strictEqual(eventName1, 'testEvent1',
 			'Wrong event name');
 		modules.module.implementation.once('handle', function (eventName2) {
-			assert.deepEqual(eventName2, '!testEvent1',
+			assert.strictEqual(eventName2, '!testEvent1',
 				'Wrong event name');
 
 			if (++counter === 2) {
@@ -264,10 +264,10 @@ function routeCase7(done) {
 		counter = 0;
 
 	modules.module2.implementation.once('handle', function (eventName1) {
-		assert.deepEqual(eventName1, 'testEvent1',
+		assert.strictEqual(eventName1, 'testEvent1',
 			'Wrong event name');
 		modules.module2.implementation.once('handle', function (eventName2) {
-			assert.deepEqual(eventName2, '!testEvent1',
+			assert.strictEqual(eventName2, '!testEvent1',
 				'Wrong event name');
 			if (++counter === 2) {
 				done();
@@ -276,10 +276,10 @@ function routeCase7(done) {
 		eventRouter.routeHashChange('module2_testEvent2');
 	});
 	modules.module.implementation.once('handle', function (eventName1) {
-		assert.deepEqual(eventName1, 'testEvent1',
+		assert.strictEqual(eventName1, 'testEvent1',
 			'Wrong event name');
 		modules.module.implementation.once('handle', function (eventName2) {
-			assert.deepEqual(eventName2, '!testEvent1',
+			assert.strictEqual(eventName2, '!testEvent1',
 				'Wrong event name');
 
 			if (++counter === 2) {

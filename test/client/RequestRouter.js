@@ -36,7 +36,7 @@ var assert = require('assert'),
 	EventRouter = require('../mocks/EventRouter'),
 	FormSubmitter = require('../mocks/FormSubmitter'),
 	PageRenderer = require('../mocks/PageRenderer'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
 	StateProvider = require('../../lib/client/StateProvider'),
 	CookiesManager = require('../../lib/CookiesManager'),
@@ -116,7 +116,7 @@ function hashHandleCase1(done) {
 		eventRouter = new EventRouter();
 	locator.registerInstance('eventRouter', eventRouter);
 	eventRouter.once('routeHashChange', function (eventName) {
-		assert.deepEqual(eventName, 'test-hash',
+		assert.strictEqual(eventName, 'test-hash',
 			'Wrong event name');
 		done();
 	});
@@ -179,12 +179,12 @@ function hashHandleCase3(done) {
 				var requestRouter = locator.resolveInstance(RequestRouter);
 
 				eventRouter.once('routeHashChange', function (eventName) {
-					assert.deepEqual(eventName, 'test1');
+					assert.strictEqual(eventName, 'test1');
 					eventRouter.once('routeHashChange', function (eventName) {
-						assert.deepEqual(eventName, 'test2');
+						assert.strictEqual(eventName, 'test2');
 						eventRouter.once('routeHashChange',
 							function (eventName) {
-								assert.deepEqual(eventName, null);
+								assert.strictEqual(eventName, null);
 								done();
 							});
 
@@ -225,7 +225,7 @@ function linkEventHandleCase1(done) {
 				var requestRouter = locator.resolveInstance(RequestRouter);
 
 				eventRouter.once('routeEvent', function (eventName) {
-					assert.deepEqual(eventName, 'test1');
+					assert.strictEqual(eventName, 'test1');
 					done();
 				});
 
@@ -249,16 +249,16 @@ function renderHandleCase1(done) {
 		pageRenderer = new PageRenderer();
 	locator.registerInstance('pageRenderer', pageRenderer);
 	pageRenderer.once('render', function (parameters) {
-		assert.deepEqual(typeof(parameters), 'object');
-		assert.deepEqual(typeof(parameters.first), 'object');
-		assert.deepEqual(typeof(parameters.second), 'object');
-		assert.deepEqual(parameters.first.value, 'firstValue');
-		assert.deepEqual(parameters.second.value, 'secondValue');
-		assert.deepEqual(parameters.first.global, 'globalValue');
-		assert.deepEqual(parameters.second.global, 'globalValue');
-		assert.deepEqual(currentWindow.location.toString(),
+		assert.strictEqual(typeof(parameters), 'object');
+		assert.strictEqual(typeof(parameters.first), 'object');
+		assert.strictEqual(typeof(parameters.second), 'object');
+		assert.strictEqual(parameters.first.value, 'firstValue');
+		assert.strictEqual(parameters.second.value, 'secondValue');
+		assert.strictEqual(parameters.first.global, 'globalValue');
+		assert.strictEqual(parameters.second.global, 'globalValue');
+		assert.strictEqual(currentWindow.location.toString(),
 				'http://local' + link);
-		assert.deepEqual(currentWindow.history.length, 1);
+		assert.strictEqual(currentWindow.history.length, 1);
 		done();
 	});
 
@@ -305,7 +305,7 @@ function renderHandleCase2(done) {
 				var requestRouter = locator.resolveInstance(RequestRouter);
 				$('a').trigger('click');
 				setTimeout(function () {
-					assert.deepEqual(window.location.toString(),
+					assert.strictEqual(window.location.toString(),
 							'http://local' + link);
 					done();
 				}, 100);
@@ -331,8 +331,8 @@ function submitHandleCase1(done) {
 	locator.registerInstance('formSubmitter', formSubmitter);
 
 	formSubmitter.once('submit', function (formToSubmit) {
-		assert.deepEqual(formToSubmit.length, 1);
-		assert.deepEqual(formToSubmit.attr('name'), 'write_some');
+		assert.strictEqual(formToSubmit.length, 1);
+		assert.strictEqual(formToSubmit.attr('name'), 'write_some');
 		done();
 	});
 

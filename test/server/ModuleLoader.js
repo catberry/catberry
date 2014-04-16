@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
-	ServiceLocator = require('../../lib/ServiceLocator'),
+	ServiceLocator = require('catberry-locator'),
 	ModuleLoader = require('../../lib/server/ModuleLoader');
 
 var CASES_DIRECTORY = path.join(__dirname, '..', 'cases',
@@ -156,7 +156,7 @@ describe('server/ModuleLoader', function () {
 				}
 			}
 			assert.equal(counter, 2, 'Expect 2 placeholders');
-			assert.deepEqual(secondModule.rootPlaceholder, undefined);
+			assert.strictEqual(secondModule.rootPlaceholder, undefined);
 			assert.equal(secondPlaceholders.placeholder2.name, 'placeholder2',
 				'Wrong placeholder name');
 			assert.equal(

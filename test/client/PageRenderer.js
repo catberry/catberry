@@ -38,7 +38,7 @@ var assert = require('assert'),
 	ModuleLoader = require('../mocks/ModuleLoader'),
 	Logger = require('../mocks/Logger'),
 	PageRenderer = require('../../lib/client/PageRenderer'),
-	ServiceLocator = require('../../lib/ServiceLocator');
+	ServiceLocator = require('catberry-locator');
 
 util.inherits(Module, EventEmitter);
 util.inherits(ModuleWithError, EventEmitter);
@@ -202,9 +202,9 @@ function renderPlaceholderCase1(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(Object.keys(rendered).length, 1);
-						assert.deepEqual('module_first' in rendered, true);
-						assert.deepEqual(window.document.body.innerHTML,
+						assert.strictEqual(Object.keys(rendered).length, 1);
+						assert.strictEqual('module_first' in rendered, true);
+						assert.strictEqual(window.document.body.innerHTML,
 							expected);
 						done();
 					});
@@ -238,10 +238,10 @@ function renderPlaceholderCase2(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(Object.keys(rendered).length, 2);
-						assert.deepEqual('module_first' in rendered, true);
-						assert.deepEqual('module_second' in rendered, true);
-						assert.deepEqual(window.document.body.innerHTML,
+						assert.strictEqual(Object.keys(rendered).length, 2);
+						assert.strictEqual('module_first' in rendered, true);
+						assert.strictEqual('module_second' in rendered, true);
+						assert.strictEqual(window.document.body.innerHTML,
 							expected);
 						done();
 					});
@@ -279,10 +279,10 @@ function renderPlaceholderCase3(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(Object.keys(rendered).length, 1);
-						assert.deepEqual(
+						assert.strictEqual(Object.keys(rendered).length, 1);
+						assert.strictEqual(
 								'moduleWithError_first' in rendered, true);
-						assert.deepEqual(
+						assert.strictEqual(
 							window.document.body.innerHTML, expected);
 						done();
 					});
@@ -323,10 +323,10 @@ function renderPlaceholderCase4(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(Object.keys(rendered).length, 1);
-						assert.deepEqual(
+						assert.strictEqual(Object.keys(rendered).length, 1);
+						assert.strictEqual(
 								'moduleWithError_first' in rendered, true);
-						assert.deepEqual(
+						assert.strictEqual(
 							window.document.body.innerHTML, expected);
 						done();
 					});
@@ -391,18 +391,18 @@ function renderModuleCase1(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(Object.keys(rendered).length, 3);
-						assert.deepEqual(order.length, 3);
-						assert.deepEqual(
+						assert.strictEqual(Object.keys(rendered).length, 3);
+						assert.strictEqual(order.length, 3);
+						assert.strictEqual(
 								'module2_second' in rendered, true);
-						assert.deepEqual(
+						assert.strictEqual(
 								'module2_first' in rendered, true);
-						assert.deepEqual(
+						assert.strictEqual(
 								'module_first' in rendered, true);
-						assert.deepEqual(order[0], 'module2_second');
-						assert.deepEqual(order[1], 'module2_first');
-						assert.deepEqual(order[2], 'module_first');
-						assert.deepEqual(
+						assert.strictEqual(order[0], 'module2_second');
+						assert.strictEqual(order[1], 'module2_first');
+						assert.strictEqual(order[2], 'module_first');
+						assert.strictEqual(
 							window.document.body.innerHTML, expected);
 						done();
 					});
@@ -470,19 +470,19 @@ function renderModuleCase2(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(Object.keys(rendered).length, 3);
-						assert.deepEqual(order.length, 3);
-						assert.deepEqual(
+						assert.strictEqual(Object.keys(rendered).length, 3);
+						assert.strictEqual(order.length, 3);
+						assert.strictEqual(
 								'module2_second' in rendered, true);
-						assert.deepEqual(
+						assert.strictEqual(
 								'module2_first' in rendered, true);
-						assert.deepEqual(
+						assert.strictEqual(
 								'module_first' in rendered, true);
-						assert.deepEqual(order[0], 'module2_second');
-						assert.deepEqual(order[1], 'module2_first');
-						assert.deepEqual(order[2], 'module_first');
+						assert.strictEqual(order[0], 'module2_second');
+						assert.strictEqual(order[1], 'module2_first');
+						assert.strictEqual(order[2], 'module_first');
 
-						assert.deepEqual(
+						assert.strictEqual(
 							window.document.body.innerHTML, expected);
 						done();
 					});
@@ -539,7 +539,7 @@ function renderModuleCase3(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(
+						assert.strictEqual(
 							window.document.body.innerHTML, page);
 						done();
 					});
@@ -601,9 +601,9 @@ function renderCase1(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(order.length, 1);
-						assert.deepEqual(order[0], 'module_first');
-						assert.deepEqual(
+						assert.strictEqual(order.length, 1);
+						assert.strictEqual(order[0], 'module_first');
+						assert.strictEqual(
 							window.document.body.innerHTML, expected);
 						done();
 					});
@@ -666,11 +666,11 @@ function renderCase2(done) {
 						if (error) {
 							assert.fail(error);
 						}
-						assert.deepEqual(order.length, 3);
-						assert.deepEqual(order[0], 'module2_second');
-						assert.deepEqual(order[1], 'module2_first');
-						assert.deepEqual(order[2], 'module_first');
-						assert.deepEqual(
+						assert.strictEqual(order.length, 3);
+						assert.strictEqual(order[0], 'module2_second');
+						assert.strictEqual(order[1], 'module2_first');
+						assert.strictEqual(order[2], 'module_first');
+						assert.strictEqual(
 							window.document.body.innerHTML, expected);
 						done();
 					});

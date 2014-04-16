@@ -1,6 +1,6 @@
 #Logger
 
-Catberry has an universal logger service registered as "logger" in [Service Locator](../service-locator.md) and accessible via dependency injection.
+Catberry has an universal logger service registered as "logger" in [Service Locator](https://github.com/pragmadash/catberry-locator/blob/master/README.md) and accessible via dependency injection.
 
 This logger implementation has standard for all loggers methods {trace, warn, info, error, fatal}. Last two supports Error object to be passed as an argument.
 
