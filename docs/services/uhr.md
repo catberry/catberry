@@ -11,7 +11,7 @@ This service has following methods.
 
 ```javascript
 /**
- * Does GEt request to HTTP server.
+ * Does GET request to HTTP server.
  * @param {string} url URL to request.
  * @param {Object} options Object with options.
  * @param {Function<Error, Object, string>?} callback Callback on finish
