@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "0.5.0",
+	"version": "0.4.1",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Catberry is a framework for fast and modular web-applications. Main feature you will get using Catberry is ability to write module once and use it at server and browser without any additional logic, just create module, put it to folder catberry_modules and start",
 	"homepage": "https://github.com/pragmadash/catberry",
