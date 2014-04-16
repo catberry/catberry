@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
-![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/develop/docs/images/logo.png)
+![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
 
 ##What is it?
 Catberry is a framework for fast and modular web-applications. Main feature you will get using Catberry is ability to write module once and use it at server and browser without any additional logic, just create module, put it to folder "catberry_modules" and start. Catberry builds client script bundle and re-use your modules in browser automatically providing Single Page Application using browser History API if it is supported.
@@ -19,13 +19,13 @@ Catberry is a framework for fast and modular web-applications. Main feature you 
 * You could register own modules (services) in [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) and inject it into any module you want
 * Framework itself is a [connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express) middleware it means you could use it with any other middleware
 * All page state is described by URL with GET query string in format "moduleName_parameterName=value" and hash "moduleName_parameterName" or without module name prefix which means global parameter or event. This approach guarantees that your page is rendered identically from server and using History API in browser.
-* Very flexible [URL mapping engine](https://github.com/pragmadash/catberry/blob/develop/docs/url-mapping.md) which allows to use short human-understandable URLs instead big URL with a lot of GET parameters
-* New concept of application architecture is called [Service-Module-Placeholder](https://github.com/pragmadash/catberry/blob/develop/docs/smp.md) instead Model-View-Controller. SMP is much easier and faster to implement.
-* Very simple [Module API](https://github.com/pragmadash/catberry/blob/develop/docs/modules.md)
+* Very flexible [URL mapping engine](https://github.com/pragmadash/catberry/blob/master/docs/url-mapping.md) which allows to use short human-understandable URLs instead big URL with a lot of GET parameters
+* New concept of application architecture is called [Service-Module-Placeholder](https://github.com/pragmadash/catberry/blob/master/docs/smp.md) instead Model-View-Controller. SMP is much easier and faster to implement.
+* Very simple [Module API](https://github.com/pragmadash/catberry/blob/master/docs/modules.md)
 
-For more details please proceed to [Catberry Documentation](https://github.com/pragmadash/catberry/blob/develop/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/pragmadash/catberry/blob/master/docs/index.md).
 
-Also you can see [example](https://github.com/pragmadash/catberry/tree/develop/example) or install it from npm:
+Also you can see [example](https://github.com/pragmadash/catberry/tree/master/example) or install it from npm:
 
 ```bash
 npm install catberry-example
@@ -35,7 +35,7 @@ npm install catberry-example
 If you have found a bug, please create pull request with mocha unit-test which reproduces it or describe all details in issue if you can not implement test.
 If you want to propose some improvements just create issue or pull request but please do not forget to use **npm test** to be sure that you code is awesome.
 
-All changes should satisfy this [Code Style Guide](https://github.com/pragmadash/catberry/blob/develop/docs/code-style.md).
+All changes should satisfy this [Code Style Guide](https://github.com/pragmadash/catberry/blob/master/docs/code-style.md).
 
 Also your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
 
