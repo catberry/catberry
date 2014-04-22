@@ -38,6 +38,7 @@ module.exports = [
 		expression: /^\/$/,
 		map: function (url) {
 			url.pathname += 'main';
+			url.search = '?main_tab=tutorial';
 			return url;
 		}
 	},
