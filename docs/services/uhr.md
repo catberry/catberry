@@ -7,6 +7,17 @@ It has one interface and different implementations on server and browser.
 At server it uses node's "http.request" or "https.request" (depend on specified protocol in URL).
 At browser it uses jQuery AJAX implementation.
 
+This module was developed using [HTTP/1.1v2 RFC 2616](http://www.w3.org/Protocols/rfc2616).
+
+It supports:
+
+ * gzip and deflate request/response content encodings
+ * application/json and application/x-www-form-urlencoded request/response content types
+ * Request timeout
+ * Auto stringify/parse request/response data
+ * HTTP/HTTPS
+ * Any additional HTTP headers you set
+
 This service has following methods.
 
 ```javascript
