@@ -1,11 +1,12 @@
 {
 	"name": "catberry-example",
-	"version": "0.4.0",
+	"version": "0.4.3",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Example application for catberry framework",
 	"homepage": "https://github.com/pragmadash/catberry",
 	"keywords": [
-		"catberry", "stream", "web", "isomorphic", "framework", "middleware", "connect",
+		"catberry", "stream", "web", "isomorphic", "framework", "middleware",
+		"connect",
 		"dust", "module", "express"
 	],
 	"bugs": {
@@ -28,7 +29,10 @@
 	},
 
 	"scripts": {
-		"start": "node ./server.js release"
+		"start": "npm run release",
+		"release": "node ./server.js release",
+		"debug": "node ./server.js",
+		"clean": "node ./server.js clean"
 	},
 
 	"licenses": [

@@ -1,4 +1,5 @@
-public
-compiled
-node_modules
+example/public
+example/catberry_modules/*/placeholders/compiled
+example/catberry_modules/*/assets
 example/node_modules
+node_modules

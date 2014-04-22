@@ -1,4 +1,4 @@
-/* 
+/*
  * catberry
  *
  * Copyright (c) 2014 Denis Rechkunov and project contributors.
@@ -176,7 +176,7 @@ ChatServiceClient.prototype.getMessages =
 					return;
 				}
 				try {
-					callback(null, JSON.parse(data));
+					callback(null, data);
 				} catch (e) {
 					callback(e);
 				}
