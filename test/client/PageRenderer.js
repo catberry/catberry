@@ -168,7 +168,7 @@ function createModules() {
 					}
 				},
 				__error: {
-					name: '_error',
+					name: '_lastError',
 					moduleName: 'moduleWithError',
 					getTemplateStream: function () {
 						return new ContentReadable('error placeholder');

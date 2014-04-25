@@ -141,6 +141,33 @@ describe('UHR', function () {
 			});
 		});
 
+		it('should send correct headers', function (done) {
+			var server = createServer(8093, function (request, response) {
+				assert.strictEqual(request.headers.host, 'localhost:8093');
+				assert.strictEqual(typeof(request.headers.accept), 'string');
+				assert.strictEqual(typeof(request.headers.pragma), 'string');
+				assert.strictEqual(typeof(request.headers['accept-charset']),
+					'string');
+				assert.strictEqual(typeof(request.headers['cache-control']),
+					'string');
+				assert.strictEqual(typeof(request.headers['user-agent']),
+					'string');
+				response.end();
+				server.close(function () {
+					done();
+				});
+			});
+
+			var uhr = new UHR();
+			uhr.request({
+				url: 'http://localhost:8093/page',
+				method: 'GET'
+			}, function (error, status) {
+				assert.strictEqual(error, null);
+				assert.strictEqual(status.code, 200);
+			});
+		});
+
 		it('should parse URL encoded response', function (done) {
 			var obj = {
 				test: 'hello world',
