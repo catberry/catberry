@@ -92,5 +92,55 @@ describe('server/streams/ParserDuplex', function () {
 					done();
 				});
 			});
+
+		it('should propery skip HTML comments', function (done) {
+			var concat = '',
+				input = fs.createReadStream(
+					path.join(casePath, 'case2', 'input.html')),
+				expected = fs.readFileSync(
+					path.join(casePath, 'case2', 'expected.html'), {
+						encoding: 'utf8'
+					}),
+				parser = new ParserDuplex(),
+				result = input.pipe(parser);
+
+			parser.foundTagIdHandler = function (id) {
+				return new ContentReadable('test' + id);
+			};
+
+			result.on('data', function (chunk) {
+				concat += chunk;
+			});
+
+			result.on('end', function () {
+				assert.strictEqual(concat, expected, 'Wrong HTML content');
+				done();
+			});
+		});
+
+		it('should ignore incorrect HTML syntax', function (done) {
+			var concat = '',
+				input = fs.createReadStream(
+					path.join(casePath, 'case3', 'input.html')),
+				expected = fs.readFileSync(
+					path.join(casePath, 'case3', 'expected.html'), {
+						encoding: 'utf8'
+					}),
+				parser = new ParserDuplex(),
+				result = input.pipe(parser);
+
+			parser.foundTagIdHandler = function (id) {
+				return new ContentReadable('test' + id);
+			};
+
+			result.on('data', function (chunk) {
+				concat += chunk;
+			});
+
+			result.on('end', function () {
+				assert.strictEqual(concat, expected, 'Wrong HTML content');
+				done();
+			});
+		});
 	});
 });
