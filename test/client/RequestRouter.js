@@ -62,6 +62,11 @@ describe('client/RequestRouter', function () {
 				linkEventHandleCase1);
 		});
 
+		describe('link event handle', function () {
+			it('should catch link click in child element and raise event',
+				linkEventHandleCase1a);
+		});
+
 		describe('link render', function () {
 			it('should catch link click and request rendering',
 				renderHandleCase1
@@ -230,6 +235,37 @@ function linkEventHandleCase1(done) {
 				});
 
 				$('#link').trigger('click');
+			});
+		}
+	});
+}
+
+/**
+ * Handles first case (sub case a), when link click causes event in module.
+ * @param {Function} done Mocha done function.
+ */
+function linkEventHandleCase1a(done) {
+	var locator = createLocator(),
+		eventRouter = new EventRouter();
+	locator.registerInstance('eventRouter', eventRouter);
+
+	jsdom.env({
+		html: '<a data-event="test1">' +
+			'<div><span><span id="click-here"></span></span></div>' +
+			'</a>',
+		done: function (errors, window) {
+			prepareWindow(window, locator);
+			var $ = locator.resolve('jQuery');
+			$(function () {
+				window.location.assign('http://local/some');
+				var requestRouter = locator.resolveInstance(RequestRouter);
+
+				eventRouter.once('routeEvent', function (eventName) {
+					assert.strictEqual(eventName, 'test1');
+					done();
+				});
+
+				$('#click-here').trigger('click');
 			});
 		}
 	});
