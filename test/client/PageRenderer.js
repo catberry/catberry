@@ -197,8 +197,11 @@ function renderPlaceholderCase1(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {};
-				pageRenderer.renderPlaceholder(modules.module.placeholders.first,
-					{module: {first: 'test1'}}, rendered, function (error) {
+				pageRenderer.renderPlaceholder(
+					modules.module.placeholders.first, {
+						$$: {$context: {}},
+						module: {first: 'test1'}
+					}, rendered, function (error) {
 						if (error) {
 							assert.fail(error);
 						}
@@ -222,6 +225,7 @@ function renderPlaceholderCase2(done) {
 		expected = '<div id="module_second">test2' +
 			'<div id="module_first">test1</div></div>',
 		modules = createModules(),
+		context = {},
 		locator = createLocator({modules: modules});
 
 	jsdom.env({
@@ -232,14 +236,20 @@ function renderPlaceholderCase2(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {};
-				pageRenderer.renderPlaceholder(modules.module.placeholders.second,
-					{module: {first: 'test1', second: 'test2'}}, rendered,
+				pageRenderer.renderPlaceholder(
+					modules.module.placeholders.second, {
+						$$: {$context: context},
+						module: {first: 'test1', second: 'test2'}
+					}, rendered,
 					function (error) {
 						if (error) {
 							assert.fail(error);
 						}
 						assert.strictEqual(Object.keys(rendered).length, 2);
 						assert.strictEqual('module_first' in rendered, true);
+						assert.strictEqual('module_second' in rendered, true);
+						assert.deepEqual(context.module.first, {data: 'test1'});
+						assert.deepEqual(context.module.second, {data: 'test2'});
 						assert.strictEqual('module_second' in rendered, true);
 						assert.strictEqual(window.document.body.innerHTML,
 							expected);
@@ -273,8 +283,10 @@ function renderPlaceholderCase3(done) {
 					}),
 					rendered = {};
 				pageRenderer.renderPlaceholder(
-					modules.moduleWithError.placeholders.first,
-					{moduleWithError: {first: 'test1'}}, rendered,
+					modules.moduleWithError.placeholders.first, {
+						$$: {$context: {}},
+						moduleWithError: {first: 'test1'}
+					}, rendered,
 					function (error) {
 						if (error) {
 							assert.fail(error);
@@ -317,8 +329,10 @@ function renderPlaceholderCase4(done) {
 					}),
 					rendered = {};
 				pageRenderer.renderPlaceholder(
-					modules.moduleWithError.placeholders.first,
-					{moduleWithError: {first: 'test1'}}, rendered,
+					modules.moduleWithError.placeholders.first, {
+						$$: {$context: {}},
+						moduleWithError: {first: 'test1'}
+					}, rendered,
 					function (error) {
 						if (error) {
 							assert.fail(error);
@@ -374,7 +388,7 @@ function renderModuleCase1(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					additional = {$global: {}},
+					additional = {$global: {}, $context: {}},
 					parameters = Object.create(additional);
 				parameters.$$ = additional;
 				parameters.module = Object.create(additional.$global);
@@ -453,7 +467,7 @@ function renderModuleCase2(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					additional = {$global: {}},
+					additional = {$global: {}, $context: {}},
 					parameters = Object.create(additional);
 				parameters.$$ = additional;
 				parameters.module = Object.create(additional.$global);
@@ -522,7 +536,7 @@ function renderModuleCase3(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					additional = {$global: {}},
+					additional = {$global: {}, $context: {}},
 					parameters = Object.create(additional);
 				parameters.$$ = additional;
 				parameters.module = Object.create(additional.$global);
@@ -589,7 +603,7 @@ function renderCase1(done) {
 			var $ = locator.resolve('jQuery');
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
-					additional = {$global: {}},
+					additional = {$global: {}, $context: {}},
 					parameters = Object.create(additional);
 				parameters.$$ = additional;
 				parameters.module = Object.create(additional.$global);
@@ -654,7 +668,7 @@ function renderCase2(done) {
 			var $ = locator.resolve('jQuery');
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
-					additional = {$global: {test: 'test'}},
+					additional = {$global: {test: 'test'}, $context: {}},
 					parameters = Object.create(additional);
 				parameters.$$ = additional;
 				parameters.module = Object.create(additional.$global);
