@@ -39,7 +39,7 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
 	StateProvider = require('../../lib/client/StateProvider'),
-	CookiesManager = require('../../lib/CookiesManager'),
+	CookiesWrapper = require('../../lib/CookiesWrapper'),
 	RequestRouter = require('../../lib/client/RequestRouter');
 
 describe('client/RequestRouter', function () {
@@ -95,7 +95,7 @@ function createLocator(config) {
 	var locator = new ServiceLocator();
 	locator.registerInstance('serviceLocator', locator);
 	locator.register('logger', Logger);
-	locator.register('cookiesManager', CookiesManager, config);
+	locator.register('cookiesWrapper', CookiesWrapper, config);
 	locator.register('pageRenderer', PageRenderer, config);
 	locator.register('eventRouter', EventRouter, config);
 	locator.register('formSubmitter', FormSubmitter, config);
