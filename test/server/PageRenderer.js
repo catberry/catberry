@@ -190,7 +190,7 @@ function checkCase(caseName, callback) {
 		}
 	};
 
-	var additional = {$pageName: 'test', $global: {}},
+	var additional = {$pageName: 'test', $global: {}, $context: {}},
 		parameters = Object.create(additional);
 	parameters.$$ = additional;
 
