@@ -38,4 +38,4 @@ CookiesWrapper.prototype.toString = function () { }
 
 Implementation:
 
-[lib/CookiesManager.js](../../lib/CookiesManager.js)
+[lib/CookiesWrapper.js](../../lib/CookiesWrapper.js)
