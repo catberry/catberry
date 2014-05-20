@@ -1,6 +1,6 @@
 {
 	"name": "catberry-example",
-	"version": "0.4.3",
+	"version": "0.6.0",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Example application for catberry framework",
 	"homepage": "https://github.com/pragmadash/catberry",
@@ -20,8 +20,8 @@
 	"main": "./server.js",
 
 	"dependencies": {
-		"catberry": "~0.4.0",
-		"connect": "~2.14.0"
+		"catberry": "~0.6.0",
+		"connect": "~2.16.2"
 	},
 
 	"engines": {
