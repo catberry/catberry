@@ -6,7 +6,7 @@
 * [Get started](get-started.md)
 * [Service Locator](https://github.com/pragmadash/catberry-locator/blob/master/README.md)
 	* Standard Catberry services
-		* [Cookies Manager](services/cookies-manager.md)
+		* [Cookies Wrapper](services/cookies-wrapper.md)
 		* [UHR (Universal HTTP(S) Request)](services/uhr.md)
 		* [Logger](services/logger.md)
 		* [Module API Provider](services/module-api.md)
