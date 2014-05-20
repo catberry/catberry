@@ -66,9 +66,19 @@ More details about placeholders you can see below in "render" method description
 
 ##Interface
 Module logic is presented by constructor and its prototype that should have 3 methods described below.
+Every method must invoke callback to notify catberry that operation is finished. Also you can pass optional 'then' function as last argument into every callback.
 
 ###Render
-render(string, Object, Function(Error, Object)) - placeholder name, current application state and callback for external error handling and to pass data to template engine.
+render(string, Object, Function(Error, Object, Function)) - placeholder name, current application state and callback for external error handling and to pass data to template engine.
+
+The second argument is very interesting. It has all state parameters and set of some service fields in '$$' property:
+
+* args.$$.$cookies - current [CookiesWrapper](services/cookies-wrapper.md) instance
+* args.$$.$pageName - name of module that has rendered first (root) placeholder in this request
+* args.$$.$url - URL of current request
+* args.$$.$global - set of global parameters that are accessible for all modules
+* args.$$.$context - set of data contexts that already were created by other render methods (other placeholder rendering process).
+Using this object you can re-use data from one rendering process to another per one request.
 
 **Warning**: this method is executed both at server and browser and should not use any environment-specified objects like "window" or "process".
 
@@ -117,7 +127,7 @@ Another words first of all method "render" of module "hello" will be called with
 All placeholder links could appear dynamically using data from template data context, it will be processed correctly and recursively with anti-infinity loop protection.
 
 ###Handle
-handle(string, callback(Error)) - event name and callback for external error handling.
+handle(string, callback(Error, Function)) - event name and callback for external error handling.
 
 **Warning**: This method is executed only in browser and you safe to use any browser specified objects like "window".
 
@@ -152,7 +162,7 @@ Another example:
 This link invokes "handle" method with event name "bang" in all modules. It does not change URL and there is no "\!bang" event then.
 
 ###Submit
-submit(string, Object, callback(Error)) - form name, object with all inputs names and values inside form and callback for external error handling.
+submit(string, Object, callback(Error, Function)) - form name, object with all inputs names and values inside form and callback for external error handling.
 
 **Warning**: This method is executed only in browser and you safe to use any browser-specified objects like "window".
 
