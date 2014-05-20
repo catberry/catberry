@@ -39,7 +39,7 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
 	StateProvider = require('../../lib/client/StateProvider'),
-	CookiesManager = require('../../lib/CookiesManager'),
+	CookiesWrapper = require('../../lib/CookiesWrapper'),
 	RequestRouter = require('../../lib/client/RequestRouter');
 
 describe('client/RequestRouter', function () {
@@ -60,9 +60,6 @@ describe('client/RequestRouter', function () {
 		describe('link event handle', function () {
 			it('should catch link click and raise event if data-event attribute',
 				linkEventHandleCase1);
-		});
-
-		describe('link event handle', function () {
 			it('should catch link click in child element and raise event',
 				linkEventHandleCase1a);
 		});
@@ -70,6 +67,14 @@ describe('client/RequestRouter', function () {
 		describe('link render', function () {
 			it('should catch link click and request rendering',
 				renderHandleCase1
+			);
+
+			it('should properly handle relative URLs with ..',
+				renderHandleCase1a
+			);
+
+			it('should properly handle relative URLs without ..',
+				renderHandleCase1b
 			);
 
 			it('should catch link click and pass through if new link changes page',
@@ -95,7 +100,7 @@ function createLocator(config) {
 	var locator = new ServiceLocator();
 	locator.registerInstance('serviceLocator', locator);
 	locator.register('logger', Logger);
-	locator.register('cookiesManager', CookiesManager, config);
+	locator.register('cookiesWrapper', CookiesWrapper, config);
 	locator.register('pageRenderer', PageRenderer, config);
 	locator.register('eventRouter', EventRouter, config);
 	locator.register('formSubmitter', FormSubmitter, config);
@@ -308,6 +313,76 @@ function renderHandleCase1(done) {
 				window.location.assign('http://local/some');
 				var requestRouter = locator.resolveInstance(RequestRouter);
 				$('a').trigger('click');
+			});
+		}
+	});
+}
+
+/**
+ * Handles first case, when user clicks relative link.
+ * @param {Function} done Mocha done function.
+ */
+function renderHandleCase1a(done) {
+	var locator = createLocator(),
+		currentWindow,
+		link = '../../some' +
+			'?global=globalValue' +
+			'&first_value=firstValue' +
+			'&second_value=secondValue',
+		pageRenderer = new PageRenderer();
+	locator.registerInstance('pageRenderer', pageRenderer);
+	jsdom.env({
+		html: '<a href="' + link + '"/>',
+		done: function (errors, window) {
+			currentWindow = window;
+			prepareWindow(window, locator);
+			var $ = locator.resolve('jQuery');
+			$(function () {
+				window.location.assign('http://local:9090/a/b');
+				var requestRouter = locator.resolveInstance(RequestRouter);
+				$('a').trigger('click');
+				assert.strictEqual(currentWindow.location.toString(),
+						'http://local:9090/' +
+						'some' +
+						'?global=globalValue' +
+						'&first_value=firstValue' +
+						'&second_value=secondValue');
+				done();
+			});
+		}
+	});
+}
+
+/**
+ * Handles first case, when user clicks relative link.
+ * @param {Function} done Mocha done function.
+ */
+function renderHandleCase1b(done) {
+	var locator = createLocator(),
+		currentWindow,
+		link = 'some' +
+			'?global=globalValue' +
+			'&first_value=firstValue' +
+			'&second_value=secondValue',
+		pageRenderer = new PageRenderer();
+	locator.registerInstance('pageRenderer', pageRenderer);
+	jsdom.env({
+		html: '<a href="' + link + '"/>',
+		done: function (errors, window) {
+			currentWindow = window;
+			prepareWindow(window, locator);
+			var $ = locator.resolve('jQuery');
+			$(function () {
+				window.location.assign('http://local:9090/a/b');
+				var requestRouter = locator.resolveInstance(RequestRouter);
+				$('a').trigger('click');
+				assert.strictEqual(currentWindow.location.toString(),
+						'http://local:9090/a/b/' +
+						'some' +
+						'?global=globalValue' +
+						'&first_value=firstValue' +
+						'&second_value=secondValue');
+				done();
 			});
 		}
 	});
