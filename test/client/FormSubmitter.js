@@ -33,9 +33,11 @@
 var assert = require('assert'),
 	jsdom = require('jsdom'),
 	util = require('util'),
+	Logger = require('../mocks/Logger'),
 	ServiceLocator = require('catberry-locator'),
 	CookiesWrapper = require('../../lib/CookiesWrapper'),
 	StateProvider = require('../../lib/client/StateProvider'),
+	ModuleApiProvider = require('../../lib/client/ModuleApiProvider'),
 	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
 	FormSubmitter = require('../../lib/client/FormSubmitter'),
 	EventEmitter = require('events').EventEmitter,
@@ -89,9 +91,11 @@ describe('client/FormSubmitter', function () {
 function createLocator(config) {
 	var locator = new ServiceLocator();
 	locator.registerInstance('serviceLocator', locator);
+	locator.register('logger', Logger, config);
 	locator.register('pageRenderer', PageRenderer, config);
 	locator.register('moduleLoader', ModuleLoader, config);
 	locator.register('urlMappingProvider', UrlMappingProvider, config);
+	locator.register('moduleApiProvider', ModuleApiProvider, config);
 	locator.register('cookiesWrapper', CookiesWrapper, config);
 	locator.register('stateProvider', StateProvider, config);
 	return locator;
