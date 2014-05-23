@@ -62,7 +62,7 @@ function ChatModule($logger, $moduleApiProvider, $chatServiceClient, $jQuery,
 	var self = this;
 	if (this._api.whereAmI() === 'browser') {
 		this._chat.on('changed', function () {
-			self._api.requestRefresh(self, 'messages');
+			self._api.requestRefresh('chat', 'messages');
 		});
 	}
 }
@@ -127,8 +127,8 @@ ChatModule.prototype.handle = function (eventName, callback) {
 				window.alert(error);
 				return;
 			}
-			self._api.requestRefresh(self, 'messages');
-			self._api.requestRefresh(self, 'post');
+			self._api.requestRefresh('chat', 'messages');
+			self._api.requestRefresh('chat', 'post');
 		};
 
 	if (eventName === 'auth') {
