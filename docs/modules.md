@@ -68,6 +68,12 @@ More details about placeholders you can see below in "render" method description
 Module logic is presented by constructor and its prototype that should have 3 methods described below.
 Every method must invoke callback to notify catberry that operation is finished. Also you can pass optional 'then' function as last argument into every callback.
 
+##How to split page to modules and placeholders
+This is very easy, just use these rules below:
+
+* If you can prepare whole data context for some part of page using one API request that means this part of page is a placeholder
+* If you want to refresh some different parts of page (placeholders) always together using shared parameters from URL then you should group these placeholders into one module
+
 ###Render
 render(string, Object, Function(Error, Object, Function)) - placeholder name, current application state and callback for external error handling and to pass data to template engine.
 
