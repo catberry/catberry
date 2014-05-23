@@ -249,7 +249,8 @@ function renderPlaceholderCase2(done) {
 						assert.strictEqual('module_first' in rendered, true);
 						assert.strictEqual('module_second' in rendered, true);
 						assert.deepEqual(context.module.first, {data: 'test1'});
-						assert.deepEqual(context.module.second, {data: 'test2'});
+						assert.deepEqual(context.module.second,
+							{data: 'test2'});
 						assert.strictEqual('module_second' in rendered, true);
 						assert.strictEqual(window.document.body.innerHTML,
 							expected);
@@ -619,7 +620,18 @@ function renderCase1(done) {
 						assert.strictEqual(order[0], 'module_first');
 						assert.strictEqual(
 							window.document.body.innerHTML, expected);
-						done();
+
+						order = [];
+						pageRenderer.render(parameters,
+							function (error) {
+								if (error) {
+									assert.fail(error);
+								}
+								assert.strictEqual(order.length, 0);
+								assert.strictEqual(
+									window.document.body.innerHTML, expected);
+								done();
+							});
 					});
 			});
 		}
