@@ -1,6 +1,6 @@
 {
 	"name": "catberry-example",
-	"version": "0.6.0",
+	"version": "0.6.4",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Example application for catberry framework",
 	"homepage": "https://github.com/pragmadash/catberry",
