@@ -26,11 +26,19 @@ ModuleApiProvider.prototype.clearHash = function () { }
 
 /**
  * Requests refresh of module's placeholder.
- * @param {Object} moduleReference Reference to any module implementation.
+ * @param {string} moduleName Name of module to refresh.
  * @param {string} placeholderName Name of placeholder to refresh.
- * @param {Function} callback Callback on finish.
+ * @param {Function?} callback Callback on finish.
  */
-ModuleApiProvider.prototype.requestRefresh = function (moduleReference, placeholderName, callback) { }
+ModuleApiProvider.prototype.requestRefresh = function (moduleName, placeholderName, callback) { }
+
+/**
+ * Requests render of module's placeholder.
+ * @param {string} moduleName Name of module to render.
+ * @param {string} placeholderName Name of placeholder to refresh.
+ * @param {Function?} callback Callback on finish.
+ */
+ModuleApiProvider.prototype.requestRender = function (moduleName, placeholderName, callback) { }
 ```
 
 If you want to see an example of usage see [example/catberry_modules/chat/ChatModule.js](../../example/catberry_modules/chat/ChatModule.js).
