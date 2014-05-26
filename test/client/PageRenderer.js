@@ -70,6 +70,8 @@ describe('client/PageRenderer', function () {
 	describe('#renderPlaceholder', function () {
 		it('should properly render placeholder on page',
 			renderPlaceholderCase1);
+		it('should properly render HEAD element placeholder',
+			renderPlaceholderCase1a);
 		it('should properly render recursive placeholders on page',
 			renderPlaceholderCase2);
 		it('should properly render empty space when error while render',
@@ -212,6 +214,108 @@ function renderPlaceholderCase1(done) {
 						done();
 					});
 			});
+		}
+	});
+}
+
+/**
+ * Checks case when just render HEAD placeholder on page.
+ * @param {Function} done Mocha done function.
+ */
+function renderPlaceholderCase1a(done) {
+	var head = '<title>First title</title>' +
+			'<base href="someLink1" target="_parent">' +
+			'<noscript>noScript1</noscript>' +
+			'<style type="text/css">' +
+			'some styles1' +
+			'</style>' +
+			'<style type="text/css">' +
+			'some styles2' +
+			'</style>' +
+			'<script type="application/javascript">' +
+			'some scripts1' +
+			'</script>' +
+			'<script type="application/javascript">' +
+			'some scripts2' +
+			'</script>' +
+			'<script type="application/javascript" src="someScriptSrc1">' +
+			'</script>' +
+			'<script type="application/javascript" src="someScriptSrc2">' +
+			'</script>' +
+			'<link rel="stylesheet" href="someStyleLink1">' +
+			'<link rel="stylesheet" href="someStyleLink2">' +
+			'<meta name="name1" content="value1">' +
+			'<meta name="name2" content="value2">' +
+			'<meta name="name3" content="value3">',
+		newHead = '<title>Second title</title>' +
+			'<base href="someLink2" target="_parent">' +
+			'<noscript>noScript2</noscript>' +
+			'<style type="text/css">' +
+			'some styles1' +
+			'</style>' +
+			'<script type="application/javascript">' +
+			'some scripts1' +
+			'</script>' +
+			'<script type="application/javascript" src="someScriptSrc1">' +
+			'</script>' +
+			'<link rel="stylesheet" href="someStyleLink1">' +
+			'<meta name="name1" content="value1">' +
+			'<style type="text/css">' +
+			'some styles3' +
+			'</style>' +
+			'<script type="application/javascript">' +
+			'some scripts3' +
+			'</script>' +
+			'<script type="application/javascript" src="someScriptSrc3">' +
+			'</script>' +
+			'<link rel="stylesheet" href="someStyleLink3">' +
+			'<meta name="name4" content="value4">',
+		expected = '<title>Second title</title>' +
+			'<base href="someLink2" target="_parent">' +
+			'<noscript>noScript2</noscript>' +
+			'<style type="text/css">' +
+			'some styles1' +
+			'</style>' +
+			'<style type="text/css">' +
+			'some styles2' +
+			'</style>' +
+			'<script type="application/javascript">' +
+			'some scripts1' +
+			'</script>' +
+			'<script type="application/javascript">' +
+			'some scripts2' +
+			'</script>' +
+			'<script type="application/javascript" src="someScriptSrc1">' +
+			'</script>' +
+			'<script type="application/javascript" src="someScriptSrc2">' +
+			'</script>' +
+			'<link rel="stylesheet" href="someStyleLink1">' +
+			'<link rel="stylesheet" href="someStyleLink2">' +
+			'<meta name="name1" content="value1">' +
+			'<style type="text/css">' +
+			'some styles3' +
+			'</style>' +
+			'<script type="application/javascript">' +
+			'some scripts3' +
+			'</script>' +
+			'<script type="application/javascript" src="someScriptSrc3">' +
+			'</script>' +
+			'<link rel="stylesheet" href="someStyleLink3">' +
+			'<meta name="name4" content="value4">',
+		modules = createModules(),
+		locator = createLocator({modules: modules});
+
+	jsdom.env({
+		html: '<div></div>',
+		done: function (errors, window) {
+			prepareWindow(window, locator);
+			var $ = locator.resolve('jQuery'),
+				currentHead = $('<head></head>');
+			currentHead.html(head);
+			locator.resolveInstance(PageRenderer)
+				._mergeHead(currentHead, newHead);
+			assert.strictEqual(currentHead.html(), expected);
+			done();
 		}
 	});
 }
