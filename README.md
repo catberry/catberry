@@ -57,6 +57,15 @@ All supported browsers are listed below:
 | Opera Mobile		| 11.1+			|
 | Blackberry Browser| 7+			|
 
+##Not included packages
+[catberry-module](https://www.npmjs.org/package/catberry-module) - Basic module implementation
+
+[catberry-l10n](https://www.npmjs.org/package/catberry-l10n) - Localization support
+
+[catberry-lazy-loader](https://www.npmjs.org/package/catberry-lazy-loader) - Module for implementing feed placeholders with infinite scroll and lazy loading
+
+And even [more modules](https://www.npmjs.org/search?q=catberry).
+
 ##Contribution
 If you have found a bug, please create pull request with mocha unit-test which reproduces it or describe all details in issue if you can not implement test.
 If you want to propose some improvements just create issue or pull request but please do not forget to use **npm test** to be sure that you code is awesome.
