@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "0.6.9",
+	"version": "0.6.10",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Catberry is a framework for fast and modular web-applications. Write module once and use it at server and browser without any additional logic",
 	"homepage": "https://github.com/pragmadash/catberry",
@@ -34,7 +34,7 @@
 		"jquery": "~2.1.1",
 		"uglify-js": "~2.4.13",
 		"browserify": "~4.1.9",
-		"dustjs-linkedin": "~2.4.0",
+		"dustjs-linkedin": "~2.3.5",
 		"dustjs-helpers": "~1.2.0",
 		"log4js": "~0.6.14",
 		"gulp": "~3.8.0",
