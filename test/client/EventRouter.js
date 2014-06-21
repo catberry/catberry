@@ -31,262 +31,270 @@
 'use strict';
 
 var assert = require('assert'),
-	util = require('util'),
 	Logger = require('../mocks/Logger'),
+	UniversalMock = require('../mocks/UniversalMock'),
 	EventRouter = require('../../lib/client/EventRouter'),
-	EventEmitter = require('events').EventEmitter,
-	ServiceLocator = require('catberry-locator'),
-	ModuleLoader = require('../mocks/ModuleLoader');
-
-util.inherits(Module, EventEmitter);
-function Module() {
-	EventEmitter.call(this);
-}
-Module.prototype.handle = function (eventName, callback) {
-	var self = this;
-	setImmediate(function () {
-		self.emit('handle', eventName);
-		callback();
-	});
-};
+	ServiceLocator = require('catberry-locator');
 
 describe('client/EventRouter', function () {
 	describe('#route', function () {
+
 		it('should route event start to module',
-			routeCase1);
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Second module should not receive anything');
+				});
+				modules.module.implementation.once('handle', function (args) {
+					assert.strictEqual(args[0], 'testEvent',
+						'Wrong event name');
+					done();
+				});
+				eventRouter.routeHashChange('module_testEvent');
+			});
+
 		it('should route event end to module when new event is coming',
-			routeCase2);
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Second module should not receive anything');
+				});
+
+				var first = function () {
+					modules.module.implementation.once('handle',
+						function (args) {
+							assert.strictEqual(args[0], 'testEvent1',
+								'Wrong event name');
+							second();
+							args[1]();
+						});
+					eventRouter.routeHashChange('module_testEvent1');
+				};
+
+				var second = function () {
+					modules.module.implementation.once('handle',
+						function (args) {
+							assert.strictEqual(args[0], '!testEvent1',
+								'Wrong event name');
+							third();
+							args[1]();
+						});
+					eventRouter.routeHashChange('module_testEvent2');
+				};
+
+				var third = function () {
+					modules.module.implementation.once('handle',
+						function (args) {
+							assert.strictEqual(args[0], 'testEvent2',
+								'Wrong event name');
+							args[1]();
+							done();
+						});
+				};
+
+				first();
+			});
+
 		it('should route event end when new event name is "undefined"',
-			routeCase3);
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Second module should not receive anything');
+				});
+
+				var first = function () {
+					modules.module.implementation.once('handle',
+						function (args) {
+							assert.strictEqual(args[0], 'testEvent1',
+								'Wrong event name');
+							second();
+							args[1]();
+						});
+					eventRouter.routeHashChange('module_testEvent1');
+				};
+				var second = function () {
+					modules.module.implementation.once('handle',
+						function (args) {
+							assert.strictEqual(args[0], '!testEvent1',
+								'Wrong event name');
+							done();
+						});
+					eventRouter.routeHashChange(undefined);
+				};
+				first();
+			});
+
 		it('should do nothing if previous and new event is "undefined"',
-			routeCase4);
-		it('should send broadcast event start to all modules', routeCase5);
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module.implementation.once('handle', function () {
+					assert.fail('Should not do anything');
+				});
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Should not do anything');
+				});
+
+				eventRouter.routeHashChange(undefined);
+				setTimeout(done, 100);
+			});
+
+		it('should send broadcast event start to all modules',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					eventRouter = locator.resolveInstance(EventRouter),
+					counter = 0;
+
+				modules.module2.implementation.once('handle', function (args) {
+					assert.strictEqual(args[0], 'testEvent',
+						'Wrong event name');
+					if (++counter === 2) {
+						done();
+					}
+					args[1]();
+				});
+				modules.module.implementation.once('handle', function (args) {
+					assert.strictEqual(args[0], 'testEvent',
+						'Wrong event name');
+					if (++counter === 2) {
+						done();
+					}
+					args[1]();
+				});
+				eventRouter.routeHashChange('testEvent');
+			});
+
 		it('should send event end after broadcast event is changed by broadcast',
-			routeCase6);
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					eventRouter = locator.resolveInstance(EventRouter),
+					counter = 0;
+
+				modules.module2.implementation.once('handle',
+					function (args) {
+						assert.strictEqual(args[0], 'testEvent1',
+							'Wrong event name');
+						modules.module2.implementation.once('handle',
+							function (args) {
+								assert.strictEqual(args[0], '!testEvent1',
+									'Wrong event name');
+								if (++counter === 2) {
+									done();
+								}
+								args[1]();
+							});
+						if (++counter === 2) {
+							counter = 0;
+							eventRouter.routeHashChange('testEvent2');
+						}
+						args[1]();
+					});
+				modules.module.implementation.once('handle',
+					function (args) {
+						assert.strictEqual(args[0], 'testEvent1',
+							'Wrong event name');
+						modules.module.implementation.once('handle',
+							function (args) {
+								assert.strictEqual(args[0], '!testEvent1',
+									'Wrong event name');
+
+								if (++counter === 2) {
+									done();
+								}
+								args[1]();
+							});
+						args[1]();
+						if (++counter === 2) {
+							counter = 0;
+							eventRouter.routeHashChange('testEvent2');
+						}
+					});
+				eventRouter.routeHashChange('testEvent1');
+			});
+
 		it('should send event end after broadcast event is changed by module event',
-			routeCase7);
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					eventRouter = locator.resolveInstance(EventRouter),
+					counter = 0;
+
+				modules.module2.implementation.once('handle', function (args) {
+					assert.strictEqual(args[0], 'testEvent1',
+						'Wrong event name');
+					modules.module2.implementation.once('handle',
+						function (args) {
+							assert.strictEqual(args[0], '!testEvent1',
+								'Wrong event name');
+							if (++counter === 2) {
+								done();
+							}
+							args[1]();
+						});
+					args[1]();
+					eventRouter.routeHashChange('module2_testEvent2');
+				});
+				modules.module.implementation.once('handle', function (args) {
+					assert.strictEqual(args[0], 'testEvent1',
+						'Wrong event name');
+					modules.module.implementation.once('handle',
+						function (args) {
+							assert.strictEqual(args[0], '!testEvent1',
+								'Wrong event name');
+
+							if (++counter === 2) {
+								done();
+							}
+							args[1]();
+						});
+					args[1]();
+					eventRouter.routeHashChange('module_testEvent3');
+				});
+				eventRouter.routeHashChange('testEvent1');
+			});
 	});
 });
 
-function createLocator(config) {
-	var locator = new ServiceLocator();
-	locator.registerInstance('serviceLocator', locator);
-	locator.register('logger', Logger, config);
-	locator.register('moduleLoader', ModuleLoader, config);
-	return locator;
-}
-
-function createModules() {
-	return {
-		module: {
-			name: 'module',
-			implementation: new Module()
+function createLocator() {
+	var modules = {
+			module: {
+				name: 'module',
+				implementation: new UniversalMock(['handle'])
+			},
+			module2: {
+				name: 'module2',
+				implementation: new UniversalMock(['handle'])
+			}
 		},
-		module2: {
-			name: 'module2',
-			implementation: new Module()
-		}
-	};
-}
-
-/**
- * Checks case when router should send event start to module.
- * @param {Function} done Mocha done function.
- */
-function routeCase1(done) {
-	var modules = createModules(),
-		locator = createLocator({modules: modules}),
-		eventRouter = locator.resolveInstance(EventRouter);
-	modules.module2.implementation.once('handle', function () {
-		assert.fail('Second module should not receive anything');
-	});
-	modules.module.implementation.once('handle', function (eventName) {
-		assert.strictEqual(eventName, 'testEvent',
-			'Wrong event name');
-		done();
-	});
-	eventRouter.routeHashChange('module_testEvent');
-}
-
-/**
- * Checks case when router should send event end when new event is starting.
- * @param {Function} done Mocha done function.
- */
-function routeCase2(done) {
-	var modules = createModules(),
-		locator = createLocator({modules: modules}),
-		eventRouter = locator.resolveInstance(EventRouter);
-	modules.module2.implementation.once('handle', function () {
-		assert.fail('Second module should not receive anything');
-	});
-	modules.module.implementation.once('handle', function (eventName1) {
-		assert.strictEqual(eventName1, 'testEvent1',
-			'Wrong event name');
-		modules.module.implementation.once('handle', function (eventName2) {
-			assert.strictEqual(eventName2, '!testEvent1',
-				'Wrong event name');
-			modules.module.implementation.once('handle', function (eventName3) {
-				assert.strictEqual(eventName3, 'testEvent2',
-					'Wrong event name');
-				done();
-			});
-		});
-		eventRouter.routeHashChange('module_testEvent2');
-	});
-	eventRouter.routeHashChange('module_testEvent1');
-}
-
-/**
- * Checks case when router should send event end when new event name is "undefined".
- * @param {Function} done Mocha done function.
- */
-function routeCase3(done) {
-	var modules = createModules(),
-		locator = createLocator({modules: modules}),
-		eventRouter = locator.resolveInstance(EventRouter);
-	modules.module2.implementation.once('handle', function () {
-		assert.fail('Second module should not receive anything');
-	});
-	modules.module.implementation.once('handle', function (eventName1) {
-		assert.strictEqual(eventName1, 'testEvent1',
-			'Wrong event name');
-		modules.module.implementation.once('handle', function (eventName2) {
-			assert.strictEqual(eventName2, '!testEvent1',
-				'Wrong event name');
-			done();
-		});
-		eventRouter.routeHashChange(undefined);
-	});
-	eventRouter.routeHashChange('module_testEvent1');
-}
-
-/**
- * Checks case when router should do nothing
- * if previous and new event is "undefined.
- * @param {Function} done Mocha done function.
- */
-function routeCase4(done) {
-	var modules = createModules(),
-		locator = createLocator({modules: modules}),
-		eventRouter = locator.resolveInstance(EventRouter);
-	modules.module.implementation.once('handle', function () {
-		assert.fail('Should not do anything');
-	});
-	modules.module2.implementation.once('handle', function () {
-		assert.fail('Should not do anything');
-	});
-	eventRouter.routeHashChange(undefined);
-	setTimeout(done, 100);
-}
-
-/**
- * Checks case when router should send event start to all modules
- * when event is a broadcast.
- * @param {Function} done Mocha done function.
- */
-function routeCase5(done) {
-	var modules = createModules(),
-		locator = createLocator({modules: modules}),
-		eventRouter = locator.resolveInstance(EventRouter),
-		counter = 0;
-
-	modules.module2.implementation.once('handle', function (eventName) {
-		assert.strictEqual(eventName, 'testEvent',
-			'Wrong event name');
-		if (++counter === 2) {
-			done();
-		}
-	});
-	modules.module.implementation.once('handle', function (eventName) {
-		assert.strictEqual(eventName, 'testEvent',
-			'Wrong event name');
-		if (++counter === 2) {
-			done();
-		}
-	});
-	eventRouter.routeHashChange('testEvent');
-}
-
-/**
- * Checks case when router should send event end to each module
- * when it is changed by another broadcast event.
- * @param {Function} done Mocha done function.
- */
-function routeCase6(done) {
-	var modules = createModules(),
-		locator = createLocator({modules: modules}),
-		eventRouter = locator.resolveInstance(EventRouter),
-		counter = 0;
-
-	modules.module2.implementation.once('handle', function (eventName1) {
-		assert.strictEqual(eventName1, 'testEvent1',
-			'Wrong event name');
-		modules.module2.implementation.once('handle', function (eventName2) {
-			assert.strictEqual(eventName2, '!testEvent1',
-				'Wrong event name');
-			if (++counter === 2) {
-				done();
+		locator = new ServiceLocator(),
+		moduleLoader = {
+			getModulesByNames: function () {
+				return modules;
 			}
-		});
-		if (++counter === 2) {
-			counter = 0;
-			eventRouter.routeHashChange('testEvent2');
-		}
-	});
-	modules.module.implementation.once('handle', function (eventName1) {
-		assert.strictEqual(eventName1, 'testEvent1',
-			'Wrong event name');
-		modules.module.implementation.once('handle', function (eventName2) {
-			assert.strictEqual(eventName2, '!testEvent1',
-				'Wrong event name');
-
-			if (++counter === 2) {
-				done();
-			}
-		});
-		if (++counter === 2) {
-			counter = 0;
-			eventRouter.routeHashChange('testEvent2');
-		}
-	});
-	eventRouter.routeHashChange('testEvent1');
-}
-
-/**
- * Checks case when router should send event end to module
- * when broadcast event is changed by another moduel-specified event.
- * @param {Function} done Mocha done function.
- */
-function routeCase7(done) {
-	var modules = createModules(),
-		locator = createLocator({modules: modules}),
-		eventRouter = locator.resolveInstance(EventRouter),
-		counter = 0;
-
-	modules.module2.implementation.once('handle', function (eventName1) {
-		assert.strictEqual(eventName1, 'testEvent1',
-			'Wrong event name');
-		modules.module2.implementation.once('handle', function (eventName2) {
-			assert.strictEqual(eventName2, '!testEvent1',
-				'Wrong event name');
-			if (++counter === 2) {
-				done();
-			}
-		});
-		eventRouter.routeHashChange('module2_testEvent2');
-	});
-	modules.module.implementation.once('handle', function (eventName1) {
-		assert.strictEqual(eventName1, 'testEvent1',
-			'Wrong event name');
-		modules.module.implementation.once('handle', function (eventName2) {
-			assert.strictEqual(eventName2, '!testEvent1',
-				'Wrong event name');
-
-			if (++counter === 2) {
-				done();
-			}
-		});
-		eventRouter.routeHashChange('module_testEvent3');
-	});
-	eventRouter.routeHashChange('testEvent1');
+		};
+	locator.registerInstance('serviceLocator', locator);
+	locator.registerInstance('moduleLoader', moduleLoader);
+	locator.register('logger', Logger);
+	return locator;
 }

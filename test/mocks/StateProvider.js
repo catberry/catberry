@@ -30,15 +30,12 @@
 
 'use strict';
 
-module.exports = ModuleLoader;
+module.exports = StateProvider;
 
-function ModuleLoader(modules) {
-	this._modules = modules;
+function StateProvider(state) {
+	this.state = state;
 }
 
-ModuleLoader.prototype._modules = null;
-ModuleLoader.prototype.lastRenderedData = {};
-
-ModuleLoader.prototype.getModulesByNames = function () {
-	return this._modules;
+StateProvider.prototype.getStateByUrl = function (urlLocation) {
+	return this.state || {};
 };
