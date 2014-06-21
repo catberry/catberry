@@ -225,7 +225,7 @@ function checkCase(caseName, callback) {
 	});
 
 	checkIsEmpty(response2, function (isEmpty) {
-		assert.strictEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
@@ -245,7 +245,7 @@ function checkCase(caseName, callback) {
 	});
 
 	checkIsEmpty(response5, function (isEmpty) {
-		assert.strictEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
