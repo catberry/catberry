@@ -135,38 +135,7 @@ describe('client/ModuleLoader', function () {
 					'Wrong module implementation');
 
 				// check contexts
-				assert.strictEqual(
-					typeof(modulesByNames.module1.implementation.$context),
-					'object', true,
-					'Module should have context');
-				assert.strictEqual(
-					typeof(modulesByNames.module2.implementation.$context),
-					'object', true,
-					'Module should have context');
-				assert.strictEqual(
-					typeof(modulesByNames.module1.implementation.$context.state),
-					'object', true,
-					'Module should have state');
-				assert.strictEqual(
-					typeof(modulesByNames.module1
-						.implementation.$context.renderedData),
-					'object', true,
-					'Module should have rendered data cache');
-				assert.strictEqual(
-					typeof(modulesByNames.module2
-						.implementation.$context.renderedData),
-					'object', true,
-					'Module should have rendered data cache');
-				assert.strictEqual(
-					typeof(modulesByNames.module2.implementation.$context.state),
-					'object', true,
-					'Module should have state');
-				assert.strictEqual(modulesByNames.module1
-					.implementation.$context.cookies instanceof
-					CookiesWrapper, true, 'Module should have cookies');
-				assert.strictEqual(modulesByNames.module2
-					.implementation.$context.cookies instanceof
-					CookiesWrapper, true, 'Module should have cookies');
+				checkContexts(modulesByNames);
 
 				// check module 1 placeholders
 				var module1Placeholders = modulesByNames.module1.placeholders;
@@ -257,3 +226,38 @@ describe('client/ModuleLoader', function () {
 			});
 	});
 });
+
+function checkContexts(modulesByNames) {
+	assert.strictEqual(
+		typeof(modulesByNames.module1.implementation.$context),
+		'object', true,
+		'Module should have context');
+	assert.strictEqual(
+		typeof(modulesByNames.module2.implementation.$context),
+		'object', true,
+		'Module should have context');
+	assert.strictEqual(
+		typeof(modulesByNames.module1.implementation.$context.state),
+		'object', true,
+		'Module should have state');
+	assert.strictEqual(
+		typeof(modulesByNames.module1
+			.implementation.$context.renderedData),
+		'object', true,
+		'Module should have rendered data cache');
+	assert.strictEqual(
+		typeof(modulesByNames.module2
+			.implementation.$context.renderedData),
+		'object', true,
+		'Module should have rendered data cache');
+	assert.strictEqual(
+		typeof(modulesByNames.module2.implementation.$context.state),
+		'object', true,
+		'Module should have state');
+	assert.strictEqual(modulesByNames.module1
+		.implementation.$context.cookies instanceof
+		CookiesWrapper, true, 'Module should have cookies');
+	assert.strictEqual(modulesByNames.module2
+		.implementation.$context.cookies instanceof
+		CookiesWrapper, true, 'Module should have cookies');
+}
