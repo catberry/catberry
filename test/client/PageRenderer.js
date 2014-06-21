@@ -45,14 +45,15 @@ util.inherits(ModuleWithError, EventEmitter);
 function Module() {
 	EventEmitter.call(this);
 }
-Module.prototype.render = function (placeholderName, parameters, callback) {
+Module.prototype.render = function (placeholderName, callback) {
 	var self = this;
+
 	setImmediate(function () {
 		self.emit('render', {
 			placeholderName: placeholderName,
-			parameters: parameters
+			parameters: self.$context.state
 		});
-		callback(null, {data: parameters[placeholderName]});
+		callback(null, {data: self.$context.state[placeholderName]});
 	});
 };
 
@@ -60,7 +61,7 @@ function ModuleWithError() {
 	EventEmitter.call(this);
 }
 ModuleWithError.prototype.render =
-	function (placeholderName, parameters, callback) {
+	function (placeholderName, callback) {
 		setImmediate(function () {
 			callback(new Error('test'));
 		});
@@ -199,10 +200,14 @@ function renderPlaceholderCase1(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {};
+				modules.module.$context = {
+					state: {first: 'test1'}
+				};
 				pageRenderer.renderPlaceholder(
 					modules.module.placeholders.first, {
-						$$: {$context: {}},
-						module: {first: 'test1'}
+						state: {
+							module: modules.module.$context.state
+						}
 					}, rendered, function (error) {
 						if (error) {
 							assert.fail(error);
@@ -340,10 +345,14 @@ function renderPlaceholderCase2(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {};
+				modules.module.$context = {
+					state: {first: 'test1', second: 'test2'}
+				};
 				pageRenderer.renderPlaceholder(
 					modules.module.placeholders.second, {
-						$$: {$context: context},
-						module: {first: 'test1', second: 'test2'}
+						state: {
+							module: {first: 'test1', second: 'test2'}
+						}
 					}, rendered,
 					function (error) {
 						if (error) {
@@ -387,10 +396,14 @@ function renderPlaceholderCase3(done) {
 						isRelease: true
 					}),
 					rendered = {};
+				modules.moduleWithError.$context = {
+					state: {first: 'test1'}
+				};
 				pageRenderer.renderPlaceholder(
 					modules.moduleWithError.placeholders.first, {
-						$$: {$context: {}},
-						moduleWithError: {first: 'test1'}
+						state: {
+							moduleWithError: {first: 'test1'}
+						}
 					}, rendered,
 					function (error) {
 						if (error) {
@@ -433,10 +446,14 @@ function renderPlaceholderCase4(done) {
 						isRelease: true
 					}),
 					rendered = {};
+				modules.moduleWithError.$context = {
+					state: {first: 'test1'}
+				};
 				pageRenderer.renderPlaceholder(
 					modules.moduleWithError.placeholders.first, {
-						$$: {$context: {}},
-						moduleWithError: {first: 'test1'}
+						state: {
+							moduleWithError: {first: 'test1'}
+						}
 					}, rendered,
 					function (error) {
 						if (error) {
@@ -472,17 +489,17 @@ function renderModuleCase1(done) {
 
 	var moduleOld = modules.module.implementation.render;
 	modules.module.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module_' + placeholderName);
 			moduleOld.call(modules.module.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 	var module2Old = modules.module2.implementation.render;
 	modules.module2.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module2_' + placeholderName);
 			module2Old.call(modules.module2.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 
 	jsdom.env({
@@ -493,19 +510,17 @@ function renderModuleCase1(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					additional = {$global: {}, $context: {}},
-					parameters = Object.create(additional);
-				parameters.$$ = additional;
-				parameters.module = Object.create(additional.$global);
-				parameters.module.$$ = additional;
-				parameters.module.first = 'test3';
-				parameters.module2 = Object.create(additional.$global);
-				parameters.module2.$$ = additional;
-				parameters.module2.first = 'test2';
-				parameters.module2.second = 'test1';
-
+					state = {
+						module: {
+							first: 'test3'
+						},
+						module2: {
+							first: 'test2',
+							second: 'test1'
+						}
+					};
 				pageRenderer.renderModule(modules.module2,
-					parameters, parameters, rendered,
+					{state: state}, state, rendered,
 					function (error) {
 						if (error) {
 							assert.fail(error);
@@ -551,17 +566,17 @@ function renderModuleCase2(done) {
 
 	var moduleOld = modules.module.implementation.render;
 	modules.module.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module_' + placeholderName);
 			moduleOld.call(modules.module.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 	var module2Old = modules.module2.implementation.render;
 	modules.module2.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module2_' + placeholderName);
 			module2Old.call(modules.module2.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 
 	jsdom.env({
@@ -572,19 +587,18 @@ function renderModuleCase2(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					additional = {$global: {}, $context: {}},
-					parameters = Object.create(additional);
-				parameters.$$ = additional;
-				parameters.module = Object.create(additional.$global);
-				parameters.module.$$ = additional;
-				parameters.module.first = 'test3';
-				parameters.module2 = Object.create(additional.$global);
-				parameters.module2.$$ = additional;
-				parameters.module2.first = 'test2';
-				parameters.module2.second = 'test1';
+					state = {
+						module: {
+							first: 'test3'
+						},
+						module2: {
+							first: 'test2',
+							second: 'test1'
+						}
+					};
 
 				pageRenderer.renderModule(modules.module,
-					parameters, parameters, rendered,
+					{state: state}, state, rendered,
 					function (error) {
 						if (error) {
 							assert.fail(error);
@@ -625,11 +639,11 @@ function renderModuleCase3(done) {
 		});
 
 	modules.module.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			callback(null, null);
 		};
 	modules.module2.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			callback(null, null);
 		};
 
@@ -641,19 +655,18 @@ function renderModuleCase3(done) {
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
 					rendered = {},
-					additional = {$global: {}, $context: {}},
-					parameters = Object.create(additional);
-				parameters.$$ = additional;
-				parameters.module = Object.create(additional.$global);
-				parameters.module.$$ = additional;
-				parameters.module.first = 'test3';
-				parameters.module2 = Object.create(additional.$global);
-				parameters.module2.$$ = additional;
-				parameters.module2.first = 'test2';
-				parameters.module2.second = 'test1';
+					state = {
+						module: {
+							first: 'test3'
+						},
+						module2: {
+							first: 'test2',
+							second: 'test1'
+						}
+					};
 
 				pageRenderer.renderModule(modules.module,
-					parameters, parameters, rendered,
+					{state: state}, state, rendered,
 					function (error) {
 						if (error) {
 							assert.fail(error);
@@ -688,17 +701,17 @@ function renderCase1(done) {
 
 	var moduleOld = modules.module.implementation.render;
 	modules.module.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module_' + placeholderName);
 			moduleOld.call(modules.module.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 	var module2Old = modules.module2.implementation.render;
 	modules.module2.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module2_' + placeholderName);
 			module2Old.call(modules.module2.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 
 	jsdom.env({
@@ -708,14 +721,13 @@ function renderCase1(done) {
 			var $ = locator.resolve('jQuery');
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
-					additional = {$global: {}, $context: {}},
-					parameters = Object.create(additional);
-				parameters.$$ = additional;
-				parameters.module = Object.create(additional.$global);
-				parameters.module.$$ = additional;
-				parameters.module.first = 'test3';
+					state = {
+						module: {
+							first: 'test3'
+						}
+					};
 
-				pageRenderer.render(parameters,
+				pageRenderer.render({state: state},
 					function (error) {
 						if (error) {
 							assert.fail(error);
@@ -726,7 +738,7 @@ function renderCase1(done) {
 							window.document.body.innerHTML, expected);
 
 						order = [];
-						pageRenderer.render(parameters,
+						pageRenderer.render({state: state},
 							function (error) {
 								if (error) {
 									assert.fail(error);
@@ -764,17 +776,17 @@ function renderCase2(done) {
 
 	var moduleOld = modules.module.implementation.render;
 	modules.module.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module_' + placeholderName);
 			moduleOld.call(modules.module.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 	var module2Old = modules.module2.implementation.render;
 	modules.module2.implementation.render =
-		function (placeholderName, args, callback) {
+		function (placeholderName, callback) {
 			order.push('module2_' + placeholderName);
 			module2Old.call(modules.module2.implementation, placeholderName,
-				args, callback);
+				callback);
 		};
 
 	jsdom.env({
@@ -784,14 +796,13 @@ function renderCase2(done) {
 			var $ = locator.resolve('jQuery');
 			$(function () {
 				var pageRenderer = locator.resolveInstance(PageRenderer),
-					additional = {$global: {test: 'test'}, $context: {}},
-					parameters = Object.create(additional);
-				parameters.$$ = additional;
-				parameters.module = Object.create(additional.$global);
-				parameters.module.$$ = additional;
-				parameters.module.first = 'test3';
+					state = {
+						module: {
+							first: 'test3'
+						}
+					};
 
-				pageRenderer.render(parameters,
+				pageRenderer.render({state: state},
 					function (error) {
 						if (error) {
 							assert.fail(error);

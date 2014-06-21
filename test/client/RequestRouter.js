@@ -37,8 +37,7 @@ var assert = require('assert'),
 	FormSubmitter = require('../mocks/FormSubmitter'),
 	PageRenderer = require('../mocks/PageRenderer'),
 	ServiceLocator = require('catberry-locator'),
-	UrlMappingProvider = require('../../lib/UrlMappingProvider'),
-	StateProvider = require('../../lib/client/StateProvider'),
+	StateProvider = require('../../lib/StateProvider'),
 	CookiesWrapper = require('../../lib/CookiesWrapper'),
 	RequestRouter = require('../../lib/client/RequestRouter');
 
@@ -105,7 +104,6 @@ function createLocator(config) {
 	locator.register('eventRouter', EventRouter, config);
 	locator.register('formSubmitter', FormSubmitter, config);
 	locator.register('stateProvider', StateProvider, config);
-	locator.register('urlMappingProvider', UrlMappingProvider, config);
 	return locator;
 }
 
@@ -194,7 +192,7 @@ function hashHandleCase3(done) {
 						assert.strictEqual(eventName, 'test2');
 						eventRouter.once('routeHashChange',
 							function (eventName) {
-								assert.strictEqual(eventName, null);
+								assert.strictEqual(eventName, '');
 								done();
 							});
 
