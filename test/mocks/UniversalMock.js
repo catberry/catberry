@@ -39,6 +39,7 @@ util.inherits(UniversalMock, events.EventEmitter);
 
 function UniversalMock(methodNames) {
 	events.EventEmitter.call(this);
+	this.setMaxListeners(0);
 	var self = this;
 	methodNames.forEach(function (name) {
 		self[name] = function () {

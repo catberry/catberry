@@ -34,6 +34,7 @@ var assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
 	ServiceLocator = require('catberry-locator'),
+	Logger = require('../mocks/Logger'),
 	ModuleLoader = require('../../lib/server/ModuleLoader');
 
 var CASES_DIRECTORY = path.join(__dirname, '..', 'cases',
@@ -45,8 +46,8 @@ function createModuleLoader(caseName) {
 		config = {modulesFolder: fullPath};
 
 	locator.register('serviceLocator', ServiceLocator, null, true);
-	locator.register('logger', require('../mocks/Logger'));
-	locator.register('templateProvider', require('../mocks/TemplateProvider'));
+	locator.register('logger', Logger);
+	locator.registerInstance('templateProvider', {});
 	locator.registerInstance('config', config);
 
 	return locator.resolveInstance(ModuleLoader, config);

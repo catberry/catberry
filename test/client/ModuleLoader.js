@@ -31,9 +31,9 @@
 'use strict';
 
 var assert = require('assert'),
-	TemplateProvider = require('../mocks/TemplateProvider'),
 	Logger = require('../mocks/Logger'),
 	ServiceLocator = require('catberry-locator'),
+	UniversalMock = require('../mocks/UniversalMock'),
 	StateProvider = require('../../lib/StateProvider'),
 	CookiesWrapper = require('../../lib/CookiesWrapper'),
 	ModuleLoader = require('../../lib/client/ModuleLoader');
@@ -97,7 +97,8 @@ describe('client/ModuleLoader', function () {
 						cookies: ''
 					}
 				});
-				locator.register('templateProvider', TemplateProvider);
+				locator.registerInstance('templateProvider',
+					new UniversalMock(['registerCompiled']));
 				locator.register('cookiesWrapper', CookiesWrapper);
 				locator.register('stateProvider', StateProvider);
 				locator.register('logger', Logger);
