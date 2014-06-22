@@ -47,7 +47,10 @@ function createModuleLoader(caseName) {
 
 	locator.register('serviceLocator', ServiceLocator, null, true);
 	locator.register('logger', Logger);
-	locator.registerInstance('templateProvider', {});
+	locator.registerInstance('templateProvider', {
+		registerSource: function () {
+
+		}});
 	locator.registerInstance('config', config);
 
 	return locator.resolveInstance(ModuleLoader, config);
