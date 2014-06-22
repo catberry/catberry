@@ -36,13 +36,16 @@ var assert = require('assert'),
 	HttpResponse = require('../mocks/HttpResponse'),
 	ServiceLocator = require('catberry-locator'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
-	StateProvider = require('../../lib/server/PageRenderer'),
+	UniversalMock = require('../mocks/UniversalMock'),
+	Logger = require('../mocks/Logger'),
 	locator = new ServiceLocator();
 
-locator.register('logger', require('../mocks/Logger'));
-locator.register('clientBundleBuilder',
-	require('../mocks/ClientBundleBuilder'));
-locator.register('resourceBuilder', require('../mocks/ResourceBuilder'));
+locator.register('logger', Logger);
+var resourceBuilder = new UniversalMock(['buildResources']);
+resourceBuilder.on('buildResources', function () {
+	resourceBuilder.emit('built');
+});
+locator.registerInstance('resourceBuilder', resourceBuilder);
 locator.register('moduleLoader', TestModuleLoader);
 
 var currentPlaceholders = {};

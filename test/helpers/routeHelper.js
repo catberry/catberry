@@ -37,7 +37,7 @@ describe('helpers/routeHelper', function () {
 	describe('#getMapperByRoute', function () {
 
 		it('should return null if expression is empty', function (done) {
-			var mapper = routeHelper.getMapperByRoute();
+			var mapper = routeHelper.getMapperByRoute(undefined);
 			assert.strictEqual(mapper, null);
 			mapper = routeHelper.getMapperByRoute(null);
 			assert.strictEqual(mapper, null);
