@@ -41,11 +41,6 @@ var assert = require('assert'),
 	locator = new ServiceLocator();
 
 locator.register('logger', Logger);
-var resourceBuilder = new UniversalMock(['buildResources']);
-resourceBuilder.on('buildResources', function () {
-	resourceBuilder.emit('built');
-});
-locator.registerInstance('resourceBuilder', resourceBuilder);
 locator.register('moduleLoader', TestModuleLoader);
 
 var currentPlaceholders = {};
