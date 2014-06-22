@@ -36,12 +36,16 @@ var assert = require('assert'),
 	HttpResponse = require('../mocks/HttpResponse'),
 	ServiceLocator = require('catberry-locator'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
+	UniversalMock = require('../mocks/UniversalMock'),
+	Logger = require('../mocks/Logger'),
 	locator = new ServiceLocator();
 
-locator.register('logger', require('../mocks/Logger'));
-locator.register('clientBundleBuilder',
-	require('../mocks/ClientBundleBuilder'));
-locator.register('resourceBuilder', require('../mocks/ResourceBuilder'));
+locator.register('logger', Logger);
+var resourceBuilder = new UniversalMock(['buildResources']);
+resourceBuilder.on('buildResources', function () {
+	resourceBuilder.emit('built');
+});
+locator.registerInstance('resourceBuilder', resourceBuilder);
 locator.register('moduleLoader', TestModuleLoader);
 
 var currentPlaceholders = {};
@@ -51,19 +55,19 @@ var CASES_FOLDER = path.join(__dirname, '..', 'cases', 'server',
 var testModules = [
 	// fine module
 	{
-		render: function (placeholderName, args, callback) {
+		render: function (placeholderName, callback) {
 			callback(null, {});
 		}
 	},
 	// send empty result
 	{
-		render: function (placeholderName, args, callback) {
+		render: function (placeholderName, callback) {
 			callback();
 		}
 	},
 	// sends error
 	{
-		render: function (placeholderName, args, callback) {
+		render: function (placeholderName, callback) {
 			callback(new Error('test'));
 		}
 	},
@@ -75,7 +79,7 @@ var testModules = [
 	},
 	// async result
 	{
-		render: function (placeholderName, args, callback) {
+		render: function (placeholderName, callback) {
 			setTimeout(callback, 200);
 		}
 	}
@@ -87,8 +91,8 @@ function TestModuleLoader(index) {
 TestModuleLoader.prototype._index = -1;
 TestModuleLoader.prototype.getModulesByNames = function () {
 	return {
-		test: {
-			name: 'test',
+		main: {
+			name: 'main',
 			implementation: testModules[this._index],
 			rootPlaceholder: currentPlaceholders.__index,
 			placeholders: currentPlaceholders
@@ -149,13 +153,13 @@ function createPlaceholdersForCase(caseName) {
 		if (basename === '__index') {
 			placeholders.__index = {
 				name: '__index',
-				moduleName: 'test',
+				moduleName: 'main',
 				getTemplateStream: streamGetter
 			};
 		} else {
 			placeholders[basename] = {
 				name: basename,
-				moduleName: 'test',
+				moduleName: 'main',
 				getTemplateStream: streamGetter
 			};
 		}
@@ -190,9 +194,7 @@ function checkCase(caseName, callback) {
 		}
 	};
 
-	var additional = {$pageName: 'test', $global: {}, $context: {}},
-		parameters = Object.create(additional);
-	parameters.$$ = additional;
+	var parameters = {state: {}};
 
 	pageRenderer1.render(response1, parameters,
 		function () {
@@ -226,7 +228,7 @@ function checkCase(caseName, callback) {
 	});
 
 	checkIsEmpty(response2, function (isEmpty) {
-		assert.strictEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
@@ -246,7 +248,7 @@ function checkCase(caseName, callback) {
 	});
 
 	checkIsEmpty(response5, function (isEmpty) {
-		assert.strictEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});

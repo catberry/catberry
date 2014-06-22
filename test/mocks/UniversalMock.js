@@ -30,14 +30,20 @@
 
 'use strict';
 
-module.exports = ModuleLoader;
+module.exports = UniversalMock;
 
-function ModuleLoader(modules) {
-	this._modules = modules;
+var util = require('util'),
+	events = require('events');
+
+util.inherits(UniversalMock, events.EventEmitter);
+
+function UniversalMock(methodNames) {
+	events.EventEmitter.call(this);
+	this.setMaxListeners(0);
+	var self = this;
+	methodNames.forEach(function (name) {
+		self[name] = function () {
+			self.emit(name, arguments);
+		};
+	});
 }
-
-ModuleLoader.prototype._modules = null;
-
-ModuleLoader.prototype.getModulesByNames = function () {
-	return this._modules;
-};
