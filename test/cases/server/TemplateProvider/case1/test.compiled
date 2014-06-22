@@ -1,8 +1,0 @@
-(function() {
-    dust.register("test", body_0);
- 
-    function body_0(chk, ctx) {
-        return chk.reference(ctx._get(false, ["testMessage"]), ctx, "h");
-    }
-    return body_0;
-})();

@@ -36,15 +36,7 @@
 		"browserify": "~4.1.9",
 		"dustjs-linkedin": "~2.3.5",
 		"dustjs-helpers": "~1.2.0",
-		"log4js": "~0.6.14",
-		"gulp": "~3.8.0",
-		"gulp-concat": "~2.2.0",
-		"gulp-uglify": "~0.3.0",
-		"gulp-imagemin": "~0.6.0",
-		"gulp-minify-css": "~0.3.4",
-		"gulp-dust": "~0.3.0",
-		"event-stream": "~3.1.5",
-		"gulp-clean": "~0.3.0"
+		"log4js": "~0.6.14"
 	},
 	"devDependencies": {
 		"jsdom": "~0.10.6",
