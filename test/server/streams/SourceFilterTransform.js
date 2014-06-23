@@ -30,38 +30,47 @@
 
 'use strict';
 
-module.exports = LogPassThrough;
+var assert = require('assert'),
+	ContentReadable = require('../../../lib/server/streams/ContentReadable'),
+	SourceFilterTransform =
+		require('../../../lib/server/streams/SourceFilterTransform');
 
-var stream = require('stream'),
-	util = require('util');
+describe('server/streams/SourceFilterTransform', function () {
+	it('should find server requires and replace with null', function (done) {
+		var transform = new SourceFilterTransform(),
+			source = 'fasdkfjalskfj' +
+				'asjfdalsjd' +
+				'/**     ' +
+				'no-client-bundle' +
+				'' +
+				'**/' +
+				' ' +
+				' ' +
+				'var some = require  (\'someTest\');' +
+				'' +
+				'dghsdghsdghsgh' +
+				'hsfghsghsgh;',
+			expected = 'fasdkfjalskfj' +
+				'asjfdalsjd' +
+				' ' +
+				' ' +
+				' var some = null;' +
+				'' +
+				'dghsdghsdghsgh' +
+				'hsfghsghsgh;';
 
-util.inherits(LogPassThrough, stream.PassThrough);
+		var input = new ContentReadable(source),
+			output = input.pipe(transform);
 
-/**
- * Creates new instance of logger pass through stream.
- * @param {Function} startLogger Log function on start of stream.
- * @param {Function} chunkLogger Log function on every chunk of stream.
- * @param {Function} endLogger Log function on end of stream.
- * @param {Function} errorLogger Log function on error of stream.
- * @constructor
- * @extends PassThrough
- */
-function LogPassThrough(startLogger, chunkLogger, endLogger, errorLogger) {
-	stream.PassThrough.call(this, {objectMode: true});
+		var result = '';
 
-	if (startLogger instanceof Function) {
-		this.once('data', startLogger);
-	}
+		output.on('data', function (chunk) {
+			result += chunk;
+		});
 
-	if (endLogger instanceof Function) {
-		this.once('finish', endLogger);
-	}
-
-	if (chunkLogger instanceof Function) {
-		this.on('data', chunkLogger);
-	}
-
-	if (errorLogger instanceof Function) {
-		this.on('error', errorLogger);
-	}
-}
+		output.on('end', function () {
+			assert.strictEqual(result, expected);
+			done();
+		});
+	});
+});
