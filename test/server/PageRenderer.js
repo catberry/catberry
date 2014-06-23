@@ -36,7 +36,6 @@ var assert = require('assert'),
 	HttpResponse = require('../mocks/HttpResponse'),
 	ServiceLocator = require('catberry-locator'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
-	UniversalMock = require('../mocks/UniversalMock'),
 	Logger = require('../mocks/Logger'),
 	locator = new ServiceLocator();
 
@@ -84,6 +83,7 @@ function TestModuleLoader(index) {
 	this._index = index;
 }
 TestModuleLoader.prototype._index = -1;
+TestModuleLoader.prototype.loadModules = function (callback) {callback();};
 TestModuleLoader.prototype.getModulesByNames = function () {
 	return {
 		main: {
