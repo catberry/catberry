@@ -18,7 +18,7 @@ Catberry is a framework for fast and modular web-applications. Main feature you 
 * All framework architecture is built using [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) pattern and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection)
 * You can register your own modules (services) in [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) and inject it into any module you want
 * Framework itself is a [connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express) middleware it means you could use it with any other middleware
-* Routing definition using "/some/:parameter[module1,module2,module3]" syntax with list of modules that will receive parameter value. Anyway regular expression are supported too.
+* Routing definition using "/some/:parameter[module1,module2,module3]" syntax with list of modules that will receive parameter's value. Anyway regular expressions are supported too.
 * New concept of application architecture is called [Service-Module-Placeholder](https://github.com/pragmadash/catberry/blob/master/docs/smp.md) instead Model-View-Controller. SMP is much easier and faster to implement.
 * Very simple [Module API](https://github.com/pragmadash/catberry/blob/master/docs/modules.md)
 
