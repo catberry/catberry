@@ -29,6 +29,8 @@
 
 	"main": "./index",
 	"dependencies": {
+		"glob": "^4.0.2",
+		"glob-watcher": "^0.0.6",
 		"catberry-locator": "~0.4.0",
 		"catberry-uhr": "~0.6.1",
 		"jquery": "~2.1.1",
