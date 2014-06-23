@@ -14,12 +14,11 @@ Catberry is a framework for fast and modular web-applications. Main feature you 
 * You get such module API which allows you to develop different blocks on page independently and use one code on server and client for rendering templates
 * Every link click on page raises event in your module automatically if you define "data-event" attribute
 * URL hash change event is raised like an event in module automatically (two event on hash set and remove)
-* Your application builds itself without any additional actions on startup using gulp and browserify (debug and release modes are supported)
+* Your application builds version of itself for browser using browserify (debug and release modes are supported)
 * All framework architecture is built using [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) pattern and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection)
 * You can register your own modules (services) in [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) and inject it into any module you want
 * Framework itself is a [connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express) middleware it means you could use it with any other middleware
-* All page state is described by URL with GET query string in format "moduleName_parameterName=value" and hash "moduleName_parameterName" or without module name prefix which means global parameter or event. This approach guarantees that your page is rendered identically from server and using History API in browser.
-* Very flexible [URL mapping engine](https://github.com/pragmadash/catberry/blob/master/docs/url-mapping.md) which allows to use short human-understandable URLs instead big URL with a lot of GET parameters
+* Routing definition using "/some/:parameter[module1,module2,module3]" syntax with list of modules that will receive parameter value. Anyway regular expression are supported too.
 * New concept of application architecture is called [Service-Module-Placeholder](https://github.com/pragmadash/catberry/blob/master/docs/smp.md) instead Model-View-Controller. SMP is much easier and faster to implement.
 * Very simple [Module API](https://github.com/pragmadash/catberry/blob/master/docs/modules.md)
 
