@@ -36,6 +36,7 @@ var assert = require('assert'),
 	HttpResponse = require('../mocks/HttpResponse'),
 	ServiceLocator = require('catberry-locator'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
+	ModuleLoaderMock = require('../mocks/ModuleLoader'),
 	Logger = require('../mocks/Logger'),
 	locator = new ServiceLocator();
 
@@ -93,6 +94,17 @@ TestModuleLoader.prototype.getModulesByNames = function () {
 			placeholders: currentPlaceholders
 		}
 	};
+};
+
+TestModuleLoader.prototype.getPlaceholdersByIds = function () {
+	var placeholdersByIds = {};
+	Object.keys(currentPlaceholders)
+		.forEach(function (placeholderName) {
+			var id = 'main_' + placeholderName;
+			placeholdersByIds[id] =
+				currentPlaceholders[placeholderName];
+		});
+	return placeholdersByIds;
 };
 
 function compareWithExpected(caseName, stream, callback) {
