@@ -33,6 +33,7 @@
 var assert = require('assert'),
 	jsdom = require('jsdom'),
 	UniversalMock = require('../mocks/UniversalMock'),
+	ModuleLoaderMock = require('../mocks/ModuleLoader'),
 	ContentReadable = require('../../lib/server/streams/ContentReadable'),
 	Logger = require('../mocks/Logger'),
 	PageRenderer = require('../../lib/client/PageRenderer'),
@@ -625,11 +626,7 @@ describe('client/PageRenderer', function () {
 function createLocator() {
 	var locator = new ServiceLocator(),
 		modules = createModules(),
-		moduleLoader = {
-			getModulesByNames: function () {
-				return modules;
-			}
-		};
+		moduleLoader = new ModuleLoaderMock(modules);
 
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('moduleLoader', moduleLoader);

@@ -30,40 +30,32 @@
 
 'use strict';
 
-module.exports = PageRendererBase;
+module.exports = ModuleLoader;
 
-var moduleContextHelper = require('./helpers/moduleContextHelper');
+var moduleContextHelper = require('../../lib/helpers/moduleContextHelper');
 
-/**
- * Creates new instance of base page renderer.
- * @param {ModuleLoader} $moduleLoader Module loader
- * to get information about modules.
- * @param {Logger} $logger Logger to log messages.
- * @param {boolean} isRelease Is current application mode release.
- * @constructor
- */
-function PageRendererBase($moduleLoader, $logger, isRelease) {
-	this._logger = $logger;
-	this._moduleLoader = $moduleLoader;
-	this._isRelease = Boolean(isRelease);
+function ModuleLoader(modulesByNames) {
+	this._modulesByNames = modulesByNames;
 }
 
-/**
- * Is current application mode release.
- * @type {boolean}
- * @protected
- */
-PageRendererBase.prototype._isRelease = false;
+ModuleLoader.prototype.getModulesByNames = function () {
+	return this._modulesByNames;
+};
 
-/**
- * Current module loader.
- * @type {ModuleLoader}
- * @protected
- */
-PageRendererBase.prototype._moduleLoader = null;
+ModuleLoader.prototype.getPlaceholdersByIds = function () {
+	var self = this,
+		placeholdersByIds = {};
+	Object.keys(this._modulesByNames)
+		.forEach(function (moduleName) {
+			Object.keys(self._modulesByNames[moduleName].placeholders)
+				.forEach(function (placeholderName) {
+					var id = moduleContextHelper.joinModuleNameAndContext(
+						moduleName, placeholderName);
+					placeholdersByIds[id] =
+						self._modulesByNames[moduleName]
+							.placeholders[placeholderName];
+				});
+		});
 
-/**
- * Current logger.
- * @type {Logger}
- */
-PageRendererBase.prototype._logger = null;
+	return placeholdersByIds;
+};
