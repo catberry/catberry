@@ -42,12 +42,10 @@ describe('server/streams/SourceFilterTransform', function () {
 				'asjfdalsjd' +
 				'/**     ' +
 				'no-client-bundle' +
-				'' +
 				'**/' +
 				' ' +
 				' ' +
 				'var some = require  (\'someTest\');' +
-				'' +
 				'dghsdghsdghsgh' +
 				'hsfghsghsgh;',
 			expected = 'fasdkfjalskfj' +
@@ -55,7 +53,6 @@ describe('server/streams/SourceFilterTransform', function () {
 				' ' +
 				' ' +
 				' var some = null;' +
-				'' +
 				'dghsdghsdghsgh' +
 				'hsfghsghsgh;';
 
