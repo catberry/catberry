@@ -201,7 +201,7 @@ function checkCase(caseName, callback) {
 		}
 	};
 
-	var parameters = {state: {}};
+	var parameters = {renderedData: {}, state: {}};
 
 	pageRenderer1.render(response1, parameters,
 		function () {
