@@ -34,14 +34,14 @@ var assert = require('assert'),
 	routeHelper = require('../../lib/helpers/routeHelper');
 
 describe('helpers/routeHelper', function () {
-	describe('#getMapperByRoute', function () {
+	describe('#getUrlMapperByRoute', function () {
 
 		it('should return null if expression is empty', function (done) {
-			var mapper = routeHelper.getMapperByRoute(undefined);
+			var mapper = routeHelper.getUrlMapperByRoute(undefined);
 			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getMapperByRoute(null);
+			mapper = routeHelper.getUrlMapperByRoute(null);
 			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getMapperByRoute('');
+			mapper = routeHelper.getUrlMapperByRoute('');
 			assert.strictEqual(mapper, null);
 			done();
 		});
@@ -54,7 +54,7 @@ describe('helpers/routeHelper', function () {
 						'/:prefix[module3]details' +
 						'?filter=:filter[module2]' +
 						'&:query[module3]=:value[module3]',
-					mapper = routeHelper.getMapperByRoute(expression1);
+					mapper = routeHelper.getUrlMapperByRoute(expression1);
 
 				var testUrl1 = '/firstValue' +
 					'/somePostfixValue' +
@@ -95,7 +95,7 @@ describe('helpers/routeHelper', function () {
 				var expression2 = ':first[module1]' +
 						':second[module1,module2]' +
 						':third[module3]',
-					mapper2 = routeHelper.getMapperByRoute(expression2),
+					mapper2 = routeHelper.getUrlMapperByRoute(expression2),
 					testUrl3 = 'some';
 
 				assert.strictEqual(mapper2.expression.test(testUrl3), true);
@@ -109,7 +109,7 @@ describe('helpers/routeHelper', function () {
 		it('should return correct mapper for non-parametrized string',
 			function (done) {
 				var url = '/some/test?filter=date',
-					mapper = routeHelper.getMapperByRoute(url);
+					mapper = routeHelper.getUrlMapperByRoute(url);
 
 				assert.strictEqual(mapper.expression.test(url), true);
 				var state = mapper.map(url);
