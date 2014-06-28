@@ -118,4 +118,39 @@ describe('helpers/routeHelper', function () {
 				done();
 			});
 	});
+	describe('#getEventMapperByRule', function () {
+		it('should return correct mapper for parametrized string', function () {
+			var eventName = 'some:param1-:param2  -> ' +
+					'  eventName  [   module1, module2     ]',
+				mapper = routeHelper.getEventMapperByRule(eventName),
+				testEvent = 'some59-73';
+
+			assert.strictEqual(mapper.expression.test(testEvent), true);
+			assert.strictEqual(mapper.eventName, 'eventName');
+			assert.strictEqual(mapper.moduleNames.length, 2);
+			assert.strictEqual(mapper.moduleNames[0], 'module1');
+			assert.strictEqual(mapper.moduleNames[1], 'module2');
+
+			var parameters = mapper.map(testEvent);
+			assert.strictEqual(parameters.param1, '59');
+			assert.strictEqual(parameters.param2, '73');
+		});
+
+		it('should return null for incorrect event definition', function () {
+			var eventName = 'some:param1-:param2  - ' +
+					'  eventName  [   module1, module2     ]',
+				mapper = routeHelper.getEventMapperByRule(eventName);
+
+			assert.strictEqual(mapper, null);
+		});
+
+		it('should return null for empty event definition', function () {
+			var mapper = routeHelper.getEventMapperByRule('');
+			assert.strictEqual(mapper, null);
+			mapper = routeHelper.getEventMapperByRule(null);
+			assert.strictEqual(mapper, null);
+			mapper = routeHelper.getEventMapperByRule(undefined);
+			assert.strictEqual(mapper, null);
+		});
+	});
 });
