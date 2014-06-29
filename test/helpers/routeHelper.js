@@ -34,14 +34,14 @@ var assert = require('assert'),
 	routeHelper = require('../../lib/helpers/routeHelper');
 
 describe('helpers/routeHelper', function () {
-	describe('#getMapperByRoute', function () {
+	describe('#getUrlMapperByRoute', function () {
 
 		it('should return null if expression is empty', function (done) {
-			var mapper = routeHelper.getMapperByRoute(undefined);
+			var mapper = routeHelper.getUrlMapperByRoute(undefined);
 			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getMapperByRoute(null);
+			mapper = routeHelper.getUrlMapperByRoute(null);
 			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getMapperByRoute('');
+			mapper = routeHelper.getUrlMapperByRoute('');
 			assert.strictEqual(mapper, null);
 			done();
 		});
@@ -54,7 +54,7 @@ describe('helpers/routeHelper', function () {
 						'/:prefix[module3]details' +
 						'?filter=:filter[module2]' +
 						'&:query[module3]=:value[module3]',
-					mapper = routeHelper.getMapperByRoute(expression1);
+					mapper = routeHelper.getUrlMapperByRoute(expression1);
 
 				var testUrl1 = '/firstValue' +
 					'/somePostfixValue' +
@@ -95,7 +95,7 @@ describe('helpers/routeHelper', function () {
 				var expression2 = ':first[module1]' +
 						':second[module1,module2]' +
 						':third[module3]',
-					mapper2 = routeHelper.getMapperByRoute(expression2),
+					mapper2 = routeHelper.getUrlMapperByRoute(expression2),
 					testUrl3 = 'some';
 
 				assert.strictEqual(mapper2.expression.test(testUrl3), true);
@@ -109,7 +109,7 @@ describe('helpers/routeHelper', function () {
 		it('should return correct mapper for non-parametrized string',
 			function (done) {
 				var url = '/some/test?filter=date',
-					mapper = routeHelper.getMapperByRoute(url);
+					mapper = routeHelper.getUrlMapperByRoute(url);
 
 				assert.strictEqual(mapper.expression.test(url), true);
 				var state = mapper.map(url);
@@ -117,5 +117,56 @@ describe('helpers/routeHelper', function () {
 				assert.strictEqual(Object.keys(state).length, 0);
 				done();
 			});
+	});
+	describe('#getEventMapperByRule', function () {
+		it('should return correct mapper for parametrized string', function () {
+			var eventName = 'some:param1-:param2  -> ' +
+					'  eventName  [   module1, module2     ]',
+				mapper = routeHelper.getEventMapperByRule(eventName),
+				testEvent = 'some59-73';
+
+			assert.strictEqual(mapper.expression.test(testEvent), true);
+			assert.strictEqual(mapper.eventName, 'eventName');
+			assert.strictEqual(mapper.moduleNames.length, 2);
+			assert.strictEqual(mapper.moduleNames[0], 'module1');
+			assert.strictEqual(mapper.moduleNames[1], 'module2');
+
+			var parameters = mapper.map(testEvent);
+			assert.strictEqual(parameters.param1, '59');
+			assert.strictEqual(parameters.param2, '73');
+		});
+
+		it('should return correct mapper for non-parametrized string',
+			function () {
+				var eventName = 'some->eventName[module1, module2]',
+					mapper = routeHelper.getEventMapperByRule(eventName),
+					testEvent = 'some';
+
+				assert.strictEqual(mapper.expression.test(testEvent), true);
+				assert.strictEqual(mapper.eventName, 'eventName');
+				assert.strictEqual(mapper.moduleNames.length, 2);
+				assert.strictEqual(mapper.moduleNames[0], 'module1');
+				assert.strictEqual(mapper.moduleNames[1], 'module2');
+
+				var parameters = mapper.map(testEvent);
+				assert.strictEqual(Object.keys(parameters).length, 0);
+			});
+
+		it('should return null for incorrect event definition', function () {
+			var eventName = 'some:param1-:param2  - ' +
+					'  eventName  [   module1, module2     ]',
+				mapper = routeHelper.getEventMapperByRule(eventName);
+
+			assert.strictEqual(mapper, null);
+		});
+
+		it('should return null for empty event definition', function () {
+			var mapper = routeHelper.getEventMapperByRule('');
+			assert.strictEqual(mapper, null);
+			mapper = routeHelper.getEventMapperByRule(null);
+			assert.strictEqual(mapper, null);
+			mapper = routeHelper.getEventMapperByRule(undefined);
+			assert.strictEqual(mapper, null);
+		});
 	});
 });
