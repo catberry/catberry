@@ -55,7 +55,7 @@ describe('client/EventRouter', function () {
 				modules.module.implementation.once('handle', function (args) {
 					assert.strictEqual(args[0], 'testEvent',
 						'Wrong event name');
-					assert.strictEqual(args[1], false);
+					assert.strictEqual(args[1], true);
 					assert.strictEqual(Object.keys(args[2]).length, 0);
 					done();
 				});
@@ -81,7 +81,7 @@ describe('client/EventRouter', function () {
 						function (args) {
 							assert.strictEqual(args[0], 'testEvent',
 								'Wrong event name');
-							assert.strictEqual(args[1], false);
+							assert.strictEqual(args[1], true);
 							assert.strictEqual(args[2].number, '1');
 							args[3]();
 							second();
@@ -94,7 +94,7 @@ describe('client/EventRouter', function () {
 						function (args) {
 							assert.strictEqual(args[0], 'testEvent',
 								'Wrong event name');
-							assert.strictEqual(args[1], true);
+							assert.strictEqual(args[1], false);
 							assert.strictEqual(args[2].number, '1');
 							third();
 							args[3]();
@@ -107,7 +107,7 @@ describe('client/EventRouter', function () {
 						function (args) {
 							assert.strictEqual(args[0], 'testEvent',
 								'Wrong event name');
-							assert.strictEqual(args[1], false);
+							assert.strictEqual(args[1], true);
 							assert.strictEqual(args[2].number, '2');
 							args[3]();
 							done();
@@ -135,7 +135,7 @@ describe('client/EventRouter', function () {
 						function (args) {
 							assert.strictEqual(args[0], 'testEvent',
 								'Wrong event name');
-							assert.strictEqual(args[1], false);
+							assert.strictEqual(args[1], true);
 							assert.strictEqual(Object.keys(args[2]).length, 0);
 							second();
 							args[3]();
@@ -147,7 +147,7 @@ describe('client/EventRouter', function () {
 						function (args) {
 							assert.strictEqual(args[0], 'testEvent',
 								'Wrong event name');
-							assert.strictEqual(args[1], true);
+							assert.strictEqual(args[1], false);
 							assert.strictEqual(Object.keys(args[2]).length, 0);
 							done();
 						});
@@ -190,7 +190,7 @@ describe('client/EventRouter', function () {
 				modules.module2.implementation.once('handle', function (args) {
 					assert.strictEqual(args[0], 'testEvent',
 						'Wrong event name');
-					assert.strictEqual(args[1], false);
+					assert.strictEqual(args[1], true);
 					assert.strictEqual(args[2].number, '1');
 					if (++counter === 2) {
 						done();
@@ -200,7 +200,7 @@ describe('client/EventRouter', function () {
 				modules.module.implementation.once('handle', function (args) {
 					assert.strictEqual(args[0], 'testEvent',
 						'Wrong event name');
-					assert.strictEqual(args[1], false);
+					assert.strictEqual(args[1], true);
 					assert.strictEqual(args[2].number, '1');
 					if (++counter === 2) {
 						done();
