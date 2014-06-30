@@ -13,8 +13,8 @@ Catberry is a framework for fast and modular web-applications. Main feature you 
 * You get automatically [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application) and back-end which renders identical page for search engines and shared links
 * You get such module API which allows you to develop different blocks on page independently and use one code on server and client for rendering templates
 * Every link click on page raises event in your module automatically if you define "data-event" attribute
-* URL hash change event is raised like an event in module automatically (two event on hash set and remove)
-* Your application builds version of itself for browser using browserify (debug and release modes are supported)
+* URL hash change event is raised like an event in module automatically (two events on hash set and remove)
+* Your application builds version of itself for browser using [browserify](http://browserify.org) (debug and release modes are supported)
 * All framework architecture is built using [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) pattern and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection)
 * You can register your own modules (services) in [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) and inject it into any module you want
 * Framework itself is a [connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express) middleware it means you could use it with any other middleware
