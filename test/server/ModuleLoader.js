@@ -31,6 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	fs = require('fs'),
 	path = require('path'),
 	ServiceLocator = require('catberry-locator'),
@@ -49,6 +50,7 @@ function createModuleLoader(caseName) {
 	locator.register('logger', Logger);
 	locator.register('moduleFinder', ModuleFinder, config, true);
 	locator.registerInstance('config', config);
+	locator.registerInstance('eventBus', new events.EventEmitter());
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('templateProvider', {
 		registerSource: function () {
