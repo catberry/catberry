@@ -31,6 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	dust = require('dustjs-linkedin'),
 	ServiceLocator = require('catberry-locator'),
 	Logger = require('./../mocks/Logger'),
@@ -47,6 +48,7 @@ describe('server/TemplateProvider', function () {
 			var locator = new ServiceLocator();
 			locator.register('logger', Logger);
 			locator.registerInstance('dust', dust);
+			locator.registerInstance('eventBus', new events.EventEmitter());
 
 			var provider = locator.resolveInstance(TemplateProvider),
 				source = fs.readFileSync(templatePath, {encoding: 'utf8'});
@@ -70,6 +72,7 @@ describe('server/TemplateProvider', function () {
 			var locator = new ServiceLocator();
 			locator.register('logger', Logger);
 			locator.registerInstance('dust', dust);
+			locator.registerInstance('eventBus', new events.EventEmitter());
 
 			var provider = locator.resolveInstance(TemplateProvider);
 

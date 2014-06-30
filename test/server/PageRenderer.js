@@ -31,16 +31,21 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	fs = require('fs'),
 	path = require('path'),
 	HttpResponse = require('../mocks/HttpResponse'),
 	ServiceLocator = require('catberry-locator'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
-	ModuleLoaderMock = require('../mocks/ModuleLoader'),
 	Logger = require('../mocks/Logger'),
+	logger = new Logger(),
+	eventBus = new events.EventEmitter(),
 	locator = new ServiceLocator();
 
-locator.register('logger', Logger);
+eventBus.on('error', logger.error);
+
+locator.registerInstance('eventBus', eventBus);
+locator.registerInstance('logger', logger);
 locator.register('moduleLoader', TestModuleLoader);
 
 var currentPlaceholders = {};

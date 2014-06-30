@@ -31,6 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	jsdom = require('jsdom'),
 	Logger = require('../mocks/Logger'),
 	UniversalMock = require('../mocks/UniversalMock'),
@@ -291,6 +292,7 @@ function createLocator() {
 		};
 
 	locator.registerInstance('serviceLocator', locator);
+	locator.registerInstance('eventBus', new events.EventEmitter());
 	locator.register('logger', Logger);
 	locator.registerInstance('moduleLoader', moduleLoader);
 	locator.registerInstance('moduleApiProvider',
