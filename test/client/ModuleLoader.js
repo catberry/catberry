@@ -31,6 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	Logger = require('../mocks/Logger'),
 	ServiceLocator = require('catberry-locator'),
 	UniversalMock = require('../mocks/UniversalMock'),
@@ -90,6 +91,7 @@ describe('client/ModuleLoader', function () {
 			function () {
 				var locator = new ServiceLocator();
 				locator.registerInstance('serviceLocator', locator);
+				locator.registerInstance('eventBus', new events.EventEmitter());
 				locator.registerInstance('config', {});
 				locator.registerInstance('window', {
 					location: '',

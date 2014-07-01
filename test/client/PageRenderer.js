@@ -31,6 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	jsdom = require('jsdom'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	ModuleLoaderMock = require('../mocks/ModuleLoader'),
@@ -625,12 +626,18 @@ describe('client/PageRenderer', function () {
 
 function createLocator() {
 	var locator = new ServiceLocator(),
+		eventBus = new events.EventEmitter(),
+		logger = new Logger(),
 		modules = createModules(),
 		moduleLoader = new ModuleLoaderMock(modules);
 
+	eventBus.on('error', function (error) {
+		logger.error(error);
+	});
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('moduleLoader', moduleLoader);
-	locator.register('logger', Logger);
+	locator.registerInstance('eventBus', eventBus);
+	locator.registerInstance('logger', logger);
 	locator.register('stateProvider', StateProvider);
 	return locator;
 }
