@@ -32,7 +32,7 @@
 		"glob": "^4.0.2",
 		"glob-watcher": "^0.0.6",
 		"catberry-locator": "~0.4.0",
-		"catberry-uhr": "~0.6.1",
+		"catberry-uhr": "git://github.com/pragmadash/catberry-uhr.git#develop",
 		"jquery": "~2.1.1",
 		"uglify-js": "~2.4.13",
 		"browserify": "~4.1.9",
