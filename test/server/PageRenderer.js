@@ -60,30 +60,35 @@ var CASES_FOLDER = path.join(__dirname, '..', 'cases', 'server',
 var testModules = [
 	// fine module
 	{
+		$context: createContext('main'),
 		render: function (placeholderName, callback) {
 			callback(null, {});
 		}
 	},
 	// send empty result
 	{
+		$context: createContext('main'),
 		render: function (placeholderName, callback) {
 			callback();
 		}
 	},
 	// sends error
 	{
+		$context: createContext('main'),
 		render: function (placeholderName, callback) {
 			callback(new Error('test'));
 		}
 	},
 	// throws error
 	{
+		$context: createContext('main'),
 		render: function () {
 			throw new Error('test');
 		}
 	},
 	// async result
 	{
+		$context: createContext('main'),
 		render: function (placeholderName, callback) {
 			setTimeout(callback, 200);
 		}
@@ -296,3 +301,17 @@ describe('server/PageRenderer', function () {
 			});
 	});
 });
+
+function createContext(moduleName) {
+	var locator = new ServiceLocator();
+	locator.register('moduleApiProvider', ModuleApiProvider);
+	locator.register('cookiesWrapper', CookiesWrapper);
+	locator.registerInstance('serviceLocator', locator);
+	locator.registerInstance('eventBus', new events.EventEmitter());
+	var context = Object.create(locator.resolve('moduleApiProvider'));
+	context.name = moduleName;
+	context.state = {};
+	context.renderedData = {};
+	context.cookies = locator.resolve('cookiesWrapper');
+	return context;
+}
