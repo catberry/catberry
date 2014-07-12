@@ -651,10 +651,30 @@ function prepareWindow(window, locator) {
 }
 
 function createModules() {
+	var context = {
+		state: {},
+		cookies: {
+			get: function () {},
+			set: function () {}
+		},
+		renderedData: {}
+	};
+
+	var moduleImplementation = new UniversalMock(['render']);
+	moduleImplementation.$context = Object.create(context);
+	moduleImplementation.$context.name = 'module';
+
+	var module2Implementation = new UniversalMock(['render']);
+	module2Implementation.$context = Object.create(context);
+	module2Implementation.$context.name = 'module2';
+
+	var moduleWithErrorImplementation = new UniversalMock(['render']);
+	moduleWithErrorImplementation.$context = Object.create(context);
+	moduleWithErrorImplementation.$context.name = 'moduleWithError';
 	return {
 		module: {
 			name: 'module',
-			implementation: new UniversalMock(['render']),
+			implementation: moduleImplementation,
 			placeholders: {
 				first: {
 					name: 'first',
@@ -675,7 +695,7 @@ function createModules() {
 		},
 		module2: {
 			name: 'module2',
-			implementation: new UniversalMock(['render']),
+			implementation: module2Implementation,
 			placeholders: {
 				first: {
 					name: 'first',
@@ -697,7 +717,7 @@ function createModules() {
 		},
 		moduleWithError: {
 			name: 'moduleWithError',
-			implementation: new UniversalMock(['render']),
+			implementation: moduleWithErrorImplementation,
 			placeholders: {
 				first: {
 					name: 'first',

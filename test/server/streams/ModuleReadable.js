@@ -48,6 +48,7 @@ describe('server/streams/ModuleReadable', function () {
 					module = {
 						name: 'test',
 						implementation: {
+							$context: createContext('test'),
 							render: function (name, callback) {
 								this.$context.redirect(location);
 								callback();
@@ -96,6 +97,7 @@ describe('server/streams/ModuleReadable', function () {
 					module = {
 						name: 'test',
 						implementation: {
+							$context: createContext('test'),
 							render: function (name, callback) {
 								this.$context.cookies.set({
 									key: cookie1Name,
@@ -148,6 +150,7 @@ describe('server/streams/ModuleReadable', function () {
 					module = {
 						name: 'test',
 						implementation: {
+							$context: createContext('test'),
 							render: function (name, callback) {
 								this.$context.clearHash();
 								callback();
@@ -216,4 +219,18 @@ function createRenderingParameters(module) {
 		placeholderIds: Object.keys(placeholdersByIds),
 		placeholdersByIds: placeholdersByIds
 	};
+}
+
+function createContext(moduleName) {
+	var locator = new ServiceLocator();
+	locator.register('moduleApiProvider', ModuleApiProvider);
+	locator.register('cookiesWrapper', CookiesWrapper);
+	locator.registerInstance('serviceLocator', locator);
+	locator.registerInstance('eventBus', new events.EventEmitter());
+	var context = Object.create(locator.resolve('moduleApiProvider'));
+	context.name = moduleName;
+	context.state = {};
+	context.renderedData = {};
+	context.cookies = locator.resolve('cookiesWrapper');
+	return context;
 }

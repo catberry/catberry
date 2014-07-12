@@ -36,6 +36,8 @@ var assert = require('assert'),
 	path = require('path'),
 	ServiceLocator = require('catberry-locator'),
 	Logger = require('../mocks/Logger'),
+	ModuleApiProvider = require('../../lib/server/ModuleApiProvider'),
+	CookiesWrapper = require('../../lib/server/CookiesWrapper'),
 	ModuleFinder = require('../../lib/server/ModuleFinder'),
 	ModuleLoader = require('../../lib/server/ModuleLoader');
 
@@ -49,6 +51,8 @@ function createModuleLoader(caseName) {
 
 	locator.register('logger', Logger);
 	locator.register('moduleFinder', ModuleFinder, config, true);
+	locator.register('moduleApiProvider', ModuleApiProvider, config);
+	locator.register('cookiesWrapper', CookiesWrapper, config);
 	locator.registerInstance('config', config);
 	locator.registerInstance('eventBus', new events.EventEmitter());
 	locator.registerInstance('serviceLocator', locator);
