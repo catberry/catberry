@@ -36,7 +36,7 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	StateProvider = require('../../lib/StateProvider'),
-	ModuleApiProvider = require('../../lib/client/moduleApiProvider'),
+	ModuleApiProvider = require('../../lib/client/ModuleApiProvider'),
 	CookiesWrapper = require('../../lib/client/CookiesWrapper'),
 	ModuleLoader = require('../../lib/client/ModuleLoader');
 
