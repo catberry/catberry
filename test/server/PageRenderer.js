@@ -36,6 +36,8 @@ var assert = require('assert'),
 	path = require('path'),
 	HttpResponse = require('../mocks/HttpResponse'),
 	ServiceLocator = require('catberry-locator'),
+	CookiesWrapper = require('../../lib/server/CookiesWrapper'),
+	ModuleApiProvider = require('../../lib/server/ModuleApiProvider'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
 	Logger = require('../mocks/Logger'),
 	logger = new Logger(),
@@ -46,6 +48,9 @@ eventBus.on('error', logger.error);
 
 locator.registerInstance('eventBus', eventBus);
 locator.registerInstance('logger', logger);
+locator.registerInstance('serviceLocator', locator);
+locator.register('moduleApiProvider', ModuleApiProvider);
+locator.register('cookiesWrapper', CookiesWrapper);
 locator.register('moduleLoader', TestModuleLoader);
 
 var currentPlaceholders = {};
@@ -206,7 +211,10 @@ function checkCase(caseName, callback) {
 		}
 	};
 
-	var parameters = {renderedData: {}, state: {}};
+	var parameters = Object.create(locator.resolve('moduleApiProvider'));
+	parameters.state = {};
+	parameters.renderedData = {};
+	parameters.cookies = locator.resolve('cookiesWrapper');
 
 	pageRenderer1.render(response1, parameters,
 		function () {
