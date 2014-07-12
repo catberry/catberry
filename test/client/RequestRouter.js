@@ -37,7 +37,7 @@ var assert = require('assert'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	ServiceLocator = require('catberry-locator'),
 	StateProvider = require('../../lib/StateProvider'),
-	CookiesWrapper = require('../../lib/CookiesWrapper'),
+	CookiesWrapper = require('../../lib/client/CookiesWrapper'),
 	RequestRouter = require('../../lib/client/RequestRouter');
 
 describe('client/RequestRouter', function () {
@@ -546,6 +546,8 @@ function createLocator() {
 	locator.registerInstance('pageRenderer', new UniversalMock(['render']));
 	locator.registerInstance('eventRouter',
 		new UniversalMock(['routeEvent', 'routeHashChange']));
+	locator.registerInstance('moduleApiProvider',
+		new UniversalMock(['redirect']));
 	locator.registerInstance('formSubmitter',
 		new UniversalMock(['submit', 'canSubmit']));
 	locator.registerInstance('moduleLoader', moduleLoader);
