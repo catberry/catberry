@@ -36,6 +36,7 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	StateProvider = require('../../lib/StateProvider'),
+	ModuleApiProvider = require('../../lib/client/moduleApiProvider'),
 	CookiesWrapper = require('../../lib/client/CookiesWrapper'),
 	ModuleLoader = require('../../lib/client/ModuleLoader');
 
@@ -102,6 +103,7 @@ describe('client/ModuleLoader', function () {
 				locator.registerInstance('templateProvider',
 					new UniversalMock(['registerCompiled']));
 				locator.register('cookiesWrapper', CookiesWrapper);
+				locator.register('moduleApiProvider', ModuleApiProvider);
 				locator.register('stateProvider', StateProvider);
 				locator.register('logger', Logger);
 
