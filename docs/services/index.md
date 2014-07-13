@@ -17,8 +17,9 @@ replace implementation of some Catberry components. For example you can replace
 Logger service in Locator with own Logger which sends messages to Graylog, for
 example.
  
-To register own components you should remember that for server and browser you
-probably need different implementations of you component.
+To register own components you should keep in ming that for server and browser 
+you probably need different implementations of your component if it depends on
+environment.
 
 Learn more how to use Service Locator in next section.
 
