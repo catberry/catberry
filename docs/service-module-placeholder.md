@@ -3,7 +3,7 @@
 If you want to write isomorphic modules that work at server and in browser 
 it is obvious that you should implement your business logic somewhere else.
 
-Catberry proposes to use [Service-oriented architecture]
+Catberry proposes to use [Service-Oriented Architecture]
 (http://en.wikipedia.org/wiki/Service-Oriented_Architecture) where every module 
 can work with set of independent services (or one service) that implement 
 some business logic.
