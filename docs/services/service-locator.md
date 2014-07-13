@@ -11,7 +11,7 @@ you use `getMiddleware` method on server or `startWhenReady` in browser code.
 Before that moment feel free to register your own services to inject it into 
 catberry modules via DI.
 
-Your Catberry application always must have server.js with code like this:
+Your Catberry application always must have `server.js` with code like this:
 ```javascript
 var catberry = require('catberry'),
 	RestApiClient = require('./lib/RestApiClient'),
@@ -33,7 +33,7 @@ http
 
 ```
 
-And client.js with code like this:
+And `client.js` with code like this:
 ```javascript
 var RestApiClient = require('./lib/RestApiClient'),
 // create catberry application instance.

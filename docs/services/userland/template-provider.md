@@ -11,7 +11,8 @@ manually and not using Catberry rendering system.
 Just inject $templateProvider into your module or resolve it from ServiceLocator.
 
 The only method you need to do that is `getStream` and pass full 
-template name to it as first argument and data context as second.
+template name (moduleName_placeholderName) to it as first argument 
+and data context as second.
 
 Keep in mind that you can use this service only in browser and direct usage of
 this service is highly **not recommended**.
