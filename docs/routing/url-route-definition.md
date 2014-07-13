@@ -15,7 +15,7 @@ Default definition syntax is following:
 ```
 
 All parameters must be marked with colon at start, after every parameter 
-it must be placed list of module names that should receive value of 
+it must be followed by list of module names that should receive value of 
 this parameter to its state object.
 
 In this example above `id` value will be set to state of modules 
@@ -43,12 +43,16 @@ For such definition just use object like this:
 }
 
 ```
+Map function receives state prepared by expression rule. State is an object 
+where keys are names of receiver modules and values are state objects for every 
+module receiver. You can change whole state object if you want and return it
+from map function.
 
 In this example module `news` will receive additional state parameter `pageType`
 with value `userNews`.
 
 ## Regular expression
-For some rare cases you may need to parse parameters by your self using regular
+For some rare cases you may need to parse parameters by yourself using regular
 expressions. In these cases you can define mapper object as listed below:
 
 ```javascript
