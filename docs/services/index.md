@@ -25,4 +25,4 @@ Learn more how to use Service Locator in next section.
 
 Read next:
 
-* [Service Locator](services/service-locator.md)
+* [Service Locator](service-locator.md)

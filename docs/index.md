@@ -8,7 +8,6 @@
 * [Catberry Services](services/index.md)
 	* [Service Locator](services/service-locator.md)
 	* [Dependency Injection](services/dependency-injection.md)
-	* [Registering Own Services](services/registering-own-services.md)
 	* Userland Catberry Services
 		* [Universal HTTP(S) Request](services/userland/universal-http-request.md)
 		* [Logger](services/userland/logger.md)
