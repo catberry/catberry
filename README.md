@@ -37,7 +37,7 @@ into any module you want
 * Framework itself is a [connect](https://github.com/senchalabs/connect)/
 [express](https://github.com/visionmedia/express) middleware it means you 
 could use it with any other middleware
-* Routing definition using "/some/:parameter[module1,module2,module3]" 
+* Routing definition using `/some/:parameter[module1,module2,module3]` 
 syntax with list of modules that will receive parameter's value. 
 Anyway regular expressions are supported too.
 * Event definition using 
