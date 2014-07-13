@@ -16,12 +16,39 @@ It means you can configure it as described [here]
 In browser it is implemented as a very simple logger that can only write 
 to browser's console.
 
+##Configuration
+To configure browser logger you can just set parameter object `logger` in Catberry
+config object.
+
+Like this for browser logger:
+```json
+{
+	logger: {
+		levels: 'warn,error'
+	}
+}
+```
+
+To configure server logger you need more actions:
+```javascript
+var log4js = require('log4js'); 
+//console log is loaded by default, so you won't normally need to do this
+//log4js.loadAppender('console');
+log4js.loadAppender('file');
+//log4js.addAppender(log4js.appenders.console());
+log4js.addAppender(log4js.appenders.file('logs/cheese.log'), 'cheese');
+
+var logger = cat.locator.resolve('logger');
+logger.setLevel('ERROR');
+```
+
+More details [here](https://github.com/nomiddlename/log4js-node#usage).
+
 Read next:
 
 Userland Services
 
 * [Universal HTTP(S) Request](universal-http-request.md)
-* [Logger](logger.md)
 * [Template Provider](template-provider.md)
 
 #Interface
