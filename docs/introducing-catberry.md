@@ -1,6 +1,9 @@
 #Intorducing Catberry
 
-Catberry is a framework for [Isomorphic Applications](isomorphic-applications.md).
+Catberry is a framework for [Isomorphic Applications]
+(isomorphic-applications.md). Also it is a [connect]
+(https://github.com/senchalabs/connect)/[express]
+(https://github.com/visionmedia/express) middleware.
 
 It makes possible to write modules that will be used for rendering at server for
 SEO and shared links and rendering in browser for [Single Page Application]
