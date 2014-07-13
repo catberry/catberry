@@ -4,7 +4,7 @@ Whole architecture of Catberry framework is based on
 [Service Locator pattern](http://en.wikipedia.org/wiki/Service_locator_pattern) 
 and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection).
 
-##Register own services
+##Register Own Services
 There is only one service locator (singleton) in one catberry application 
 instance and all Catberry's components are resolved from this locator when 
 you use `getMiddleware` method on server or `startWhenReady` in browser code.
@@ -61,30 +61,11 @@ registered implementation of every service.
 
 You can also get access to all implementations using `resolveAll` method.
 
-##Using Registrations via Dependency Injection
+How to use registered service please read in next section.
 
-If you need to use your own or Catberry's service registered in Service Locator
-you just need to inject it in module of your application.
+Read next:
 
-For example, you have module called AwesomeModule. In Catberry every module is 
-a constructor with prototype. To inject Logger, your own RestApiClient and 
-someConfigKey from config object you just need to specify such constructor in 
-your module:
-
-```javascript
-function AwesomeModule($logger, $restApiClient, someConfigKey) {
-	// here logger and restApiClient are instances will be accessible
-	// via dependency injection from service locator
-	// someConfigKey will be accessible from startup config object
-	// via dependency injection too
-}
-```
-
-When this code will be optimized (minified) for browser all these injections
-will stay as is and will not be broken.
-
-Also you can inject only `$serviceLocator` and resolve everything you want
-directly.
+* [Dependency Injection](dependency-injection.md)
 
 ##Interface
 
