@@ -7,7 +7,7 @@ and error messages.
 There are two ways for listening to Catberry events:
 
 * Subscribe on it using [module context](modules/context.md)
-* Subscribe on it using catberry application instance directly like this
+* Subscribe on it using Catberry application instance directly like this
 
 ```javascript
 var catberry = require('catberry'),
