@@ -51,7 +51,7 @@ Anyway regular expressions are supported too.
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called [Service-Module-Placeholder]
-(https://github.com/pragmadash/catberry/blob/master/docs/smp.md) 
+(docs/service-module-placeholder.md) 
 instead Model-View-Controller. SMP is the right concept for 
 [isomorphic web-applications](docs/isomorphic-applications.md).
 
@@ -107,13 +107,13 @@ And even [more modules](https://www.npmjs.org/search?q=catberry).
 
 ##Contribution
 If you have found a bug, please create pull request with [mocha]
-(http://visionmedia.github.io/mocha/) unit-test which reproduces it or describe 
+(https://www.npmjs.org/package/mocha) unit-test which reproduces it or describe 
 all details in issue if you can not implement test. If you want to propose some 
 improvements just create issue or pull request but please do not forget to use 
 `npm test` to be sure that you code is awesome.
 
 All changes should satisfy this [Code Style Guide]
-(docs/code-style.md).
+(docs/code-style-guide.md).
 
 Also your changes should be covered by unit tests using [mocha]
 (https://www.npmjs.org/package/mocha).

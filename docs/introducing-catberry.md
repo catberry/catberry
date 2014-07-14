@@ -1,4 +1,4 @@
-#Intorducing Catberry
+#Introducing Catberry
 
 Catberry is a framework for [Isomorphic Applications]
 (isomorphic-applications.md). Also it is a [connect]

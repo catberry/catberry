@@ -7,13 +7,13 @@ if set `modulesFolder` parameter in Catberry config.
 ##How to add modules
 There are some rules how to add modules to your application:
 
-* It always should be module `main` and its placeholder `__index.dust' with
+* It always should be module `main` and its placeholder `__index.dust` with
 template of whole application page (html, head, body etc)
 * In fact every module is a folder, name of folder is a name of module
 * Module can optionally have a logic (can just has templates), if so 
 it should have `index.js` that exports module constructor
 * Module can optionally have placeholders, if so it should have `placeholders`
-folder inside with [dustjs](https://github.com/linkedin/dustjs)) templates.
+folder inside with [dustjs](https://github.com/linkedin/dustjs) templates.
 Placeholders can be placed in sub-folders but with unique names
 
 Please keep in mind that module name (folder name) should satisfy regular 
@@ -78,7 +78,7 @@ to release mode passing `isRelease: true` parameter in config of Catberry
 application like this:
 
 ```javascript
-var catberry = require('catberry),
+var catberry = require('catberry'),
 cat = catberry.create({isRelease: true}),
 ```
 

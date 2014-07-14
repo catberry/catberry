@@ -7,10 +7,7 @@ Catberry has Universal HTTP(S) Request service registered as "uhr" in
 All details about usage you can read in UHR read me file [here]
 (https://github.com/pragmadash/catberry-uhr/blob/master/README.md).
 
-Read next:
+Read also:
 
-Userland Services
-
-* [Universal HTTP(S) Request](universal-http-request.md)
 * [Logger](logger.md)
 * [Template Provider](template-provider.md)

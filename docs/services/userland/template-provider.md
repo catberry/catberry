@@ -17,15 +17,13 @@ and data context as second.
 Keep in mind that you can use this service only in browser and direct usage of
 this service is highly **not recommended**.
 
-Read next:
-
-Userland Services
+Read also:
 
 * [Universal HTTP(S) Request](universal-http-request.md)
 * [Logger](logger.md)
-* [Template Provider](template-provider.md)
 
 ##Interface
+```javascript
 /**
  * Gets stream of specified template for rendering specified data.
  * @param {string} name Template name.
@@ -33,3 +31,4 @@ Userland Services
  * @returns {Stream} Rendering stream.
  */
 TemplateProvider.prototype.getStream = function (name, context) { }
+```

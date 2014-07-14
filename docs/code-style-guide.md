@@ -1,4 +1,4 @@
-#Catberry framework code style guide
+#Catberry Framework Code Style Guide
 
 There are some aspects of our code style below:
 
