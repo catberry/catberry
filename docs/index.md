@@ -1,4 +1,4 @@
-#Catberry framework documentation
+#Catberry Framework Documentation
 
 ![Catberry](images/logo.png) 
 
