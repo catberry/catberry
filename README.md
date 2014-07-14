@@ -16,6 +16,8 @@ modules in browser: automatically creates
 [Single Page Application](http://en.wikipedia.org/wiki/Single-page_application) 
 using browser [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
+Here you can find full [Catberry Documentation](docs/index.md).
+
 ##Advantages
 * Super fast rendering engine using [node.js streams]
 (http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) without 
