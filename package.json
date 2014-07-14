@@ -2,7 +2,7 @@
 	"name": "catberry",
 	"version": "1.0.0-dev",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
-	"description": "Catberry is a framework for fast and modular web-applications. Write module once and use it at server and browser without any additional logic",
+	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
 	"homepage": "https://github.com/pragmadash/catberry",
 	"keywords": [
 		"stream", "web", "isomorphic", "framework", "middleware", "connect",
