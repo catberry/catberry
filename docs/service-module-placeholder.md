@@ -1,8 +1,5 @@
 #Service-Module-Placeholder
 
-If you want to write isomorphic modules that work at server and in browser 
-it is obvious that you should implement your business logic somewhere else.
-
 Catberry proposes to use [Service-Oriented Architecture]
 (http://en.wikipedia.org/wiki/Service-Oriented_Architecture) where every module 
 can work with set of independent services (or one service) that implement 
@@ -15,7 +12,7 @@ So, Catberry Application consist of:
  * Set of placeholders. Templates that can reference each other 
  (more details in [Placeholders section](modules/placeholders.md))
 
-Typical architecture in common case is presented on image below:
+Typical architecture in common case is presented in image below:
 
 ![Catberry Application Architecture](images/smp.png)
 
