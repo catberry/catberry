@@ -181,6 +181,12 @@ set some cookies that should be 100% secured. It is better to use additional
 [connect](https://github.com/senchalabs/connect)/[express]
 (https://github.com/visionmedia/express) middleware for this task.
 
+##Context events
+As you may notice in context methods subsection, context has method for 
+subscribing on Catberry methods, which are described in details in 
+[Event Bus and Diagnostics](../event-bus-and-diagnostics.md) 
+documentation section.
+
 Read also:
 
 * [Placeholders](placeholders.md)
