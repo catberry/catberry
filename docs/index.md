@@ -23,5 +23,4 @@
 	* [Context](modules/context.md)
 * [Building Browser Bundle](building-browser-bundle.md) 
 * [Event Bus and Diagnostics](event-bus-and-diagnostics.md) 
-* [Not Included Packages](not-included-packages.md)
 * [Code Style Guide](code-style-guide.md)
