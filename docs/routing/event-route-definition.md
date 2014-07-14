@@ -7,11 +7,13 @@ what parameters Catberry can parse from event names and what modules will
 receive event and parsed parameters.
 
 Event could be raised in two cases:
+
 * Change of hash in location, in this case hash is an event name
 * Click on link (`<a>` element) with `data-event` attribute, which value
 is event name
 
 When you change hash in location modules receive two events:
+
 * Previous event was ended (last hash is cleared)
 * New event is starting (new hash is set)
 
