@@ -41,8 +41,8 @@ in your modules automatically. Just manual hash change does the same thing.
 * You can register your own components (services) in [Service Locator]
 (http://en.wikipedia.org/wiki/Service_locator_pattern) and inject it 
 into any module you want
-* Framework itself is a [connect](https://github.com/senchalabs/connect)/
-[express](https://github.com/visionmedia/express) middleware, it means you 
+* Framework itself is a [connect](https://github.com/senchalabs/connect)/[express]
+(https://github.com/visionmedia/express) middleware, it means you 
 can use it with any other middlewares
 * Definition of routing rules using `/some/:parameter[module1,module2,module3]` 
 syntax with list of modules that will receive parameter's value. 
