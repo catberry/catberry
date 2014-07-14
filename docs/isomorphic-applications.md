@@ -22,19 +22,20 @@ In fact, every module in isomorphic application should receive all data from
 API server which could be written in any platform you want using REST approach.
 
 There is a list of problems are solved by isomorphic applications:
- * Using single page applications without SEO problems. Your isomorphic
- modules will render exactly the same page on server as it is rendered 
- in browser
- * Code duplication for rendering parts of page at server and in browser, 
- sometimes it even written in different programming languages. 
- Since isomorphic modules are written only once and in JavaScript 
- you do not have this problem.
- * Maintenance is complicated, because you need to synchronize changes 
- in server-side and browser modules. It is obviously that you do not need this
- using isomorphic modules. It is always one module to change.
- * High load on server. Since server clients render and receive page from 
- server only once and then render all other pages in their browsers 
- your server's load will be reduced dramatically.
+
+* Using single page applications without SEO problems. Your isomorphic
+modules will render exactly the same page on server as it is rendered 
+in browser
+* Code duplication for rendering parts of page at server and in browser, 
+sometimes it even written in different programming languages. 
+Since isomorphic modules are written only once and in JavaScript 
+you do not have this problem.
+* Maintenance is complicated, because you need to synchronize changes 
+in server-side and browser modules. It is obviously that you do not need this
+using isomorphic modules. It is always one module to change.
+* High load on server. Since server clients render and receive page from 
+server only once and then render all other pages in their browsers 
+your server's load will be reduced dramatically.
  
 And maybe a lot of more, who knows.
 
