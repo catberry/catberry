@@ -16,6 +16,9 @@ it should have `index.js` that exports module constructor
 folder inside with [dustjs](https://github.com/linkedin/dustjs)) templates.
 Placeholders can be placed in sub-folders but with unique names
 
+Please keep in mind that module name (folder name) should satisfy regular 
+expression `^\w+$`.
+
 ##Module context
 Every module instance always has `$context` property which is assigned by
 Catberry when module initializes. Catberry updates `$context` every time the 
@@ -71,7 +74,10 @@ events.js # definition of event route definitions
 If you want to see finished application as an example then please proceed to 
 [example](../../example) folder.
 
-Read next:
+Read also:
 
 * [Placeholders](placeholders.md)
-
+* [Render Method](render-method.md)
+* [Handle Method](handle-method.md)
+* [Submit Method](submit-method.md)
+* [Context](context.md)
