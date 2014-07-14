@@ -30,7 +30,7 @@ please pass `isRelease: true` parameter in config of Catberry application like
 this:
 
 ```javascript
-var catberry = require('catberry),
+var catberry = require('catberry'),
 	cat = catberry.create({isRelease: true}),
 ```
 

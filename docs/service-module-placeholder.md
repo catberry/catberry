@@ -13,7 +13,7 @@ So, Catberry Application consist of:
  * Set of services (HTTP servers)
  * Set of modules (more details in [Modules section](modules/index.md))
  * Set of placeholders. Templates that can reference each other 
- (more details in [Placeholders section](modules/index.md))
+ (more details in [Placeholders section](modules/placeholders.md))
 
 Typical architecture in common case is presented on image below:
 
@@ -25,7 +25,7 @@ You can find example application [here](../example) with architecture that is de
 
 This approach allows your module to be executed at server and browser as well 
 without any additional logic written by you. All you need is to use 
-[Universal HTTP(S) Request](services/universal-http-request.md) - 
+[Universal HTTP(S) Request](services/userland/universal-http-request.md) - 
 this component implements HTTP(S) request logic using XmlHttpRequest in browser 
 and http.request at server and has the same interface.
 

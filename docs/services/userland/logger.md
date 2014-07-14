@@ -23,8 +23,8 @@ config object.
 Like this for browser logger:
 ```json
 {
-	logger: {
-		levels: 'warn,error'
+	"logger": {
+		"levels": "warn,error"
 	}
 }
 ```
@@ -44,9 +44,7 @@ logger.setLevel('ERROR');
 
 More details [here](https://github.com/nomiddlename/log4js-node#usage).
 
-Read next:
-
-Userland Services
+Read also:
 
 * [Universal HTTP(S) Request](universal-http-request.md)
 * [Template Provider](template-provider.md)
