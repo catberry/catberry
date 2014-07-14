@@ -16,8 +16,8 @@ in browser. This [Single Page Application]
 can re-render all parts of page using the same isomorphic modules and not 
 reloading the page at all.
 
-In isomorphic applications your business logic should be implemented 
-somewhere else, outside of these modules, because it may not work in browser. 
+Isomorphic applications can work with set of independent services that 
+implements some business logic (Facebook API, Twitter API etc). 
 In fact, every module in isomorphic application should receive all data from 
 API server which could be written in any platform you want using REST approach.
 
