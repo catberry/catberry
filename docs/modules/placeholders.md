@@ -140,6 +140,25 @@ content of page. In this case you can add `data-scroll-top` attribute to your
 placeholder HTML element. After such placeholder was rendered page will be 
 scrolled top.
 
+##HEAD element as a placeholder
+`<head>` element also can be a placeholder. You can change `<title>`, `<meta>`,
+add new `<script>` or `<link>` elements dynamically. At server `<head>` 
+placeholder is rendered as usually, but in browser `<head>` rendering is 
+not simple. When your module change content of `<head>` placeholder, rendering 
+engine merges all changes with current `<head>` and do not load styles and 
+scripts more times.
+
+So, what is happened during this merge:
+
+* Catberry compares current and new `<head>` representation
+* If current `<head>` has elements that are absent in new `<head>` then all 
+these elements are removed from `<head>` except scripts and styles
+* Then Catberry takes elements from new `<head>` that are absent in current 
+`<head>` and adds it to end of current `<head>`
+
+This approach makes `<head>` changes smoothly for user and do not execute 
+JavaScript code twice.
+
 Read also:
 
 * [Render Method](render-method.md)
