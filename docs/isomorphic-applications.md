@@ -17,7 +17,7 @@ can re-render all parts of page using the same isomorphic modules and not
 reloading the page at all.
 
 Isomorphic applications can work with set of independent services that 
-implements some business logic (Facebook API, Twitter API etc). 
+implement some business logic (Facebook API, Twitter API etc). 
 In fact, every module in isomorphic application should receive all data from 
 API server which could be written in any platform you want using REST approach.
 
