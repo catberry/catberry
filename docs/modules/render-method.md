@@ -25,6 +25,15 @@ to callback as first argument. Passed error causes stack trace print instead
 placeholder template in debug mode or `__error` placeholder rendering in 
 release mode (or nothing if `_error` does not exist).
 
+By default rendering works in debug mode, to switch it to release mode,
+please pass `isRelease: true` parameter in config of Catberry application like
+this:
+
+```javascript
+var catberry = require('catberry),
+	cat = catberry.create({isRelease: true}),
+```
+
 Second callback argument is a data context for template engine. 
 
 Third callback argument is a `then` function - action that should be called 

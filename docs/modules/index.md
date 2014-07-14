@@ -8,7 +8,7 @@ if set `modulesFolder` parameter in Catberry config.
 There are some rules how to add modules to your application:
 
 * It always should be module `main` and its placeholder `__index.dust' with
- template of whole application page (html, head, body etc)
+template of whole application page (html, head, body etc)
 * In fact every module is a folder, name of folder is a name of module
 * Module can optionally have a logic (can just has templates), if so 
 it should have `index.js` that exports module constructor
@@ -69,6 +69,17 @@ client.js # browser initial script
 server.js # connect server start script
 routes.js # definition of URL route definitions
 events.js # definition of event route definitions
+```
+
+##Module code watch and reload
+By default Catberry works in debug mode and it means that all changes in code
+of your modules will automatically reload module in runtime. You can switch it 
+to release mode passing `isRelease: true` parameter in config of Catberry 
+application like this:
+
+```javascript
+var catberry = require('catberry),
+cat = catberry.create({isRelease: true}),
 ```
 
 If you want to see finished application as an example then please proceed to 

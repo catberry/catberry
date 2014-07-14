@@ -20,6 +20,7 @@ Please keep in mind that placeholder name should satisfy regular expression
 
 ##How do I decide what part of page should be a placeholder?
 There are two simple rules that helps with this decision:
+
 * If you can prepare whole data context for some part of page using one request 
 to API service that means this part of page could be a placeholder
 * If you want to refresh some group of placeholders always together using 
@@ -36,9 +37,9 @@ placeholders should be grouped into one module `product`.
 ##Placeholder types
 There are two reserved names of placeholders:
 
-* __index - is used as whole page template in `main` module and 
+* `__index` - is used as whole page template in `main` module and 
 is called "root placeholder"
-* __error - is used to show user-friendly error messages in blocks that has 
+* `__error` - is used to show user-friendly error messages in blocks that has 
 errors during rendering. It is called "error placeholder"
 
 ##Placeholder references

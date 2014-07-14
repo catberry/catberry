@@ -25,6 +25,7 @@ Typical form using this method looks like this:
 </form>
 ```
 Required attributes to send this form to module are following:
+
 * `name` - form should have a name
 * `data-module` - name of module receiver
 
