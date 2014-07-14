@@ -12,7 +12,7 @@ Catberry is a framework for fast and modular [isomorphic web-applications]
 Catberry makes possible to write module once and use it at server and in browser
 without any additional code, just create module and put it to folder 
 `catberry_modules`. Catberry builds browser script bundle and re-uses your 
-modules in browser automatically create 
+modules in browser: automatically creates 
 [Single Page Application](http://en.wikipedia.org/wiki/Single-page_application) 
 using browser [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
@@ -21,18 +21,18 @@ using browser [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/A
 (http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) without 
 in-memory template rendering (powered by [dustjs]
 (https://github.com/linkedin/dustjs))
-* Write code in server-side style (using [node modules system]
-(http://nodejs.org/api/modules.html#modules_modules)) and only once for 
-execution at server and in browser
-* Get automatically [Single Page Application]
-(http://en.wikipedia.org/wiki/Single_Page_Application) and back-end that 
-renders identical page for search engines and shared links
-* Get such module API that allows you to develop different blocks on page 
-independently and refresh only changed blocks in browser
-* Click on link with `href` in bounds of Catberry application rebuilds page
+* You will write code in server-side style (using [node modules system]
+(http://nodejs.org/api/modules.html#modules_modules)) and only once to 
+execute it at server and in browser
+* You will get [Single Page Application]
+(http://en.wikipedia.org/wiki/Single_Page_Application) automatically and 
+back-end that renders identical page for search engines and shared links
+* You will get such module API that allows you to develop different independent 
+blocks on page and refresh only changed blocks in browser
+* A click on link with `href` in bounds of Catberry application rebuilds page
 structure in browser without reloading of page
-* Click on link with `data-event` attribute or hash in `href` raises event 
-in your modules automatically. Just manual hash change does the same thing.
+* A click on link with `data-event` attribute or hash in `href` raises an event 
+in your modules automatically. Manual hash changing does the same thing.
 * Your application builds version of itself for browser using 
 [browserify](http://browserify.org) (debug and release modes are supported)
 * All framework architecture is built using [Service Locator]
@@ -44,16 +44,16 @@ into any module you want
 * Framework itself is a [connect](https://github.com/senchalabs/connect)/[express]
 (https://github.com/visionmedia/express) middleware, it means you 
 can use it with any other middlewares
-* Definition of routing rules using `/some/:parameter[module1,module2,module3]` 
-syntax with list of modules that will receive parameter's value. 
-Anyway regular expressions are supported too.
-* Definition of event routing rules using 
+* Definition of routing rules are specified using 
+`/some/:parameter[module1,module2,module3]` syntax with list of modules that 
+will receive parameter's value. Anyway regular expressions are supported too.
+* Definitions of event routing rules are specified using 
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called [Service-Module-Placeholder]
-(docs/service-module-placeholder.md) 
-instead Model-View-Controller. SMP is the right concept for 
-[isomorphic web-applications](docs/isomorphic-applications.md).
+(docs/service-module-placeholder.md) instead Model-View-Controller. 
+SMP is the right concept for [isomorphic web-applications]
+(docs/isomorphic-applications.md).
 
 For more details please proceed to [Catberry Documentation]
 (docs/index.md).
@@ -103,14 +103,14 @@ Localization support
 * [catberry-lazy-loader](https://www.npmjs.org/package/catberry-lazy-loader) - 
 Module for implementing feed placeholders with infinite scroll and lazy loading
 
-And even [more modules](https://www.npmjs.org/search?q=catberry).
+And even [more packages](https://www.npmjs.org/search?q=catberry).
 
 ##Contribution
 If you have found a bug, please create pull request with [mocha]
 (https://www.npmjs.org/package/mocha) unit-test which reproduces it or describe 
 all details in issue if you can not implement test. If you want to propose some 
 improvements just create issue or pull request but please do not forget to use 
-`npm test` to be sure that you code is awesome.
+`npm test` to be sure that your code is awesome.
 
 All changes should satisfy this [Code Style Guide]
 (docs/code-style-guide.md).
