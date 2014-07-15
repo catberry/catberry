@@ -33,17 +33,17 @@ Actually `cat.API` has almost the same interface as [module context]
 
 Here is a list of common Catberry events:
 
-| Event					| When happens															| Arguments																							|
-|-----------------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
-| ready					| Catberry finishes initialization										|	no																								|
-| error					| Error is happened														|	`Error` object																					|
-| moduleLoaded			| each module is loaded													|	Module name as string																			|
-| placeholderLoaded		| each placeholder is loaded											|	`{name: String, moduleName: String}`															|
-| allModulesLoaded		| all modules are loaded												|	no																								|
-| templateRegistered	| template of placeholder is registered									|	`{name: String, source: String}`																|
-| placeholderRender		| Catberry starts rendering placeholder									|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`}`	|
-| placeholderRendered	| Catberry finishes rendering placeholder								|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`}`	|
-| pageRendered			| Catberry finishes rendering of all placeholders after state changing	|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`}`	|
+| Event					| When happens															| Arguments																											|
+|-----------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| ready					| Catberry finishes initialization										|	no																												|
+| error					| Error is happened														|	`Error` object																									|
+| moduleLoaded			| each module is loaded													|	Module name as string																							|
+| placeholderLoaded		| each placeholder is loaded											|	`{name: String, moduleName: String}`																			|
+| allModulesLoaded		| all modules are loaded												|	no																												|
+| templateRegistered	| template of placeholder is registered									|	`{name: String, source: String}`																				|
+| placeholderRender		| Catberry starts rendering placeholder									|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`}`					|
+| placeholderRendered	| Catberry finishes rendering placeholder								|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`, time: Number}`	|
+| pageRendered			| Catberry finishes rendering of all placeholders after state changing	|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`}`					|
 
 Next list of only-server events:
 
