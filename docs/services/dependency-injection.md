@@ -33,6 +33,3 @@ Userland Services
 * [Universal HTTP(S) Request](userland/universal-http-request.md)
 * [Logger](userland/logger.md)
 * [Template Provider](userland/template-provider.md)
-
-
-* [Routing](../routing/index.md)
