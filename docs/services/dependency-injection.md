@@ -26,10 +26,14 @@ directly.
 It is very important do not make loops in resolving dependencies. It causes
 infinite recursion and just kill your application.
 
-Read next:
+Read also:
 
 Userland Services
 
 * [Universal HTTP(S) Request](userland/universal-http-request.md)
 * [Logger](userland/logger.md)
 * [Template Provider](userland/template-provider.md)
+
+Read next:
+
+* [Routing](../routing/index.md)
