@@ -16,7 +16,8 @@ Typical architecture in common case is presented in image below:
 
 ![Catberry Application Architecture](images/smp.png)
 
-You can find example application [here](../example) with architecture that is described below:
+You can find example application [here](../project_template) with architecture 
+that is described below:
 
 ![Example Application Architecture](images/smp-chat.png)
 
