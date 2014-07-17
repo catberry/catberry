@@ -19,7 +19,7 @@ Then to start in `debug` mode without script minification and with file watch:
 npm run debug
 ```
 
-To start in release mode
+To start in `release` mode:
 
 ```
 npm start
