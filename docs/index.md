@@ -9,9 +9,11 @@
 	* [Service Locator](services/service-locator.md)
 	* [Dependency Injection](services/dependency-injection.md)
 	* Userland Catberry Services
-		* [Universal HTTP(S) Request](services/userland/universal-http-request.md)
 		* [Logger](services/userland/logger.md)
-		* [Template Provider](services/userland/template-provider.md)
+        * [Config](services/userland/config.md)
+        * [jQuery](services/userland/jquery.md)
+        * [Template Provider](services/userland/template-provider.md)
+        * [Universal HTTP(S) Request](services/userland/universal-http-request.md)
 * [Routing](routing/index.md)
 	* [URL Route Definition](routing/url-route-definition.md)
 	* [Event Route Definition](routing/event-route-definition.md)
