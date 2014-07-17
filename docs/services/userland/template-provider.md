@@ -8,7 +8,7 @@ If you in situation when it is needed to render placeholder or partial
 dynamically, maybe for lazy loading or anything else, you can render template
 manually and not using Catberry rendering system.
 
-Just inject $templateProvider into your module or resolve it from 
+Just inject `$templateProvider` into your module or resolve it from 
 Service Locator to use this service.
 
 The only method you need to do that is `getStream` and pass full 
