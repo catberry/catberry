@@ -10,4 +10,6 @@ All details about usage you can read in UHR read me file [here]
 Read also:
 
 * [Logger](logger.md)
+* [Config](config.md)
+* [jQuery](jquery.md)
 * [Template Provider](template-provider.md)
