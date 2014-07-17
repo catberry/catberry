@@ -1,4 +1,5 @@
 node_modules
+public
 .idea
 *.log
 .DS_Store

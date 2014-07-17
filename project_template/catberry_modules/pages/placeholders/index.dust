@@ -1,0 +1,7 @@
+{@select key="{page}"}
+	{@eq value="about"}
+        <div id="about_index"></div>{/eq}
+	{@eq value="commits"}
+        <div id="commits_index"></div>{/eq}
+	{@default} Page Not Found {/default}
+{/select}

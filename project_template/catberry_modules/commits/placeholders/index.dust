@@ -1,0 +1,8 @@
+{#.commits}
+    <section>
+        <a id="{.sha}"
+           href="#show-details-{.sha}">
+			{.commit.author.name}- {.commit.message}
+        </a>
+    </section>
+{/.commits}
