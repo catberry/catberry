@@ -4,7 +4,7 @@ Catberry has an universal logger service registered as "logger" in
 [Service Locator](../service-locator.md) and accessible via 
 [dependency injection](../dependency-injection.md).
 
-Just inject $logger into your module or resolve it from 
+Just inject `$logger` into your module or resolve it from 
 Service Locator to use this service.
 
 This logger implementation has standard for all loggers methods 

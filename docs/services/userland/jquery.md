@@ -4,7 +4,7 @@ Catberry has jQuery service registered as "jQuery" in
 [Service Locator](../service-locator.md) and accessible via 
 [dependency injection](../dependency-injection.md).
 
-Just inject $jQuery into your module or resolve it from 
+Just inject `$jQuery` into your module or resolve it from 
 Service Locator to use this service.
 
 This a popular library used for DOM manipulation in Catberry's browser modules.
