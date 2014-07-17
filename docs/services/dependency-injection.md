@@ -30,9 +30,11 @@ Read also:
 
 Userland Services
 
-* [Universal HTTP(S) Request](userland/universal-http-request.md)
 * [Logger](userland/logger.md)
+* [Config](userland/config.md)
+* [jQuery](userland/jquery.md)
 * [Template Provider](userland/template-provider.md)
+* [Universal HTTP(S) Request](userland/universal-http-request.md)
 
 Read next:
 
