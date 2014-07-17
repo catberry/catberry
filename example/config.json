@@ -1,9 +1,0 @@
-{
-	"title": "Catberry example application",
-	"helloMessage": "Meow, I am Catberry and it is my example page",
-	"chatHost": "localhost",
-	"chatHostPort": 3000,
-	"staticHost": "localhost",
-	"staticPort": 3000,
-	"isRelease": false
-}

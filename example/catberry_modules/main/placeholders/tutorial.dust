@@ -1,4 +1,0 @@
-<h1>Tutorial</h1>
-<div class="content-text">
-	{page|s}
-</div>

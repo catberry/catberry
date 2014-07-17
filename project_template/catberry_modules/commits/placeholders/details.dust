@@ -1,0 +1,6 @@
+<div>+ {.stats.additions}, - {.stats.deletions}, = {.stats.total}</div>
+<div>
+    <a href="{.html_url}" target="_blank">
+        comments: {.commit.comment_count}
+    </a>
+</div>
