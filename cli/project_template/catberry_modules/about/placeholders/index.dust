@@ -1,1 +1,3 @@
-{.html|s}
+<div class="container">
+	{.html|s}
+</div>

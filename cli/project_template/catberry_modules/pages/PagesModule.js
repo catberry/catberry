@@ -17,13 +17,26 @@ function PagesModule() {
 }
 
 /**
- * Renders page tabs.
+ * Renders page content.
  * This method is called when need to render index template of module pages.
  * @param {Function} callback Callback on finish prepare data context.
  */
 PagesModule.prototype.renderIndex = function (callback) {
+	callback(null, {page: this.$context.state.page});
+};
+
+/**
+ * Renders page navigation tabs.
+ * This method is called when need to render navigation template
+ * of module pages.
+ * @param {Function} callback Callback on finish prepare data context.
+ */
+PagesModule.prototype.renderNavigation = function (callback) {
 	if (!this.$context.state.page) {
 		this.$context.redirect('/about');
+		return;
 	}
-	callback(null, {page: this.$context.state.page});
+	var data = {};
+	data[this.$context.state.page] = true;
+	callback(null, data);
 };

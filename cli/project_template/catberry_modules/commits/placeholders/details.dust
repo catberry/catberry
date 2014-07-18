@@ -1,8 +1,35 @@
-<div>
-    <div>+ {.stats.additions}, - {.stats.deletions}, = {.stats.total}</div>
-    <div>
-        <a href="{.html_url}" target="_blank">
-            comments: {.commit.comment_count}
-        </a>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <ul class="list-inline">
+            <li>
+                <span class="glyphicon glyphicon-plus"></span>
+            </li>
+			<li>
+				{.stats.additions}
+			</li>
+            <li>
+                <span class="glyphicon glyphicon-minus"></span>
+            </li>
+			<li>
+				{.stats.deletions}
+			</li>
+            <li>
+				<span class="glyphicon glyphicon-asterisk"></span>
+            </li>
+			<li>
+				{.stats.total}
+			</li>
+            <li>
+                <span class="glyphicon glyphicon-comment"></span>
+            </li>
+			<li>
+				{.commit.comment_count}
+			</li>
+            <li>
+                <a href="{.html_url}" target="_blank">
+                    Show comments
+                </a>
+            </li>
+		</ul>
     </div>
 </div>

@@ -1,8 +1,7 @@
+<div class="list-group">
 {#.commits}
-    <section>
-        <a id="{.sha}"
-           href="#show-details-{.sha}">
-			{.commit.author.name}- {.commit.message}
-        </a>
-    </section>
+    <a id="{.sha}" href="#show-details-{.sha}" class="list-group-item">
+		{.commit.message} ({.commit.author.name})
+	</a>
 {/.commits}
+</div>
