@@ -38,6 +38,6 @@
 	"excludeFiles": [
 		"./**/node_modules/**",
 		"./node_modules/**",
-		"./**/public/"
+		"./cli/**/public/"
 	]
 }

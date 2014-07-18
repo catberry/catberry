@@ -5,7 +5,8 @@
 ##How to use
 This is simple web-application that works with [GitHub API]
 (http://developer.github.com/) and demonstrates how to build isomorphic
-web-application using Catberry.
+web-application using [Catberry Framework]
+(https://github.com/pragmadash/catberry).
 
 First of all it is needed to install dependencies:
 

@@ -1,8 +1,8 @@
 {
-	"name": "catberry",
+	"name": "catberry-cli",
 	"version": "1.0.0-dev",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
-	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
+	"description": "CLI utility for Catberry Framework",
 	"homepage": "https://github.com/pragmadash/catberry",
 	"keywords": [
 		"stream", "web", "isomorphic", "framework", "middleware", "connect",
@@ -24,37 +24,21 @@
 		{
 			"name": "Julia Rechkunova",
 			"email": "julia.rechkunova@gmail.com"
-		},
-		{
-			"name": "Julia Kostyukova",
-			"email": "kostyukova.julia@gmail.com"
 		}
 	],
-
-	"main": "./index",
+	"bin": {
+		"catberry": "./bin/catberry.js"
+	},
 	"dependencies": {
-		"glob": "^4.0.2",
-		"glob-watcher": "^0.0.6",
-		"catberry-locator": "~0.4.0",
-		"catberry-uhr": "git://github.com/pragmadash/catberry-uhr.git#develop",
-		"jquery": "~2.1.1",
-		"uglify-js": "~2.4.13",
-		"browserify": "~4.1.9",
-		"dustjs-linkedin": "~2.3.5",
-		"dustjs-helpers": "~1.2.0",
-		"log4js": "~0.6.14"
+		"ncp": "^0.6.0",
+		"commander": "^2.2.0"
 	},
 	"devDependencies": {
-		"jsdom": "~0.10.6",
-		"mocha": "~1.20.1",
 		"jscs": "~1.4.5",
 		"jshint": "~2.5.1"
 	},
 	"engines": {
 		"node": "~0.10.26"
-	},
-	"scripts": {
-		"test": "jshint ./ && jscs ./** && mocha --recursive"
 	},
 	"licenses": [
 		{
