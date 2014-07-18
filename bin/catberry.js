@@ -78,7 +78,12 @@ function copyTemplateTo(destination) {
 		if (error) {
 			return console.error(error);
 		}
-		console.log('Project template has been deployed to "' +
+		console.log('\nProject template has been deployed to "' +
 			destination + '"');
+		console.log('\nNow install dependencies:\n\n\tnpm install\n');
+		console.log('Then to start in debug mode without code ' +
+			'minification and with file watch:\n\n\tnpm run debug\n');
+		console.log('To start in release mode with code ' +
+			'minification and without file watch:\n\n\tnpm start\n');
 	});
 }
