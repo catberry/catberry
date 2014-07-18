@@ -43,14 +43,14 @@ var fs = require('fs'),
 program.version(version)
 	.command('init <template>')
 	.description('Initialize Catberry project template')
-	.option('-D, --dist <path>', 'change destination directory')
+	.option('-D, --dest <path>', 'change destination directory')
 	.action(function (template, options) {
-		options.dist = options.dist || process.cwd();
-		if (!fs.existsSync(options.dist)) {
+		options.dest = options.dest || process.cwd();
+		if (!fs.existsSync(options.dest)) {
 			console.log('Destination does not exist');
 			return;
 		}
-		if (fs.readdirSync(options.dist).length !== 0) {
+		if (fs.readdirSync(options.dest).length !== 0) {
 			var rl = readline.createInterface({
 				input: process.stdin,
 				output: process.stdout
@@ -59,12 +59,12 @@ program.version(version)
 				function (answer) {
 					answer = answer || 'n';
 					if (answer[0] === 'y') {
-						copyTemplateTo(template, options.dist);
+						copyTemplateTo(template, options.dest);
 					}
 					rl.close();
 				});
 		} else {
-			copyTemplateTo(template, options.dist);
+			copyTemplateTo(template, options.dest);
 		}
 	});
 
@@ -82,14 +82,15 @@ function copyTemplateTo(template, destination) {
 		fs.readdirSync(templatesRoot).forEach(function (name) {
 			console.log('\t' + name);
 		});
+		console.log();
 		return;
 	}
 	ncp(templateFolder, destination, function (error) {
 		if (error) {
 			return console.error(error);
 		}
-		console.log('\nProject template has been deployed to "' +
-			destination + '"');
+		console.log('\nProject template "' + template +
+			'" has been deployed to "' + destination + '"');
 		console.log('\nNow install dependencies:\n\n\tnpm install\n');
 		console.log('Then to start in debug mode without code ' +
 			'minification and with file watch:\n\n\tnpm run debug\n');
