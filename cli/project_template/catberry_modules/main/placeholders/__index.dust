@@ -6,6 +6,7 @@
 <body>
 <a href="/about">About</a>
 <a href="/commits">Commits</a>
+<a href="/search">Search</a>
 <!--This is reference to placeholder 'index' of module 'pages'-->
 <div id="pages_index"></div>
 </body>
