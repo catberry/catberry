@@ -2,31 +2,30 @@
 
 There is an awesome [post in airbnb technical blog]
 (http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) 
-about idea of isomorphic JavaScript applications and what exactly it is.
+about the idea of isomorphic JavaScript applications and what exactly it is.
 Also you can find video [Spike Brehm: Building Isomorphic Apps]
 (http://www.youtube.com/watch?v=CH6icJbLhlI)
 from JSConf 2014 talks.
 
-If say shortly, isomorphic applications are built such way that makes possible 
-to write module one time and use it for page rendering on server 
-(for SEO and some shared links) and in browser without work of server at all.
-It means on server your modules are executing the same code as on server ad 
+Simply speaking, isomorphic applications are built to make it possible 
+to write module once and use it for both page rendering on server 
+(for SEO and some shared links) and in browser with no server side at all.
+It means on server your modules are executing the same code as 
 in browser. This [Single Page Application]
 (http://en.wikipedia.org/wiki/Single_Page_Application) 
-can re-render all parts of page using the same isomorphic modules and not 
+can re-render all parts of the page using the same isomorphic modules and not 
 reloading the page at all.
 
 Isomorphic applications can work with set of independent services that 
-implement some business logic (Facebook API, Twitter API etc). 
-In fact, every module in isomorphic application should receive all data from 
+implement some business logic (Facebook API, Twitter API etc).
+In fact, each module in isomorphic application should receive all data from 
 API server which could be written in any platform you want using REST approach.
 
 There is a list of problems which are solved by isomorphic applications:
 
 * *Using single page applications causes SEO problems*. Your isomorphic
-modules will render exactly the same page on server as it is rendered 
-in browser
-* *Code duplication for rendering parts of page at server and in browser, 
+modules will render exactly the same page on server as it is in browser
+* *Code duplication for rendering parts of the page at server and in browser, 
 sometimes it even written in different programming languages*. 
 Since isomorphic modules are written only once and in JavaScript 
 you do not have this problem.
