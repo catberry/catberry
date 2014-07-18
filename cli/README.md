@@ -5,13 +5,13 @@
 ![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
 
 ##What is it?
-This is command line utility for creation of application based on 
+This is command line utility for creation of project based on 
 [Catberry Framework](https://github.com/pragmadash/catberry).
 
 It can:
 
 * Create Catberry Application using project template 
-`catberry init [destination]`
+`catberry init [--dest=directory] <template>`
 * Add module to current Catberry Application using module template 
 `catberry module <name>`
 
