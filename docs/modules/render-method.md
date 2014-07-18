@@ -47,9 +47,12 @@ to determine what logic module should use to prepare data context, you can use
 [catberry-module](https://www.npmjs.org/package/catberry-module) with smart 
 method calling to avoid that.
 
-Read also:
+Read next:
 
 * [Handle Method](handle-method.md)
+
+Read also:
+
 * [Submit Method](submit-method.md)
 * [Context](context.md)
 * [URL Route Definition](../routing/url-route-definition.md)

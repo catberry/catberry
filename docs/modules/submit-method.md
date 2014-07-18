@@ -48,9 +48,12 @@ to determine what logic module should use to submit data, you can use
 [catberry-module](https://www.npmjs.org/package/catberry-module) with smart 
 method calling to avoid that.
 
+Read next:
+
+* [Context](context.md)
+
 Read also:
 
 * [Placeholders](placeholders.md)
 * [Render Method](render-method.md)
 * [Handle Method](handle-method.md)
-* [Context](context.md)
