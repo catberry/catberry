@@ -15,5 +15,8 @@ All details about definition of route rules are described in next sections.
 
 Read next:
  
- * [URL Route Definition](url-route-definition.md)
- * [Event Route Definition](event-route-definition.md)
+* [URL Route Definition](url-route-definition.md)
+ 
+Read also:
+
+* [Event Route Definition](event-route-definition.md)

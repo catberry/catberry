@@ -85,9 +85,12 @@ cat = catberry.create({isRelease: true}),
 If you want to see finished application as an example then please proceed to 
 [project_template](../../project_template) folder.
 
-Read also:
+Read next:
 
 * [Placeholders](placeholders.md)
+
+Read also:
+
 * [Render Method](render-method.md)
 * [Handle Method](handle-method.md)
 * [Submit Method](submit-method.md)
