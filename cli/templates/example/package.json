@@ -1,7 +1,7 @@
 {
-	"name": "catberry-template",
+	"name": "catberry-example",
 	"version": "0.0.0",
-	"description": "Template Application based on Catberry Framework",
+	"description": "Example Application based on Catberry Framework",
 	"main": "./server.js",
 	"author": "Catberry",
 	"license": "MIT",
