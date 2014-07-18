@@ -47,14 +47,14 @@ logger.setLevel('ERROR');
 
 More details [here](https://github.com/nomiddlename/log4js-node#usage).
 
+#Interface
+
+* Browser: [/lib/client/Logger.js](../../../lib/client/Logger.js)
+* Server: [log4js](https://www.npmjs.org/package/log4js)
+
 Read also:
 
 * [Config](config.md)
 * [jQuery](jquery.md)
 * [Template Provider](template-provider.md)
 * [Universal HTTP(S) Request](universal-http-request.md)
-
-#Interface
-
-* Browser: [/lib/client/Logger.js](../../../lib/client/Logger.js)
-* Server: [log4js](https://www.npmjs.org/package/log4js)
