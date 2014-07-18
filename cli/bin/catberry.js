@@ -35,21 +35,22 @@ var fs = require('fs'),
 	readline = require('readline'),
 	program = require('commander'),
 	path = require('path'),
-	templateFolder = path.join(__dirname, '..', 'project_template'),
+	templatesRoot = path.join(__dirname, '..', 'templates'),
 	ncp = require('ncp'),
 	packageInfo = require('../package.json'),
 	version = packageInfo.version;
 
 program.version(version)
-	.command('init [destination]')
-	.description('Init project structure for Catberry application')
-	.action(function (destination) {
-		destination = destination || process.cwd();
-		if (!fs.existsSync(destination)) {
+	.command('init <template>')
+	.description('Initialize Catberry project template')
+	.option('-D, --dist <path>', 'change destination directory')
+	.action(function (template, options) {
+		options.dist = options.dist || process.cwd();
+		if (!fs.existsSync(options.dist)) {
 			console.log('Destination does not exist');
 			return;
 		}
-		if (fs.readdirSync(destination).length !== 0) {
+		if (fs.readdirSync(options.dist).length !== 0) {
 			var rl = readline.createInterface({
 				input: process.stdin,
 				output: process.stdout
@@ -58,12 +59,12 @@ program.version(version)
 				function (answer) {
 					answer = answer || 'n';
 					if (answer[0] === 'y') {
-						copyTemplateTo(destination);
+						copyTemplateTo(template, options.dist);
 					}
 					rl.close();
 				});
 		} else {
-			copyTemplateTo(destination);
+			copyTemplateTo(template, options.dist);
 		}
 	});
 
@@ -71,9 +72,18 @@ program.parse(process.argv);
 
 /**
  * Copies project template to specified destination.
+ * @param {string} template Name of template to copy.
  * @param {string} destination Destination where to copy.
  */
-function copyTemplateTo(destination) {
+function copyTemplateTo(template, destination) {
+	var templateFolder = path.join(templatesRoot, template);
+	if (!fs.existsSync(templateFolder)) {
+		console.log('No such template. Templates are:\n');
+		fs.readdirSync(templatesRoot).forEach(function (name) {
+			console.log('\t' + name);
+		});
+		return;
+	}
 	ncp(templateFolder, destination, function (error) {
 		if (error) {
 			return console.error(error);

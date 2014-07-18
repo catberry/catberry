@@ -1,4 +1,4 @@
-#Catberry Template Project
+#Catberry Example Project
 
 ![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
 
