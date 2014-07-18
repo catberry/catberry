@@ -1,0 +1,8 @@
+{?.total_count}
+	<section>Found {.total_count} file(s)</section>
+	{#.items}
+		<section>
+			<a href="{.html_url}" target="_blank">{.name} - {.path}</a>
+		</section>
+	{/.items}
+{/.total_count}

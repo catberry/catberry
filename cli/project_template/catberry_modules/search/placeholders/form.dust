@@ -1,0 +1,5 @@
+<form name="search-in-code" data-module="search">
+	<label for="input-query">What?</label>
+    <input id="input-query" type="text" name="query" value="{.query}"/>
+    <input type="submit" value="Search"/>
+</form>

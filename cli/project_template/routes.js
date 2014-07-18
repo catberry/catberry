@@ -10,5 +10,6 @@
 // https://github.com/pragmadash/catberry/blob/master/docs/routing/url-route-definition.md
 
 module.exports = [
-	'/:page[main, pages]'
+	'/:page[main, pages]',
+	'/:page[main, pages]?query=:query[search]'
 ];
