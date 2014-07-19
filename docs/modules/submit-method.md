@@ -1,5 +1,5 @@
 #Submit method
-Every module should have `submit` method like this:
+Every module can have `submit` method like this:
 ```javascript
 Module.prototype.submit = function (formName, formObject, callback) {
 	callback(null, function () {

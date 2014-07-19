@@ -1,7 +1,7 @@
 #Dependency Injection
 
 If you need to use your own or Catberry's service registered in Service Locator
-you just need to inject it in module of your application.
+you just should inject it in module of your application.
 
 For example, you have module called AwesomeModule. In Catberry every module is 
 a constructor with prototype. To inject Logger, your own RestApiClient and 
@@ -17,13 +17,13 @@ function AwesomeModule($logger, $restApiClient, someConfigKey) {
 }
 ```
 
-When this code will be optimized (minified) for browser all these injections
-will stay as is and will not be broken.
+In release mode this code will be optimized (minified) for browser, 
+but all these injections will stay as is and will not be broken.
 
 Also you can inject only `$serviceLocator` and resolve everything you want
 directly.
 
-It is very important do not make loops in resolving dependencies. It causes
+It is really important not to make loops in resolving dependencies. It causes
 infinite recursion and just kill your application.
 
 Read also:

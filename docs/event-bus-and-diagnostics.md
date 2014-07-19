@@ -35,8 +35,8 @@ Here is a list of common Catberry events:
 
 | Event					| When happens															| Arguments																											|
 |-----------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| ready					| Catberry finishes initialization										|	no																												|
-| error					| Error is happened														|	`Error` object																									|
+| ready					| Catberry has finished initialization										|	no																												|
+| error					| error is happened														|	`Error` object																									|
 | moduleLoaded			| each module is loaded													|	Module name as string																							|
 | placeholderLoaded		| each placeholder is loaded											|	`{name: String, moduleName: String}`																			|
 | allModulesLoaded		| all modules are loaded												|	no																												|

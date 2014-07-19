@@ -8,10 +8,10 @@ and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection).
 There is only one service locator (singleton) in one catberry application 
 instance and all Catberry's components are resolved from this locator when 
 you use `getMiddleware` method on server or `startWhenReady` in browser code.
-Before that moment feel free to register your own services to inject it into 
+Before that, feel free to register your own services to inject it into 
 catberry modules via DI.
 
-Your Catberry application always must have `server.js` with code like this:
+Your Catberry application must have `server.js` with code like this:
 ```javascript
 var catberry = require('catberry'),
 	RestApiClient = require('./lib/RestApiClient'),
@@ -61,7 +61,8 @@ registered implementation of every service.
 
 You can also get access to all implementations using `resolveAll` method.
 
-How to use registered service please read in next section.
+How to use registered service please read 
+in [Dependency Injection](dependency-injection.md) section.
 
 ##Interface
 
@@ -70,7 +71,7 @@ Catberry's Service Locator implementation has following methods:
 ```javascript
 /**
  * Registers new type in service locator.
- * @param {string} type Type name, which will be alias in other constructors.
+ * @param {string} type Type name, which will be an alias in other constructors.
  * @param {Function} constructor Constructor which
  * initializes instance of specified type.
  * @param {Object?} parameters Set of named parameters
