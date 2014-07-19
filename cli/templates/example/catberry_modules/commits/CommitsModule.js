@@ -77,12 +77,16 @@ CommitsModule.prototype.handleDetails = function (isStarted, args, callback) {
 		return;
 	}
 
-	var self = this;
+	var self = this,
+		link = this.$('#' + args.sha);
+
+	link.addClass('loading');
 
 	this._uhr.get('https://api.github.com/repos/catberry/catberry/commits/' +
 			args.sha,
 		{},
 		function (error, status, data) {
+			link.removeClass('loading');
 			if (error) {
 				callback(error);
 				return;
@@ -101,7 +105,7 @@ CommitsModule.prototype.handleDetails = function (isStarted, args, callback) {
 				.on('end', function () {
 					self.$(content)
 						.attr('id', 'details-' + args.sha)
-						.insertAfter('#' + args.sha);
+						.insertAfter(link);
 					callback(null);
 				});
 		});
