@@ -140,6 +140,11 @@ content of page. In this case you can add `data-scroll-top` attribute to your
 placeholder HTML element. After such placeholder was rendered page will be 
 scrolled top.
 
+##Loading class
+Every time when placeholder is waiting for data from module's `render` method
+it receives `loading` CSS class. It means you can customize loading state as 
+you want.
+
 ##HEAD element as a placeholder
 `<head>` element also can be a placeholder. You can change `<title>`, `<meta>`,
 add new `<script>` or `<link>` elements dynamically. At server `<head>` 
