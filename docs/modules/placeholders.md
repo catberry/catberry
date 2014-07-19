@@ -1,8 +1,8 @@
 #Placeholders
 
 Placeholder is a block of page that is controlled by a module. In fact every
-placeholder is a template that is stored in module's `placeholders` directory and 
-rendered in any position on page.
+placeholder is a template that is stored in module's `placeholders` directory 
+and rendered in any position on page.
 
 Catberry uses [dustjs](https://github.com/linkedin/dustjs) template engine.
 All stuff about how to use and what syntax it has you can read [here]
@@ -104,7 +104,7 @@ All placeholder references just were replaced with rendered templates with data
 from modules.
 
 In some situations you need to render some part of HTML that often repeats
-in you markup but do not have some complex logic for creation of data context.
+in your markup but do not have some complex logic for creation of data context.
 In this case it is really handy to use [dustjs partials]
 (https://github.com/linkedin/dustjs/wiki/Dust-Tutorial#partials) 
 not placeholders.

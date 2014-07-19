@@ -17,8 +17,8 @@ function AwesomeModule($logger, $restApiClient, someConfigKey) {
 }
 ```
 
-In release mode this code will be optimized (minified) for browser, but all these injections
-will stay as is and will not be broken.
+In release mode this code will be optimized (minified) for browser, 
+but all these injections will stay as is and will not be broken.
 
 Also you can inject only `$serviceLocator` and resolve everything you want
 directly.

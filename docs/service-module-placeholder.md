@@ -7,7 +7,7 @@ some business logic.
 
 So, Catberry Application consist of:
 
- * Set of services (that realizes business logic or uses third part API)
+ * Set of services (that implements business logic or uses third-party APIs)
  * Set of modules (more details in [Modules section](modules/index.md))
  * Set of placeholders (templates) that can reference each other 
  (more details in [Placeholders section](modules/placeholders.md))

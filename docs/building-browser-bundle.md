@@ -17,8 +17,8 @@ and it looks like your `/server.js` script spends 1GB of RAM, which is not so of
 course.
 
 For example you can use `/build.js` script with following:
-```javascript
-node ./build.js release && node ./server.js release
+```
+node ./build.js release
 ```
 
 To build browser bundle Catberry uses [browserify](http://browserify.org) which 

@@ -7,7 +7,7 @@ Catberry has jQuery service registered as "jQuery" in
 Just inject `$jQuery` into your module or resolve it from 
 Service Locator to use this service.
 
-This popular library uses for DOM manipulation in Catberry's browser modules.
+This popular library is used for DOM manipulation in Catberry's browser modules.
 But it also can be used in your own modules.
 
 All details about usage you can read in jQuery official documentation [here]
