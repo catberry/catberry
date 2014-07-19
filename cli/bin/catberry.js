@@ -99,7 +99,23 @@ program
 		}
 
 		var modulePath = path.join(options.dest, MODULES_ROOT, moduleName);
-		createModule(moduleName, modulePath);
+
+		if (fs.existsSync(modulePath)) {
+			var rl = readline.createInterface({
+				input: process.stdin,
+				output: process.stdout
+			});
+			rl.question('Module directory already exists, continue? (y/n): ',
+				function (answer) {
+					answer = answer || 'n';
+					if (answer[0] === 'y') {
+						createModule(moduleName, modulePath);
+					}
+					rl.close();
+				});
+		} else {
+			createModule(moduleName, modulePath);
+		}
 	});
 
 program.parse(process.argv);
