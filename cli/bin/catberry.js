@@ -74,7 +74,7 @@ program
 			});
 			rl.question('Destination directory is not empty, continue? (y/n): ',
 				function (answer) {
-					answer = answer || 'n';
+					answer = (answer || 'n').toLowerCase();
 					if (answer[0] === 'y') {
 						copyTemplateTo(template, options.dest);
 					}
@@ -112,7 +112,7 @@ program
 			});
 			rl.question('Module directory already exists, continue? (y/n): ',
 				function (answer) {
-					answer = answer || 'n';
+					answer = (answer || 'n').toLowerCase();
 					if (answer[0] === 'y') {
 						createModule(moduleName, modulePath);
 					}
