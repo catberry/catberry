@@ -11,20 +11,21 @@ Event could be raised in two cases:
 * Changed hash in location (if you has clicked in page on link that contains 
 hash in `href` attribute or if you open shared link with hash), 
 in this case hash is an event name. 
-Sample link tag: `<a href="#event-name">Title</a>`.
+Sample link element: `<a href="#event-name">Title</a>`.
 Sample url: `http://yourserver.com#event-name`.
-* Click on link (`<a>` element) with `data-event` attribute, which value
-is event name. Use this case if you don't want to update location hash. 
-`href` attribute of link tag in this will be ignored.
-Sample link tag: `<a href="#event-name" data-event="event-name">Title</a>`.
+* Click on link or button (`<a>` or `<button>` element) with `data-event` 
+attribute, which value is event name. Use this case if you don't want to update 
+location hash. `href` attribute of link element in this will be ignored.
+Sample link element: `<a href="#event-name" data-event="event-name">Title</a>`.
+Sample button element: `<button data-event="event-name">Details</button>`.
 
 When you change hash in location, modules receive two events:
 
 * Previous event was ended (last hash is cleared)
 * New event is starting (new hash is set)
 
-When you click on link with `data-event` it is always "start" an event and never
-"end" of event.
+When you click on link or button with `data-event` it is always "start" an 
+event and never "end" of event.
 
 ##Definition or rules
 
