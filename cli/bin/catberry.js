@@ -62,7 +62,12 @@ program
 			return;
 		}
 
-		if (fs.readdirSync(options.dest).length !== 0) {
+		var isNotEmpty = fs.readdirSync(options.dest)
+			.some(function (name) {
+				return name && name[0] !== '.';
+			});
+
+		if (isNotEmpty) {
 			var rl = readline.createInterface({
 				input: process.stdin,
 				output: process.stdout
