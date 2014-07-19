@@ -17,7 +17,7 @@ folder inside with [dustjs](https://github.com/linkedin/dustjs) templates.
 Placeholders can be placed in sub-folders but with unique names
 
 Please keep in mind that module name (folder name) should satisfy regular 
-expression `^\w+$`.
+expression `^[a-z]+[a-z0-9-]*$`.
 
 ##Module context
 Every module instance always has `$context` property which is assigned by
