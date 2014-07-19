@@ -1,6 +1,7 @@
 #Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
+
 [![NPM](https://nodei.co/npm/catberry-cli.png)](https://nodei.co/npm/catberry-cli/)
 
 ![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
