@@ -27,7 +27,7 @@ AboutModule.prototype._uhr = null;
 
 /**
  * Renders document about Catberry Framework.
- * This method is called when need to render index template of module about.
+ * This method is called when need to render "index" template of module "about".
  * @param {Function} callback Callback on finish prepare data context.
  */
 AboutModule.prototype.renderIndex = function (callback) {

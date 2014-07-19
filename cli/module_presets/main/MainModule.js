@@ -9,7 +9,7 @@ util.inherits(MainModule, ModuleBase);
 
 /**
  * Creates new instance of main module.
- * @param {string} title Site title.
+ * @param {string} title Site title from config.
  * @constructor
  * @extends ModuleBase
  */

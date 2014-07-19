@@ -38,6 +38,7 @@
 	"excludeFiles": [
 		"./**/node_modules/**",
 		"./node_modules/**",
-		"./cli/**/public/"
+		"./cli/**/public/",
+		"./cli/module_presets/other/"
 	]
 }
