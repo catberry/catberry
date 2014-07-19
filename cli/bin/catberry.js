@@ -67,7 +67,7 @@ program
 				input: process.stdin,
 				output: process.stdout
 			});
-			rl.question('Destination is not empty, continue? (y/n): ',
+			rl.question('Destination directory is not empty, continue? (y/n): ',
 				function (answer) {
 					answer = answer || 'n';
 					if (answer[0] === 'y') {
