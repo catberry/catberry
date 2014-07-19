@@ -8,16 +8,19 @@ receive event and parsed parameters.
 
 Event could be raised in two cases:
 
-* Change of hash in location, in this case hash is an event name
+* Changed hash in location (if you has clicked in page on link that contains hash in href attribute or if you open shared link with hash), in this case hash is an event name. 
+Sample link tag: `<a href="#event-name">Title</a>`.
+Sample url: `http://yourserver.com#event-name`.
 * Click on link (`<a>` element) with `data-event` attribute, which value
-is event name
+is event name. Use this case if you don't want to update location hash. Href attribute of link tag will be ignored
+Sample link tag: `<a href="#event-name" data-event="event-name">Title</a>`.
 
-When you change hash in location modules receive two events:
+When you change hash in location, modules receive two events:
 
 * Previous event was ended (last hash is cleared)
 * New event is starting (new hash is set)
 
-When you click on link with `data-event` it is always "start" of event and never
+When you click on link with `data-event` it is always "start" an event and never
 "end" of event.
 
 ##Definition or rules
@@ -32,7 +35,7 @@ expressionWithParameters->eventName[module1, module2, module3]
 which is very similar with [URL Route Definition](url-route-definition.md) but
 without list of modules receivers in it.
 
-Then after `->` you must define event name that will be raised in module and
+Then after `->` you should define event name that will be raised in module and
 list of modules that will receive this event.
 
 ## Example of definition
@@ -53,7 +56,7 @@ More complex example:
 removeComment-:id-:someOther->removeComment[comments, feed, rating]
 ```
 
-Let's say hash is `removeComment-1-text`.
+Let's say hash is `#removeComment-1-text`.
 
 Modules `comments`, `feed` and `rating` will handle event with name 
 `removeComment` and arguments:
@@ -69,7 +72,7 @@ Please keep in mind that parameter names should satisfy regular expression
 `\w*`.
 
 ## File example
-Here is example of `/events.js` file with some event route definitions:
+Here is an example of `/events.js` file with some event route definitions:
 
 ```javascript
 module.exports = [

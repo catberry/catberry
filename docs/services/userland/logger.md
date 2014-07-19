@@ -20,7 +20,7 @@ In browser it is implemented as a very simple logger that can only write
 to browser's console.
 
 ##Configuration
-To configure browser logger you can just set parameter object `logger` in Catberry
+To configure browser logger you should just set parameter object `logger` in Catberry
 config object.
 
 Like this for browser logger:
@@ -32,7 +32,7 @@ Like this for browser logger:
 }
 ```
 
-To configure server logger you need more actions:
+To configure server logger you have to do more actions:
 ```javascript
 var log4js = require('log4js'); 
 //console log is loaded by default, so you won't normally need to do this
