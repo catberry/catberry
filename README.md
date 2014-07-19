@@ -1,6 +1,7 @@
 #Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
+[![NPM](https://nodei.co/npm/catberry-cli.png)](https://nodei.co/npm/catberry-cli/)
 
 ![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
@@ -17,6 +18,8 @@ modules in browser: automatically creates
 using browser [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
 Here you can find full [Catberry Documentation](docs/index.md).
+
+To get started with example please proceed to [this document](cli/README.md).
 
 ##Advantages
 * Super fast rendering engine using [node.js streams]
