@@ -14,8 +14,8 @@ Default definition syntax is following:
 /some/:id[module1,module2]/actions?someParameter=:parameter[module1]
 ```
 
-All parameters must be marked with colon at start and followed by list of module names that will receive value of 
-this parameter to its state object.
+All parameters must be marked with colon at start and followed by list of 
+module names that will receive value of this parameter to its state object.
 
 In previous example `id` value will be set to state of modules 
 `module1`, `module2`; and `parameter` value will be set only to state of module
@@ -27,7 +27,8 @@ regular expression `[^\/\\&\?=]*`.
 
 ## Colon-marked parameters with additional `map` function
 
-Also you can define mapper object, that allows you to modify state object before it will be processed by modules.
+Also you can define mapper object, that allows you to modify state object before 
+it will be processed by modules.
 
 For such definition just use object like this:
 

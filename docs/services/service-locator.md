@@ -61,7 +61,8 @@ registered implementation of every service.
 
 You can also get access to all implementations using `resolveAll` method.
 
-How to use registered service please read in [Dependency Injection](dependency-injection.md) section.
+How to use registered service please read 
+in [Dependency Injection](dependency-injection.md) section.
 
 ##Interface
 

@@ -8,11 +8,14 @@ receive event and parsed parameters.
 
 Event could be raised in two cases:
 
-* Changed hash in location (if you has clicked in page on link that contains hash in href attribute or if you open shared link with hash), in this case hash is an event name. 
+* Changed hash in location (if you has clicked in page on link that contains 
+hash in `href` attribute or if you open shared link with hash), 
+in this case hash is an event name. 
 Sample link tag: `<a href="#event-name">Title</a>`.
 Sample url: `http://yourserver.com#event-name`.
 * Click on link (`<a>` element) with `data-event` attribute, which value
-is event name. Use this case if you don't want to update location hash. Href attribute of link tag will be ignored
+is event name. Use this case if you don't want to update location hash. 
+`href` attribute of link tag in this will be ignored.
 Sample link tag: `<a href="#event-name" data-event="event-name">Title</a>`.
 
 When you change hash in location, modules receive two events:

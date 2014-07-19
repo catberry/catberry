@@ -20,8 +20,8 @@ In browser it is implemented as a very simple logger that can only write
 to browser's console.
 
 ##Configuration
-To configure browser logger you should just set parameter object `logger` in Catberry
-config object.
+To configure browser logger you should just set parameter object `logger` in 
+Catberry config object.
 
 Like this for browser logger:
 ```json

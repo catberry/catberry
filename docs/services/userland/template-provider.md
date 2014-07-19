@@ -11,7 +11,7 @@ manually and skip usage of Catberry rendering system.
 Just inject `$templateProvider` into your module or resolve it from 
 Service Locator to use this service.
 
-You only need to implement ont method: `getStream`. Pass full 
+You only need to use one method: `getStream`. Pass full 
 template name (moduleName_placeholderName) to it as first argument 
 and data context as second.
 

@@ -16,7 +16,8 @@ when application state is changing.
 
 ##Environment flags
 For some situations you maybe need to determine where current code is executing.
-There are two flags in context for this purpose: `isBrowser` and `isServer`. Both flags are read-only properties.
+There are two flags in context for this purpose: `isBrowser` and `isServer`. 
+Both flags are read-only properties.
 
 ##State
 Most important thing in context is `state` property. It is an immutable 
@@ -26,9 +27,10 @@ All these parameters are specified by
 of input data for rendering and often is used in module [`render` methods]
 (render-method.md).
 
-Keep in mind that state object is immutable and every time when state is changing it
-is just re-assigned to context therefore it is highly not recommended 
-to save state into variable, it can cause unexpected behaviour and memory leaks.
+Keep in mind that state object is immutable and every time 
+when state is changing it is just re-assigned to context 
+therefore it is highly not recommended to save state into variable, 
+it can cause unexpected behaviour and memory leaks.
 
 ##Rendered data cache
 Context also has a set of data contexts that were rendered on page in property

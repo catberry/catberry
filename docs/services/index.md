@@ -14,7 +14,8 @@ catberry module can ask for a Logger to log messages to console.
 When Catberry initializes itself it fills Service Locator with own set of
 components, but framework users can also register own components and even
 replace implementation of some Catberry components. For example, you can replace
-Logger service in Locator with your own logger which sends messages to Graylog (or any other).
+Logger service in Locator with your own logger which sends messages 
+to Graylog (or any other).
  
 To register your own components you should keep in mind that 
 you probably need different implementations of your component for server and browser 
