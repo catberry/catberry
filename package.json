@@ -3,18 +3,18 @@
 	"version": "1.0.0-dev",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
-	"homepage": "https://github.com/pragmadash/catberry",
+	"homepage": "https://github.com/catberry/catberry",
 	"keywords": [
 		"stream", "web", "isomorphic", "framework", "middleware", "connect",
 		"dust", "module", "express"
 	],
 	"bugs": {
-		"url": "https://github.com/pragmadash/catberry/issues",
+		"url": "https://github.com/catberry/catberry/issues",
 		"email": "denis.rechkunov@gmail.com"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/pragmadash/catberry.git"
+		"url": "git://github.com/catberry/catberry.git"
 	},
 	"contributors": [
 		{
@@ -36,7 +36,7 @@
 		"glob": "^4.0.2",
 		"glob-watcher": "^0.0.6",
 		"catberry-locator": "~0.4.0",
-		"catberry-uhr": "git://github.com/pragmadash/catberry-uhr.git#develop",
+		"catberry-uhr": "git://github.com/catberry/catberry-uhr.git#develop",
 		"jquery": "~2.1.1",
 		"uglify-js": "~2.4.13",
 		"browserify": "~4.1.9",
@@ -59,7 +59,7 @@
 	"licenses": [
 		{
 			"type": "MIT",
-			"url": "https://github.com/pragmadash/catberry/blob/master/LICENSE"
+			"url": "https://github.com/catberry/catberry/blob/master/LICENSE"
 		}
 	]
 }

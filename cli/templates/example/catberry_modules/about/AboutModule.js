@@ -31,7 +31,7 @@ AboutModule.prototype._uhr = null;
  * @param {Function} callback Callback on finish prepare data context.
  */
 AboutModule.prototype.renderIndex = function (callback) {
-	this._uhr.get('https://api.github.com/repos/pragmadash/catberry/readme', {
+	this._uhr.get('https://api.github.com/repos/catberry/catberry/readme', {
 			headers: {
 				Accept: 'application/vnd.github.VERSION.html+json'
 			}
@@ -43,6 +43,7 @@ AboutModule.prototype.renderIndex = function (callback) {
 			}
 			if (status.code >= 400 && status.code < 600) {
 				callback(new Error(status.text));
+				return;
 			}
 			callback(null, {html: data});
 		});

@@ -7,7 +7,7 @@
 // /some/:parameter[module1,module2,module3]
 //
 // More details here:
-// https://github.com/pragmadash/catberry/blob/master/docs/routing/url-route-definition.md
+// https://github.com/catberry/catberry/blob/master/docs/routing/url-route-definition.md
 
 module.exports = [
 	'/:page[main, pages]',

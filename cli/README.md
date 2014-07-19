@@ -2,11 +2,11 @@
 
 [![NPM](https://nodei.co/npm/catberry-cli.png)](https://nodei.co/npm/catberry-cli/)
 
-![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
+![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##What is it?
 This is command line interface for [Catberry Framework]
-(https://github.com/pragmadash/catberry) that helps to create projects 
+(https://github.com/catberry/catberry) that helps to create projects 
 and modules.
 
 It helps to:

@@ -1,12 +1,12 @@
 #Catberry Example Project
 
-![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
+![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##How to use
 This is simple web-application that works with [GitHub API]
 (http://developer.github.com/) and demonstrates how to build isomorphic
 web-application using [Catberry Framework]
-(https://github.com/pragmadash/catberry).
+(https://github.com/catberry/catberry).
 
 First of all it is needed to install dependencies:
 

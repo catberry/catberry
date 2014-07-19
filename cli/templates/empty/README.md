@@ -1,6 +1,6 @@
 #Catberry Empty Project
 
-![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
+![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##How to use
 

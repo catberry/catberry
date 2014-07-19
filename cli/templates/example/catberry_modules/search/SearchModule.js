@@ -35,7 +35,7 @@ SearchModule.prototype.renderResults = function (callback) {
 	if (this.$context.state.query) {
 		this._uhr.get('https://api.github.com/search/code?q=' +
 				this.$context.state.query +
-				'+in:file+repo:pragmadash/catberry',
+				'+in:file+repo:catberry/catberry',
 			{},
 			function (error, status, data) {
 				if (error) {
@@ -44,6 +44,7 @@ SearchModule.prototype.renderResults = function (callback) {
 				}
 				if (status.code >= 400 && status.code < 600) {
 					callback(new Error(status.text));
+					return;
 				}
 				callback(null, data);
 			});

@@ -3,18 +3,18 @@
 	"version": "1.0.0-dev",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "CLI utility for Catberry Framework",
-	"homepage": "https://github.com/pragmadash/catberry",
+	"homepage": "https://github.com/catberry/catberry",
 	"keywords": [
 		"stream", "web", "isomorphic", "framework", "middleware", "connect",
 		"dust", "module", "express"
 	],
 	"bugs": {
-		"url": "https://github.com/pragmadash/catberry/issues",
+		"url": "https://github.com/catberry/catberry/issues",
 		"email": "denis.rechkunov@gmail.com"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/pragmadash/catberry.git"
+		"url": "git://github.com/catberry/catberry.git"
 	},
 	"contributors": [
 		{
@@ -45,7 +45,7 @@
 	"licenses": [
 		{
 			"type": "MIT",
-			"url": "https://github.com/pragmadash/catberry/blob/master/LICENSE"
+			"url": "https://github.com/catberry/catberry/blob/master/LICENSE"
 		}
 	]
 }
