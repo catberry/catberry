@@ -1,11 +1,11 @@
 #Placeholders
 
-Placeholder is a block of page is controlled by a module. In fact every
-placeholder is a template that is placed in module's `placeholders` folder and 
-rendered in any place on page.
+Placeholder is a block of page that is controlled by a module. In fact every
+placeholder is a template that is stored in module's `placeholders` directory and 
+rendered in any position on page.
 
-As a template engine is used [dustjs](https://github.com/linkedin/dustjs).
-All stuff about how to use and what is a syntax you can read [here]
+Catberry uses [dustjs](https://github.com/linkedin/dustjs) template engine.
+All stuff about how to use and what syntax it has you can read [here]
 (https://github.com/linkedin/dustjs/wiki/Dust-Tutorial). Also [dustjs-helpers]
 (https://github.com/linkedin/dustjs-helpers) are included in Catberry.
 
@@ -23,7 +23,7 @@ There are two simple rules that helps with this decision:
 
 * If you can prepare whole data context for some part of page using one request 
 to API service that means this part of page could be a placeholder
-* If you want to refresh some group of placeholders always together using 
+* If you want to refresh some group of placeholders simultaneously using 
 shared parameters from URL then you should group these placeholders into 
 one module
 
@@ -31,7 +31,7 @@ For example, you have some parts of page that dependents on current ID of
 product in URL. There is a part of page that displays product details, 
 another one displays comments of users about this product and some side block 
 that shows "similar product". All these three parts of page are placeholders.
-And as well it all depends on one shared parameter `productId` it means that
+And as well it all depends on one shared parameter `productId`. It means that
 placeholders should be grouped into one module `product`.
 
 ##Placeholder types
@@ -46,7 +46,7 @@ errors during rendering. It is called "error placeholder"
 All placeholders can have references to other placeholders and when rendering
 engine starts to render some placeholder and meet such reference it render
 referenced placeholder and recursively repeat this process. 
-But every placeholder can be rendered only once, second time it just will be
+But every placeholder can be rendered only once, second time it will just be
 skipped.
 
 The reference itself is any HTML element with ID equals full name 
@@ -103,15 +103,15 @@ As a result of rendering will be:
 All placeholder references just were replaced with rendered templates with data
 from modules.
 
-In some situations you need just render some part of HTML that often repeats
+In some situations you need to render some part of HTML that often repeats
 in you markup but do not have some complex logic for creation of data context.
-In this case it is very handy to use [dustjs partials]
+In this case it is really handy to use [dustjs partials]
 (https://github.com/linkedin/dustjs/wiki/Dust-Tutorial#partials) 
 not placeholders.
  
 ##Streaming
 At server whole page is rendered using stream. In many frameworks (like express)
-rendering is happened in-memory and when whole page is prepared 
+rendering is happened in-memory and after whole page is prepared 
 it is sent to browser.
 
 Catberry works different. When rendering process is just started it already 
@@ -157,7 +157,7 @@ these elements are removed from `<head>` except scripts and styles
 `<head>` and adds it to end of current `<head>`
 
 This approach makes `<head>` changes smoothly for user and do not execute 
-JavaScript code twice.
+JavaScript code, included in head, twice.
 
 Read next:
 

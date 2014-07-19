@@ -4,19 +4,19 @@ Catberry has a template provider service registered as "templateProvider" in
 [Service Locator](../service-locator.md) and accessible via 
 [dependency injection](../dependency-injection.md).
 
-If you in situation when it is needed to render placeholder or partial 
+If you need to render placeholder or partial template
 dynamically, maybe for lazy loading or anything else, you can render template
-manually and not using Catberry rendering system.
+manually and skip usage of Catberry rendering system.
 
 Just inject `$templateProvider` into your module or resolve it from 
 Service Locator to use this service.
 
-The only method you need to do that is `getStream` and pass full 
+You only need to implement ont method: `getStream`. Pass full 
 template name (moduleName_placeholderName) to it as first argument 
 and data context as second.
 
 Keep in mind that you can use this service only in browser and direct usage of
-this service is highly **not recommended**.
+this service is **not recommended**.
 
 ##Interface
 ```javascript
