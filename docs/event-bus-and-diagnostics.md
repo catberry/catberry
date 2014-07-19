@@ -68,7 +68,7 @@ too many subscribers it can cause performance decrease.
 
 Read next:
 
-* [Code Style Guide](code-style-guide.md)
+* [CLI](cli.md) 
 
 Read also:
  
