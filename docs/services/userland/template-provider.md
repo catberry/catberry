@@ -18,13 +18,6 @@ and data context as second.
 Keep in mind that you can use this service only in browser and direct usage of
 this service is highly **not recommended**.
 
-Read also:
-
-* [Logger](logger.md)
-* [Config](config.md)
-* [jQuery](jquery.md)
-* [Universal HTTP(S) Request](universal-http-request.md)
-
 ##Interface
 ```javascript
 /**
@@ -35,3 +28,10 @@ Read also:
  */
 TemplateProvider.prototype.getStream = function (name, context) { }
 ```
+
+Read also:
+
+* [Logger](logger.md)
+* [Config](config.md)
+* [jQuery](jquery.md)
+* [Universal HTTP(S) Request](universal-http-request.md)

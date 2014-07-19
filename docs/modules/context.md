@@ -187,6 +187,10 @@ subscribing on Catberry methods, which are described in details in
 [Event Bus and Diagnostics](../event-bus-and-diagnostics.md) 
 documentation section.
 
+Read next:
+
+* [Building Browser Bundle](../building-browser-bundle.md)
+
 Read also:
 
 * [Placeholders](placeholders.md)

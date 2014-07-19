@@ -63,10 +63,6 @@ You can also get access to all implementations using `resolveAll` method.
 
 How to use registered service please read in next section.
 
-Read next:
-
-* [Dependency Injection](dependency-injection.md)
-
 ##Interface
 
 Catberry's Service Locator implementation has following methods:
@@ -121,3 +117,7 @@ ServiceLocator.prototype.resolveInstance = function (constructor, parameters) { 
  */
 ServiceLocator.prototype.unregister = function (type) { }
 ```
+
+Read next:
+
+* [Dependency Injection](dependency-injection.md)

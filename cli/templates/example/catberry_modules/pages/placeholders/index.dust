@@ -1,0 +1,2 @@
+<!--This is dynamic reference to placeholder -->
+<div id="{page}_index"></div>

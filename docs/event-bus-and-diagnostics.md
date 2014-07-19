@@ -66,6 +66,10 @@ This events can be used for browser extensions, extended logging or module
 logic, feel free to use them everywhere you want but remember if any event has 
 too many subscribers it can cause performance decrease.
 
+Read next:
+
+* [CLI](cli.md) 
+
 Read also:
  
- * [Module Context](modules/context.md)
+* [Module Context](modules/context.md)
