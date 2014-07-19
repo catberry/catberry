@@ -9,7 +9,8 @@ util.inherits(MainModule, ModuleBase);
 
 var SUBTITLES = {
 	about: 'About Catberry Framework',
-	commits: 'Commits to Catberry Framework repository'
+	commits: 'Commits to Catberry Framework repository',
+	search: 'Search in Catberry code'
 };
 
 /**
