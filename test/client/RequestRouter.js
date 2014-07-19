@@ -423,7 +423,7 @@ describe('client/RequestRouter', function () {
 								window.location.assign('http://local/some');
 								locator.resolveInstance(RequestRouter);
 								$('#form').html(form);
-								$('input[type="submit"]').trigger('click');
+								$('form').trigger('submit');
 							});
 						}
 					});
@@ -449,7 +449,7 @@ describe('client/RequestRouter', function () {
 								window.location.assign('http://local/some');
 								locator.resolveInstance(RequestRouter);
 								$('#form').html(input);
-								$('input[type="submit"]').trigger('click');
+								$('form').trigger('submit');
 								setTimeout(function () {
 									done();
 								}, 100);
@@ -484,7 +484,7 @@ describe('client/RequestRouter', function () {
 								window.location.assign('http://local/some');
 								locator.resolveInstance(RequestRouter);
 								$('#form').html(form);
-								$('input[type="submit"]').trigger('click');
+								$('form').trigger('submit');
 								setTimeout(function () {
 									done();
 								}, 100);
@@ -518,7 +518,7 @@ describe('client/RequestRouter', function () {
 								window.location.assign('http://local/some');
 								locator.resolveInstance(RequestRouter);
 								$('#form').html(form);
-								$('input[type="submit"]').trigger('click');
+								$('form').trigger('submit');
 								setTimeout(function () {
 									done();
 								}, 100);
