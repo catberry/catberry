@@ -140,7 +140,7 @@ function copyTemplateTo(template, destination) {
  */
 function checkDestination(destination) {
 	if (!fs.existsSync(destination)) {
-		console.log('Destination does not exist');
+		console.log('Destination directory does not exist');
 		return false;
 	}
 
