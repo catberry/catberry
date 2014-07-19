@@ -5,15 +5,20 @@
 ![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
 
 ##What is it?
-This is command line utility for creation of project based on 
-[Catberry Framework](https://github.com/pragmadash/catberry).
+This is command line interface for [Catberry Framework]
+(https://github.com/pragmadash/catberry) that helps to create projects 
+and modules.
 
-It can:
+It helps to:
 
 * Create Catberry Application using project template 
 `catberry init [--dest=directory] <template>`
-* Add module to current Catberry Application using module template 
-`catberry module <name>`
+	Included templates:
+	* `example` - finished project that works with GitHub API and demonstrates
+	how to implement such isomorphic application using Catberry Framework
+	* `empty` - empty project that helps to start a new project using Catberry 
+* Add module to project using module preset 
+`catberry add [--dest=directory] <moduleName>`
 
 ##Installation
 
