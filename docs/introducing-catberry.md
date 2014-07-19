@@ -34,4 +34,4 @@ You can read about a lot of additional features in other documentation sections.
  
 Read next:
  
- * [Service-Module-Placeholder](service-module-placeholder.md)
+* [Service-Module-Placeholder](service-module-placeholder.md)

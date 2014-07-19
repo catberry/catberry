@@ -17,7 +17,7 @@ folder inside with [dustjs](https://github.com/linkedin/dustjs) templates.
 Placeholders can be placed in sub-folders but with unique names
 
 Please keep in mind that module name (folder name) should satisfy regular 
-expression `^\w+$`.
+expression `^[a-z]+[a-z0-9-]*$`.
 
 ##Module context
 Every module instance always has `$context` property which is assigned by
@@ -83,11 +83,14 @@ cat = catberry.create({isRelease: true}),
 ```
 
 If you want to see finished application as an example then please proceed to 
-[example](../../example) folder.
+[cli/templates/example](../../cli/templates/example) folder.
+
+Read next:
+
+* [Placeholders](placeholders.md)
 
 Read also:
 
-* [Placeholders](placeholders.md)
 * [Render Method](render-method.md)
 * [Handle Method](handle-method.md)
 * [Submit Method](submit-method.md)

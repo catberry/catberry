@@ -36,10 +36,13 @@ to determine what logic module should use to handle event, you can use
 [catberry-module](https://www.npmjs.org/package/catberry-module) with smart 
 method calling to avoid that.
 
+Read next:
+
+* [Submit Method](submit-method.md)
+
 Read also:
 
 * [Placeholders](placeholders.md)
 * [Render Method](render-method.md)
-* [Submit Method](submit-method.md)
 * [Context](context.md)
 * [Event Route Definition](../routing/event-route-definition.md)

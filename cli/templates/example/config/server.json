@@ -1,0 +1,6 @@
+{
+	"title": "Catberry Application",
+	"server": {
+		"port": 3000
+	}
+}

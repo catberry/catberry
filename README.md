@@ -60,12 +60,7 @@ SMP is the right concept for [isomorphic web-applications]
 For more details please proceed to [Catberry Documentation]
 (docs/index.md).
 
-Also you can see [example](example) or install 
-it from npm:
-
-```bash
-npm install catberry-example
-```
+Also you can see [cli/templates/example](cli/templates/example).
 
 ##Browser support
 Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 

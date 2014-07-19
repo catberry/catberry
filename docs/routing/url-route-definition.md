@@ -97,6 +97,6 @@ module.exports = [
 ];
 ```
 
-Read also:
+Read next:
  
- * [Event Route Definition](event-route-definition.md)
+* [Event Route Definition](event-route-definition.md)

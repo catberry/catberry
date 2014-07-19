@@ -159,9 +159,12 @@ these elements are removed from `<head>` except scripts and styles
 This approach makes `<head>` changes smoothly for user and do not execute 
 JavaScript code twice.
 
-Read also:
+Read next:
 
 * [Render Method](render-method.md)
+
+Read also:
+
 * [Handle Method](handle-method.md)
 * [Submit Method](submit-method.md)
 * [Context](context.md)
