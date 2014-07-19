@@ -5,7 +5,7 @@ Catberry has Universal HTTP(S) Request service registered as "uhr" in
 [dependency injection](../dependency-injection.md).
 
 All details about usage you can read in UHR read me file [here]
-(https://github.com/pragmadash/catberry-uhr/blob/master/README.md).
+(https://github.com/catberry/catberry-uhr/blob/master/README.md).
 
 Read also:
 

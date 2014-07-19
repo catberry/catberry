@@ -7,7 +7,7 @@
 // someHashOrDataEvent:parameter->eventName[module1,module2,module3]
 //
 // More details here:
-// https://github.com/pragmadash/catberry/blob/master/docs/routing/event-route-definition.md
+// https://github.com/catberry/catberry/blob/master/docs/routing/event-route-definition.md
 
 module.exports = [
 	'show-details-:sha->details[commits]'

@@ -49,7 +49,7 @@ CommitsModule.prototype.$ = null;
  * @param {Function} callback Callback on finish prepare data context.
  */
 CommitsModule.prototype.renderIndex = function (callback) {
-	this._uhr.get('https://api.github.com/repos/pragmadash/catberry/commits',
+	this._uhr.get('https://api.github.com/repos/catberry/catberry/commits',
 		{},
 		function (error, status, data) {
 			if (error) {
@@ -58,6 +58,7 @@ CommitsModule.prototype.renderIndex = function (callback) {
 			}
 			if (status.code >= 400 && status.code < 600) {
 				callback(new Error(status.text));
+				return;
 			}
 			callback(null, {commits: data});
 		});
@@ -78,7 +79,7 @@ CommitsModule.prototype.handleDetails = function (isStarted, args, callback) {
 
 	var self = this;
 
-	this._uhr.get('https://api.github.com/repos/pragmadash/catberry/commits/' +
+	this._uhr.get('https://api.github.com/repos/catberry/catberry/commits/' +
 			args.sha,
 		{},
 		function (error, status, data) {
@@ -88,6 +89,7 @@ CommitsModule.prototype.handleDetails = function (isStarted, args, callback) {
 			}
 			if (status.code >= 400 && status.code < 600) {
 				callback(new Error(status.text));
+				return;
 			}
 
 			var content = '';

@@ -1,8 +1,8 @@
-#Catberry [![Build Status](https://travis-ci.org/pragmadash/catberry.png?branch=master)](https://travis-ci.org/pragmadash/catberry)
+#Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
-![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
+![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##What is it?
 Catberry is a framework for fast and modular [isomorphic web-applications]
