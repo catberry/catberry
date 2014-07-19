@@ -12,17 +12,17 @@ This method can be called in `/server.js` script or separately in
 different script and process.
 
 It is highly recommended to use `build` method in separated process 
-(not in server process) because JavaScript minification requires a lot  memory 
+(not in server process) because JavaScript minification requires a lot of memory 
 and it looks like your `/server.js` script spends 1GB of RAM, which is not so of 
 course.
 
 For example you can use `/build.js` script with following:
-```javascript
-
+```
+node ./build.js release
 ```
 
-Building browser bundle uses [browserify](http://browserify.org) which 
-is awesome and can convert your server-side JavaScript to browser code.
+To build browser bundle Catberry uses [browserify](http://browserify.org) which 
+is awesome and can convert your JavaScript server-side code to browser code.
 
 ##Including packages into browser bundle
 There are some rules according browserify limitations:
@@ -38,7 +38,7 @@ var serverSidePackage = require('server/package');
 ```
 Some Catberry plugins uses this hint to exclude its server side 
 implementations from browser bundle. Also you can use this hint for server-side
-configuration that has some secret parameters and it should not appear 
+configuration that can have some secret parameters and it should not appear 
 in browser.
 
 Filter for such excluded `require` is implemented as browserify transform 
