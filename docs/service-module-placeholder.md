@@ -7,9 +7,9 @@ some business logic.
 
 So, Catberry Application consist of:
 
- * Set of services (HTTP servers)
+ * Set of services (that implements business logic or uses third-party APIs)
  * Set of modules (more details in [Modules section](modules/index.md))
- * Set of placeholders. Templates that can reference each other 
+ * Set of placeholders (templates) that can reference each other 
  (more details in [Placeholders section](modules/placeholders.md))
 
 Typical architecture in common case is presented in image below:
@@ -21,7 +21,7 @@ that is described below:
 
 ![Example Application Architecture](images/smp-example.png)
 
-This approach allows your module to be executed at server and browser as well 
+This approach allows your module to be executed at server and in browser as well 
 without any additional logic written by you. All you need is to use 
 [Universal HTTP(S) Request](services/userland/universal-http-request.md) - 
 this component implements HTTP(S) request logic using `XmlHttpRequest` 

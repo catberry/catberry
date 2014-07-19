@@ -1,5 +1,5 @@
 #Handle method
-Every module should have `handle` method like this:
+Every module can have `handle` method like this:
 ```javascript
 Module.prototype.handle = function (eventName, isStarted, args, callback) {
 	callback(null, function () {

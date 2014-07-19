@@ -1,5 +1,5 @@
 #Render method
-Every module should have `render` method like this:
+Every module can have `render` method like this:
 ```javascript
 Module.prototype.render = function (placeholderName, callback) {
 	callback(null, {some: 'data'}, function () {
@@ -7,8 +7,8 @@ Module.prototype.render = function (placeholderName, callback) {
 	}); 
 };
 ```
-During rendering process if parser finds placeholder reference it calls method
-`render` of module which is owner of this placeholder. The main task of this
+During rendering process, if parser finds placeholder reference, it calls method
+`render` of module, which is owner of this placeholder. The main task of this
 method is to prepare data context for template that represents the placeholder.
 
 In browser it is also called when module state is changed and need to refresh
@@ -42,7 +42,7 @@ need to attach JavaScript logic to rendered HTML elements. For this you can
 check if code is executing in browser 
 using [Module Context methods](context.md).
 
-If you do not want to code ugly `switch` statements for placeholder name 
+If you do not want to see in code ugly `switch` statements for placeholder name 
 to determine what logic module should use to prepare data context, you can use
 [catberry-module](https://www.npmjs.org/package/catberry-module) with smart 
 method calling to avoid that.
