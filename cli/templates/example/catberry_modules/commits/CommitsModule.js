@@ -44,7 +44,8 @@ CommitsModule.prototype.$ = null;
 
 /**
  * Renders commit list of Catberry Framework repository.
- * This method is called when need to render index template of module commits.
+ * This method is called when need to render "index" template
+ * of module "commits".
  * @param {Function} callback Callback on finish prepare data context.
  */
 CommitsModule.prototype.renderIndex = function (callback) {

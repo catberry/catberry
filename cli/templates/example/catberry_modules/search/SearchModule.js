@@ -27,7 +27,8 @@ SearchModule.prototype._uhr = null;
 
 /**
  * Renders result list for search query in Catberry Framework repository.
- * This method is called when need to render index template of module search.
+ * This method is called when need to render "index" template
+ * of module "search".
  * @param {Function} callback Callback on finish prepare data context.
  */
 SearchModule.prototype.renderResults = function (callback) {
@@ -53,7 +54,7 @@ SearchModule.prototype.renderResults = function (callback) {
 
 /**
  * Renders search form.
- * This method is called when need to render form template of module search.
+ * This method is called when need to render "form" template of module "search".
  * @param {Function} callback Callback on finish prepare data context.
  */
 SearchModule.prototype.renderForm = function (callback) {

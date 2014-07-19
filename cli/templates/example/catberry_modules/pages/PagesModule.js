@@ -27,8 +27,8 @@ PagesModule.prototype.renderIndex = function (callback) {
 
 /**
  * Renders page navigation tabs.
- * This method is called when need to render navigation template
- * of module pages.
+ * This method is called when need to render "navigation" template
+ * of module "pages".
  * @param {Function} callback Callback on finish prepare data context.
  */
 PagesModule.prototype.renderNavigation = function (callback) {

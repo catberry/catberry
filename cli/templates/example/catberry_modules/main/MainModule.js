@@ -31,7 +31,8 @@ function MainModule(title) {
 MainModule.prototype._title = '';
 
 /**
- * Renders HEAD element of page..
+ * Renders HEAD element of page.
+ * This method is called when need to render "head" template of module "main".
  * @param {Function} callback Callback on finish prepare data context.
  */
 MainModule.prototype.renderHead = function (callback) {

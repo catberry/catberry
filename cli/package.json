@@ -31,7 +31,9 @@
 	},
 	"dependencies": {
 		"ncp": "^0.6.0",
-		"commander": "^2.2.0"
+		"split": "^0.3.0",
+		"commander": "^2.2.0",
+		"mkdirp": "^0.5.0"
 	},
 	"devDependencies": {
 		"jscs": "~1.4.5",
