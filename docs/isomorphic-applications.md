@@ -1,13 +1,6 @@
 #Isomorphic Applications
 
-There is an awesome [post in airbnb technical blog]
-(http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) 
-about the idea of isomorphic JavaScript applications and what exactly it is.
-Also you can find video [Spike Brehm: Building Isomorphic Apps]
-(http://www.youtube.com/watch?v=CH6icJbLhlI)
-from JSConf 2014 talks.
-
-Simply speaking, isomorphic applications are built to make it possible 
+Make a long story short, isomorphic applications are built to make it possible 
 to write module once and use it for both page rendering on server 
 (for SEO and some shared links) and in browser with no server side at all.
 It means on server your modules are executing the same code as 
@@ -16,8 +9,15 @@ in browser. This [Single Page Application]
 can re-render all parts of the page using the same isomorphic modules and not 
 reloading the page at all.
 
+There is an awesome [post in airbnb technical blog]
+(http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) 
+about the idea of isomorphic JavaScript applications and what exactly it is.
+Also you can find video [Spike Brehm: Building Isomorphic Apps]
+(http://www.youtube.com/watch?v=CH6icJbLhlI)
+from JSConf 2014 talks.
+
 Isomorphic applications can work with set of independent services that 
-implement some business logic (Facebook API, Twitter API etc).
+implement some business logic (Facebook API, Twitter API, your API etc).
 In fact, each module in isomorphic application should receive all data from 
 API server which could be written in any platform you want using REST approach.
 
@@ -38,7 +38,7 @@ their browsers your server's load will be reduced dramatically.
  
 And maybe a lot of more, who knows.
 
-Technologies such History API and node.js make this type 
+Technologies like History API and node.js make this type 
 of applications possible and we should use this possibility.  
 
 Read next:

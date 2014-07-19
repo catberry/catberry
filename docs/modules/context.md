@@ -15,21 +15,22 @@ assigned by Catberry on module initialization and then refreshed every time
 when application state is changing.
 
 ##Environment flags
-For some situations you may need to determine where current code is executing.
-There are two flags in context for that `isBrowser` and `isServer`. Both these
-flags are read-only properties.
+For some situations you maybe need to determine where current code is executing.
+There are two flags in context for this purpose: `isBrowser` and `isServer`. 
+Both flags are read-only properties.
 
 ##State
 Most important thing in context is `state` property. It is an immutable 
-object that you can use to know what application parameters now. 
+object that you can use to know what application parameters now are. 
 All these parameters are specified by 
 [URL Route Definition](../routing/url-route-definition.md). It is main source 
 of input data for rendering and often is used in module [`render` methods]
 (render-method.md).
 
-Keep in mind that state object is immutable and every time state is changing it
-is just re-assigned to context therefore it is highly not recommended 
-to save state into variable, it can cause unexpected behaviour and memory leaks.
+Keep in mind that state object is immutable and every time 
+when state is changing it is just re-assigned to context 
+therefore it is highly not recommended to save state into variable, 
+it can cause unexpected behaviour and memory leaks.
 
 ##Rendered data cache
 Context also has a set of data contexts that were rendered on page in property
@@ -173,10 +174,10 @@ module rendering `__index` placeholder then `<script>` element will be placed in
 `<head>` element of page. Otherwise it will be rendered at the beginning of
 placeholder content.
 
-After code is execution `<script>` elements are removed by Catberry 
+After code is executed, `<script>` elements will be removed by Catberry 
 initialization due security reasons.
 
-Even `<script>` element are removed after executing it is still not save to
+Although `<script>` element are removed after executing it is still not save to
 set some cookies that should be 100% secured. It is better to use additional
 [connect](https://github.com/senchalabs/connect)/[express]
 (https://github.com/visionmedia/express) middleware for this task.
