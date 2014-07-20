@@ -10,18 +10,28 @@ that helps to create projects and modules.
 
 It helps to:
 
-* Create Catberry Application using project template 
-`catberry init [--dest=directory] <template>`
-	Included templates:
-	* `example` - finished project that works with GitHub API and demonstrates
-	how to implement such isomorphic application using Catberry Framework
-	* `empty` - empty project that helps to start a new project using Catberry 
-* Add module to project using module preset 
-`catberry add [--dest=directory] <moduleName>`
+###Create Catberry Application using project template 
+
+```bash
+catberry init [--dest=directory] <template>
+```
+
+Included templates:
+* `example` - finished project that works with GitHub API and demonstrates
+how to implement such isomorphic application using Catberry Framework
+* `empty` - empty project that helps to start a new project using Catberry
+	 
+###Add module to project using module preset
+ 
+```bash
+catberry add [--dest=directory] <moduleName>
+```
 
 ##Installation
 
-`npm -g install catberry-cli`
+```bash
+npm -g install catberry-cli
+```
 
 To get more usage details `catberry --help`
 
