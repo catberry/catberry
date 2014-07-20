@@ -5,9 +5,8 @@
 ![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##What is it?
-This is command line interface for [Catberry Framework]
-(https://github.com/catberry/catberry) that helps to create projects 
-and modules.
+This is command line interface for [Catberry Framework](https://github.com/catberry/catberry) 
+that helps to create projects and modules.
 
 It helps to:
 
@@ -27,16 +26,14 @@ It helps to:
 To get more usage details `catberry --help`
 
 ##Contribution
-If you have found a bug, please create pull request with [mocha]
-(https://www.npmjs.org/package/mocha) unit-test which reproduces it or describe 
-all details in issue if you can not implement test. If you want to propose some 
-improvements just create issue or pull request but please do not forget to use 
-`npm test` to be sure that your code is awesome.
+If you have found a bug, please create pull request with [mocha](https://www.npmjs.org/package/mocha) 
+unit-test which reproduces it or describe all details in issue if you can not 
+implement test. If you want to propose some improvements just create issue or 
+pull request but please do not forget to use `npm test` to be sure that your 
+code is awesome.
 
-All changes should satisfy this [Code Style Guide]
-(https://github.com/catberry/catberry/blob/master/docs/code-style-guide.md).
+All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/master/docs/code-style-guide.md).
 
-Also your changes should be covered by unit tests using [mocha]
-(https://www.npmjs.org/package/mocha).
+Also your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
 
 Denis Rechkunov <denis.rechkunov@gmail.com>
