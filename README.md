@@ -18,9 +18,11 @@ modules in browser: automatically creates
 [Single Page Application](http://en.wikipedia.org/wiki/Single-page_application) 
 using browser [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
-Here you can find full [Catberry Documentation](docs/index.md).
+Here you can find full [Catberry Documentation]
+(https://github.com/catberry/catberry/blob/develop/docs/index.md).
 
-To get started with example please proceed to [this document](cli/README.md).
+To get started with example please proceed to [this document]
+(https://github.com/catberry/catberry/blob/develop/cli/README.md).
 
 ##Advantages
 * Super fast rendering engine using [node.js streams]
@@ -37,8 +39,8 @@ back-end that renders identical page for search engines and shared links
 blocks on page and refresh only changed blocks in browser
 * A click on link with `href` in bounds of Catberry application rebuilds page
 structure in browser without reloading of page
-* A click on link with `data-event` attribute or hash in `href` raises an event 
-in your modules automatically. Manual hash changing does the same thing.
+* A click on button or link with `data-event` attribute or hash in `href` 
+raises an event in your modules automatically. Manual hash changing does the same thing.
 * Your application builds version of itself for browser using 
 [browserify](http://browserify.org) (debug and release modes are supported)
 * All framework architecture is built using [Service Locator]
@@ -57,14 +59,16 @@ will receive parameter's value. Anyway regular expressions are supported too.
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called [Service-Module-Placeholder]
-(docs/service-module-placeholder.md) instead Model-View-Controller. 
+(https://github.com/catberry/catberry/blob/develop/docs/service-module-placeholder.md) 
+instead Model-View-Controller. 
 SMP is the right concept for [isomorphic web-applications]
-(docs/isomorphic-applications.md).
+(https://github.com/catberry/catberry/blob/develop/docs/isomorphic-applications.md).
 
 For more details please proceed to [Catberry Documentation]
-(docs/index.md).
+(https://github.com/catberry/catberry/blob/develop/docs/index.md).
 
-Also you can see [cli/templates/example](cli/templates/example).
+Also you can see [cli/templates/example]
+(https://github.com/catberry/catberry/blob/develop/cli/templates/example).
 
 ##Browser support
 Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 
@@ -114,7 +118,7 @@ improvements just create issue or pull request but please do not forget to use
 `npm test` to be sure that your code is awesome.
 
 All changes should satisfy this [Code Style Guide]
-(docs/code-style-guide.md).
+(https://github.com/catberry/catberry/blob/develop/docs/code-style-guide.md).
 
 Also your changes should be covered by unit tests using [mocha]
 (https://www.npmjs.org/package/mocha).
