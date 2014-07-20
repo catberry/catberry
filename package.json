@@ -34,7 +34,7 @@
 	"main": "./index",
 	"dependencies": {
 		"glob": "^4.0.0",
-		"glob-watcher": "^0.0.6",
+		"glob-watcher": "~0.0.6",
 		"catberry-locator": "^1.0.0",
 		"catberry-uhr": "^1.0.0",
 		"jquery": "^2.0.0",
@@ -45,7 +45,7 @@
 		"log4js": "~0.6.0"
 	},
 	"devDependencies": {
-		"jsdom": "^0.11.0",
+		"jsdom": "~0.11.0",
 		"mocha": "^1.20.0",
 		"jscs": "~1.4.0",
 		"jshint": "^2.5.0"
