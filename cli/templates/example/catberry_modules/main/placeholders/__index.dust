@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<!--This is reference to placeholder 'head' of module 'main'-->
+<head lang="en" id="main_head">
+</head>
+<body>
+<!--This is reference to placeholder 'navigation' of module 'pages'-->
+<div id="pages_navigation"></div>
+<!--This is reference to placeholder 'index' of module 'pages'-->
+<div id="pages_index"></div>
+</body>
+</html>

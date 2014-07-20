@@ -31,6 +31,8 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
+	dust = require('dustjs-linkedin'),
 	ServiceLocator = require('catberry-locator'),
 	Logger = require('./../mocks/Logger'),
 	path = require('path'),
@@ -38,18 +40,20 @@ var assert = require('assert'),
 	TemplateProvider = require('../../lib/server/TemplateProvider');
 
 var templatePath = path.join(__dirname, '..',
-	'cases', 'server', 'TemplateProvider', 'case1', 'test.compiled');
+	'cases', 'server', 'TemplateProvider', 'case1', 'test.dust');
 
 describe('server/TemplateProvider', function () {
-	describe('#registerCompiled', function () {
-		it('should properly register compiled template', function (done) {
+	describe('#registerSource', function () {
+		it('should properly register template source', function (done) {
 			var locator = new ServiceLocator();
 			locator.register('logger', Logger);
+			locator.registerInstance('dust', dust);
+			locator.registerInstance('eventBus', new events.EventEmitter());
 
 			var provider = locator.resolveInstance(TemplateProvider),
 				source = fs.readFileSync(templatePath, {encoding: 'utf8'});
 
-			provider.registerCompiled('test', source);
+			provider.registerSource('test', source);
 
 			var templateStream = provider.getStream('test',
 					{testMessage: 'hello'}),
@@ -65,7 +69,12 @@ describe('server/TemplateProvider', function () {
 		});
 
 		it('should throw error if template file not found', function () {
-			var provider = new TemplateProvider();
+			var locator = new ServiceLocator();
+			locator.register('logger', Logger);
+			locator.registerInstance('dust', dust);
+			locator.registerInstance('eventBus', new events.EventEmitter());
+
+			var provider = locator.resolveInstance(TemplateProvider);
 
 			assert.throws(function () {
 				provider.registerCompiled('test', 'wrong template');

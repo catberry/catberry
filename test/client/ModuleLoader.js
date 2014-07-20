@@ -31,9 +31,13 @@
 'use strict';
 
 var assert = require('assert'),
-	TemplateProvider = require('../mocks/TemplateProvider'),
+	events = require('events'),
 	Logger = require('../mocks/Logger'),
 	ServiceLocator = require('catberry-locator'),
+	UniversalMock = require('../mocks/UniversalMock'),
+	StateProvider = require('../../lib/StateProvider'),
+	ModuleApiProvider = require('../../lib/client/ModuleApiProvider'),
+	CookiesWrapper = require('../../lib/client/CookiesWrapper'),
 	ModuleLoader = require('../../lib/client/ModuleLoader');
 
 function Module1() {}
@@ -88,8 +92,19 @@ describe('client/ModuleLoader', function () {
 			function () {
 				var locator = new ServiceLocator();
 				locator.registerInstance('serviceLocator', locator);
+				locator.registerInstance('eventBus', new events.EventEmitter());
 				locator.registerInstance('config', {});
-				locator.register('templateProvider', TemplateProvider);
+				locator.registerInstance('window', {
+					location: '',
+					document: {
+						cookies: ''
+					}
+				});
+				locator.registerInstance('templateProvider',
+					new UniversalMock(['registerCompiled']));
+				locator.register('cookiesWrapper', CookiesWrapper);
+				locator.register('moduleApiProvider', ModuleApiProvider);
+				locator.register('stateProvider', StateProvider);
 				locator.register('logger', Logger);
 
 				modules.forEach(function (module) {
@@ -105,9 +120,11 @@ describe('client/ModuleLoader', function () {
 
 				assert.strictEqual(Object.keys(modulesByNames).length, 2,
 					'Should be 2 modules');
-				assert.strictEqual(modulesByNames.hasOwnProperty('module1'), true,
+				assert.strictEqual(modulesByNames.hasOwnProperty('module1'),
+					true,
 					'Should have module1 in set');
-				assert.strictEqual(modulesByNames.hasOwnProperty('module2'), true,
+				assert.strictEqual(modulesByNames.hasOwnProperty('module2'),
+					true,
 					'Should have module2 in set');
 				assert.strictEqual(modulesByNames.module1.name, 'module1',
 					'Wrong module name');
@@ -121,6 +138,9 @@ describe('client/ModuleLoader', function () {
 						modulesByNames.module2.implementation instanceof
 						Module2, true,
 					'Wrong module implementation');
+
+				// check contexts
+				checkContexts(modulesByNames);
 
 				// check module 1 placeholders
 				var module1Placeholders = modulesByNames.module1.placeholders;
@@ -211,3 +231,38 @@ describe('client/ModuleLoader', function () {
 			});
 	});
 });
+
+function checkContexts(modulesByNames) {
+	assert.strictEqual(
+		typeof(modulesByNames.module1.implementation.$context),
+		'object', true,
+		'Module should have context');
+	assert.strictEqual(
+		typeof(modulesByNames.module2.implementation.$context),
+		'object', true,
+		'Module should have context');
+	assert.strictEqual(
+		typeof(modulesByNames.module1.implementation.$context.state),
+		'object', true,
+		'Module should have state');
+	assert.strictEqual(
+		typeof(modulesByNames.module1
+			.implementation.$context.renderedData),
+		'object', true,
+		'Module should have rendered data cache');
+	assert.strictEqual(
+		typeof(modulesByNames.module2
+			.implementation.$context.renderedData),
+		'object', true,
+		'Module should have rendered data cache');
+	assert.strictEqual(
+		typeof(modulesByNames.module2.implementation.$context.state),
+		'object', true,
+		'Module should have state');
+	assert.strictEqual(modulesByNames.module1
+		.implementation.$context.cookies instanceof
+		CookiesWrapper, true, 'Module should have cookies');
+	assert.strictEqual(modulesByNames.module2
+		.implementation.$context.cookies instanceof
+		CookiesWrapper, true, 'Module should have cookies');
+}

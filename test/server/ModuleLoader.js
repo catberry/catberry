@@ -31,9 +31,14 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	fs = require('fs'),
 	path = require('path'),
 	ServiceLocator = require('catberry-locator'),
+	Logger = require('../mocks/Logger'),
+	ModuleApiProvider = require('../../lib/server/ModuleApiProvider'),
+	CookiesWrapper = require('../../lib/server/CookiesWrapper'),
+	ModuleFinder = require('../../lib/server/ModuleFinder'),
 	ModuleLoader = require('../../lib/server/ModuleLoader');
 
 var CASES_DIRECTORY = path.join(__dirname, '..', 'cases',
@@ -44,17 +49,24 @@ function createModuleLoader(caseName) {
 		locator = new ServiceLocator(),
 		config = {modulesFolder: fullPath};
 
-	locator.register('serviceLocator', ServiceLocator, null, true);
-	locator.register('logger', require('../mocks/Logger'));
-	locator.register('templateProvider', require('../mocks/TemplateProvider'));
+	locator.register('logger', Logger);
+	locator.register('moduleFinder', ModuleFinder, config, true);
+	locator.register('moduleApiProvider', ModuleApiProvider, config);
+	locator.register('cookiesWrapper', CookiesWrapper, config);
 	locator.registerInstance('config', config);
+	locator.registerInstance('eventBus', new events.EventEmitter());
+	locator.registerInstance('serviceLocator', locator);
+	locator.registerInstance('templateProvider', {
+		registerSource: function () {
+
+		}});
 
 	return locator.resolveInstance(ModuleLoader, config);
 }
 
 describe('server/ModuleLoader', function () {
 	describe('#getModulesByNames', function () {
-		it('should skip empty folders', function () {
+		it('should skip empty folders', function (done) {
 			var case1Folder = path.join(CASES_DIRECTORY, 'case1'),
 				emptyFolderPath = path.join(case1Folder, 'emptyFolder');
 
@@ -67,110 +79,105 @@ describe('server/ModuleLoader', function () {
 				fs.mkdirSync(emptyFolderPath);
 			}
 
-			var moduleLoader = createModuleLoader('case1'),
-				modules = moduleLoader.getModulesByNames(),
-				counter = 0;
+			var moduleLoader = createModuleLoader('case1');
+			moduleLoader.loadModules(function (modules) {
+				var counter = 0;
 
-			for (var moduleName in modules) {
-				if (modules.hasOwnProperty(moduleName)) {
-					counter++;
+				for (var moduleName in modules) {
+					if (modules.hasOwnProperty(moduleName)) {
+						counter++;
+					}
 				}
-			}
 
-			assert.equal(counter, 0, 'Too many loaded modules');
-		});
-
-		it('should throw error if module interface is incorrect', function () {
-			var moduleLoader = createModuleLoader('case2');
-
-			assert.throws(function () {
-				moduleLoader.getModulesByNames();
+				assert.equal(counter, 0, 'Too many loaded modules');
+				done();
 			});
 		});
 
-		it('should skip module folders with wrong module names', function () {
-			var moduleLoader = createModuleLoader('case3'),
-				modules = moduleLoader.getModulesByNames(),
-				counter = 0;
+		it('should not throw error if module interface is incorrect',
+			function (done) {
+				var moduleLoader = createModuleLoader('case2');
+				moduleLoader.loadModules(function () {
+					done();
+				});
+			});
 
-			for (var moduleName in modules) {
-				if (modules.hasOwnProperty(moduleName)) {
-					counter++;
-				}
-			}
+		it('should skip module folders with wrong module names',
+			function (done) {
+				var moduleLoader = createModuleLoader('case3');
+				moduleLoader.loadModules(function (modules) {
+					var counter = 0;
 
-			assert.equal(counter, 0, 'Too many loaded modules');
-		});
+					for (var moduleName in modules) {
+						if (modules.hasOwnProperty(moduleName)) {
+							counter++;
+						}
+					}
 
-		it('should properly load correct modules', function () {
-			var moduleLoader = createModuleLoader('case4'),
-				modules = moduleLoader.getModulesByNames(),
-				counter = 0;
+					assert.equal(counter, 0, 'Too many loaded modules');
+					done();
+				});
+			});
 
-			for (var moduleName in modules) {
-				if (modules.hasOwnProperty(moduleName)) {
-					counter++;
-				}
-			}
+		it('should properly load correct modules', function (done) {
+			var moduleLoader = createModuleLoader('case4');
 
-			assert.equal(counter, 2, 'Not all modules were loaded');
+			moduleLoader.loadModules(function (modules) {
+				assert.equal(Object.keys(modules).length, 2,
+					'Not all modules were loaded');
 
-			assert.equal('correctModule1' in modules, true,
-				'correctModule1 not found');
+				assert.equal('correctModule1' in modules, true,
+					'correctModule1 not found');
 
-			assert.equal('correctModule2' in modules, true,
-				'correctModule2 not found');
+				assert.equal('correctModule2' in modules, true,
+					'correctModule2 not found');
 
-			// check assets
-			var firstModule = modules.correctModule1,
-				secondModule = modules.correctModule2;
+				// check assets
+				var firstModule = modules.correctModule1,
+					secondModule = modules.correctModule2;
 
-			// check placeholders
-			var firstPlaceholders = firstModule.placeholders;
-			counter = 0;
-			for (var key1 in firstPlaceholders) {
-				if (firstPlaceholders.hasOwnProperty(key1)) {
-					counter++;
-				}
-			}
-			assert.equal(counter, 1, 'Too many placeholders');
-			assert.equal(firstModule.rootPlaceholder.name, '__index',
-				'Wrong placeholder name');
-			assert.equal(
-					firstModule.rootPlaceholder.getTemplateStream instanceof
-					Function, true,
-				'Root placeholder not found');
-			assert.equal(firstPlaceholders.placeholder1.name, 'placeholder1',
-				'Wrong placeholder name');
-			assert.equal(
-					firstPlaceholders.placeholder1.getTemplateStream instanceof
-					Function,
-				true, 'Placeholder not found');
+				// check placeholders
+				var firstPlaceholders = firstModule.placeholders;
 
-			var secondPlaceholders = secondModule.placeholders;
-			counter = 0;
+				assert.equal(Object.keys(firstPlaceholders).length, 1,
+					'Wrong count of placeholders');
+				assert.equal(firstModule.rootPlaceholder.name, '__index',
+					'Wrong placeholder name');
+				assert.equal(
+						firstModule.rootPlaceholder.getTemplateStream instanceof
+						Function, true,
+					'Root placeholder not found');
+				assert.equal(firstPlaceholders.placeholder1.name,
+					'placeholder1',
+					'Wrong placeholder name');
+				assert.equal(
+						firstPlaceholders.placeholder1.getTemplateStream instanceof
+						Function,
+					true, 'Placeholder not found');
 
-			for (var key2 in secondPlaceholders) {
-				if (secondPlaceholders.hasOwnProperty(key2)) {
-					counter++;
-				}
-			}
-			assert.equal(counter, 2, 'Expect 2 placeholders');
-			assert.strictEqual(secondModule.rootPlaceholder, undefined);
-			assert.equal(secondPlaceholders.placeholder2.name, 'placeholder2',
-				'Wrong placeholder name');
-			assert.equal(
-					secondPlaceholders.placeholder2.getTemplateStream instanceof
-					Function,
-				true,
-				'Placeholder not found');
-			assert.equal(secondPlaceholders.placeholder3.name, 'placeholder3',
-				'Wrong placeholder name');
-			assert.equal(
-					secondPlaceholders.placeholder3.getTemplateStream instanceof
-					Function,
-				true,
-				'Placeholder not found');
+				var secondPlaceholders = secondModule.placeholders;
+
+				assert.equal(Object.keys(secondPlaceholders).length, 2,
+					'Expect 2 placeholders');
+				assert.strictEqual(secondModule.rootPlaceholder, undefined);
+				assert.equal(secondPlaceholders.placeholder2.name,
+					'placeholder2',
+					'Wrong placeholder name');
+				assert.equal(
+						secondPlaceholders.placeholder2.getTemplateStream instanceof
+						Function,
+					true,
+					'Placeholder not found');
+				assert.equal(secondPlaceholders.placeholder3.name,
+					'placeholder3',
+					'Wrong placeholder name');
+				assert.equal(
+						secondPlaceholders.placeholder3.getTemplateStream instanceof
+						Function,
+					true,
+					'Placeholder not found');
+				done();
+			});
 		});
 	});
 });

@@ -31,17 +31,26 @@
 'use strict';
 
 var assert = require('assert'),
+	events = require('events'),
 	fs = require('fs'),
 	path = require('path'),
 	HttpResponse = require('../mocks/HttpResponse'),
 	ServiceLocator = require('catberry-locator'),
+	CookiesWrapper = require('../../lib/server/CookiesWrapper'),
+	ModuleApiProvider = require('../../lib/server/ModuleApiProvider'),
 	PageRenderer = require('../../lib/server/PageRenderer'),
+	Logger = require('../mocks/Logger'),
+	logger = new Logger(),
+	eventBus = new events.EventEmitter(),
 	locator = new ServiceLocator();
 
-locator.register('logger', require('../mocks/Logger'));
-locator.register('clientBundleBuilder',
-	require('../mocks/ClientBundleBuilder'));
-locator.register('resourceBuilder', require('../mocks/ResourceBuilder'));
+eventBus.on('error', logger.error);
+
+locator.registerInstance('eventBus', eventBus);
+locator.registerInstance('logger', logger);
+locator.registerInstance('serviceLocator', locator);
+locator.register('moduleApiProvider', ModuleApiProvider);
+locator.register('cookiesWrapper', CookiesWrapper);
 locator.register('moduleLoader', TestModuleLoader);
 
 var currentPlaceholders = {};
@@ -51,31 +60,36 @@ var CASES_FOLDER = path.join(__dirname, '..', 'cases', 'server',
 var testModules = [
 	// fine module
 	{
-		render: function (placeholderName, args, callback) {
+		$context: createContext('main'),
+		render: function (placeholderName, callback) {
 			callback(null, {});
 		}
 	},
 	// send empty result
 	{
-		render: function (placeholderName, args, callback) {
+		$context: createContext('main'),
+		render: function (placeholderName, callback) {
 			callback();
 		}
 	},
 	// sends error
 	{
-		render: function (placeholderName, args, callback) {
+		$context: createContext('main'),
+		render: function (placeholderName, callback) {
 			callback(new Error('test'));
 		}
 	},
 	// throws error
 	{
+		$context: createContext('main'),
 		render: function () {
 			throw new Error('test');
 		}
 	},
 	// async result
 	{
-		render: function (placeholderName, args, callback) {
+		$context: createContext('main'),
+		render: function (placeholderName, callback) {
 			setTimeout(callback, 200);
 		}
 	}
@@ -85,15 +99,27 @@ function TestModuleLoader(index) {
 	this._index = index;
 }
 TestModuleLoader.prototype._index = -1;
+TestModuleLoader.prototype.loadModules = function (callback) {callback();};
 TestModuleLoader.prototype.getModulesByNames = function () {
 	return {
-		test: {
-			name: 'test',
+		main: {
+			name: 'main',
 			implementation: testModules[this._index],
 			rootPlaceholder: currentPlaceholders.__index,
 			placeholders: currentPlaceholders
 		}
 	};
+};
+
+TestModuleLoader.prototype.getPlaceholdersByIds = function () {
+	var placeholdersByIds = {};
+	Object.keys(currentPlaceholders)
+		.forEach(function (placeholderName) {
+			var id = 'main_' + placeholderName;
+			placeholdersByIds[id] =
+				currentPlaceholders[placeholderName];
+		});
+	return placeholdersByIds;
 };
 
 function compareWithExpected(caseName, stream, callback) {
@@ -149,13 +175,13 @@ function createPlaceholdersForCase(caseName) {
 		if (basename === '__index') {
 			placeholders.__index = {
 				name: '__index',
-				moduleName: 'test',
+				moduleName: 'main',
 				getTemplateStream: streamGetter
 			};
 		} else {
 			placeholders[basename] = {
 				name: basename,
-				moduleName: 'test',
+				moduleName: 'main',
 				getTemplateStream: streamGetter
 			};
 		}
@@ -190,9 +216,10 @@ function checkCase(caseName, callback) {
 		}
 	};
 
-	var additional = {$pageName: 'test', $global: {}, $context: {}},
-		parameters = Object.create(additional);
-	parameters.$$ = additional;
+	var parameters = Object.create(locator.resolve('moduleApiProvider'));
+	parameters.state = {};
+	parameters.renderedData = {};
+	parameters.cookies = locator.resolve('cookiesWrapper');
 
 	pageRenderer1.render(response1, parameters,
 		function () {
@@ -226,7 +253,7 @@ function checkCase(caseName, callback) {
 	});
 
 	checkIsEmpty(response2, function (isEmpty) {
-		assert.strictEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
@@ -246,7 +273,7 @@ function checkCase(caseName, callback) {
 	});
 
 	checkIsEmpty(response5, function (isEmpty) {
-		assert.strictEqual(isEmpty, true);
+		assert.strictEqual(isEmpty, false);
 		checkCounter++;
 		callbackInvoker();
 	});
@@ -274,3 +301,17 @@ describe('server/PageRenderer', function () {
 			});
 	});
 });
+
+function createContext(moduleName) {
+	var locator = new ServiceLocator();
+	locator.register('moduleApiProvider', ModuleApiProvider);
+	locator.register('cookiesWrapper', CookiesWrapper);
+	locator.registerInstance('serviceLocator', locator);
+	locator.registerInstance('eventBus', new events.EventEmitter());
+	var context = Object.create(locator.resolve('moduleApiProvider'));
+	context.name = moduleName;
+	context.state = {};
+	context.renderedData = {};
+	context.cookies = locator.resolve('cookiesWrapper');
+	return context;
+}
