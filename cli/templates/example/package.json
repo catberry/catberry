@@ -6,8 +6,8 @@
 	"author": "Catberry",
 	"license": "MIT",
 	"dependencies": {
-		"catberry": "git://github.com/catberry/catberry.git#develop",
-		"catberry-module": "git://github.com/catberry/catberry-module.git#develop",
+		"catberry": "^1.0.0",
+		"catberry-module": "^1.0.0",
 		"connect": "^3.0.0",
 		"compression": "^1.0.0",
 		"serve-static": "^1.0.0",
