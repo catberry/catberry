@@ -32,7 +32,7 @@ improvements just create issue or pull request but please do not forget to use
 `npm test` to be sure that your code is awesome.
 
 All changes should satisfy this [Code Style Guide]
-(https://github.com/catberry/catberry/blob/develop/docs/code-style-guide.md).
+(https://github.com/catberry/catberry/blob/master/docs/code-style-guide.md).
 
 Also your changes should be covered by unit tests using [mocha]
 (https://www.npmjs.org/package/mocha).
