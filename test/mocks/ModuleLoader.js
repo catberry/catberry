@@ -32,12 +32,30 @@
 
 module.exports = ModuleLoader;
 
-function ModuleLoader(modules) {
-	this._modules = modules;
+var moduleContextHelper = require('../../lib/helpers/moduleContextHelper');
+
+function ModuleLoader(modulesByNames) {
+	this._modulesByNames = modulesByNames;
 }
 
-ModuleLoader.prototype._modules = null;
-
 ModuleLoader.prototype.getModulesByNames = function () {
-	return this._modules;
+	return this._modulesByNames;
+};
+
+ModuleLoader.prototype.getPlaceholdersByIds = function () {
+	var self = this,
+		placeholdersByIds = {};
+	Object.keys(this._modulesByNames)
+		.forEach(function (moduleName) {
+			Object.keys(self._modulesByNames[moduleName].placeholders)
+				.forEach(function (placeholderName) {
+					var id = moduleContextHelper.joinModuleNameAndContext(
+						moduleName, placeholderName);
+					placeholdersByIds[id] =
+						self._modulesByNames[moduleName]
+							.placeholders[placeholderName];
+				});
+		});
+
+	return placeholdersByIds;
 };

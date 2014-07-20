@@ -1,3 +1,0 @@
-<h2>{chatSubtitle}</h2>
-<div class="message-items" id="chat_messages"></div>
-<div id="chat_post"></div>

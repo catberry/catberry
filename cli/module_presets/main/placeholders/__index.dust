@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<!--This is reference to placeholder 'head' of module 'main'-->
+<head lang="en" id="main_head">
+</head>
+<body>
+	<h1>{.message}</h1>
+</body>
+</html>

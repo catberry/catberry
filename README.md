@@ -1,44 +1,84 @@
-#Catberry [![Build Status](https://travis-ci.org/pragmadash/catberry.png?branch=master)](https://travis-ci.org/pragmadash/catberry)
+#Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
-![Catberry](https://raw.githubusercontent.com/pragmadash/catberry/master/docs/images/logo.png)
+[![NPM](https://nodei.co/npm/catberry-cli.png)](https://nodei.co/npm/catberry-cli/)
+
+![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##What is it?
-Catberry is a framework for fast and modular web-applications. Main feature you will get using Catberry is ability to write module once and use it at server and browser without any additional logic, just create module, put it to folder "catberry_modules" and start. Catberry builds client script bundle and re-uses your modules in browser automatically providing Single Page Application using browser History API if it is supported.
+Catberry is a framework for fast and modular 
+[isomorphic web-applications](docs/isomorphic-applications.md) written in 
+JavaScript using [node.js](http://nodejs.org). 
+
+Catberry makes possible to write module once and use it at server and in browser
+without any additional code, just create module and put it to folder 
+`catberry_modules`. Catberry builds browser script bundle and re-uses your 
+modules in browser: automatically creates 
+[Single Page Application](http://en.wikipedia.org/wiki/Single-page_application) 
+using browser 
+[History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
+
+Here you can find full 
+[Catberry Documentation](https://github.com/catberry/catberry/blob/1.0.0/docs/index.md).
+
+To get started with example please proceed to 
+[this document](https://github.com/catberry/catberry/blob/1.0.0/cli/README.md).
 
 ##Advantages
-* Super fast rendering engine using streams without in-memory template rendering (powered by [dustjs](https://github.com/linkedin/dustjs))
-* You write code in server-side style and only once for both server-side and client-side execution
-* You get automatically [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application) and back-end which renders identical page for search engines and shared links
-* You get such module API which allows you to develop different blocks on page independently and use one code on server and client for rendering templates
-* Every link click on page raises event in your module automatically if you define "data-event" attribute
-* URL hash change event is raised like an event in module automatically (two event on hash set and remove)
-* Your application builds itself without any additional actions on startup using gulp and browserify (debug and release modes are supported)
-* All framework architecture is built using [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) pattern and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection)
-* You can register your own modules (services) in [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) and inject it into any module you want
-* Framework itself is a [connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express) middleware it means you could use it with any other middleware
-* All page state is described by URL with GET query string in format "moduleName_parameterName=value" and hash "moduleName_parameterName" or without module name prefix which means global parameter or event. This approach guarantees that your page is rendered identically from server and using History API in browser.
-* Very flexible [URL mapping engine](https://github.com/pragmadash/catberry/blob/master/docs/url-mapping.md) which allows to use short human-understandable URLs instead big URL with a lot of GET parameters
-* New concept of application architecture is called [Service-Module-Placeholder](https://github.com/pragmadash/catberry/blob/master/docs/smp.md) instead Model-View-Controller. SMP is much easier and faster to implement.
-* Very simple [Module API](https://github.com/pragmadash/catberry/blob/master/docs/modules.md)
+* Super fast rendering engine using 
+[node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) 
+without in-memory template rendering (powered by [dustjs](https://github.com/linkedin/dustjs))
+* You will write code in server-side style 
+(using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) 
+and only once to execute it at server and in browser
+* You will get [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application) 
+automatically and back-end that renders identical page for search engines 
+and shared links
+* You will get such module API that allows you to develop different independent 
+blocks on page and refresh only changed blocks in browser
+* A click on link with `href` in bounds of Catberry application rebuilds page
+structure in browser without reloading of page
+* A click on button or link with `data-event` attribute or hash in `href` 
+raises an event in your modules automatically. Manual hash changing does the same thing.
+* Your application builds version of itself for browser using 
+[browserify](http://browserify.org) (debug and release modes are supported)
+* All framework architecture is built using 
+[Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) 
+pattern and 
+[Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection)
+* You can register your own components (services) in 
+[Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) and 
+inject it into any module you want
+* Framework itself is a 
+[connect](https://github.com/senchalabs/connect)/[express](https://github.com/visionmedia/express) 
+middleware, it means you can use it with any other middlewares
+* Definition of routing rules are specified using 
+`/some/:parameter[module1,module2,module3]` syntax with list of modules that 
+will receive parameter's value. Anyway regular expressions are supported too.
+* Definitions of event routing rules are specified using 
+`someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
+syntax with list of modules that will receive event and its parameters.
+* New concept of application architecture is called 
+[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/1.0.0/docs/service-module-placeholder.md) 
+instead Model-View-Controller. 
+SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/1.0.0/docs/isomorphic-applications.md).
 
-For more details please proceed to [Catberry Documentation](https://github.com/pragmadash/catberry/blob/master/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/1.0.0/docs/index.md).
 
-Also you can see [example](https://github.com/pragmadash/catberry/tree/master/example) or install it from npm:
-
-```bash
-npm install catberry-example
-```
+Also you can see [cli/templates/example](https://github.com/catberry/catberry/blob/1.0.0/cli/templates/example).
 
 ##Browser support
-Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) and some HTML5 features 
-like [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history)
+Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 
+and some HTML5 features like [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history)
 therefore it does not support old browsers at all.
-The main goal for Catberry is to use full power of new technologies and provide user with best experience.
+The main goal of Catberry Framework is to use full power of new technologies 
+and provide user with best experience.
 
-Actually user gets HTML page from server only once and all the rest of the time whole page is rendered in browser receiving only pure data from API server.
-Thanks to Catberry's very fast page rendering engine, user receives refreshed page as fast as API server could provide data for it.
+Actually user gets HTML page from server only once and all the rest of the time 
+whole page is rendered in browser receiving only pure data from some 
+API service(s). Thanks to Catberry's very fast page rendering engine, 
+user receives refreshed page as fast as API server could provide data for it.
 
 All supported browsers are listed below:
 
@@ -58,17 +98,23 @@ All supported browsers are listed below:
 | Blackberry Browser| 7+			|
 
 ##Not included packages
-* [catberry-module](https://www.npmjs.org/package/catberry-module) - Basic module implementation
-* [catberry-l10n](https://www.npmjs.org/package/catberry-l10n) - Localization support
-* [catberry-lazy-loader](https://www.npmjs.org/package/catberry-lazy-loader) - Module for implementing feed placeholders with infinite scroll and lazy loading
+* [catberry-module](https://www.npmjs.org/package/catberry-module) - 
+Basic module implementation with "smart method invocation"
+* [catberry-l10n](https://www.npmjs.org/package/catberry-l10n) - 
+Localization support
+* [catberry-lazy-loader](https://www.npmjs.org/package/catberry-lazy-loader) - 
+Module for implementing feed placeholders with infinite scroll and lazy loading
 
-And even [more modules](https://www.npmjs.org/search?q=catberry).
+And even [more packages](https://www.npmjs.org/search?q=catberry).
 
 ##Contribution
-If you have found a bug, please create pull request with mocha unit-test which reproduces it or describe all details in issue if you can not implement test.
-If you want to propose some improvements just create issue or pull request but please do not forget to use **npm test** to be sure that you code is awesome.
+If you have found a bug, please create pull request with [mocha](https://www.npmjs.org/package/mocha) 
+unit-test which reproduces it or describe all details in issue if you can not 
+implement test. If you want to propose some improvements just create issue or 
+pull request but please do not forget to use `npm test` to be sure that your 
+code is awesome.
 
-All changes should satisfy this [Code Style Guide](https://github.com/pragmadash/catberry/blob/master/docs/code-style.md).
+All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/master/docs/code-style-guide.md).
 
 Also your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
 

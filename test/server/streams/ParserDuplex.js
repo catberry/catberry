@@ -93,7 +93,7 @@ describe('server/streams/ParserDuplex', function () {
 				});
 			});
 
-		it('should propery skip HTML comments', function (done) {
+		it('should properly skip HTML comments', function (done) {
 			var concat = '',
 				input = fs.createReadStream(
 					path.join(casePath, 'case2', 'input.html')),
