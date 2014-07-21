@@ -20,10 +20,10 @@ using browser
 [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
 Here you can find full 
-[Catberry Documentation](https://github.com/catberry/catberry/blob/1.0.0/docs/index.md).
+[Catberry Documentation](https://github.com/catberry/catberry/blob/1.1.0/index.md).
 
 To get started with example please proceed to 
-[this document](https://github.com/catberry/catberry/blob/1.0.0/cli/README.md).
+[this document](https://github.com/catberry/catberry/blob/1.1.0/README.md).
 
 ##Advantages
 * Super fast rendering engine using 
@@ -60,13 +60,13 @@ will receive parameter's value. Anyway regular expressions are supported too.
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called 
-[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/1.0.0/docs/service-module-placeholder.md) 
+[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/1.1.0/service-module-placeholder.md) 
 instead Model-View-Controller. 
-SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/1.0.0/docs/isomorphic-applications.md).
+SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/1.1.0/isomorphic-applications.md).
 
-For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/1.0.0/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/1.1.0/index.md).
 
-Also you can see [cli/templates/example](https://github.com/catberry/catberry/blob/1.0.0/cli/templates/example).
+Also you can see [cli/templates/example](https://github.com/catberry/catberry/blob/1.1.0/example).
 
 ##Browser support
 Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 
@@ -114,7 +114,7 @@ implement test. If you want to propose some improvements just create issue or
 pull request but please do not forget to use `npm test` to be sure that your 
 code is awesome.
 
-All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/master/docs/code-style-guide.md).
+All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/1.1.0/code-style-guide.md).
 
 Also your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
 
