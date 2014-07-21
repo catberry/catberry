@@ -39,9 +39,9 @@ var packageInfo = require('./package.json'),
 	version = packageInfo.version;
 
 var REPOSITORY_LINK_REGEXP =
-		/(https:\/\/github.com\/catberry\/catberry\/blob\/)(develop)(\/)/gi,
+		/(https:\/\/github.com\/catberry\/catberry\/blob\/)(.+)(\/)/gi,
 	PATHS = [
-		'README.md',
+		'README.md'
 	];
 
 PATHS.forEach(function (currentPath) {
