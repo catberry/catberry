@@ -23,7 +23,7 @@ Here you can find full
 [Catberry Documentation](https://github.com/catberry/catberry/blob/1.1.0/index.md).
 
 To get started with example please proceed to 
-[this document](https://github.com/catberry/catberry/blob/1.1.0/README.md).
+[this document](https://github.com/catberry/catberry/blob/1.1.0/cli/README.md).
 
 ##Advantages
 * Super fast rendering engine using 
