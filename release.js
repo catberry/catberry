@@ -39,7 +39,7 @@ var packageInfo = require('./package.json'),
 	version = packageInfo.version;
 
 var REPOSITORY_LINK_REGEXP =
-		/(https:\/\/github.com\/catberry\/catberry\/blob\/)(.+)(\/)/gi,
+		/(https:\/\/github.com\/catberry\/catberry\/blob\/)([0-9a-z\.]+)(\/)/gi,
 	PATHS = [
 		'README.md'
 	];
