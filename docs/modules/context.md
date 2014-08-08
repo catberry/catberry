@@ -19,6 +19,11 @@ For some situations you maybe need to determine where current code is executing.
 There are two flags in context for this purpose: `isBrowser` and `isServer`. 
 Both flags are read-only properties.
 
+##Current URL path
+If you need to determine what is the current URL path then you can use `urlPath` 
+property. Its value is a concatenation of `location.pathname` and 
+`location.search` in browser and `request.url` at server.
+
 ##State
 Most important thing in context is `state` property. It is an immutable 
 object that you can use to know what application parameters now are. 

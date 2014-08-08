@@ -226,6 +226,7 @@ describe('client/RequestRouter', function () {
 					);
 					pageRenderer.once('render', function (args) {
 						assert.strictEqual(typeof(args[0]), 'object');
+						assert.strictEqual(args[0].urlPath, link);
 						assert.strictEqual(
 							typeof(args[0].state), 'object');
 						assert.strictEqual(
