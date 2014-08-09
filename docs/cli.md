@@ -9,8 +9,9 @@ To start using of Catberry CLI just install it globally from npm
 npm -g install catberry-cli
 ```
 
-And then follow usage instructions you can find [here](../cli/README.md) or
-just use help of catberry utility:
+And then follow usage instructions you can find
+[here](https://github.com/catberry/catberry-cli) or just use help of
+catberry utility:
 
 ```
 catberry --help
