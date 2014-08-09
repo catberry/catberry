@@ -34,6 +34,7 @@ PagesModule.prototype.renderIndex = function (callback) {
 PagesModule.prototype.renderNavigation = function (callback) {
 	if (!this.$context.state.page) {
 		this.$context.redirect('/about');
+		callback();
 		return;
 	}
 	var data = {};
