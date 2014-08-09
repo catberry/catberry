@@ -2,8 +2,6 @@
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
-[![NPM](https://nodei.co/npm/catberry-cli.png)](https://nodei.co/npm/catberry-cli/)
-
 ![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##What is it?
@@ -23,7 +21,7 @@ Here you can find full
 [Catberry Documentation](https://github.com/catberry/catberry/blob/1.2.0/docs/index.md).
 
 To get started with example please proceed to 
-[this document](https://github.com/catberry/catberry/blob/1.2.0/cli/README.md).
+[this link](https://github.com/catberry/catberry-cli).
 
 ##Advantages
 * Super fast rendering engine using 
@@ -66,7 +64,7 @@ SMP is the right concept for [isomorphic web-applications](https://github.com/ca
 
 For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/1.2.0/docs/index.md).
 
-Also you can see [cli/templates/example](https://github.com/catberry/catberry/blob/1.2.0/cli/templates/example).
+Also you can see [https://github.com/catberry/catberry-cli/templates/example).
 
 ##Browser support
 Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 

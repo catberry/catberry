@@ -1,5 +1,1 @@
-cli/templates/example/public
-cli/templates/example/node_modules
-cli/module_presets/other
 node_modules
-cli/node_modules
