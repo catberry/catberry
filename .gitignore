@@ -1,5 +1,4 @@
 node_modules
-public/catberry.js
 .idea
 *.log
 .DS_Store

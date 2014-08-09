@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
 	"homepage": "https://github.com/catberry/catberry",
@@ -54,7 +54,7 @@
 		"node": "~0.10.26"
 	},
 	"scripts": {
-		"test": "jshint ./ && jscs ./**.js && mocha --recursive"
+		"test": "jshint ./ && jscs ./ && mocha --recursive"
 	},
 	"licenses": [
 		{
