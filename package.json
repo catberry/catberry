@@ -54,7 +54,7 @@
 		"node": "~0.10.26"
 	},
 	"scripts": {
-		"test": "jshint ./ && jscs ./**.js && mocha --recursive"
+		"test": "jshint ./ && jscs ./ && mocha --recursive"
 	},
 	"licenses": [
 		{
