@@ -83,7 +83,7 @@ cat = catberry.create({isRelease: true}),
 ```
 
 If you want to see finished application as an example then please proceed to 
-[https://github.com/catberry/catberry-cli/templates/example](https://github.com/catberry/catberry-cli/templates/example) directory.
+[example directory](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
 Read next:
 
