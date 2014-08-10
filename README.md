@@ -18,7 +18,7 @@ using browser
 [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
 Here you can find full 
-[Catberry Documentation](https://github.com/catberry/catberry/blob/1.2.1/docs/index.md).
+[Catberry Documentation](https://github.com/catberry/catberry/blob/1.2.2/docs/index.md).
 
 To get started with example please proceed to 
 [this link](https://github.com/catberry/catberry-cli).
@@ -58,11 +58,11 @@ will receive parameter's value. Anyway regular expressions are supported too.
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called 
-[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/1.2.1/docs/service-module-placeholder.md) 
+[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/1.2.2/docs/service-module-placeholder.md) 
 instead Model-View-Controller. 
-SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/1.2.1/docs/isomorphic-applications.md).
+SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/1.2.2/docs/isomorphic-applications.md).
 
-For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/1.2.1/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/1.2.2/docs/index.md).
 
 Also you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
@@ -112,7 +112,7 @@ implement test. If you want to propose some improvements just create issue or
 pull request but please do not forget to use `npm test` to be sure that your 
 code is awesome.
 
-All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/1.2.1/docs/code-style-guide.md).
+All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/1.2.2/docs/code-style-guide.md).
 
 Also your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
 
