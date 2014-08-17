@@ -29,6 +29,10 @@ If you need to know previous client's page URL you can use `referrer` property.
 But use it very carefully because at server Catberry uses `Referer` HTTP header 
 and in browser it is just previous URL in History API.
 
+##User agent
+You can get user agent string whenever you want using `userAgent` property
+of context.
+
 ##State
 Most important thing in context is `state` property. It is an immutable 
 object that you can use to know what application parameters now are. 
