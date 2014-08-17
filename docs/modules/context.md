@@ -24,6 +24,15 @@ If you need to determine what is the current URL path then you can use `urlPath`
 property. Its value is a concatenation of `location.pathname` and 
 `location.search` in browser and `request.url` at server.
 
+##Referrer
+If you need to know previous client's page URL you can use `referrer` property. 
+But use it very carefully because at server Catberry uses `Referer` HTTP header 
+and in browser it is just previous URL in History API.
+
+##User agent
+You can get user agent string whenever you want using `userAgent` property
+of context.
+
 ##State
 Most important thing in context is `state` property. It is an immutable 
 object that you can use to know what application parameters now are. 
