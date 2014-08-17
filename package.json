@@ -36,7 +36,7 @@
 		"glob": "^4.0.0",
 		"glob-watcher": "~0.0.6",
 		"catberry-locator": "^1.0.0",
-		"catberry-uhr": "^1.0.0",
+		"catberry-uhr": "^1.1.0",
 		"jquery": "^2.0.0",
 		"uglify-js": "^2.0.0",
 		"browserify": "^4.0.0",
