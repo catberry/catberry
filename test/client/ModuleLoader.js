@@ -98,6 +98,9 @@ describe('client/ModuleLoader', function () {
 					location: '',
 					document: {
 						cookies: ''
+					},
+					navigator: {
+						userAgent: 'test agent'
 					}
 				});
 				locator.registerInstance('templateProvider',
