@@ -176,7 +176,29 @@ ModuleApiProviderBase.prototype.removeListener =
  * @returns {ModuleApiProviderBase} This object for chaining.
  */
 ModuleApiProviderBase.prototype.removeAllListeners = function (eventName) { }
+
+/**
+ * Renders specified template with data.
+ * @param {string} moduleName Name of module, template owner.
+ * @param {string} templateName Name of template.
+ * @param {Object} data Data context for template.
+ * @param {Function} callback Callback on finish.
+ */
+ModuleApiProvider.prototype.render =
+	function (moduleName, templateName, data, callback) { }
 ```
+
+##Rendering on demand
+You can update any placeholder any time using `requestRender` or 
+`requestRefresh` (the same but re-invokes hash event). 
+
+If you need to render placeholder or partial template
+dynamically, maybe for lazy loading or anything else, you can render template
+manually and skip usage of Catberry rendering system.
+For this purpose just use `render` method in context object.
+
+Keep in mind that you can use render on demand only in browser therefore at
+server these methods do nothing.
 
 ##How does work redirect, clear hash and cookies manipulating?
 Since Catberry uses streaming engine to render page, it can not use HTTP headers
