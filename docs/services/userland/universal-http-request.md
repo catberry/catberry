@@ -12,4 +12,3 @@ Read also:
 * [Logger](logger.md)
 * [Config](config.md)
 * [jQuery](jquery.md)
-* [Template Provider](template-provider.md)
