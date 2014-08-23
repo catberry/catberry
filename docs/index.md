@@ -12,7 +12,6 @@
 		* [Logger](services/userland/logger.md)
         * [Config](services/userland/config.md)
         * [jQuery](services/userland/jquery.md)
-        * [Template Provider](services/userland/template-provider.md)
         * [Universal HTTP(S) Request](services/userland/universal-http-request.md)
 * [Routing](routing/index.md)
 	* [URL Route Definition](routing/url-route-definition.md)
