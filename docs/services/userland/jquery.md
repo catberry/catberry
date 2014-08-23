@@ -20,5 +20,4 @@ Read also:
 
 * [Logger](logger.md)
 * [Config](config.md)
-* [Template Provider](template-provider.md)
 * [Universal HTTP(S) Request](universal-http-request.md)

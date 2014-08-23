@@ -10,9 +10,8 @@ All stuff about how to use and what syntax it has you can read [here]
 (https://github.com/linkedin/dustjs-helpers) are included in Catberry.
 
 Placeholder is named by its filename, for example, if file is called `some.dust`
-then placeholder name is `some`. But in some cases, for example using 
-[Template Provider](../services/userland/template-provider.md) you will need 
-a full name. It means if you have module `cat` and its placeholder `paw` then 
+then placeholder name is `some`. But in some cases you will need a full name. 
+It means if you have module `cat` and its placeholder `paw` then 
 full name of placeholder will be `cat_paw`.
  
 Please keep in mind that placeholder name should satisfy regular expression
