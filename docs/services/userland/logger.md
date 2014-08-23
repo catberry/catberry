@@ -56,5 +56,4 @@ Read also:
 
 * [Config](config.md)
 * [jQuery](jquery.md)
-* [Template Provider](template-provider.md)
 * [Universal HTTP(S) Request](universal-http-request.md)
