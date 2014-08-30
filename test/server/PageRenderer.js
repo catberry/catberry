@@ -32,6 +32,7 @@
 
 var assert = require('assert'),
 	events = require('events'),
+	Promise = require('promise'),
 	fs = require('fs'),
 	path = require('path'),
 	HttpResponse = require('../mocks/HttpResponse'),
@@ -99,7 +100,9 @@ function TestModuleLoader(index) {
 	this._index = index;
 }
 TestModuleLoader.prototype._index = -1;
-TestModuleLoader.prototype.loadModules = function (callback) {callback();};
+TestModuleLoader.prototype.loadModules = function () {
+	return Promise.resolve();
+};
 TestModuleLoader.prototype.getModulesByNames = function () {
 	return {
 		main: {

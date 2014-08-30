@@ -80,7 +80,7 @@ describe('server/ModuleLoader', function () {
 			}
 
 			var moduleLoader = createModuleLoader('case1');
-			moduleLoader.loadModules(function (modules) {
+			moduleLoader.loadModules().then(function (modules) {
 				var counter = 0;
 
 				for (var moduleName in modules) {
@@ -97,7 +97,7 @@ describe('server/ModuleLoader', function () {
 		it('should not throw error if module interface is incorrect',
 			function (done) {
 				var moduleLoader = createModuleLoader('case2');
-				moduleLoader.loadModules(function () {
+				moduleLoader.loadModules().then(function () {
 					done();
 				});
 			});
@@ -105,7 +105,7 @@ describe('server/ModuleLoader', function () {
 		it('should skip module folders with wrong module names',
 			function (done) {
 				var moduleLoader = createModuleLoader('case3');
-				moduleLoader.loadModules(function (modules) {
+				moduleLoader.loadModules().then(function (modules) {
 					var counter = 0;
 
 					for (var moduleName in modules) {
@@ -122,7 +122,7 @@ describe('server/ModuleLoader', function () {
 		it('should properly load correct modules', function (done) {
 			var moduleLoader = createModuleLoader('case4');
 
-			moduleLoader.loadModules(function (modules) {
+			moduleLoader.loadModules().then(function (modules) {
 				assert.equal(Object.keys(modules).length, 2,
 					'Not all modules were loaded');
 
