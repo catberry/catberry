@@ -42,7 +42,8 @@
 		"browserify": "^4.0.0",
 		"dustjs-linkedin": "~2.3.5",
 		"dustjs-helpers": "~1.2.0",
-		"log4js": "~0.6.0"
+		"log4js": "~0.6.0",
+		"promise": "^5.0.0"
 	},
 	"devDependencies": {
 		"jsdom": "~0.11.0",
