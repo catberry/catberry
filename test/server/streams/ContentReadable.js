@@ -43,15 +43,15 @@ describe('server/streams/ContentReadable', function () {
 					highWaterMark: 1
 				});
 
-			contentStream.on('data', function (chunk) {
-				assert.equal(chunk.toString(), content[counter]);
-				counter++;
-			});
-
-			contentStream.on('end', function () {
-				assert.equal(counter, content.length);
-				done();
-			});
+			contentStream
+				.on('data', function (chunk) {
+					assert.equal(chunk.toString(), content[counter]);
+					counter++;
+				})
+				.on('end', function () {
+					assert.equal(counter, content.length);
+					done();
+				});
 		});
 
 		it('should properly return all data at first time when buffer is big',
@@ -63,15 +63,15 @@ describe('server/streams/ContentReadable', function () {
 						highWaterMark: 1024
 					});
 
-				contentStream.on('data', function (chunk) {
-					assert.equal(chunk.toString(), content);
-					counter++;
-				});
-
-				contentStream.on('end', function () {
-					assert.equal(counter, 1);
-					done();
-				});
+				contentStream
+					.on('data', function (chunk) {
+						assert.equal(chunk.toString(), content);
+						counter++;
+					})
+					.on('end', function () {
+						assert.equal(counter, 1);
+						done();
+					});
 			});
 	});
 });

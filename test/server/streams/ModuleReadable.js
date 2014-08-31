@@ -32,7 +32,7 @@
 
 var assert = require('assert'),
 	events = require('events'),
-	moduleContextHelper = require('../../../lib/helpers/moduleContextHelper'),
+	moduleHelper = require('../../../lib/helpers/moduleHelper'),
 	ContentStream = require('../../../lib/server/streams/ContentReadable'),
 	CookiesWrapper = require('../../../lib/server/CookiesWrapper'),
 	ServiceLocator = require('catberry-locator'),
@@ -49,9 +49,8 @@ describe('server/streams/ModuleReadable', function () {
 						name: 'test',
 						implementation: {
 							$context: createContext('test'),
-							render: function (name, callback) {
+							render: function () {
 								this.$context.redirect(location);
-								callback();
 							}
 						},
 						placeholders: {
@@ -76,14 +75,14 @@ describe('server/streams/ModuleReadable', function () {
 						module.placeholders.test, parameters, false),
 					result = '';
 
-				moduleReadable.on('data', function (chunk) {
-					result += chunk;
-				});
-
-				moduleReadable.on('end', function () {
-					assert.strictEqual(result, expected);
-					done();
-				});
+				moduleReadable
+					.on('data', function (chunk) {
+						result += chunk;
+					})
+					.on('end', function () {
+						assert.strictEqual(result, expected);
+						done();
+					});
 				moduleReadable.render();
 			});
 
@@ -98,7 +97,7 @@ describe('server/streams/ModuleReadable', function () {
 						name: 'test',
 						implementation: {
 							$context: createContext('test'),
-							render: function (name, callback) {
+							render: function () {
 								this.$context.cookies.set({
 									key: cookie1Name,
 									value: cookie1Value
@@ -107,7 +106,6 @@ describe('server/streams/ModuleReadable', function () {
 									key: cookie2Name,
 									value: cookie2Value
 								});
-								callback();
 							}
 						},
 						placeholders: {
@@ -133,14 +131,14 @@ describe('server/streams/ModuleReadable', function () {
 						module.placeholders.test, parameters, false),
 					result = '';
 
-				moduleReadable.on('data', function (chunk) {
-					result += chunk;
-				});
-
-				moduleReadable.on('end', function () {
-					assert.strictEqual(result, expected);
-					done();
-				});
+				moduleReadable
+					.on('data', function (chunk) {
+						result += chunk;
+					})
+					.on('end', function () {
+						assert.strictEqual(result, expected);
+						done();
+					});
 				moduleReadable.render();
 			});
 
@@ -151,9 +149,8 @@ describe('server/streams/ModuleReadable', function () {
 						name: 'test',
 						implementation: {
 							$context: createContext('test'),
-							render: function (name, callback) {
+							render: function () {
 								this.$context.clearHash();
-								callback();
 							}
 						},
 						placeholders: {
@@ -176,14 +173,14 @@ describe('server/streams/ModuleReadable', function () {
 						module.placeholders.test, parameters, false),
 					result = '';
 
-				moduleReadable.on('data', function (chunk) {
-					result += chunk;
-				});
-
-				moduleReadable.on('end', function () {
-					assert.strictEqual(result, expected);
-					done();
-				});
+				moduleReadable
+					.on('data', function (chunk) {
+						result += chunk;
+					})
+					.on('end', function () {
+						assert.strictEqual(result, expected);
+						done();
+					});
 				moduleReadable.render();
 			});
 	});
@@ -201,7 +198,7 @@ function createRenderingParameters(module) {
 	var placeholdersByIds = {};
 	Object.keys(module.placeholders)
 		.forEach(function (placeholderName) {
-			var id = moduleContextHelper.joinModuleNameAndContext(
+			var id = moduleHelper.joinModuleNameAndContext(
 				module.name, placeholderName);
 			placeholdersByIds[id] = module.placeholders[placeholderName];
 		});

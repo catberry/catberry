@@ -61,13 +61,13 @@ describe('server/streams/SourceFilterTransform', function () {
 
 		var result = '';
 
-		output.on('data', function (chunk) {
-			result += chunk;
-		});
-
-		output.on('end', function () {
-			assert.strictEqual(result, expected);
-			done();
-		});
+		output
+			.on('data', function (chunk) {
+				result += chunk;
+			})
+			.on('end', function () {
+				assert.strictEqual(result, expected);
+				done();
+			});
 	});
 });

@@ -57,14 +57,17 @@ describe('server/streams/ParserDuplex', function () {
 					return new ContentReadable('test' + id);
 				};
 
-				result.on('data', function (chunk) {
-					concat += chunk;
-				});
-
-				result.on('end', function () {
-					assert.strictEqual(concat, expected, 'Wrong HTML content');
-					done();
-				});
+				result
+					.on('data', function (chunk) {
+						concat += chunk;
+					})
+					.on('end', function () {
+						assert.strictEqual(
+							concat,
+							expected,
+							'Wrong HTML content');
+						done();
+					});
 			});
 
 		it('should properly work when tags do not fit in buffer',
@@ -83,14 +86,17 @@ describe('server/streams/ParserDuplex', function () {
 					return new ContentReadable('test' + id);
 				};
 
-				result.on('data', function (chunk) {
-					concat += chunk;
-				});
-
-				result.on('end', function () {
-					assert.strictEqual(concat, expected, 'Wrong HTML content');
-					done();
-				});
+				result
+					.on('data', function (chunk) {
+						concat += chunk;
+					})
+					.on('end', function () {
+						assert.strictEqual(
+							concat,
+							expected,
+							'Wrong HTML content');
+						done();
+					});
 			});
 
 		it('should properly skip HTML comments', function (done) {
@@ -108,14 +114,14 @@ describe('server/streams/ParserDuplex', function () {
 				return new ContentReadable('test' + id);
 			};
 
-			result.on('data', function (chunk) {
-				concat += chunk;
-			});
-
-			result.on('end', function () {
-				assert.strictEqual(concat, expected, 'Wrong HTML content');
-				done();
-			});
+			result
+				.on('data', function (chunk) {
+					concat += chunk;
+				})
+				.on('end', function () {
+					assert.strictEqual(concat, expected, 'Wrong HTML content');
+					done();
+				});
 		});
 
 		it('should ignore incorrect HTML syntax', function (done) {
@@ -133,14 +139,14 @@ describe('server/streams/ParserDuplex', function () {
 				return new ContentReadable('test' + id);
 			};
 
-			result.on('data', function (chunk) {
-				concat += chunk;
-			});
-
-			result.on('end', function () {
-				assert.strictEqual(concat, expected, 'Wrong HTML content');
-				done();
-			});
+			result
+				.on('data', function (chunk) {
+					concat += chunk;
+				})
+				.on('end', function () {
+					assert.strictEqual(concat, expected, 'Wrong HTML content');
+					done();
+				});
 		});
 	});
 });

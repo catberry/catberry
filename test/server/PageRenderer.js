@@ -45,6 +45,8 @@ var assert = require('assert'),
 	eventBus = new events.EventEmitter(),
 	locator = new ServiceLocator();
 
+global.Promise = require('promise');
+
 eventBus.on('error', logger.error);
 
 locator.registerInstance('eventBus', eventBus);
@@ -62,22 +64,24 @@ var testModules = [
 	// fine module
 	{
 		$context: createContext('main'),
-		render: function (placeholderName, callback) {
-			callback(null, {});
+		render: function () {
+			return {};
 		}
 	},
 	// send empty result
 	{
 		$context: createContext('main'),
-		render: function (placeholderName, callback) {
-			callback();
+		render: function () {
+
 		}
 	},
 	// sends error
 	{
 		$context: createContext('main'),
-		render: function (placeholderName, callback) {
-			callback(new Error('test'));
+		render: function () {
+			return new Promise(function (fulfill, reject) {
+				reject(new Error('test'));
+			});
 		}
 	},
 	// throws error
@@ -90,8 +94,10 @@ var testModules = [
 	// async result
 	{
 		$context: createContext('main'),
-		render: function (placeholderName, callback) {
-			setTimeout(callback, 200);
+		render: function () {
+			return new Promise(function (fulfill) {
+				setTimeout(fulfill, 200);
+			});
 		}
 	}
 ];
@@ -125,37 +131,43 @@ TestModuleLoader.prototype.getPlaceholdersByIds = function () {
 	return placeholdersByIds;
 };
 
-function compareWithExpected(caseName, stream, callback) {
+function compareWithExpected(caseName, stream) {
 	var fullPath = path.join(CASES_FOLDER, caseName, 'expected.html'),
 		rendered = '',
 		expected = '';
 
-	stream.on('data', function (chunk) {
-		rendered += chunk.toString();
+	return new Promise(function (fulfill, reject) {
+		stream
+			.on('data', function (chunk) {
+				rendered += chunk.toString();
+			})
+			.on('error', reject)
+			.on('end', function () {
+				fs.createReadStream(fullPath)
+					.on('data', function (chunk) {
+						expected += chunk.toString();
+					})
+					.on('error', reject)
+					.on('end', function () {
+						fulfill(rendered === expected);
+					});
+			});
 	});
 
-	stream.on('end', function () {
-
-		var expectedStream = fs.createReadStream(fullPath);
-		expectedStream.on('data', function (chunk) {
-			expected += chunk.toString();
-		});
-
-		expectedStream.on('end', function () {
-			callback(rendered === expected);
-		});
-	});
 }
 
-function checkIsEmpty(stream, callback) {
+function checkIsEmpty(stream) {
 	var rendered = '';
 
-	stream.on('data', function (chunk) {
-		rendered += chunk.toString();
-	});
-
-	stream.on('end', function () {
-		callback(rendered.length === 0);
+	return new Promise(function (fulfill, reject) {
+		stream
+			.on('data', function (chunk) {
+				rendered += chunk.toString();
+			})
+			.on('error', reject)
+			.on('end', function () {
+				fulfill(rendered.length === 0);
+			});
 	});
 }
 
@@ -199,10 +211,9 @@ function getRendererForModule(index) {
 	return locator.resolveInstance(PageRenderer);
 }
 
-function checkCase(caseName, callback) {
+function checkCase(caseName) {
 	currentPlaceholders = createPlaceholdersForCase(caseName);
-	var checkCounter = 0,
-		pageRenderer1 = getRendererForModule(0),
+	var pageRenderer1 = getRendererForModule(0),
 		pageRenderer2 = getRendererForModule(1),
 		pageRenderer3 = getRendererForModule(2),
 		pageRenderer4 = getRendererForModule(3),
@@ -212,12 +223,6 @@ function checkCase(caseName, callback) {
 		response3 = new HttpResponse(),
 		response4 = new HttpResponse(),
 		response5 = new HttpResponse();
-
-	var callbackInvoker = function () {
-		if (checkCounter === 5) {
-			callback();
-		}
-	};
 
 	var parameters = Object.create(locator.resolve('moduleApiProvider'));
 	parameters.state = {};
@@ -249,56 +254,48 @@ function checkCase(caseName, callback) {
 			assert.fail('Unexpected next middleware call');
 		});
 
-	compareWithExpected(caseName, response1, function (isValid) {
-		assert.strictEqual(isValid, true);
-		checkCounter++;
-		callbackInvoker();
-	});
+	return Promise.all([
+		compareWithExpected(caseName, response1).then(function (isValid) {
+			assert.strictEqual(isValid, true);
+		}),
 
-	checkIsEmpty(response2, function (isEmpty) {
-		assert.strictEqual(isEmpty, false);
-		checkCounter++;
-		callbackInvoker();
-	});
+		checkIsEmpty(response2).then(function (isEmpty) {
+			assert.strictEqual(isEmpty, false);
+		}),
 
-	// must be error description and stack trace
-	checkIsEmpty(response3, function (isEmpty) {
-		assert.strictEqual(isEmpty, false);
-		checkCounter++;
-		callbackInvoker();
-	});
+		// must be error description and stack trace
+		checkIsEmpty(response3).then(function (isEmpty) {
+			assert.strictEqual(isEmpty, false);
+		}),
 
-	// must be error description and stack trace
-	checkIsEmpty(response4, function (isEmpty) {
-		assert.strictEqual(isEmpty, false);
-		checkCounter++;
-		callbackInvoker();
-	});
+		// must be error description and stack trace
+		checkIsEmpty(response4).then(function (isEmpty) {
+			assert.strictEqual(isEmpty, false);
+		}),
 
-	checkIsEmpty(response5, function (isEmpty) {
-		assert.strictEqual(isEmpty, false);
-		checkCounter++;
-		callbackInvoker();
-	});
+		checkIsEmpty(response5).then(function (isEmpty) {
+			assert.strictEqual(isEmpty, false);
+		})
+	]);
 }
 
 describe('server/PageRenderer', function () {
 	describe('#render', function () {
 		it('should properly render nested placeholders', function (done) {
-			checkCase('case1', function () {
+			checkCase('case1').then(function () {
 				done();
 			});
 		});
 
 		it('should properly render sequence of placeholders', function (done) {
-			checkCase('case2', function () {
+			checkCase('case2').then(function () {
 				done();
 			});
 		});
 
 		it('should properly render huge content in placeholder',
 			function (done) {
-				checkCase('case3', function () {
+				checkCase('case3').then(function () {
 					done();
 				});
 			});
