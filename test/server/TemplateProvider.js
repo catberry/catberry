@@ -59,13 +59,14 @@ describe('server/TemplateProvider', function () {
 					{testMessage: 'hello'}),
 				rendered = '';
 
-			templateStream.on('data', function (chunk) {
-				rendered += chunk.toString();
-			});
-			templateStream.on('end', function () {
-				assert.strictEqual(rendered, 'hello', 'Wrong render');
-				done();
-			});
+			templateStream
+				.on('data', function (chunk) {
+					rendered += chunk.toString();
+				})
+				.on('end', function () {
+					assert.strictEqual(rendered, 'hello', 'Wrong render');
+					done();
+				});
 		});
 
 		it('should throw error if template file not found', function () {
