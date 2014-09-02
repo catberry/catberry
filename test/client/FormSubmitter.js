@@ -38,13 +38,15 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	FormSubmitter = require('../../lib/client/FormSubmitter');
 
+global.Promise = require('promise');
+
 describe('client/FormSubmitter', function () {
 	describe('#submit', function () {
 		it('should submit specified form to module', function (done) {
 			var locator = createLocator(),
 				moduleLoader = locator.resolve('moduleLoader'),
 				modules = moduleLoader.getModulesByNames(),
-				form = '<form name="write_some"' +
+				form = '<form id="write-form" name="write_some"' +
 					'data-module="module">' +
 					'<input type="text" name="text" value="test text">' +
 					'<input type="submit" value="Submit">' +
@@ -60,18 +62,35 @@ describe('client/FormSubmitter', function () {
 
 						modules.module.implementation.once('submit',
 							function (args) {
-								assert.strictEqual(args[0], 'write_some',
-									'Wrong form name');
-								assert.strictEqual(args[1].text, 'test text',
-									'Wrong input value');
-								args[2]();
+								var formName = args[0],
+									formArgs = args[1];
+
+								assert.strictEqual(
+									formName, 'write_some', 'Wrong form name'
+								);
+								assert.strictEqual(
+									formArgs.name, 'write_some',
+									'Wrong form name'
+								);
+								assert.strictEqual(
+									formArgs.element.attr('id'),
+									'write-form', 'Wrong form id'
+								);
+								assert.strictEqual(
+									formArgs.moduleName,
+									'module', 'Wrong module name'
+								);
+								assert.strictEqual(
+									formArgs.values.text,
+									'test text', 'Wrong input value'
+								);
 							});
-						formSubmitter.submit($('form[name="write_some"]'),
-							function (error) {
-								if (error) {
-									assert.fail(error);
-								}
+						formSubmitter.submit($('form[name="write_some"]'))
+							.then(function () {
 								done();
+							},
+							function (error) {
+								done(error);
 							});
 					});
 				}
@@ -100,13 +119,20 @@ describe('client/FormSubmitter', function () {
 								assert.fail('module should not submit data');
 							});
 						modules.moduleWithError.implementation
-							.once('submit', function (args) {
-								args[2](new Error());
+							.once('submit', function () {
+								throw new Error('test');
 							});
-						formSubmitter.submit($('form[name="write_some"]'),
+						formSubmitter.submit($('form[name="write_some"]'))
+							.then(function () {
+								assert.fail('Should be error');
+								done();
+							},
 							function (error) {
-								assert.equal(error instanceof Error, true,
-									'Should be error');
+								assert.strictEqual(
+										error instanceof Error, true,
+									'Should be error'
+								);
+								assert.strictEqual(error.message, 'test');
 								done();
 							});
 					});
@@ -117,7 +143,6 @@ describe('client/FormSubmitter', function () {
 			function (done) {
 				var locator = createLocator(),
 					moduleLoader = locator.resolve('moduleLoader'),
-					modules = moduleLoader.getModulesByNames(),
 					apiProvider = locator.resolve('moduleApiProvider'),
 					form = '<form name="write_some"' +
 						'data-module="module" ' +
@@ -142,11 +167,6 @@ describe('client/FormSubmitter', function () {
 							var formSubmitter =
 								locator.resolveInstance(FormSubmitter);
 
-							modules.module.implementation.once('submit',
-								function (args) {
-									args[2]();
-								});
-
 							apiProvider.once('requestRefresh', function (args) {
 								assert.strictEqual(args[0],
 									'module',
@@ -162,18 +182,15 @@ describe('client/FormSubmitter', function () {
 										assert.strictEqual(args[1],
 											'second',
 											'Wrong placeholder name');
-										args[2]();
 									});
-								args[2]();
 							});
 
-							formSubmitter.submit(
-								$('form[name="write_some"]'),
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
+							formSubmitter.submit($('form[name="write_some"]'))
+								.then(function () {
 									done();
+								},
+								function (error) {
+									done(error);
 								});
 						});
 					}

@@ -40,6 +40,8 @@ var assert = require('assert'),
 	CookiesWrapper = require('../../lib/client/CookiesWrapper'),
 	ModuleLoader = require('../../lib/client/ModuleLoader');
 
+global.Promise = require('promise');
+
 function Module1() {}
 function Module2() {}
 
@@ -89,6 +91,7 @@ var placeholders = [
 describe('client/ModuleLoader', function () {
 	describe('#getModulesByNames', function () {
 		it('should load all modules and placeholders from Service Locator',
+			/*jshint maxstatements:false */
 			function () {
 				var locator = new ServiceLocator();
 				locator.registerInstance('serviceLocator', locator);
@@ -168,8 +171,15 @@ describe('client/ModuleLoader', function () {
 					'placeholder1', 'Wrong placeholder name');
 				assert.strictEqual(module1Placeholders.placeholder2.name,
 					'placeholder2', 'Wrong placeholder name');
+				assert.strictEqual(module1Placeholders.placeholder1.fullName,
+					'module1_placeholder1', 'Wrong placeholder full name');
+				assert.strictEqual(module1Placeholders.placeholder2.fullName,
+					'module1_placeholder2', 'Wrong placeholder full name');
 				assert.strictEqual(modulesByNames.module1.errorPlaceholder.name,
 					'__error', 'Wrong placeholder name');
+				assert.strictEqual(
+					modulesByNames.module1.errorPlaceholder.fullName,
+					'module1___error', 'Wrong placeholder full name');
 				assert.strictEqual(module1Placeholders.placeholder1.moduleName,
 					'module1', 'Wrong module name');
 				assert.strictEqual(module1Placeholders.placeholder2.moduleName,
@@ -179,18 +189,18 @@ describe('client/ModuleLoader', function () {
 					'module1', 'Wrong module name');
 				assert.strictEqual(
 						module1Placeholders.placeholder1
-							.getTemplateStream instanceof Function, true,
-					'Placeholder should have getTemplateStream method'
+							.render instanceof Function, true,
+					'Placeholder should have render method'
 				);
 				assert.strictEqual(
 						module1Placeholders.placeholder2
-							.getTemplateStream instanceof Function, true,
-					'Placeholder should have getTemplateStream method'
+							.render instanceof Function, true,
+					'Placeholder should have render method'
 				);
 				assert.strictEqual(
 						modulesByNames.module1.errorPlaceholder
-							.getTemplateStream instanceof Function, true,
-					'Placeholder should have getTemplateStream method'
+							.render instanceof Function, true,
+					'Placeholder should have render method'
 				);
 
 				// check module 1 placeholders
@@ -217,19 +227,23 @@ describe('client/ModuleLoader', function () {
 					'placeholder1', 'Wrong placeholder name');
 				assert.strictEqual(module2Placeholders.placeholder2.name,
 					'placeholder2', 'Wrong placeholder name');
+				assert.strictEqual(module2Placeholders.placeholder1.fullName,
+					'module2_placeholder1', 'Wrong placeholder full name');
+				assert.strictEqual(module2Placeholders.placeholder2.fullName,
+					'module2_placeholder2', 'Wrong placeholder full name');
 				assert.strictEqual(module2Placeholders.placeholder1.moduleName,
 					'module2', 'Wrong module name');
 				assert.strictEqual(module2Placeholders.placeholder2.moduleName,
 					'module2', 'Wrong module name');
 				assert.strictEqual(
 						module2Placeholders.placeholder1
-							.getTemplateStream instanceof Function, true,
-					'Placeholder should have getTemplateStream method'
+							.render instanceof Function, true,
+					'Placeholder should have render method'
 				);
 				assert.strictEqual(
 						module2Placeholders.placeholder2
-							.getTemplateStream instanceof Function, true,
-					'Placeholder should have getTemplateStream method'
+							.render instanceof Function, true,
+					'Placeholder should have render method'
 				);
 			});
 	});

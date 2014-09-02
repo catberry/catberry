@@ -39,6 +39,8 @@ var assert = require('assert'),
 	fs = require('fs'),
 	TemplateProvider = require('../../lib/server/TemplateProvider');
 
+global.Promise = require('promise');
+
 var templatePath = path.join(__dirname, '..',
 	'cases', 'server', 'TemplateProvider', 'case1', 'test.dust');
 

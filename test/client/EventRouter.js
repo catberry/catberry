@@ -37,6 +37,8 @@ var assert = require('assert'),
 	EventRouter = require('../../lib/client/EventRouter'),
 	ServiceLocator = require('catberry-locator');
 
+global.Promise = require('promise');
+
 describe('client/EventRouter', function () {
 	describe('#route', function () {
 
@@ -54,14 +56,29 @@ describe('client/EventRouter', function () {
 					assert.fail('Second module should not receive anything');
 				});
 				modules.module.implementation.once('handle', function (args) {
-					assert.strictEqual(args[0], 'testEvent',
-						'Wrong event name');
-					assert.strictEqual(args[1], true);
-					assert.strictEqual(Object.keys(args[2]).length, 0);
-					done();
+					var eventName = args[0],
+						event = args[1];
+					assert.strictEqual(
+						eventName, 'testEvent', 'Wrong event name'
+					);
+					assert.strictEqual(
+						event.name, 'testEvent', 'Wrong event name'
+					);
+					assert.strictEqual(
+						event.string, 'someTestEvent', 'Wrong event name'
+					);
+					assert.strictEqual(event.isEnding, false);
+					assert.strictEqual(event.isHashChanging, true);
+					assert.strictEqual(Object.keys(event.args).length, 0);
 				});
 
-				eventRouter.routeHashChange('someTestEvent');
+				eventRouter.routeHashChange('someTestEvent')
+					.then(function () {
+						done();
+					},
+					function (error) {
+						done(error);
+					});
 			});
 
 		it('should route event end to module when new event is coming',
@@ -77,45 +94,59 @@ describe('client/EventRouter', function () {
 					assert.fail('Second module should not receive anything');
 				});
 
-				var first = function () {
-					modules.module.implementation.once('handle',
-						function (args) {
-							assert.strictEqual(args[0], 'testEvent',
-								'Wrong event name');
-							assert.strictEqual(args[1], true);
-							assert.strictEqual(args[2].number, '1');
-							args[3]();
-							second();
-						});
-					eventRouter.routeHashChange('someTestEvent1');
+				var nameValidator = function (eventName, event) {
+					assert.strictEqual(
+						eventName, 'testEvent', 'Wrong event name'
+					);
+					assert.strictEqual(
+						event.name, 'testEvent', 'Wrong event name'
+					);
 				};
 
-				var second = function () {
-					modules.module.implementation.once('handle',
-						function (args) {
-							assert.strictEqual(args[0], 'testEvent',
-								'Wrong event name');
-							assert.strictEqual(args[1], false);
-							assert.strictEqual(args[2].number, '1');
-							third();
-							args[3]();
-						});
-					eventRouter.routeHashChange('someTestEvent2');
-				};
+				Promise.resolve()
+					.then(function () {
+						modules.module.implementation.once('handle',
+							function (args) {
+								var eventName = args[0],
+									event = args[1];
 
-				var third = function () {
-					modules.module.implementation.once('handle',
-						function (args) {
-							assert.strictEqual(args[0], 'testEvent',
-								'Wrong event name');
-							assert.strictEqual(args[1], true);
-							assert.strictEqual(args[2].number, '2');
-							args[3]();
-							done();
-						});
-				};
+								nameValidator(eventName, event);
+								assert.strictEqual(event.isEnding, false);
+								assert.strictEqual(event.isHashChanging, true);
+								assert.strictEqual(event.args.number, '1');
+							});
+						return eventRouter.routeHashChange('someTestEvent1');
+					})
+					.then(function () {
+						modules.module.implementation.once('handle',
+							function (args) {
+								var eventName = args[0],
+									event = args[1];
 
-				first();
+								nameValidator(eventName, event);
+								assert.strictEqual(event.isEnding, true);
+								assert.strictEqual(event.isHashChanging, true);
+								assert.strictEqual(event.args.number, '1');
+							});
+						return eventRouter.routeHashChange('someTestEvent2');
+					})
+					.then(function () {
+						modules.module.implementation.once('handle',
+							function (args) {
+								var eventName = args[0],
+									event = args[1];
+
+								nameValidator(eventName, event);
+								assert.strictEqual(event.isEnding, false);
+								assert.strictEqual(event.isHashChanging, true);
+								assert.strictEqual(event.args.number, '2');
+							});
+					})
+					.then(function () {
+						done();
+					}, function (error) {
+						done(error);
+					});
 			});
 
 		it('should route event end when new event name is "undefined"',
@@ -131,30 +162,51 @@ describe('client/EventRouter', function () {
 					assert.fail('Second module should not receive anything');
 				});
 
-				var first = function () {
-					modules.module.implementation.once('handle',
-						function (args) {
-							assert.strictEqual(args[0], 'testEvent',
-								'Wrong event name');
-							assert.strictEqual(args[1], true);
-							assert.strictEqual(Object.keys(args[2]).length, 0);
-							second();
-							args[3]();
-						});
-					eventRouter.routeHashChange('someTestEvent');
+				var nameValidator = function (eventName, event) {
+					assert.strictEqual(
+						eventName, 'testEvent', 'Wrong event name'
+					);
+					assert.strictEqual(
+						event.name, 'testEvent', 'Wrong event name'
+					);
 				};
-				var second = function () {
-					modules.module.implementation.once('handle',
-						function (args) {
-							assert.strictEqual(args[0], 'testEvent',
-								'Wrong event name');
-							assert.strictEqual(args[1], false);
-							assert.strictEqual(Object.keys(args[2]).length, 0);
-							done();
-						});
-					eventRouter.routeHashChange(undefined);
-				};
-				first();
+
+				Promise.resolve()
+					.then(function () {
+						modules.module.implementation.once('handle',
+							function (args) {
+								var eventName = args[0],
+									event = args[1];
+
+								nameValidator(eventName, event);
+								assert.strictEqual(event.isEnding, false);
+								assert.strictEqual(event.isHashChanging, true);
+								assert.strictEqual(
+									Object.keys(event.args).length, 0
+								);
+							});
+						return eventRouter.routeHashChange('someTestEvent');
+					})
+					.then(function () {
+						modules.module.implementation.once('handle',
+							function (args) {
+								var eventName = args[0],
+									event = args[1];
+
+								nameValidator(eventName, event);
+								assert.strictEqual(event.isEnding, true);
+								assert.strictEqual(event.isHashChanging, true);
+								assert.strictEqual(
+									Object.keys(event.args).length, 0
+								);
+							});
+						return eventRouter.routeHashChange(undefined);
+					})
+					.then(function () {
+						done();
+					}, function (error) {
+						done(error);
+					});
 			});
 
 		it('should do nothing if previous and new event is "undefined"',
@@ -174,8 +226,12 @@ describe('client/EventRouter', function () {
 					assert.fail('Should not do anything');
 				});
 
-				eventRouter.routeHashChange(undefined);
-				setTimeout(done, 100);
+				eventRouter.routeHashChange(undefined)
+					.then(function () {
+						done();
+					}, function (error) {
+						done(error);
+					});
 			});
 
 		it('should send event start to several modules',
@@ -186,29 +242,43 @@ describe('client/EventRouter', function () {
 				locator.registerInstance('eventDefinition',
 					'someTestEvent:number->testEvent[module, module2]');
 				var eventRouter = locator.resolveInstance(EventRouter),
-					counter = 0;
+					invoked = {},
+					validator = function (moduleName, args) {
+						var eventName = args[0],
+							event = args[1];
 
-				modules.module2.implementation.once('handle', function (args) {
-					assert.strictEqual(args[0], 'testEvent',
-						'Wrong event name');
-					assert.strictEqual(args[1], true);
-					assert.strictEqual(args[2].number, '1');
-					if (++counter === 2) {
+						assert.strictEqual(
+							eventName, 'testEvent', 'Wrong event name'
+						);
+						assert.strictEqual(
+							event.name, 'testEvent', 'Wrong event name'
+						);
+						assert.strictEqual(event.isEnding, false);
+						assert.strictEqual(event.isHashChanging, true);
+						assert.strictEqual(event.args.number, '1');
+						if (!(moduleName in invoked)) {
+							invoked[moduleName] = 0;
+						}
+						invoked[moduleName]++;
+					};
+
+				modules.module.implementation.once(
+					'handle',
+					validator.bind(modules.module.implementation, 'module')
+				);
+				modules.module2.implementation.once(
+					'handle',
+					validator.bind(modules.module2.implementation, 'module2')
+				);
+
+				eventRouter.routeHashChange('someTestEvent1')
+					.then(function () {
+						assert.strictEqual(invoked.module, 1);
+						assert.strictEqual(invoked.module2, 1);
 						done();
-					}
-					args[3]();
-				});
-				modules.module.implementation.once('handle', function (args) {
-					assert.strictEqual(args[0], 'testEvent',
-						'Wrong event name');
-					assert.strictEqual(args[1], true);
-					assert.strictEqual(args[2].number, '1');
-					if (++counter === 2) {
-						done();
-					}
-					args[3]();
-				});
-				eventRouter.routeHashChange('someTestEvent1');
+					}, function (error) {
+						done(error);
+					});
 			});
 	});
 });
