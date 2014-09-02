@@ -30,4 +30,57 @@
 
 'use strict';
 
-module.exports = require('./lib/Bootstrapper');
+module.exports = Catberry;
+
+var util = require('util'),
+	CatberryBase = require('../lib/base/CatberryBase'),
+	ServiceLocator = require('catberry-locator');
+
+var INLINE_SCRIPTS_CLASS = 'catberry-inline-script';
+
+util.inherits(Catberry, CatberryBase);
+
+/**
+ * Creates new instance of client-side catberry.
+ * @constructor
+ * @extends CatberryBase
+ */
+function Catberry() {
+	CatberryBase.call(this);
+}
+
+/**
+ * Current request router.
+ * @type {RequestRouter}
+ * @private
+ */
+Catberry.prototype._router = null;
+
+/**
+ * Wraps current HTML document with catberry event handlers.
+ */
+Catberry.prototype.wrapDocument = function () {
+	this._router = this.locator.resolve('requestRouter');
+};
+
+/**
+ * Starts catberry application when document is ready.
+ * @returns {Promise} Promise for nothing.
+ */
+Catberry.prototype.startWhenReady = function () {
+	if (window.catberry) {
+		return Promise.resolve();
+	}
+	var self = this,
+		jQuery = this.locator.resolve('jQuery');
+	// for jQuery plugins
+	window.jQuery = window.$ = jQuery;
+	return new Promise(function (fulfill) {
+		jQuery(function () {
+			jQuery('.' + INLINE_SCRIPTS_CLASS).remove();
+			self.wrapDocument();
+			window.catberry = self;
+			fulfill();
+		});
+	});
+};
