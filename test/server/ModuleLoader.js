@@ -41,7 +41,7 @@ var assert = require('assert'),
 	ModuleFinder = require('../../lib/server/ModuleFinder'),
 	ModuleLoader = require('../../lib/server/ModuleLoader');
 
-global.Promise = require('promise/core');
+global.Promise = require('promise');
 
 var CASES_DIRECTORY = path.join(__dirname, '..', 'cases',
 	'server', 'ModuleLoader');

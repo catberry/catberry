@@ -35,7 +35,6 @@ var assert = require('assert'),
 	jsdom = require('jsdom'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	ModuleLoaderMock = require('../mocks/ModuleLoader'),
-	ContentReadable = require('../../lib/server/streams/ContentReadable'),
 	Logger = require('../mocks/Logger'),
 	PageRenderer = require('../../lib/client/PageRenderer'),
 	StateProvider = require('../../lib/StateProvider'),
@@ -51,10 +50,11 @@ describe('client/PageRenderer', function () {
 					moduleLoader = locator.resolve('moduleLoader'),
 					modules = moduleLoader.getModulesByNames();
 
-				modules.module.implementation.once('render', function (args) {
-					assert.strictEqual(args[0], 'first');
-					args[1](null, {data: 'test1'});
-				});
+				modules.module.implementation.decorateMethod('render',
+					function (name) {
+						assert.strictEqual(name, 'first');
+						return {data: 'test1'};
+					});
 
 				jsdom.env({
 					html: page,
@@ -64,7 +64,6 @@ describe('client/PageRenderer', function () {
 						$(function () {
 							var pageRenderer = locator
 									.resolveInstance(PageRenderer),
-								rendered = {},
 								renderingParameters = {
 									state: {
 										module: {
@@ -74,20 +73,25 @@ describe('client/PageRenderer', function () {
 								};
 							pageRenderer.renderPlaceholder(
 								modules.module.placeholders.first,
-								renderingParameters,
-								rendered,
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
+								renderingParameters
+							)
+								.then(function (context) {
 									assert.strictEqual(
-										Object.keys(rendered).length, 1);
+										Object.keys(context.rendered).length, 1
+									);
 									assert.strictEqual(
-											'module_first' in rendered, true);
+											'module_first' in context.rendered,
+										true
+									);
 									assert.strictEqual(
 										window.document.body.innerHTML,
-										expected);
+										expected
+									);
+								})
+								.then(function () {
 									done();
+								}, function (error) {
+									done(error);
 								});
 						});
 					}
@@ -208,14 +212,15 @@ describe('client/PageRenderer', function () {
 					locator = createLocator(),
 					moduleLoader = locator.resolve('moduleLoader'),
 					modules = moduleLoader.getModulesByNames(),
-					context = {};
+					dataContext = {};
 
-				modules.module.implementation.on('render', function (args) {
-					context[args[0]] = {
-						data: args[0] === 'first' ? 'test1' : 'test2'
-					};
-					args[1](null, context[args[0]]);
-				});
+				modules.module.implementation.decorateMethod('render',
+					function (name) {
+						dataContext[name] = {
+							data: name === 'first' ? 'test1' : 'test2'
+						};
+						return dataContext[name];
+					});
 
 				jsdom.env({
 					html: page,
@@ -225,37 +230,47 @@ describe('client/PageRenderer', function () {
 						$(function () {
 							var pageRenderer = locator
 									.resolveInstance(PageRenderer),
-								rendered = {};
-							var renderingParameters = {
-								module: {
-									first: 'test1',
-									second: 'test2'
-								}
-							};
+								renderingParameters = {
+									module: {
+										first: 'test1',
+										second: 'test2'
+									}
+								};
 							pageRenderer.renderPlaceholder(
 								modules.module.placeholders.second,
-								renderingParameters,
-								rendered,
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
+								renderingParameters
+							)
+								.then(function (context) {
 									assert.strictEqual(
-										Object.keys(rendered).length, 2);
+										Object.keys(context.rendered).length, 2
+									);
 									assert.strictEqual(
-											'module_first' in rendered, true);
+											'module_first' in context.rendered,
+										true
+									);
 									assert.strictEqual(
-											'module_second' in rendered, true);
+											'module_second' in context.rendered,
+										true
+									);
 									assert.deepEqual(
-										context.first, {data: 'test1'});
+										dataContext.first, {data: 'test1'}
+									);
 									assert.deepEqual(
-										context.second, {data: 'test2'});
+										dataContext.second, {data: 'test2'}
+									);
 									assert.strictEqual(
-											'module_second' in rendered, true);
+											'module_second' in context.rendered,
+										true
+									);
 									assert.strictEqual(
 										window.document.body.innerHTML,
-										expected);
+										expected
+									);
+								})
+								.then(function () {
 									done();
+								}, function (error) {
+									done(error);
 								});
 						});
 					}
@@ -270,9 +285,9 @@ describe('client/PageRenderer', function () {
 					moduleLoader = locator.resolve('moduleLoader'),
 					modules = moduleLoader.getModulesByNames();
 
-				modules.moduleWithError.implementation.once('render',
-					function (args) {
-						args[1](new Error());
+				modules.moduleWithError.implementation.decorateMethod('render',
+					function () {
+						throw new Error();
 					});
 
 				jsdom.env({
@@ -285,30 +300,35 @@ describe('client/PageRenderer', function () {
 									PageRenderer, {
 										isRelease: true
 									}),
-								rendered = {};
-							var renderingParameters = {
-								state: {
-									moduleWithError: {
-										first: 'test1'
+								renderingParameters = {
+									state: {
+										moduleWithError: {
+											first: 'test1'
+										}
 									}
-								}
-							};
+								};
 							pageRenderer.renderPlaceholder(
 								modules.moduleWithError.placeholders.first,
-								renderingParameters, rendered,
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
+								renderingParameters
+							)
+								.then(function (context) {
 									assert.strictEqual(
-										Object.keys(rendered).length, 1);
+										Object.keys(context.rendered).length, 1
+									);
 									assert.strictEqual(
-											'moduleWithError_first' in rendered,
-										true);
+											'moduleWithError' +
+											'_first' in context.rendered,
+										true
+									);
 									assert.strictEqual(
 										window.document.body.innerHTML,
-										expected);
+										expected
+									);
+								})
+								.then(function () {
 									done();
+								}, function (error) {
+									done(error);
 								});
 						});
 					}
@@ -343,7 +363,6 @@ describe('client/PageRenderer', function () {
 									PageRenderer, {
 										isRelease: true
 									}),
-								rendered = {},
 								renderingParameters = {
 									state: {
 										moduleWithError: {
@@ -353,20 +372,26 @@ describe('client/PageRenderer', function () {
 								};
 							pageRenderer.renderPlaceholder(
 								modules.moduleWithError.placeholders.first,
-								renderingParameters, rendered,
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
+								renderingParameters
+							)
+								.then(function (context) {
 									assert.strictEqual(
-										Object.keys(rendered).length, 1);
+										Object.keys(context.rendered).length, 1
+									);
 									assert.strictEqual(
-											'moduleWithError_first' in rendered,
-										true);
+											'moduleWithError' +
+											'_first' in context.rendered,
+										true
+									);
 									assert.strictEqual(
 										window.document.body.innerHTML,
-										expected);
+										expected
+									);
+								})
+								.then(function () {
 									done();
+								}, function (error) {
+									done(error);
 								});
 						});
 					}
@@ -374,7 +399,7 @@ describe('client/PageRenderer', function () {
 			});
 	});
 
-	describe('#renderModule', function () {
+	describe('#render', function () {
 		it('should render module\'s placeholders in nesting order',
 			function (done) {
 				var page = '<div id="module2_second"></div>',
@@ -387,18 +412,19 @@ describe('client/PageRenderer', function () {
 					modules = moduleLoader.getModulesByNames(),
 					order = [];
 
-				modules.module.implementation.on('render',
-					function (args) {
-						order.push('module_' + args[0]);
-						args[1](null, {
+				modules.module.implementation.decorateMethod('render',
+					function (name) {
+						order.push('module_' + name);
+						return Promise.resolve({
 							data: 'test3'
 						});
 					});
-				modules.module2.implementation.on('render',
-					function (args) {
-						order.push('module2_' + args[0]);
-						args[1](null, {
-							data: args[0] === 'first' ? 'test2' : 'test1'
+
+				modules.module2.implementation.decorateMethod('render',
+					function (name) {
+						order.push('module2_' + name);
+						return Promise.resolve({
+							data: name === 'first' ? 'test2' : 'test1'
 						});
 					});
 
@@ -410,7 +436,6 @@ describe('client/PageRenderer', function () {
 						$(function () {
 							var pageRenderer = locator
 									.resolveInstance(PageRenderer),
-								rendered = {},
 								renderingParameters = {
 									state: {
 										module: {
@@ -423,128 +448,33 @@ describe('client/PageRenderer', function () {
 									}
 								};
 
-							pageRenderer.renderModule(
-								modules.module2,
-								renderingParameters,
-								renderingParameters.state,
-								rendered,
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
-									assert.strictEqual(
-										Object.keys(rendered).length, 3);
+							pageRenderer.render(renderingParameters)
+								.then(function () {
 									assert.strictEqual(order.length, 3);
 									assert.strictEqual(
-											'module2_second' in rendered, true);
+										order[0], 'module2_second'
+									);
 									assert.strictEqual(
-											'module2_first' in rendered, true);
+										order[1], 'module2_first'
+									);
 									assert.strictEqual(
-											'module_first' in rendered, true);
-									assert.strictEqual(order[0],
-										'module2_second');
-									assert.strictEqual(order[1],
-										'module2_first');
-									assert.strictEqual(order[2],
-										'module_first');
+										order[2], 'module_first'
+									);
 									assert.strictEqual(
 										window.document.body.innerHTML,
-										expected);
+										expected
+									);
+								})
+								.then(function () {
 									done();
+								}, function (error) {
+									done(error);
 								});
 						});
 					}
 				});
 			});
 
-		it('should re-render module\'s placeholders in nesting order',
-			function (done) {
-				var page = '<div id="module2_second">dummy' +
-						'<div id="module2_first">dummy' +
-						'<div id="module_first">dummy' +
-						'</div></div></div>',
-					expected = '<div id="module2_second">test1' +
-						'<div id="module2_first">test2' +
-						'<div id="module_first">test3' +
-						'</div></div></div>',
-					locator = createLocator(),
-					moduleLoader = locator.resolve('moduleLoader'),
-					modules = moduleLoader.getModulesByNames(),
-					order = [];
-
-				modules.module.implementation.on('render',
-					function (args) {
-						order.push('module_' + args[0]);
-						args[1](null, {
-							data: 'test3'
-						});
-					});
-
-				modules.module2.implementation.on('render',
-					function (args) {
-						order.push('module2_' + args[0]);
-						args[1](null, {
-							data: args[0] === 'first' ? 'test2' : 'test1'
-						});
-					});
-
-				jsdom.env({
-					html: page,
-					done: function (errors, window) {
-						prepareWindow(window, locator);
-						var $ = locator.resolve('jQuery');
-						$(function () {
-							var pageRenderer = locator.resolveInstance(PageRenderer),
-								rendered = {},
-								renderingParameters = {
-									state: {
-										module: {
-											first: 'test3'
-										},
-										module2: {
-											first: 'test2',
-											second: 'test1'
-										}
-									}
-								};
-
-							pageRenderer.renderModule(
-								modules.module2,
-								renderingParameters,
-								renderingParameters.state,
-								rendered,
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
-									assert.strictEqual(
-										Object.keys(rendered).length, 3);
-									assert.strictEqual(order.length, 3);
-									assert.strictEqual(
-											'module2_second' in rendered, true);
-									assert.strictEqual(
-											'module2_first' in rendered, true);
-									assert.strictEqual(
-											'module_first' in rendered, true);
-									assert.strictEqual(order[0],
-										'module2_second');
-									assert.strictEqual(order[1],
-										'module2_first');
-									assert.strictEqual(order[2],
-										'module_first');
-
-									assert.strictEqual(
-										window.document.body.innerHTML,
-										expected);
-									done();
-								});
-						});
-					}
-				});
-			});
-	});
-
-	describe('#render', function () {
 		it('should re-render module\'s placeholders only for changed parameters',
 			function (done) {
 				var page = '<div id="module2_second">dummy' +
@@ -560,22 +490,21 @@ describe('client/PageRenderer', function () {
 					modules = moduleLoader.getModulesByNames(),
 					order = [];
 
-				modules.module.implementation.on('render',
-					function (args) {
-						order.push('module_' + args[0]);
-						args[1](null, {
+				modules.module.implementation.decorateMethod('render',
+					function (name) {
+						order.push('module_' + name);
+						return Promise.resolve({
 							data: 'test3'
 						});
 					});
 
-				modules.module2.implementation.on('render',
-					function (args) {
-						order.push('module2_' + args[0]);
-						args[1](null, {
-							data: args[0] === 'first' ? 'test2' : 'test1'
+				modules.module2.implementation.decorateMethod('render',
+					function (name) {
+						order.push('module2_' + name);
+						return Promise.resolve({
+							data: name === 'first' ? 'test2' : 'test1'
 						});
 					});
-
 				jsdom.env({
 					html: page,
 					done: function (errors, window) {
@@ -592,11 +521,8 @@ describe('client/PageRenderer', function () {
 									}
 								};
 
-							pageRenderer.render(renderingParameters,
-								function (error) {
-									if (error) {
-										assert.fail(error);
-									}
+							pageRenderer.render(renderingParameters)
+								.then(function () {
 									assert.strictEqual(order.length, 1);
 									assert.strictEqual(order[0],
 										'module_first');
@@ -605,17 +531,21 @@ describe('client/PageRenderer', function () {
 										expected);
 
 									order = [];
-									pageRenderer.render(renderingParameters,
-										function (error) {
-											if (error) {
-												assert.fail(error);
-											}
-											assert.strictEqual(order.length, 0);
-											assert.strictEqual(
-												window.document.body.innerHTML,
-												expected);
-											done();
-										});
+									return pageRenderer.render(
+										renderingParameters
+									);
+								})
+								.then(function () {
+									assert.strictEqual(order.length, 0);
+									assert.strictEqual(
+										window.document.body.innerHTML,
+										expected
+									);
+								})
+								.then(function () {
+									done();
+								}, function (error) {
+									done(error);
 								});
 						});
 					}
@@ -678,17 +608,20 @@ function createModules() {
 			placeholders: {
 				first: {
 					name: 'first',
+					fullName: 'module_first',
 					moduleName: 'module',
-					getTemplateStream: function (context) {
-						return new ContentReadable(context.data);
+					render: function (context) {
+						return Promise.resolve(context.data);
 					}
 				},
 				second: {
 					name: 'second',
+					fullName: 'module_second',
 					moduleName: 'module',
-					getTemplateStream: function (context) {
-						var content = context.data + '<div id="module_first">';
-						return new ContentReadable(content);
+					render: function (context) {
+						return Promise.resolve(
+								context.data + '<div id="module_first">'
+						);
 					}
 				}
 			}
@@ -699,18 +632,22 @@ function createModules() {
 			placeholders: {
 				first: {
 					name: 'first',
+					fullName: 'module2_first',
 					moduleName: 'module2',
-					getTemplateStream: function (context) {
-						var content = context.data + '<div id="module_first">';
-						return new ContentReadable(content);
+					render: function (context) {
+						return Promise.resolve(
+								context.data + '<div id="module_first">'
+						);
 					}
 				},
 				second: {
 					name: 'second',
+					fullName: 'module2_second',
 					moduleName: 'module2',
-					getTemplateStream: function (context) {
-						var content = context.data + '<div id="module2_first">';
-						return new ContentReadable(content);
+					render: function (context) {
+						return Promise.resolve(
+								context.data + '<div id="module2_first">'
+						);
 					}
 				}
 			}
@@ -721,16 +658,18 @@ function createModules() {
 			placeholders: {
 				first: {
 					name: 'first',
+					fullName: 'moduleWithError_first',
 					moduleName: 'moduleWithError',
-					getTemplateStream: function () {
-						throw new Error('stream');
+					render: function () {
+						return Promise.reject(new Error('content'));
 					}
 				},
 				__error: {
 					name: '_lastError',
+					fullName: 'moduleWithError__lastError',
 					moduleName: 'moduleWithError',
-					getTemplateStream: function () {
-						return new ContentReadable('error placeholder');
+					render: function () {
+						return Promise.resolve('error placeholder');
 					}
 				}
 			}

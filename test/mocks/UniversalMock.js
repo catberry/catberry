@@ -33,6 +33,7 @@
 module.exports = UniversalMock;
 
 var util = require('util'),
+	Promise = require('promise/core'),
 	events = require('events');
 
 util.inherits(UniversalMock, events.EventEmitter);
@@ -44,6 +45,18 @@ function UniversalMock(methodNames) {
 	methodNames.forEach(function (name) {
 		self[name] = function () {
 			self.emit(name, arguments);
+			return Promise.resolve();
 		};
 	});
 }
+
+UniversalMock.prototype.decorateMethod = function (name, method) {
+	var old = this[name];
+	if (typeof(old) !== 'function') {
+		return;
+	}
+	this[name] = function () {
+		old();
+		return method.apply(this, arguments);
+	};
+};

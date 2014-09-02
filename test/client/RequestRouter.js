@@ -105,47 +105,60 @@ describe('client/RequestRouter', function () {
 								window.location.assign('http://local/some');
 								locator.resolveInstance(RequestRouter);
 
-								var first = function () {
+								new Promise(function (fulfill) {
 									eventRouter.once('routeHashChange',
 										function (args) {
-											assert.strictEqual(args[0],
-												'test1');
-											second();
+											assert.strictEqual(
+												args[0], 'test1'
+											);
+											fulfill();
 										});
 
 									// first set hash to test1
-									window.location
-										.assign('http://local/some#test1');
+									window.location.assign(
+										'http://local/some#test1'
+									);
 									$(window).trigger('hashchange');
-								};
+								})
+									.then(function () {
+										return new Promise(function (fulfill) {
+											eventRouter.once('routeHashChange',
+												function (args) {
+													assert.strictEqual(
+														args[0], 'test2'
+													);
+													fulfill();
+												});
 
-								var second = function () {
-									eventRouter.once('routeHashChange',
-										function (args) {
-											assert.strictEqual(args[0],
-												'test2');
-											third();
+											// second set to test2
+											window.location.assign(
+												'http://local/some#test2'
+											);
+											$(window).trigger('hashchange');
+
+										});
+									})
+									.then(function () {
+										return new Promise(function (fulfill) {
+											eventRouter.once('routeHashChange',
+												function (args) {
+													assert.strictEqual(
+														args[0], ''
+													);
+													fulfill();
+												});
 											// at last remove any hash
-											window.location
-												.assign('http://local/some');
+											window.location.assign(
+												'http://local/some'
+											);
 											$(window).trigger('hashchange');
 										});
-
-									// second set to test2
-									window.location
-										.assign('http://local/some#test2');
-									$(window).trigger('hashchange');
-								};
-
-								var third = function () {
-									eventRouter.once('routeHashChange',
-										function (args) {
-											assert.strictEqual(args[0], '');
-											done();
-										});
-								};
-
-								first();
+									})
+									.then(function () {
+										done();
+									}, function (error) {
+										done(error);
+									});
 							});
 						}
 					});
@@ -167,10 +180,11 @@ describe('client/RequestRouter', function () {
 								window.location.assign('http://local/some');
 								locator.resolveInstance(RequestRouter);
 
-								eventRouter.once('routeEvent', function (args) {
-									assert.strictEqual(args[0], 'test1');
-									done();
-								});
+								eventRouter.once('routeDataEvent',
+									function (args) {
+										assert.strictEqual(args[0], 'test1');
+										done();
+									});
 
 								$('#link').trigger('click');
 							});
@@ -195,10 +209,11 @@ describe('client/RequestRouter', function () {
 								window.location.assign('http://local/some');
 								locator.resolveInstance(RequestRouter);
 
-								eventRouter.once('routeEvent', function (args) {
-									assert.strictEqual(args[0], 'test1');
-									done();
-								});
+								eventRouter.once('routeDataEvent',
+									function (args) {
+										assert.strictEqual(args[0], 'test1');
+										done();
+									});
 
 								$('#click-here').trigger('click');
 							});
@@ -411,7 +426,6 @@ describe('client/RequestRouter', function () {
 					formSubmitter.once('submit', function (args) {
 						assert.strictEqual(args[0].length, 1);
 						assert.strictEqual(args[0].attr('name'), 'write_some');
-						args[1]();
 						done();
 					});
 
@@ -471,43 +485,12 @@ describe('client/RequestRouter', function () {
 					var locator = createLocator(),
 						formSubmitter = locator.resolve('formSubmitter');
 
+					formSubmitter.decorateMethod('canSubmit', function () {
+						return false;
+					});
 					formSubmitter.once('submit', function () {
 						assert.fail('This event should not be triggered ' +
 							'because submitter can not handle request');
-					});
-
-					jsdom.env({
-						html: '<div id="form"></div>',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-								$('#form').html(form);
-								$('form').trigger('submit');
-								setTimeout(function () {
-									done();
-								}, 100);
-							});
-						}
-					});
-				});
-			it('should not catch submit click if button is disabled',
-				function (done) {
-					var form = '<form name="write_some" ' +
-						'action="/some/?some_arg=value" ' +
-						'data-module="receiver" ' +
-						'data-dependents="some_first&receiver_second">' +
-						'<input type="text" name="text">' +
-						'<input type="submit" value="Submit" disabled>' +
-						'</form>';
-					var locator = createLocator(),
-						formSubmitter = locator.resolve('formSubmitter');
-
-					formSubmitter.once('submit', function () {
-						assert.fail('This event should not be triggered ' +
-							'because submit button is disabled');
 					});
 
 					jsdom.env({
@@ -546,7 +529,7 @@ function createLocator() {
 	locator.register('cookiesWrapper', CookiesWrapper);
 	locator.registerInstance('pageRenderer', new UniversalMock(['render']));
 	locator.registerInstance('eventRouter',
-		new UniversalMock(['routeEvent', 'routeHashChange']));
+		new UniversalMock(['routeDataEvent', 'routeHashChange']));
 	locator.registerInstance('moduleApiProvider',
 		new UniversalMock(['redirect']));
 	locator.registerInstance('formSubmitter',

@@ -36,7 +36,10 @@ var moduleHelper = require('../../lib/helpers/moduleHelper');
 
 function ModuleLoader(modulesByNames) {
 	this._modulesByNames = modulesByNames;
+	this.lastRenderedData = {};
 }
+
+ModuleLoader.prototype.lastRenderedData = null;
 
 ModuleLoader.prototype.getModulesByNames = function () {
 	return this._modulesByNames;
