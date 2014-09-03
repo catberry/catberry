@@ -33,8 +33,8 @@ will not work
 * If you want to exclude some server package from browser bundle you can
 mark it with special hint comment like this:
 ```javascript
-/**no-client-bundle**/
-var serverSidePackage = require('server/package');
+/**no-browser-bundle**/
+var serverSidePackage = require('./lib/package');
 ```
 Some Catberry plugins uses this hint to exclude its server side 
 implementations from browser bundle. Also you can use this hint for server-side

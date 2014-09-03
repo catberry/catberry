@@ -30,7 +30,7 @@
 
 /**
  * This module is a template and it is used only with some string replaces
- * by ClientBundleBuilder module. It does not work by itself.
+ * by BrowserBundleBuilder module. It does not work by itself.
  */
 
 'use strict';
@@ -82,7 +82,7 @@ if (!('Promise' in window)) {
 util.inherits(Bootstrapper, BootstrapperBase);
 
 /**
- * Creates new instance of client catberry bootstrapper.
+ * Creates new instance of browser catberry bootstrapper.
  * @constructor
  * @extends BootstrapperBase
  */

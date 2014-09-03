@@ -41,7 +41,7 @@ var INLINE_SCRIPTS_CLASS = 'catberry-inline-script';
 util.inherits(Catberry, CatberryBase);
 
 /**
- * Creates new instance of client-side catberry.
+ * Creates new instance of browser catberry.
  * @constructor
  * @extends CatberryBase
  */

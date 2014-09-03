@@ -39,7 +39,7 @@ var assert = require('assert'),
 	ModuleApiProvider = require('../../../lib/ModuleApiProvider'),
 	ModuleReadable = require('../../../lib/streams/ModuleReadable');
 
-describe('server/streams/ModuleReadable', function () {
+describe('libr/streams/ModuleReadable', function () {
 	describe('#render', function () {
 		it('should render script element if module called redirect',
 			function (done) {

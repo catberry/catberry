@@ -40,7 +40,7 @@ var util = require('util'),
 util.inherits(ModuleLoader, ModuleLoaderBase);
 
 /**
- * Creates new instance of client-side module loader.
+ * Creates new instance of browser module loader.
  * @param {ServiceLocator} $serviceLocator Service locator to resolve modules.
  * @extends ModuleLoaderBase
  * @constructor

@@ -40,7 +40,7 @@ var assert = require('assert'),
 	StateProvider = require('../../lib/StateProvider'),
 	ServiceLocator = require('catberry-locator');
 
-describe('client/PageRenderer', function () {
+describe('browser/PageRenderer', function () {
 	describe('#renderPlaceholder', function () {
 		it('should properly render placeholder on page',
 			function (done) {

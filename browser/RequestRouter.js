@@ -51,7 +51,7 @@ var MOUSE_KEYS = {
 	ERROR_WRONG_PLACEHOLDER_NAME = 'Wrong placeholder name "%s"';
 
 /**
- * Creates new instance of client-side request router.
+ * Creates new instance of browser request router.
  * @param {ServiceLocator} $serviceLocator Service locator to resolve services.
  * @constructor
  */
@@ -181,7 +181,7 @@ RequestRouter.prototype._formSubmitter = null;
 RequestRouter.prototype.$ = null;
 
 /**
- * Routes client-side render request.
+ * Routes browser render request.
  * @returns {Promise} Promise for nothing.
  */
 RequestRouter.prototype.route = function () {

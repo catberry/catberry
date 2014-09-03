@@ -37,7 +37,7 @@ var util = require('util'),
 	dust;
 
 /**
- * Creates new instance of client-side template provider.
+ * Creates new instance of browser template provider.
  * @param {Window} $window Window object.
  * @param {dust} $dust Dust template engine.
  * @param {Logger} $logger Logger to log registrations.

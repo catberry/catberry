@@ -39,7 +39,7 @@ var assert = require('assert'),
 
 global.Promise = require('promise');
 
-describe('client/EventRouter', function () {
+describe('browser/EventRouter', function () {
 	describe('#route', function () {
 
 		it('should route event start to module',

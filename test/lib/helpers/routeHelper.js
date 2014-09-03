@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	routeHelper = require('../../../lib/helpers/routeHelper');
 
-describe('helpers/routeHelper', function () {
+describe('lib/helpers/routeHelper', function () {
 	describe('#getUrlMapperByRoute', function () {
 
 		it('should return null if expression is empty', function (done) {

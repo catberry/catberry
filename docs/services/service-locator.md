@@ -33,12 +33,12 @@ http
 
 ```
 
-And `client.js` with code like this:
+And `browser.js` with code like this:
 ```javascript
 var RestApiClient = require('./lib/RestApiClient'),
 // create catberry application instance.
 	catberry = require('catberry'),
-	config = require('./client-config'),
+	config = require('./browser-config'),
 	cat = catberry.create(config);
 
 // then you could register your components to inject into catberry modules.

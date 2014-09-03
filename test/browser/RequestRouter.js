@@ -40,7 +40,7 @@ var assert = require('assert'),
 	CookiesWrapper = require('../../browser/CookiesWrapper'),
 	RequestRouter = require('../../browser/RequestRouter');
 
-describe('client/RequestRouter', function () {
+describe('browser/RequestRouter', function () {
 	describe('#route', function () {
 		describe('hash handle', function () {
 			it('should catch hash on start and request event routing',

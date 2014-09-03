@@ -35,13 +35,13 @@ var assert = require('assert'),
 	SourceFilterTransform =
 		require('../../../lib/streams/SourceFilterTransform');
 
-describe('server/streams/SourceFilterTransform', function () {
+describe('lib/streams/SourceFilterTransform', function () {
 	it('should find server requires and replace with null', function (done) {
 		var transform = new SourceFilterTransform(),
 			source = 'fasdkfjalskfj' +
 				'asjfdalsjd' +
 				'/**     ' +
-				'no-client-bundle' +
+				'no-browser-bundle' +
 				'**/' +
 				' ' +
 				' ' +

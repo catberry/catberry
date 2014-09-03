@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	ContentReadable = require('../../../lib/streams/ContentReadable');
 
-describe('server/streams/ContentReadable', function () {
+describe('lib/streams/ContentReadable', function () {
 	describe('#read', function () {
 		it('should properly return all chunks of 1 byte size', function (done) {
 
