@@ -154,7 +154,8 @@ FormSubmitter.prototype.submit = function (form) {
 					}
 					return afterPromise;
 				});
-		}, function (reason) {
+		})
+		.then(null, function (reason) {
 			switchForm(form, false);
 			self._eventBus.emit('error', reason);
 		});

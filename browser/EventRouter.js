@@ -181,6 +181,7 @@ EventRouter.prototype.routeEvent = function (event) {
 
 	return Promise.all(promises)
 		.then(function () {
+			self._eventBus.emit('eventRouted', event);
 			var afterMethodPromises = afterMethods.map(
 				function (afterMethod) {
 					var afterPromise;
@@ -194,8 +195,8 @@ EventRouter.prototype.routeEvent = function (event) {
 
 			return Promise.all(afterMethodPromises);
 		})
-		.then(function () {
-			self._eventBus.emit('eventRouted', event);
+		.then(null, function (reason) {
+			self._eventBus.emit('error', reason);
 		});
 };
 
