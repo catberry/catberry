@@ -221,14 +221,12 @@ PageRenderer.prototype.renderPlaceholder =
 					element, placeholder, dataContext
 				)
 					.then(function () {
-						self._setToLastRendered(placeholder, dataContext);
+						element.removeClass(LOADING_CLASS_NAME);
+						eventArgs.time = Date.now() - startTime;
+						self._eventBus.emit('placeholderRendered', eventArgs);
 					});
 			})
 			.then(function () {
-				element.removeClass(LOADING_CLASS_NAME);
-				eventArgs.time = Date.now() - startTime;
-				self._eventBus.emit('placeholderRendered', eventArgs);
-
 				var innerPromises = Object
 					.keys(renderingContext.placeholdersByIds)
 					.filter(function (id) {
@@ -247,10 +245,11 @@ PageRenderer.prototype.renderPlaceholder =
 			.then(function () {
 				return renderingContext;
 			}, function (reason) {
+				element.removeClass(LOADING_CLASS_NAME);
 				self._handleRenderingError(
 					currentModule, element, parameters, reason
 				);
-				element.removeClass(LOADING_CLASS_NAME);
+				self._eventBus.emit('error', reason);
 				return renderingContext;
 			});
 	};
@@ -273,6 +272,7 @@ PageRenderer.prototype._handleDataContext =
 					return;
 				}
 				element.html(html);
+				self._setToLastRendered(placeholder, dataContext);
 			});
 	};
 
