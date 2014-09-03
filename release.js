@@ -39,8 +39,8 @@ var packageInfo = require('./package.json'),
 	version = packageInfo.version;
 
 var REPOSITORY_LINK_REGEXP =
-		/(https:\/\/github.com\/catberry\/catberry\/blob\/)([0-9a-z\.]+)(\/)/gi,
-	PACKAGE_REGEXP = /(Catberry@)([0-9a-z\.]+)/gi,
+		/(https:\/\/github.com\/catberry\/catberry\/blob\/)([0-9\-a-z\.]+)(\/)/gi,
+	PACKAGE_REGEXP = /(Catberry@)([0-9\-a-z\.]+)/gi,
 	PATHS = [
 		'README.md',
 		'lib/helpers/errorHelper.js'
