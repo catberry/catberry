@@ -70,6 +70,9 @@ function PageRenderer($serviceLocator, $moduleLoader, $eventBus, isRelease) {
 	this._lastState = stateProvider.getStateByUrl(
 		this._window.location.toString()
 	);
+	// need to run all afterRender methods for placeholders
+	// were rendered at server
+	this._runAfterMethods();
 }
 
 /**
@@ -540,3 +543,28 @@ PageRenderer.prototype._setToLastRendered =
 
 		lastRendered[placeholder.moduleName][placeholder.name] = dataContext;
 	};
+
+/**
+ * Run all `after` methods for placeholders that were rendered at server-side.
+ * @private
+ */
+PageRenderer.prototype._runAfterMethods = function () {
+	var self = this,
+		lastRenderedData = this._moduleLoader.lastRenderedData,
+		modules = this._moduleLoader.getModulesByNames();
+	Object.keys(lastRenderedData)
+		.forEach(function (moduleName) {
+			Object.keys(lastRenderedData[moduleName])
+				.forEach(function (placeholderName) {
+					try {
+						var afterMethod = moduleHelper.getMethodToInvoke(
+							modules[moduleName].implementation,
+							'afterRender', placeholderName
+						);
+						afterMethod(lastRenderedData[moduleName][placeholderName]);
+					} catch (e) {
+						self._eventBus.emit('error', e);
+					}
+				});
+		});
+};
