@@ -53,7 +53,7 @@ var SCROLL_TOP_ATTRIBUTE = 'data-scroll-top',
 	LINK_ELEMENT_NAME = 'LINK';
 
 /**
- * Creates instance of client-side page renderer.
+ * Creates instance of browser page renderer.
  * @param {ServiceLocator} $serviceLocator Service locator
  * to resolve dependencies.
  * @param {ModuleLoader} $moduleLoader Module loader to load modules set.
@@ -86,7 +86,7 @@ PageRenderer.prototype._window = null;
 PageRenderer.prototype.$ = null;
 
 /**
- * Renders changed placeholders at client-side.
+ * Renders changed placeholders in browser.
  * @param {Object} renderingParameters Set of parameters.
  * @returns {Promise} Promise for nothing.
  */

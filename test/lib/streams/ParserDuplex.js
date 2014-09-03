@@ -39,7 +39,7 @@ var assert = require('assert'),
 var casePath = path.join(__dirname, '..', '..', 'cases',
 	'server', 'streams', 'ParserDuplex');
 
-describe('server/streams/ParserDuplex', function () {
+describe('lib/streams/ParserDuplex', function () {
 	describe('#foundTagIdHandler', function () {
 		it('should find HTML tags with ids and replace its content',
 			function (done) {

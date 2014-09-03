@@ -14,7 +14,7 @@ A lot of features are also described in [read me](../README.md) and
 there is a list of most important advantages which your isomorphic application 
 receives using Catberry:
 
-* Server-side rendering is stream-based, it means client will see a page
+* Server-side rendering is stream-based, it means user will see a page
 immediately and do not need to wait until all requests to API will be finished.
 * Application consists of independent modules. Page consist of placeholders and 
 every module controls a group of such placeholders. 

@@ -40,7 +40,7 @@ var assert = require('assert'),
 
 global.Promise = require('promise');
 
-describe('client/FormSubmitter', function () {
+describe('browser/FormSubmitter', function () {
 	describe('#submit', function () {
 		it('should submit specified form to module', function (done) {
 			var locator = createLocator(),

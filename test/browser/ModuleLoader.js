@@ -88,7 +88,7 @@ var placeholders = [
 	}
 ];
 
-describe('client/ModuleLoader', function () {
+describe('browser/ModuleLoader', function () {
 	describe('#getModulesByNames', function () {
 		it('should load all modules and placeholders from Service Locator',
 			/*jshint maxstatements:false */
@@ -161,7 +161,7 @@ describe('client/ModuleLoader', function () {
 				assert.strictEqual(
 					modulesByNames.module1.hasOwnProperty('rootPlaceholder'),
 					false,
-					'module1 should not have root placeholder at client-side'
+					'module1 should not have root placeholder in browser'
 				);
 				assert.strictEqual(
 					modulesByNames.module1.hasOwnProperty('errorPlaceholder'),

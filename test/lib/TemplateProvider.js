@@ -44,7 +44,7 @@ global.Promise = require('promise');
 var templatePath = path.join(__dirname, '..',
 	'cases', 'server', 'TemplateProvider', 'case1', 'test.dust');
 
-describe('server/TemplateProvider', function () {
+describe('lib/TemplateProvider', function () {
 	describe('#registerSource', function () {
 		it('should properly register template source', function (done) {
 			var locator = new ServiceLocator();

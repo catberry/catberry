@@ -279,7 +279,7 @@ function checkCase(caseName) {
 	]);
 }
 
-describe('server/PageRenderer', function () {
+describe('lib/PageRenderer', function () {
 	describe('#render', function () {
 		it('should properly render nested placeholders', function (done) {
 			checkCase('case1').then(function () {

@@ -25,7 +25,7 @@ property. Its value is a concatenation of `location.pathname` and
 `location.search` in browser and `request.url` at server.
 
 ##Referrer
-If you need to know previous client's page URL you can use `referrer` property. 
+If you need to know previous browser's page URL you can use `referrer` property. 
 But use it very carefully because at server Catberry uses `Referer` HTTP header 
 and in browser it is just previous URL in History API.
 

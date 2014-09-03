@@ -66,7 +66,7 @@ function createModuleLoader(caseName) {
 	return locator.resolveInstance(ModuleLoader, config);
 }
 
-describe('server/ModuleLoader', function () {
+describe('lib/ModuleLoader', function () {
 	describe('#getModulesByNames', function () {
 		it('should skip empty folders', function (done) {
 			var case1Folder = path.join(CASES_DIRECTORY, 'case1'),
