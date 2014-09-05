@@ -32,8 +32,7 @@
 
 module.exports = RequestRouter;
 
-var propertyHelper = require('../lib/helpers/propertyHelper'),
-	util = require('util'),
+var util = require('util'),
 	url = require('url');
 
 var MOUSE_KEYS = {
@@ -65,6 +64,7 @@ function RequestRouter($serviceLocator) {
 	this._formSubmitter = $serviceLocator.resolve('formSubmitter');
 	this._stateProvider = $serviceLocator.resolve('stateProvider');
 	this._moduleLoader = $serviceLocator.resolve('moduleLoader');
+	this._contextFactory = $serviceLocator.resolve('contextFactory');
 	this._historySupported = this._window.history &&
 		this._window.history.pushState instanceof Function;
 	this._serviceLocator = $serviceLocator;
@@ -103,6 +103,13 @@ RequestRouter.prototype._eventBus = null;
  * @private
  */
 RequestRouter.prototype._serviceLocator = null;
+
+/**
+ * Current context factory.
+ * @type {ContextFactory}
+ * @private
+ */
+RequestRouter.prototype._contextFactory = null;
 
 /**
  * Current module loader.
@@ -205,17 +212,19 @@ RequestRouter.prototype.route = function () {
 		}
 
 		self._currentPath = urlPath;
-		var renderingParameters = self._createRenderingParameters(state);
-		propertyHelper.defineReadOnly(renderingParameters, 'referrer',
-			self._referrer
-		);
-		self._referrer = self._window.location.toString();
-		propertyHelper.defineReadOnly(renderingParameters, 'urlPath',
-			urlPath
+		var renderingParameters = self._contextFactory.create(
+			self._moduleLoader.lastRenderedData,
+			self._serviceLocator.resolve('cookiesWrapper'),
+			state, {
+				referrer: self._referrer,
+				urlPath: urlPath,
+				userAgent: self._window.navigator.userAgent
+			}
 		);
 
 		return self._pageRenderer.render(renderingParameters)
 			.then(function () {
+				self._referrer = self._window.location.toString();
 				self._eventBus.emit('stateChanged', renderingParameters);
 				return self._raiseHashChangeEvent();
 			})
@@ -292,14 +301,16 @@ RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
 	var currentState = this._stateProvider.getStateByUrl(
 			this._window.location.toString()
 		),
-		renderingParameters = this._createRenderingParameters(currentState);
-
-	propertyHelper.defineReadOnly(renderingParameters, 'referrer',
-		this._referrer
-	);
-	propertyHelper.defineReadOnly(renderingParameters, 'urlPath',
-			this._window.location.pathname + this._window.location.search
-	);
+		renderingParameters = this._contextFactory.create(
+			this._moduleLoader.lastRenderedData,
+			this._serviceLocator.resolve('cookiesWrapper'),
+			currentState, {
+				referrer: this._referrer,
+				urlPath: this._window.location.pathname +
+					this._window.location.search,
+				userAgent: this._window.navigator.userAgent
+			}
+		);
 
 	return this._pageRenderer.renderPlaceholder(
 		placeholder, renderingParameters
@@ -308,9 +319,7 @@ RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
 			var afterPromises = context.afterMethods
 				.map(function (afterMethod) {
 					try {
-						return Promise.resolve(
-							afterMethod()
-						);
+						return Promise.resolve(afterMethod());
 					} catch (e) {
 						return Promise.reject(e);
 					}
@@ -496,22 +505,4 @@ RequestRouter.prototype._normalizeLocation = function (location) {
 
 	return this._window.location.protocol + '//' +
 		this._window.location.host + '/' + current.join('/');
-};
-
-/**
- * Creates rendering context.
- * @param {Object} state Application state object.
- * @returns {{renderedData: Object, state: Object, cookies: CookiesWrapper}}
- * @private
- */
-RequestRouter.prototype._createRenderingParameters = function (state) {
-	var apiProvider = this._serviceLocator.resolve('moduleApiProvider'),
-		context = Object.create(apiProvider);
-	context.renderedData = this._moduleLoader.lastRenderedData;
-	context.state = state;
-	context.cookies = this._serviceLocator.resolve('cookiesWrapper');
-	propertyHelper.defineReadOnly(context, 'userAgent',
-		this._window.navigator.userAgent
-	);
-	return context;
 };

@@ -70,9 +70,11 @@ function PageRenderer($serviceLocator, $moduleLoader, $eventBus, isRelease) {
 	this._lastState = stateProvider.getStateByUrl(
 		this._window.location.toString()
 	);
-	// need to run all afterRender methods for placeholders
+	this._contextFactory = $serviceLocator.resolve('contextFactory');
+	this._serviceLocator = $serviceLocator;
+	// need to run all afterRender methods and events for placeholders
 	// were rendered at server
-	this._runAfterMethods();
+	this._runAfterMethodsAndEvents();
 }
 
 /**
@@ -174,7 +176,7 @@ PageRenderer.prototype.renderPlaceholder =
 			modulesByNames: this._moduleLoader.getModulesByNames()
 		};
 		var element = this.$('#' + placeholder.fullName);
-		if (element.length === 0 ||
+		if (element.length !== 1 ||
 			(placeholder.fullName in renderingContext.rendered)) {
 			return Promise.resolve();
 		}
@@ -217,6 +219,7 @@ PageRenderer.prototype.renderPlaceholder =
 
 		return promise
 			.then(function (dataContext) {
+				eventArgs.dataContext = dataContext;
 				renderingContext.afterMethods.push(
 					afterMethod.bind(dataContext)
 				);
@@ -548,7 +551,7 @@ PageRenderer.prototype._setToLastRendered =
  * Run all `after` methods for placeholders that were rendered at server-side.
  * @private
  */
-PageRenderer.prototype._runAfterMethods = function () {
+PageRenderer.prototype._runAfterMethodsAndEvents = function () {
 	var self = this,
 		lastRenderedData = this._moduleLoader.lastRenderedData,
 		modules = this._moduleLoader.getModulesByNames();
@@ -556,15 +559,39 @@ PageRenderer.prototype._runAfterMethods = function () {
 		.forEach(function (moduleName) {
 			Object.keys(lastRenderedData[moduleName])
 				.forEach(function (placeholderName) {
+					var placeholder = modules[moduleName]
+							.placeholders[placeholderName],
+						dataContext = lastRenderedData
+							[moduleName][placeholderName],
+						eventArgs = {
+							name: placeholderName,
+							moduleName: moduleName,
+							element: self.$('#' + placeholder.fullName),
+							dataContext: dataContext,
+							context: modules[moduleName]
+								.implementation.$context
+						};
+					self._eventBus.emit('placeholderRendered', eventArgs);
 					try {
 						var afterMethod = moduleHelper.getMethodToInvoke(
 							modules[moduleName].implementation,
 							'afterRender', placeholderName
 						);
-						afterMethod(lastRenderedData[moduleName][placeholderName]);
+						afterMethod(dataContext);
 					} catch (e) {
 						self._eventBus.emit('error', e);
 					}
 				});
 		});
+
+	var context = this._contextFactory.create(
+		lastRenderedData, this._serviceLocator.resolve('cookiesWrapper'),
+		this._lastState, {
+			referrer: this._window.document.referrer,
+			urlPath: this._window.location.pathname +
+				this._window.location.search,
+			userAgent: this._window.navigator.userAgent
+		}
+	);
+	self._eventBus.emit('placeholderRendered', context);
 };

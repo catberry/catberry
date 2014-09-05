@@ -37,6 +37,7 @@ var assert = require('assert'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	ServiceLocator = require('catberry-locator'),
 	StateProvider = require('../../lib/StateProvider'),
+	ContextFactory = require('../../lib/ContextFactory'),
 	CookiesWrapper = require('../../browser/CookiesWrapper'),
 	RequestRouter = require('../../browser/RequestRouter');
 
@@ -536,6 +537,7 @@ function createLocator() {
 		new UniversalMock(['submit', 'canSubmit']));
 	locator.registerInstance('moduleLoader', moduleLoader);
 	locator.register('stateProvider', StateProvider);
+	locator.register('contextFactory', ContextFactory);
 	return locator;
 }
 

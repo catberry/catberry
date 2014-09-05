@@ -181,7 +181,9 @@ EventRouter.prototype.routeEvent = function (event) {
 
 	return Promise.all(promises)
 		.then(function () {
-			self._eventBus.emit('eventRouted', event);
+			var busEvent = Object.create(event);
+			busEvent.moduleNames = eventMapper.moduleNames;
+			self._eventBus.emit('eventRouted', busEvent);
 			var afterMethodPromises = afterMethods.map(
 				function (afterMethod) {
 					var afterPromise;

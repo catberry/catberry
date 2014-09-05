@@ -36,6 +36,7 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	StateProvider = require('../../lib/StateProvider'),
+	ContextFactory = require('../../lib/ContextFactory'),
 	ModuleApiProvider = require('../../browser/ModuleApiProvider'),
 	CookiesWrapper = require('../../browser/CookiesWrapper'),
 	ModuleLoader = require('../../browser/ModuleLoader');
@@ -111,6 +112,7 @@ describe('browser/ModuleLoader', function () {
 				locator.register('cookiesWrapper', CookiesWrapper);
 				locator.register('moduleApiProvider', ModuleApiProvider);
 				locator.register('stateProvider', StateProvider);
+				locator.register('contextFactory', ContextFactory);
 				locator.register('logger', Logger);
 
 				modules.forEach(function (module) {
