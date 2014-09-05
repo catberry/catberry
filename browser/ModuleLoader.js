@@ -139,7 +139,17 @@ ModuleLoader.prototype._initModules = function () {
 	var currentState = this._stateProvider.getStateByUrl(
 			this._window.location.toString()
 		),
-		cookiesWrapper = this._serviceLocator.resolve('cookiesWrapper');
+		cookiesWrapper = this._serviceLocator.resolve('cookiesWrapper'),
+		context = self._contextFactory.create(
+			self.lastRenderedData, cookiesWrapper,
+				currentState || {},
+			{
+				urlPath: self._window.location.pathname +
+					self._window.location.search,
+				referrer: self._window.document.referrer,
+				userAgent: self._window.navigator.userAgent
+			}
+		);
 
 	this._serviceLocator
 		.resolveAll('module')
@@ -150,34 +160,21 @@ ModuleLoader.prototype._initModules = function () {
 				};
 			}
 
-			var context = Object.create(self._moduleApiProvider);
-			context.name = module.name;
-			context.cookies = cookiesWrapper;
-			context.renderedData = self.lastRenderedData;
-			context.state = currentState[module.name] || {};
-			propertyHelper.defineReadOnly(context, 'referrer',
-				self._window.document.referrer
-			);
-			propertyHelper.defineReadOnly(context, 'userAgent',
-				self._window.navigator.userAgent
-			);
-			propertyHelper.defineReadOnly(context, 'urlPath',
-					self._window.location.pathname +
-					self._window.location.search
-			);
-
+			var moduleContext = Object.create(context);
+			moduleContext.name = module.name;
+			moduleContext.state = moduleContext.state[module.name] || {};
 			module.implementation =
 				(module.implementation instanceof Function) ?
 					module.implementation : Object;
 			// set initial context
-			module.implementation.prototype.$context = context;
+			module.implementation.prototype.$context = moduleContext;
 
 			var implementation = self._serviceLocator.resolveInstance(
 				module.implementation, self._config
 			);
 
 			if (!implementation.$context) {
-				implementation.$context = context;
+				implementation.$context = moduleContext;
 			}
 			modules[module.name].name = module.name;
 			modules[module.name].implementation = implementation;

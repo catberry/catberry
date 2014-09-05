@@ -38,6 +38,9 @@ var assert = require('assert'),
 	Logger = require('../mocks/Logger'),
 	PageRenderer = require('../../browser/PageRenderer'),
 	StateProvider = require('../../lib/StateProvider'),
+	ContextFactory = require('../../lib/ContextFactory'),
+	ModuleApiProvider = require('../../browser/ModuleApiProvider'),
+	CookiesWrapper = require('../../browser/CookiesWrapper'),
 	ServiceLocator = require('catberry-locator');
 
 describe('browser/PageRenderer', function () {
@@ -569,6 +572,9 @@ function createLocator() {
 	locator.registerInstance('eventBus', eventBus);
 	locator.registerInstance('logger', logger);
 	locator.register('stateProvider', StateProvider);
+	locator.register('contextFactory', ContextFactory);
+	locator.register('moduleApiProvider', ModuleApiProvider);
+	locator.register('cookiesWrapper', CookiesWrapper);
 	return locator;
 }
 

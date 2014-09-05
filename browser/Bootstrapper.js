@@ -162,13 +162,14 @@ Bootstrapper.prototype._wrapEventsWithLogger = function (eventBus, logger) {
 				args.moduleNames.join(', ')
 			));
 		})
-		.on('eventRouted', function (args) {
-			var messageFormat = args.isStarted ?
-				TRACE_EVENT_START_ROUTED :
-				TRACE_EVENT_END_ROUTED;
+		.on('eventRouted', function (event) {
+			var messageFormat = event.isEnding ?
+				TRACE_EVENT_END_ROUTED :
+				TRACE_EVENT_START_ROUTED;
+
 			logger.trace(util.format(
 				messageFormat,
-				args.eventName, args.moduleNames.join(', ')
+				event.name, event.moduleNames.join(', ')
 			));
 		})
 		.on('renderRequested', function (args) {
