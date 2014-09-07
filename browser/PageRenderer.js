@@ -137,6 +137,9 @@ PageRenderer.prototype.render = function (renderingParameters) {
 	return renderPromise
 		.then(function () {
 			var promises = self._findRenderingRoots(changedModuleNames)
+				.filter(function (placeholder) {
+					return (placeholder.fullName !== headPlaceholderId);
+				})
 				.map(function (placeholder) {
 					return self.renderPlaceholder(
 						placeholder, renderingParameters, context
@@ -175,6 +178,7 @@ PageRenderer.prototype.renderPlaceholder =
 			placeholdersByIds: this._moduleLoader.getPlaceholdersByIds(),
 			modulesByNames: this._moduleLoader.getModulesByNames()
 		};
+
 		var element = this.$('#' + placeholder.fullName);
 		if (element.length !== 1 ||
 			(placeholder.fullName in renderingContext.rendered)) {
@@ -221,7 +225,9 @@ PageRenderer.prototype.renderPlaceholder =
 			.then(function (dataContext) {
 				eventArgs.dataContext = dataContext;
 				renderingContext.afterMethods.push(
-					afterMethod.bind(dataContext)
+					function () {
+						afterMethod(dataContext);
+					}
 				);
 				return self._handleDataContext(
 					element, placeholder, dataContext
