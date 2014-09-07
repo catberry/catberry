@@ -251,11 +251,9 @@ PageRenderer.prototype.renderPlaceholder =
 			.then(function () {
 				return renderingContext;
 			}, function (reason) {
-				element.removeClass(LOADING_CLASS_NAME);
 				self._handleRenderingError(
 					currentModule, element, parameters, reason
 				);
-				self._eventBus.emit('error', reason);
 				return renderingContext;
 			});
 	};
@@ -293,11 +291,16 @@ PageRenderer.prototype._handleDataContext =
 PageRenderer.prototype._handleRenderingError =
 	function (module, element, renderingParameters, error) {
 		this._eventBus.emit('error', error);
+		element.removeClass(LOADING_CLASS_NAME);
+
+		if (element[0].tagName === HEAD_ELEMENT_NAME) {
+			return;
+		}
+
 		if (!this._isRelease && error instanceof Error) {
 			element.html(
 				errorHelper.prettyPrint(error, renderingParameters.userAgent)
 			);
-			element.removeClass(LOADING_CLASS_NAME);
 		} else if (module.errorPlaceholder) {
 			module.errorPlaceholder.render(error)
 				.then(function (html) {
