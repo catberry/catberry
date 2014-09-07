@@ -272,10 +272,10 @@ PageRenderer.prototype._handleDataContext =
 		return new placeholder.render(dataContext)
 			.then(function (html) {
 				if (element[0].tagName === HEAD_ELEMENT_NAME) {
-					self._mergeHead(element, dataContext);
-					return;
+					self._mergeHead(element, html);
+				} else {
+					element.html(html);
 				}
-				element.html(html);
 				self._setToLastRendered(placeholder, dataContext);
 			});
 	};
@@ -293,6 +293,7 @@ PageRenderer.prototype._handleRenderingError =
 		this._eventBus.emit('error', error);
 		element.removeClass(LOADING_CLASS_NAME);
 
+		// do not corrupt existed HEAD when error occours
 		if (element[0].tagName === HEAD_ELEMENT_NAME) {
 			return;
 		}
