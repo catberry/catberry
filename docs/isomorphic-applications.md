@@ -32,7 +32,7 @@ you do not have this problem.
 * *Maintenance is complicated, because you need to synchronize changes 
 in server-side and browser modules*. Obviously, you do not need this
 using isomorphic modules. It is always one module to change.
-* *Overhead connected with rendering all pages on server*. Since clients 
+* *Overhead connected with rendering all pages on server*. Since browsers 
 receive a page from server only once and then render all other pages in 
 their browsers your server's load will be reduced dramatically.
  

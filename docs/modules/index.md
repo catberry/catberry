@@ -65,7 +65,7 @@ catberry_modules/
 	moduleN/
 lib/ # directory for your own external non-catberry components/services
 public/ # this directory is default destination for browser bundle building
-client.js # browser initial script
+browser.js # browser initial script
 server.js # connect server start script
 routes.js # definition of URL route definitions
 events.js # definition of event route definitions

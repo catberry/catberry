@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "1.4.0",
+	"version": "2.0.0-dev",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
 	"homepage": "https://github.com/catberry/catberry",
@@ -36,13 +36,14 @@
 		"glob": "^4.0.0",
 		"glob-watcher": "~0.0.6",
 		"catberry-locator": "^1.0.0",
-		"catberry-uhr": "^1.1.0",
+		"catberry-uhr": "git://github.com/catberry/catberry-uhr.git#develop",
 		"jquery": "^2.0.0",
 		"uglify-js": "^2.0.0",
 		"browserify": "^4.0.0",
 		"dustjs-linkedin": "~2.3.5",
 		"dustjs-helpers": "~1.2.0",
-		"log4js": "~0.6.0"
+		"log4js": "~0.6.0",
+		"promise": "^5.0.0"
 	},
 	"devDependencies": {
 		"jsdom": "~0.11.0",

@@ -30,4 +30,48 @@
 
 'use strict';
 
-module.exports = require('./lib/Bootstrapper');
+var assert = require('assert'),
+	ContentReadable = require('../../../lib/streams/ContentReadable');
+
+describe('lib/streams/ContentReadable', function () {
+	describe('#read', function () {
+		it('should properly return all chunks of 1 byte size', function (done) {
+
+			var content = '1234567890',
+				counter = 0,
+				contentStream = new ContentReadable(content, {
+					highWaterMark: 1
+				});
+
+			contentStream
+				.on('data', function (chunk) {
+					assert.equal(chunk.toString(), content[counter]);
+					counter++;
+				})
+				.on('end', function () {
+					assert.equal(counter, content.length);
+					done();
+				});
+		});
+
+		it('should properly return all data at first time when buffer is big',
+			function (done) {
+
+				var content = '1234567890',
+					counter = 0,
+					contentStream = new ContentReadable(content, {
+						highWaterMark: 1024
+					});
+
+				contentStream
+					.on('data', function (chunk) {
+						assert.equal(chunk.toString(), content);
+						counter++;
+					})
+					.on('end', function () {
+						assert.equal(counter, 1);
+						done();
+					});
+			});
+	});
+});
