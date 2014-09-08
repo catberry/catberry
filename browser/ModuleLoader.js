@@ -165,8 +165,8 @@ ModuleLoader.prototype._initModules = function () {
 			moduleContext.name = module.name;
 			moduleContext.state = moduleContext.state[module.name] || {};
 			module.implementation =
-				(module.implementation instanceof Function) ?
-					module.implementation : Object;
+				(typeof(module.implementation) === 'function') ?
+					module.implementation : function Module() {};
 			// set initial context
 			module.implementation.prototype.$context = moduleContext;
 
