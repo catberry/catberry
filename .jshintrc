@@ -21,6 +21,7 @@
 	"node": true,
 
 	"globals": {
+		"Promise": true,
 		"window": true,
 		"describe": true,
 		"it": true

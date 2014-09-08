@@ -30,4 +30,44 @@
 
 'use strict';
 
-module.exports = require('./lib/Bootstrapper');
+var assert = require('assert'),
+	ContentReadable = require('../../../lib/streams/ContentReadable'),
+	SourceFilterTransform =
+		require('../../../lib/streams/SourceFilterTransform');
+
+describe('lib/streams/SourceFilterTransform', function () {
+	it('should find server requires and replace with null', function (done) {
+		var transform = new SourceFilterTransform(),
+			source = 'fasdkfjalskfj' +
+				'asjfdalsjd' +
+				'/**     ' +
+				'no-browser-bundle' +
+				'**/' +
+				' ' +
+				' ' +
+				'var some = require  (\'someTest\');' +
+				'dghsdghsdghsgh' +
+				'hsfghsghsgh;',
+			expected = 'fasdkfjalskfj' +
+				'asjfdalsjd' +
+				' ' +
+				' ' +
+				' var some = null;' +
+				'dghsdghsdghsgh' +
+				'hsfghsghsgh;';
+
+		var input = new ContentReadable(source),
+			output = input.pipe(transform);
+
+		var result = '';
+
+		output
+			.on('data', function (chunk) {
+				result += chunk;
+			})
+			.on('end', function () {
+				assert.strictEqual(result, expected);
+				done();
+			});
+	});
+});
