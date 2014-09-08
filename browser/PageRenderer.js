@@ -603,5 +603,5 @@ PageRenderer.prototype._runAfterMethodsAndEvents = function () {
 			userAgent: this._window.navigator.userAgent
 		}
 	);
-	self._eventBus.emit('placeholderRendered', context);
+	self._eventBus.emit('pageRendered', context);
 };
