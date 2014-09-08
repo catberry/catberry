@@ -110,7 +110,8 @@ ModuleLoader.prototype._initModules = function () {
 			var module = modules[placeholder.moduleName],
 				fullName = moduleHelper.joinModuleNameAndContext(
 					placeholder.moduleName,
-					placeholder.name);
+					placeholder.name
+				);
 
 			self._templateProvider.registerCompiled(fullName,
 				placeholder.compiledSource);
