@@ -196,6 +196,61 @@ describe('browser/FormSubmitter', function () {
 					}
 				});
 			});
+
+		it('should invoke after method', function (done) {
+			var locator = createLocator(),
+				moduleLoader = locator.resolve('moduleLoader'),
+				modules = moduleLoader.getModulesByNames(),
+				form = '<form id="write-form" name="write_some"' +
+					'data-module="module">' +
+					'<input type="text" name="text" value="test text">' +
+					'<input type="submit" value="Submit">' +
+					'</form>';
+			jsdom.env({
+				html: '<div id="form"></div>',
+				done: function (errors, window) {
+					prepareWindow(window, locator);
+					var $ = locator.resolve('jQuery');
+					$(function () {
+						var formSubmitter = locator.resolveInstance(FormSubmitter);
+						$('#form').html(form);
+
+						modules.module.implementation.once('afterSubmit',
+							function (args) {
+								var formName = args[0],
+									formArgs = args[1];
+
+								assert.strictEqual(
+									formName, 'write_some', 'Wrong form name'
+								);
+								assert.strictEqual(
+									formArgs.name, 'write_some',
+									'Wrong form name'
+								);
+								assert.strictEqual(
+									formArgs.element.attr('id'),
+									'write-form', 'Wrong form id'
+								);
+								assert.strictEqual(
+									formArgs.moduleName,
+									'module', 'Wrong module name'
+								);
+								assert.strictEqual(
+									formArgs.values.text,
+									'test text', 'Wrong input value'
+								);
+							});
+						formSubmitter.submit($('form[name="write_some"]'))
+							.then(function () {
+								done();
+							},
+							function (error) {
+								done(error);
+							});
+					});
+				}
+			});
+		});
 	});
 
 	describe('#canSubmit', function () {
@@ -285,7 +340,9 @@ function createLocator() {
 		modules = {
 			module: {
 				name: 'module',
-				implementation: new UniversalMock(['render', 'submit']),
+				implementation: new UniversalMock([
+					'render', 'submit', 'afterSubmit'
+				]),
 				placeholders: {
 					first: {
 						moduleName: 'module',
@@ -299,7 +356,9 @@ function createLocator() {
 			},
 			moduleWithError: {
 				name: 'moduleWithError',
-				implementation: new UniversalMock(['render', 'submit'])
+				implementation: new UniversalMock([
+					'render', 'submit', 'afterSubmit'
+				])
 			}
 		},
 		moduleLoader = {
