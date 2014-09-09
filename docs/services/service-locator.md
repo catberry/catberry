@@ -11,7 +11,7 @@ you use `getMiddleware` method on server or `startWhenReady` in browser code.
 Before that, feel free to register your own services to inject it into 
 catberry modules via DI.
 
-Your Catberry application must have `server.js` with code like this:
+Your Catberry application must have `./server.js` with code like this:
 ```javascript
 var catberry = require('catberry'),
 	RestApiClient = require('./lib/RestApiClient'),
@@ -33,7 +33,7 @@ http
 
 ```
 
-And `browser.js` with code like this:
+And `./browser.js` with code like this:
 ```javascript
 var RestApiClient = require('./lib/RestApiClient'),
 // create catberry application instance.
@@ -46,7 +46,7 @@ cat.locator.register('restApiClient', RestApiClient, config, true);
 
 // you can register services only before this method cat.startWhenReady()
 // tell catberry to start when HTML document will be ready
-cat.startWhenReady();
+cat.startWhenReady(); // returns promise
 
 ```
 

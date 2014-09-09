@@ -5,14 +5,14 @@ module already has an initial context with empty state.
 
 Context is an object with methods and data that dependents on current 
 application state. You can use context everywhere: at server or in browser, in
-constructor or in any methods of module. All context method are 
+constructor or in any methods of module. All context methods are 
 environment-independent and have different implementations for 
 server and browser but module developer should not worry about it, usage of 
 context is always safe.
 
 You can access context via `$context` property of your module object. It is
-assigned by Catberry on module initialization and then refreshed every time
-when application state is changing.
+assigned by Catberry on module initialization and then refreshed (re-assigned) 
+every time when application state is changing.
 
 ##Environment flags
 For some situations you maybe need to determine where current code is executing.
@@ -34,7 +34,7 @@ You can get user agent string whenever you want using `userAgent` property
 of context.
 
 ##State
-Most important thing in context is `state` property. It is an immutable 
+Most important thing in context is a `state` property. It is an immutable 
 object that you can use to know what application parameters now are. 
 All these parameters are specified by 
 [URL Route Definition](../routing/url-route-definition.md). It is main source 
@@ -118,40 +118,41 @@ Also context has a lot of useful methods:
 /**
  * Redirects current page to specified URL.
  * @param {string} locationUrl URL to direct.
+ * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.redirect = function (locationUrl) { }
+ModuleApiProvider.prototype.redirect = function (locationUrl) {};
 
 /**
  * Clears current location's hash.
+ * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.clearHash = function () { }
+ModuleApiProvider.prototype.clearHash = function () {};
 
 /**
  * Requests refresh of module's placeholder.
  * Refresh also re-handles current hash event.
  * @param {string} moduleName Name of module to render.
  * @param {string} placeholderName Name of placeholder to refresh.
- * @param {Function?} callback Callback on finish.
+ * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.requestRefresh =
-	function (moduleName, placeholderName, callback) { }
+ModuleApiProvider.prototype.requestRefresh = function (moduleName, placeholderName) {};
 
 /**
  * Requests render of module's placeholder.
  * @param {string} moduleName Name of module to render.
  * @param {string} placeholderName Name of placeholder to refresh.
- * @param {Function?} callback Callback on finish.
+ * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.requestRender =
-	function (moduleName, placeholderName, callback) { }
-	
+ModuleApiProvider.prototype.requestRender = function (moduleName, placeholderName) {};
+
 /**
- * Subscribes on specified event in Catberry.
- * @param {string} eventName Name of event.
- * @param {Function} handler Event handler.
- * @returns {ModuleApiProviderBase} This object for chaining.
+ * Renders specified template with data.
+ * @param {string} moduleName Name of module, template owner.
+ * @param {string} templateName Name of template.
+ * @param {Object} data Data context for template.
+ * @returns {Promise<string>} Promise for rendered template.
  */
-ModuleApiProviderBase.prototype.on = function (eventName, handler) { }
+ModuleApiProvider.prototype.render = function (moduleName, templateName, data) {};
 
 /**
  * Subscribes on specified event in Catberry to handle once.
@@ -159,7 +160,7 @@ ModuleApiProviderBase.prototype.on = function (eventName, handler) { }
  * @param {Function} handler Event handler.
  * @returns {ModuleApiProviderBase} This object for chaining.
  */
-ModuleApiProviderBase.prototype.once = function (eventName, handler) { }
+ModuleApiProviderBase.prototype.once = function (eventName, handler) {};
 
 /**
  * Removes specified handler from specified event.
@@ -167,25 +168,14 @@ ModuleApiProviderBase.prototype.once = function (eventName, handler) { }
  * @param {Function} handler Event handler.
  * @returns {ModuleApiProviderBase} This object for chaining.
  */
-ModuleApiProviderBase.prototype.removeListener = 
-	function (eventName, handler) { }
+ModuleApiProviderBase.prototype.removeListener = function (eventName, handler) {};
 
 /**
  * Removes all handlers from specified event in Catberry.
  * @param {string} eventName Name of event.
  * @returns {ModuleApiProviderBase} This object for chaining.
  */
-ModuleApiProviderBase.prototype.removeAllListeners = function (eventName) { }
-
-/**
- * Renders specified template with data.
- * @param {string} moduleName Name of module, template owner.
- * @param {string} templateName Name of template.
- * @param {Object} data Data context for template.
- * @param {Function} callback Callback on finish.
- */
-ModuleApiProvider.prototype.render =
-	function (moduleName, templateName, data, callback) { }
+ModuleApiProviderBase.prototype.removeAllListeners = function (eventName) {};
 ```
 
 ##Rendering on demand
@@ -212,7 +202,7 @@ module rendering `__index` placeholder then `<script>` element will be placed in
 placeholder content.
 
 After code is executed, `<script>` elements will be removed by Catberry 
-initialization due security reasons.
+initialization.
 
 Although `<script>` element are removed after executing it is still not save to
 set some cookies that should be 100% secured. It is better to use additional

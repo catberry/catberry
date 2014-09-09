@@ -1,8 +1,15 @@
 #Modules
 
 Modules are building blocks of web-application using Catberry framework.
-Usually modules are placed in `/catberry_modules` directory. Or you can override it
+Usually modules are placed in `./catberry_modules` directory. Or you can override it
 if set `modulesFolder` parameter in Catberry config.
+
+The main approach in Catberry for controlling asynchronous operations is 
+[Promise](https://www.promisejs.org/). Catberry uses native `Promise` in browser 
+or in node.js (V8) if it is possible but if `Promise` is not found in global 
+scope it will be defined using 
+["Bare bones Promises/A+ implementation"](https://www.npmjs.org/package/promise).
+It means you can use `Promise` type globally and do not worry about its support.
 
 ##How to add modules
 There are some rules how to add modules to your application:
@@ -31,12 +38,6 @@ for every incoming HTTP request and represents URL parameters.
 In browser Catberry creates module once and create `$context` at the same time.
 Then just update state of `$context` every time user clicks link with URLs
 inside the application.
-
-##ModuleBase
-Also it can be really useful to inherit your module from [catberry-module]
-(https://www.npmjs.org/package/catberry-module). It is a base module 
-implementation with "smart method invocation" that reduce all this code that
-should decide what logic to execute by placeholder, event or form name.
 
 ##Example of application structure
 Typically directory structure of your application should look like this:

@@ -35,7 +35,7 @@ Here is a list of common Catberry events:
 
 | Event					| When happens															| Arguments																											|
 |-----------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| ready					| Catberry has finished initialization										|	no																												|
+| ready					| Catberry has finished initialization									|	no																												|
 | error					| error is happened														|	`Error` object																									|
 | moduleLoaded			| each module is loaded													|	Module name as string																							|
 | placeholderLoaded		| each placeholder is loaded											|	`{name: String, moduleName: String}`																			|
@@ -43,7 +43,7 @@ Here is a list of common Catberry events:
 | templateRegistered	| template of placeholder is registered									|	`{name: String, source: String}`																				|
 | placeholderRender		| Catberry starts rendering placeholder									|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`}`					|
 | placeholderRendered	| Catberry finishes rendering placeholder								|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`, time: Number}`	|
-| pageRendered			| Catberry finishes rendering of all placeholders after state changing	|	`{name: String, moduleName: String, element: jQuery, context: `[Context](modules/context.md)`}`					|
+| pageRendered			| Catberry finishes rendering of all placeholders after state changing	|	[Context](modules/context.md) with states of all modules														|
 
 Next list of only-server events:
 
@@ -55,12 +55,12 @@ Next list of only-server events:
 
 And list of only-browser events:
 
-| Event				| When happens																| Arguments																				|
-|-------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| eventRegistered	| event definition is registered											|	`{eventName: String, moduleNames: Array<String>, expression: RegExp}`				|
-| eventRouted		| Catberry finishes invocation of all handle methods subscribed on event	|	`{moduleNames: Array<String>, eventName: String, isStarted: Boolean, args: Object}`	|
-| formSubmitted		| Catberry finishes invocation of submit method for any form on page		|	`{element: jQuery, name: String, moduleName: String, values: Object}`				|
-| renderRequested	| some module requests refresh of any placeholder							|	`{placeholderName: String, moduleName: String}`										|
+| Event				| When happens																| Arguments																																					|
+|-------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| eventRegistered	| event definition is registered											|	`{eventName: String, moduleNames: Array<String>, expression: RegExp}`																					|
+| eventRouted		| Catberry finishes invocation of all handle methods subscribed on event	|	`{string: String, isEnding: Boolean, isHashChanging: Boolean, element: jQuery, eventName: String, args: Object, moduleNames: Array<String>}`			|
+| formSubmitted		| Catberry finishes invocation of submit method for any form on page		|	`{element: jQuery, name: String, moduleName: String, values: Object}`																					|
+| renderRequested	| some module requests refresh of any placeholder							|	`{placeholderName: String, moduleName: String}`																											|
 
 This events can be used for browser extensions, extended logging or module 
 logic, feel free to use them everywhere you want but remember if any event has 

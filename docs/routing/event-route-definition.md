@@ -1,8 +1,8 @@
 #Event Route Definition
 
-Catberry supports optional event route definitions in `/events.js`.
+Catberry supports optional event route definitions in `./events.js`.
 
-Event route definitions describe which events are handled by Catberry 
+Event route definitions describe which events are handled by Catberry, 
 what parameters Catberry can parse from event names and what modules will
 receive event and parsed parameters.
 
@@ -10,11 +10,11 @@ Event could be raised in two cases:
 
 * Changed hash in location (if you has clicked in page on link that contains 
 hash in `href` attribute or if you open shared link with hash), 
-in this case hash is an event name. 
+in this case hash is an event string. 
 Sample link element: `<a href="#event-name">Title</a>`.
 Sample url: `http://yourserver.com#event-name`.
 * Click on link or button (`<a>` or `<button>` element) with `data-event` 
-attribute, which value is event name. Use this case if you don't want to update 
+attribute, which value is event string. Use this case if you don't want to update 
 location hash. `href` attribute of link element in this will be ignored.
 Sample link element: `<a href="#event-name" data-event="event-name">Title</a>`.
 Sample button element: `<button data-event="event-name">Details</button>`.
@@ -38,8 +38,8 @@ expressionWithParameters->eventName[module1, module2, module3]
 `expressionWithParameters` - this is expression with colon-marked parameters
 which is very similar with [URL Route Definition](url-route-definition.md) but
 without list of modules receivers in it.
-
-Then after `->` you should define event name that will be raised in module and
+Before `->` it is **event string format** that can contain any parameters.
+Then after `->` you should define **event name** that will be raised in module and
 list of modules that will receive this event.
 
 ## Example of definition
@@ -48,7 +48,8 @@ For example, we have rule
 limit:count->limit[feed]
 ```
 If this rule is defined and event or hash is `limit50` then `feed` module's 
-`handle` method will be invoked with event name `limit` and arguments: 
+`handle` method will be invoked with event string `limit50`, event name `limit`
+ and arguments: 
 ```json
 {
   "count": "50"
@@ -76,7 +77,7 @@ Please keep in mind that parameter names should satisfy regular expression
 `\w*`.
 
 ## File example
-Here is an example of `/events.js` file with some event route definitions:
+Here is an example of `./events.js` file with some event route definitions:
 
 ```javascript
 module.exports = [
