@@ -554,6 +554,138 @@ describe('browser/PageRenderer', function () {
 					}
 				});
 			});
+
+		it('should invoke after methods for rendered placeholders',
+			function (done) {
+				var page = '<div id="module2_second">dummy' +
+						'<div id="module2_first">dummy' +
+						'<div id="module_first">dummy' +
+						'</div></div></div>',
+					locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					dataContext = {
+						module: {
+							first: {},
+							second: {}
+						},
+						module2: {
+							first: {},
+							second: {}
+						},
+					},
+					rendered = {};
+
+				modules.module.implementation.decorateMethod('render',
+					function (name) {
+						return dataContext.module[name];
+					});
+				modules.module.implementation.decorateMethod('afterRender',
+					function (name, dataContext) {
+						rendered['module-' + name] = dataContext;
+					});
+
+				modules.module2.implementation.decorateMethod('render',
+					function (name) {
+						return dataContext.module2[name];
+					});
+				modules.module2.implementation.decorateMethod('afterRender',
+					function (name, dataContext) {
+						rendered['module2-' + name] = dataContext;
+					});
+
+				jsdom.env({
+					html: page,
+					done: function (errors, window) {
+						prepareWindow(window, locator);
+						var $ = locator.resolve('jQuery');
+						$(function () {
+							var pageRenderer = locator
+									.resolveInstance(PageRenderer),
+								renderingParameters = {
+									state: {
+										module: {
+											first: 'test3'
+										},
+										module2: {
+											second: 'test3'
+										}
+									}
+								};
+
+							pageRenderer.render(renderingParameters)
+								.then(function () {
+									assert.strictEqual(
+										rendered['module-first'],
+										dataContext.module.first
+									);
+									assert.strictEqual(
+										rendered['module2-first'],
+										dataContext.module2.first
+									);
+									assert.strictEqual(
+										rendered['module2-second'],
+										dataContext.module2.second
+									);
+									assert.strictEqual(
+										Object.keys(rendered).length, 3
+									);
+								})
+								.then(function () {
+									done();
+								}, function (error) {
+									done(error);
+								});
+						});
+					}
+				});
+			});
+
+		it('should invoke after methods when init for data rendered at server',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames(),
+					rendered = {};
+
+				modules.module.implementation.decorateMethod('afterRender',
+					function (name) {
+						rendered['module-' + name] = true;
+					});
+
+				modules.module2.implementation.decorateMethod('afterRender',
+					function (name) {
+						rendered['module2-' + name] = true;
+					});
+				moduleLoader.lastRenderedData = {
+					module: {
+						first: {}
+					},
+					module2: {
+						second: {}
+					}
+				};
+				jsdom.env({
+					html: '<div></div>',
+					done: function (errors, window) {
+						prepareWindow(window, locator);
+						var $ = locator.resolve('jQuery');
+						$(function () {
+							locator.resolveInstance(PageRenderer);
+							assert.strictEqual(
+								rendered['module-first'], true
+							);
+							assert.strictEqual(
+								rendered['module2-second'], true
+							);
+							assert.strictEqual(
+								Object.keys(rendered).length, 2
+							);
+							done();
+						});
+					}
+				});
+			});
 	});
 });
 
@@ -596,15 +728,17 @@ function createModules() {
 		renderedData: {}
 	};
 
-	var moduleImplementation = new UniversalMock(['render']);
+	var moduleImplementation = new UniversalMock(['render', 'afterRender']);
 	moduleImplementation.$context = Object.create(context);
 	moduleImplementation.$context.name = 'module';
 
-	var module2Implementation = new UniversalMock(['render']);
+	var module2Implementation = new UniversalMock(['render', 'afterRender']);
 	module2Implementation.$context = Object.create(context);
 	module2Implementation.$context.name = 'module2';
 
-	var moduleWithErrorImplementation = new UniversalMock(['render']);
+	var moduleWithErrorImplementation = new UniversalMock([
+		'render', 'afterRender'
+	]);
 	moduleWithErrorImplementation.$context = Object.create(context);
 	moduleWithErrorImplementation.$context.name = 'moduleWithError';
 	return {
