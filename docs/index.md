@@ -13,6 +13,7 @@
         * [Config](services/userland/config.md)
         * [jQuery](services/userland/jquery.md)
         * [Universal HTTP(S) Request](services/userland/universal-http-request.md)
+        * [Dust](services/userland/dust.md)
 * [Routing](routing/index.md)
 	* [URL Route Definition](routing/url-route-definition.md)
 	* [Event Route Definition](routing/event-route-definition.md)

@@ -34,6 +34,7 @@ Userland Services
 * [Config](userland/config.md)
 * [jQuery](userland/jquery.md)
 * [Universal HTTP(S) Request](userland/universal-http-request.md)
+* [Dust](userland/dust.md)
 
 Read next:
 
