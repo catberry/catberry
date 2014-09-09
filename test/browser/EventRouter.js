@@ -280,6 +280,63 @@ describe('browser/EventRouter', function () {
 						done(error);
 					});
 			});
+
+		it('should invoke after methods in several modules',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+				locator.registerInstance(
+					'eventDefinition',
+					'someTestEvent:number->testEvent[module, module2]'
+				);
+				var eventRouter = locator.resolveInstance(EventRouter),
+					invoked = {},
+					handleInvoked = 0,
+					validator = function (moduleName, args) {
+						var eventName = args[0],
+							event = args[1];
+
+						assert.strictEqual(handleInvoked, 2);
+						assert.strictEqual(
+							eventName, 'testEvent', 'Wrong event name'
+						);
+						assert.strictEqual(
+							event.name, 'testEvent', 'Wrong event name'
+						);
+						assert.strictEqual(event.isEnding, false);
+						assert.strictEqual(event.isHashChanging, true);
+						assert.strictEqual(event.args.number, '1');
+						if (!(moduleName in invoked)) {
+							invoked[moduleName] = 0;
+						}
+						invoked[moduleName]++;
+					};
+
+				modules.module.implementation.once('handle', function () {
+					handleInvoked++;
+				});
+				modules.module2.implementation.once('handle', function () {
+					handleInvoked++;
+				});
+				modules.module.implementation.once(
+					'afterHandle',
+					validator.bind(modules.module.implementation, 'module')
+				);
+				modules.module2.implementation.once(
+					'afterHandle',
+					validator.bind(modules.module2.implementation, 'module2')
+				);
+
+				eventRouter.routeHashChange('someTestEvent1')
+					.then(function () {
+						assert.strictEqual(invoked.module, 1);
+						assert.strictEqual(invoked.module2, 1);
+						done();
+					}, function (error) {
+						done(error);
+					});
+			});
 	});
 });
 
@@ -287,11 +344,11 @@ function createLocator() {
 	var modules = {
 			module: {
 				name: 'module',
-				implementation: new UniversalMock(['handle'])
+				implementation: new UniversalMock(['handle', 'afterHandle'])
 			},
 			module2: {
 				name: 'module2',
-				implementation: new UniversalMock(['handle'])
+				implementation: new UniversalMock(['handle', 'afterHandle'])
 			}
 		},
 		locator = new ServiceLocator(),

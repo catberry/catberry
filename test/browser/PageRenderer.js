@@ -572,25 +572,30 @@ describe('browser/PageRenderer', function () {
 						module2: {
 							first: {},
 							second: {}
-						},
+						}
 					},
+					renderedCount = 0,
 					rendered = {};
 
 				modules.module.implementation.decorateMethod('render',
 					function (name) {
+						renderedCount++;
 						return dataContext.module[name];
 					});
 				modules.module.implementation.decorateMethod('afterRender',
 					function (name, dataContext) {
+						assert.strictEqual(renderedCount, 3);
 						rendered['module-' + name] = dataContext;
 					});
 
 				modules.module2.implementation.decorateMethod('render',
 					function (name) {
+						renderedCount++;
 						return dataContext.module2[name];
 					});
 				modules.module2.implementation.decorateMethod('afterRender',
 					function (name, dataContext) {
+						assert.strictEqual(renderedCount, 3);
 						rendered['module2-' + name] = dataContext;
 					});
 

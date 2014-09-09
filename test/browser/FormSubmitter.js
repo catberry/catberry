@@ -215,11 +215,17 @@ describe('browser/FormSubmitter', function () {
 						var formSubmitter = locator.resolveInstance(FormSubmitter);
 						$('#form').html(form);
 
+						var isSubmitted = false;
+						modules.module.implementation.once('submit',
+							function () {
+								isSubmitted = true;
+							});
 						modules.module.implementation.once('afterSubmit',
 							function (args) {
 								var formName = args[0],
 									formArgs = args[1];
 
+								assert.strictEqual(isSubmitted, true);
 								assert.strictEqual(
 									formName, 'write_some', 'Wrong form name'
 								);
