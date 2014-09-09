@@ -182,7 +182,7 @@ PageRenderer.prototype.renderPlaceholder =
 		var element = this.$('#' + placeholder.fullName);
 		if (element.length !== 1 ||
 			(placeholder.fullName in renderingContext.rendered)) {
-			return Promise.resolve();
+			return Promise.resolve(renderingContext);
 		}
 		renderingContext.rendered[placeholder.fullName] = true;
 
