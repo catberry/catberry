@@ -5,24 +5,24 @@ Catberry application object has a method `build` that can be used like this:
 ```javascript
 var catberry = require('catberry'),
 	cat = catberry.create();
-cat.build();
+cat.build(); // returns a promise
 ```
 
-This method can be called in `/server.js` script or separately in
+This method can be called in `./server.js` script or separately in
 different script and process.
 
 It is highly recommended to use `build` method in separated process 
 (not in server process) because JavaScript minification requires a lot of memory 
-and it looks like your `/server.js` script spends 1GB of RAM, which is not so of 
+and it looks like your `./server.js` script spends 1GB of RAM, which is not so of 
 course.
 
-For example you can use `/build.js` script with following:
+For example you can use `./build.js` script with following:
 ```
 node ./build.js release
 ```
 
 To build browser bundle Catberry uses [browserify](http://browserify.org) which 
-is awesome and can convert your JavaScript server-side code to browser code.
+is awesome and can convert your server-side JavaScript to browser code.
 
 ##Including packages into browser bundle
 There are some rules according browserify limitations:
@@ -36,10 +36,8 @@ mark it with special hint comment like this:
 /**no-browser-bundle**/
 var serverSidePackage = require('./lib/package');
 ```
-Some Catberry plugins uses this hint to exclude its server side 
-implementations from browser bundle. Also you can use this hint for server-side
-configuration that can have some secret parameters and it should not appear 
-in browser.
+Also you can use this hint for server-side configuration that can have some 
+secret parameters and it should not appear in browser.
 
 Filter for such excluded `require` is implemented as browserify transform 
 stream and has a good performance.

@@ -1,6 +1,6 @@
 #URL Route Definition
 
-Catberry requires route definitions in `/routes.js`.
+Catberry requires route definitions in `./routes.js`.
 
 Route definition is a rule that describes which URLs are handled by Catberry,
 what parameters Catberry can parse from these URLs and what modules will 
@@ -72,7 +72,7 @@ In this example module `order` will receive parameter `orderId` with value
 matched with number in URL.
 
 ## File example
-Here is example of `/routes.js` file with all 3 cases of route definition:
+Here is example of `./routes.js` file with all 3 cases of route definition:
 
 ```javascript
 module.exports = [

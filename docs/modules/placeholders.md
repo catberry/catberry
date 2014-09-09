@@ -136,7 +136,7 @@ concurrently for all placeholder references that makes rendering process fast.
 By default Catberry tries to save current scroll position when rendering 
 in browser but in some situation you may need to scroll top of page when change
 content of page. In this case you can add `data-scroll-top` attribute to your
-placeholder HTML element. After such placeholder was rendered page will be 
+placeholder`s HTML element. After such placeholder was rendered page will be 
 scrolled top.
 
 ##Loading class
@@ -148,9 +148,9 @@ you want.
 `<head>` element also can be a placeholder. You can change `<title>`, `<meta>`,
 add new `<script>` or `<link>` elements dynamically. At server `<head>` 
 placeholder is rendered as usually, but in browser `<head>` rendering is 
-not simple. When your module change content of `<head>` placeholder, rendering 
-engine merges all changes with current `<head>` and do not load styles and 
-scripts more times.
+not simple for Catberry but is simple for you. When your module changes 
+content of `<head>` placeholder, rendering engine merges all changes with 
+current `<head>` and do not load styles and scripts one more time.
 
 So, what is happened during this merge:
 
@@ -161,7 +161,7 @@ these elements are removed from `<head>` except scripts and styles
 `<head>` and adds it to end of current `<head>`
 
 This approach makes `<head>` changes smoothly for user and do not execute 
-JavaScript code, included in head, twice.
+JavaScript code, included in head twice.
 
 Read next:
 

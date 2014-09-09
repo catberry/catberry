@@ -49,7 +49,7 @@ More details [here](https://github.com/nomiddlename/log4js-node#usage).
 
 #Interface
 
-* Browser: [/lib/client/Logger.js](../../../browser/Logger.js)
+* Browser: [./lib/client/Logger.js](../../../browser/Logger.js)
 * Server: [log4js](https://www.npmjs.org/package/log4js)
 
 Read also:

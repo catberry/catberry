@@ -30,6 +30,9 @@ location in the same way as at server as in browser
 * Every module can handle link clicks and hash changes with passing arguments 
 in a very simple way
 * Every module can receive submitted form and, for example, pass its data to API
+* Whole module API is built using [promises](https://www.promisejs.org/). 
+Promise is a main approach for working with asynchronous operations in Catberry
+application.
  
 You can read a lot about additional features in other documentation sections.
  
