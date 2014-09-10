@@ -44,24 +44,13 @@ var placeholders = [
 ];
 
 var util = require('util'),
-	uhr = require('catberry-uhr'),
-	Promise = require('promise'),
 	routeDefinitions = '__routeDefinitions' || [],
 	eventDefinitions = '__eventDefinitions' || [],
-	dust = '__templateEngine',
-	helpers = require('dustjs-helpers'),
-	Catberry = require('./Catberry'),
-	jQuery = require('jquery'),
-	Logger = require('./Logger'),
-	ModuleLoader = require('./ModuleLoader'),
-	PageRenderer = require('./PageRenderer'),
-	RequestRouter = require('./RequestRouter'),
-	EventRouter = require('./EventRouter'),
-	FormSubmitter = require('./FormSubmitter'),
-	TemplateProvider = require('./TemplateProvider'),
-	ModuleApiProvider = require('./ModuleApiProvider'),
-	CookiesWrapper = require('./CookiesWrapper'),
-	BootstrapperBase = require('../lib/base/BootstrapperBase');
+	Catberry = require('catberry/browser/Catberry'),
+	Logger = require('catberry/browser/Logger'),
+	EventRouter = require('catberry/browser/EventRouter'),
+	FormSubmitter = require('catberry/browser/FormSubmitter'),
+	BootstrapperBase = require('catberry/lib/base/BootstrapperBase');
 
 var INFO_EVENT_REGISTERED =
 		'Event "%s" was registered for module(s) %s',
@@ -73,11 +62,6 @@ var INFO_EVENT_REGISTERED =
 		'Requesting rendering of placeholder "%s", module "%s"',
 	TRACE_FORM_SUBMITTED =
 		'Form "%s" was submitted to module "%s"';
-
-// if browser still does not have promises then add it.
-if (!('Promise' in window)) {
-	window.Promise = Promise;
-}
 
 util.inherits(Bootstrapper, BootstrapperBase);
 
@@ -97,36 +81,25 @@ function Bootstrapper() {
  */
 Bootstrapper.prototype.configure = function (configObject, locator) {
 	BootstrapperBase.prototype.configure.call(this, configObject, locator);
-	var loggerConfig = configObject.logger || {};
 
-	var logger = new Logger(loggerConfig.levels);
+	// if browser still does not have promises then add it.
+	if (!('Promise' in window)) {
+		window.Promise = locator.resolve('promise');
+	}
+
+	locator.registerInstance('window', window);
+	locator.register('eventRouter', EventRouter, configObject, true);
+	locator.register('formSubmitter', FormSubmitter, configObject, true);
+
+	var loggerConfig = configObject.logger || {},
+		logger = new Logger(loggerConfig.levels);
+	locator.registerInstance('logger', logger);
 	window.onerror = function errorHandler(msg, url, line) {
 		logger.fatal(url + ':' + line + ' ' + msg);
 		return true;
 	};
 	var eventBus = locator.resolve('eventBus');
 	this._wrapEventsWithLogger(eventBus, logger);
-
-	locator.registerInstance('logger', logger);
-	locator.registerInstance('window', window);
-
-	locator.register('moduleLoader', ModuleLoader, configObject, true);
-	locator.register('pageRenderer', PageRenderer, configObject, true);
-	locator.register('requestRouter', RequestRouter, configObject, true);
-	locator.register('eventRouter', EventRouter, configObject, true);
-	locator.register('formSubmitter', FormSubmitter, configObject, true);
-	locator.register('templateProvider', TemplateProvider, configObject, true);
-	locator.register('moduleApiProvider',
-		ModuleApiProvider, configObject, true
-	);
-	locator.register('cookiesWrapper',
-		CookiesWrapper, configObject, true
-	);
-
-	uhr.register(locator);
-
-	locator.registerInstance('dust', dust);
-	locator.registerInstance('jQuery', jQuery);
 
 	routeDefinitions.forEach(function (routeDefinition) {
 		locator.registerInstance('routeDefinition', routeDefinition);
