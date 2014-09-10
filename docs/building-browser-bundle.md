@@ -30,17 +30,9 @@ There are some rules according browserify limitations:
 * If you want to include some module into browser bundle it should be required
 directly via `require('some/path/to/module')`. If module path is variable it
 will not work
-* If you want to exclude some server package from browser bundle you can
-mark it with special hint comment like this:
-```javascript
-/**no-browser-bundle**/
-var serverSidePackage = require('./lib/package');
-```
-Also you can use this hint for server-side configuration that can have some 
-secret parameters and it should not appear in browser.
-
-Filter for such excluded `require` is implemented as browserify transform 
-stream and has a good performance.
+* If you want to exclude some server-side package from browser bundle or 
+replace it with browser versions just use browserify `browser` field 
+in `package.json` as it is described [here](http://github.com/substack/node-browserify#packagejson).
 
 All modules are defined in `modulesFolder` 
 (details in [Modules](modules/index.md) section) and its placeholders are 
