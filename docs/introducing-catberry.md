@@ -10,14 +10,14 @@ rendering at the server side for SEO purposes and shared links,
 and on the other hand for rendering in browser for [Single Page Application]
 (http://en.wikipedia.org/wiki/Single_Page_Application).
 
-A lot of features are also described in [read me](../README.md) and 
+A lot of features are also described in [read me](../README.md) file and 
 there is a list of most important advantages which your isomorphic application 
 receives using Catberry:
 
 * Server-side rendering is stream-based, it means user will see a page
-immediately and do not need to wait until all requests to API will be finished.
-* Application consists of independent modules. Page consist of placeholders and 
-every module controls a group of such placeholders. 
+immediately and do not need to wait until all API requests will be finished
+* Application consists of independent modules. Page consists of placeholders and 
+each module controls a group of such placeholders. 
 Make and combine placeholders in modules as you want
 * Every placeholder is a [dustjs](https://github.com/linkedin/dustjs) template 
 with all advantages of this streaming template engine 
@@ -34,7 +34,7 @@ in a very simple way
 Promise is a main approach for working with asynchronous operations in Catberry
 application.
  
-You can read a lot about additional features in other documentation sections.
+You can read about additional features in other documentation sections.
  
 Read next:
  
