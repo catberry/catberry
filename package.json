@@ -32,6 +32,16 @@
 	],
 
 	"main": "./index",
+	"browser": {
+		"./lib/Bootstrapper.js": "__BrowserBundle.js",
+		"./lib/Catberry.js": "./browser/Catberry.js",
+		"./lib/CookiesWrapper.js": "./browser/CookiesWrapper.js",
+		"./lib/ModuleApiProvider.js": "./browser/ModuleApiProvider.js",
+		"./lib/ModuleLoader.js": "./browser/ModuleLoader.js",
+		"./lib/PageRenderer.js": "./browser/PageRenderer.js",
+		"./lib/RequestRouter.js": "./browser/RequestRouter.js",
+		"./lib/TemplateProvider.js": "./browser/TemplateProvider.js"
+	},
 	"dependencies": {
 		"glob": "^4.0.0",
 		"glob-watcher": "~0.0.6",
