@@ -96,8 +96,6 @@ All supported browsers are listed below:
 | Blackberry Browser| 7+			|
 
 ##Not included packages
-* [catberry-module](https://www.npmjs.org/package/catberry-module) - 
-Basic module implementation with "smart method invocation"
 * [catberry-l10n](https://www.npmjs.org/package/catberry-l10n) - 
 Localization support
 * [catberry-lazy-loader](https://www.npmjs.org/package/catberry-lazy-loader) - 
