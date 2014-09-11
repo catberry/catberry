@@ -17,11 +17,16 @@ test:
 		--bail
 
 test-cov:
-	@NODE_ENV=test node --harmony-generators \
-		node_modules/.bin/istanbul cover \
+	@NODE_ENV=test node node_modules/.bin/istanbul cover \
 		./node_modules/.bin/_mocha \
+		--harmony-generators \
 		-- -u exports \
 		$(TESTS) \
 		--bail
+
+coveralls: test-cov
+	cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+
+travis: lint coveralls
 
 .PHONY: test
