@@ -45,7 +45,7 @@ var MOUSE_KEYS = {
 	A_TAG_NAME = 'A',
 	BUTTON_TAG_NAME = 'BUTTON',
 	PROTOCOL_REGEXP = /^\w+:/,
-	HASH_REGEXP = /^#(.)+$/,
+	HASH_REGEXP = /^#.+$/,
 	ERROR_WRONG_MODULE_NAME = 'Wrong module name "%s"',
 	ERROR_WRONG_PLACEHOLDER_NAME = 'Wrong placeholder name "%s"';
 
