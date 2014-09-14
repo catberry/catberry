@@ -51,7 +51,7 @@ Next list of only-server events:
 |-------------------|-------------------------------|-----------------------------------|
 | moduleFound		| each module is found			|	`{name: String, path: String}`	|
 | placeholderFound	| each placeholder is found		|	`{name: String, path: String}`	|
-| bundleBuilt 		| browser bundle is built		|	Path to bundle file as string	|
+| bundleBuilt 		| browser bundle is built		|	`{time: Number, path: String}`	|
 
 And list of only-browser events:
 
