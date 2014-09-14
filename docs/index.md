@@ -428,3 +428,205 @@ for placeholder rendering and if you need to add some
 [filters](https://github.com/linkedin/dustjs/wiki/Dust-Tutorial#more-on-dust-output-and-dust-filters) 
 or [helpers](https://github.com/linkedin/dustjs/wiki/Dust-Tutorial#writing-a-dust-helper) 
 in it you can inject it to main module and do everything you need.
+
+#Routing
+
+Catberry has two routing subsystems:
+
+* URL routing system: routes all URL changes and map URL arguments 
+to states of modules. All rules must be defined in `./routes.js`
+* Event routing system: routes all page hash changes or `data-event` 
+attributes of links in page. Invokes handle methods of all modules-receivers. 
+All rules must be defined in `./events.js`.
+
+If your application does not have routing rules, your modules can not render
+page blocks and handle any events from page.
+
+All details about definition of route rules are described in next sections.
+
+##URL Route Definition
+
+Catberry requires route definitions in `./routes.js`.
+
+Route definition is a rule that describes which URLs are handled by Catberry,
+what parameters Catberry can parse from these URLs and what modules will 
+receive parsed parameters.
+ 
+### Colon-marked parameters definition
+
+Default definition syntax is following:
+
+```
+/some/:id[module1,module2]/actions?someParameter=:parameter[module1]
+```
+
+All parameters must be marked with colon at start and followed by list of 
+module names that will receive value of this parameter to its state object.
+
+In previous example `id` value will be set to state of modules 
+`module1`, `module2`; and `parameter` value will be set only to state of module
+`module1`.
+
+Please keep in mind that parameter **name** in route definition should satisfy
+regular expression `[$A-Z_][\dA-Z_$]*` and parameter **value** should satisfy
+regular expression `[^\/\\&\?=]*`.
+
+### Colon-marked parameters with additional `map` function
+
+Also you can define mapper object, that allows you to modify state object before 
+it will be processed by modules.
+
+For such definition just use object like this:
+
+```javascript
+{
+	expression: '/user/news/:category[news]',
+	map: function(state) {
+		state.news.pageType = 'userNews';
+		return state;
+	}
+}
+
+```
+Map function receives state prepared by expression rule. State is an object 
+where keys are names of receiver modules and values are state objects for every 
+module receiver. You can change whole state object if you want and return it
+from map function.
+
+In this example module `news` will receive additional state parameter `pageType`
+with value `userNews`.
+
+### Regular expression
+For some rare cases you may need to parse parameters by yourself using regular
+expressions. In these cases you can define mapper object as listed below:
+
+```javascript
+{
+	expression: /^\/orders\/\d+/i,
+	map: function(urlPath) {
+		var matches = urlPath.match(/^\/orders\/(\d+)/i);
+		return {
+			order:{
+				orderId: Number(matches[1])
+			}
+		};
+	}
+}
+```
+
+In this example module `order` will receive parameter `orderId` with value
+matched with number in URL.
+
+### File example
+Here is example of `./routes.js` file with all 3 cases of route definition:
+
+```javascript
+module.exports = [
+	'/user/:id[user,menu,notifications]',
+	{
+		expression: '/user/news/:category[news]',
+		map: function(state) {
+			state.news.pageType = 'userNews';
+			return state;
+		}
+	},
+	{
+		expression: /^\/orders\/\d+/i,
+		map: function(urlPath) {
+			var matches = urlPath.match(/^\/orders\/(\d+)/i);
+			return {
+				orderId: Number(matches[1])
+			};
+		}
+	}
+];
+```
+##Event Route Definition
+
+Catberry supports optional event route definitions in `./events.js`.
+
+Event route definitions describe which events are handled by Catberry, 
+what parameters Catberry can parse from event names and what modules will
+receive event and parsed parameters.
+
+Event could be raised in two cases:
+
+* Changed hash in location (if you has clicked in page on link that contains 
+hash in `href` attribute or if you open shared link with hash), 
+in this case hash is an event string. 
+Sample link element: `<a href="#event-name">Title</a>`.
+Sample url: `http://yourserver.com#event-name`.
+* Click on link or button (`<a>` or `<button>` element) with `data-event` 
+attribute, which value is event string. Use this case if you don't want to update 
+location hash. `href` attribute of link element in this will be ignored.
+Sample link element: `<a href="#event-name" data-event="event-name">Title</a>`.
+Sample button element: `<button data-event="event-name">Details</button>`.
+
+When you change hash in location, modules receive two events:
+
+* Previous event was ended (last hash is cleared)
+* New event is starting (new hash is set)
+
+When you click on link or button with `data-event` it is always "start" an 
+event and never "end" of event.
+
+###Definition or rules
+
+There is one way to define event routing rule:
+
+```
+expressionWithParameters->eventName[module1, module2, module3]
+```
+
+`expressionWithParameters` - this is expression with colon-marked parameters
+which is very similar with [URL Route Definition](#url-route-definition) but
+without list of modules receivers in it.
+Before `->` it is **event string format** that can contain any parameters.
+Then after `->` you should define **event name** that will be raised in module and
+list of modules that will receive this event.
+
+### Example of definition
+For example, we have rule 
+```
+limit:count->limit[feed]
+```
+If this rule is defined and event or hash is `limit50` then `feed` module's 
+`handle` method will be invoked with event string `limit50`, event name `limit`
+ and arguments: 
+```json
+{
+  "count": "50"
+}
+```
+
+More complex example:
+```
+removeComment-:id-:someOther->removeComment[comments, feed, rating]
+```
+
+Let's say hash is `#removeComment-1-text`.
+
+Modules `comments`, `feed` and `rating` will handle event with name 
+`removeComment` and arguments:
+```json
+{
+  "id": "1",
+  "someOther": "text"
+}
+```
+
+Please keep in mind that parameter names should satisfy regular expression
+`[$A-Z_][\dA-Z_$]*` and parameter values should satisfy regular expression
+`\w*`.
+
+### File example
+Here is an example of `./events.js` file with some event route definitions:
+
+```javascript
+module.exports = [
+	'forget-password->forget-password[auth]',
+	'limit:number->limit[orderComments]',
+	'remove-:entityType-:id->remove[main]'
+];
+```
+
