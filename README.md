@@ -58,9 +58,9 @@ will receive parameter's value. Anyway regular expressions are supported too.
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called 
-[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/service-module-placeholder.md) 
+[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md#service-module-placeholder) 
 instead of Model-View-Controller. 
-SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/isomorphic-applications.md).
+SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md#isomorphic-applications).
 
 For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md).
 
