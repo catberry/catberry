@@ -92,7 +92,7 @@ immediately and do not need to wait until all API requests will be finished
 * Application consists of independent modules. Page consists of placeholders and 
 each module controls a group of such placeholders. 
 Make and combine placeholders in modules as you want
-* Every placeholder is a [dustjs](https://github.com/linkedin/dustjs) template 
+* Every placeholder is a [dustjs](https://github.com/catberry/catberry-dust) template 
 with all advantages of this streaming template engine 
 * Routing engine supports parsing of parameters from URLs and map it 
 to state object in the module. URL and state are automatically synchronized 
@@ -423,10 +423,8 @@ Catberry has dustjs template engine service registered as "dust" in
 Just inject `$dust` into your module or resolve it from 
 Service Locator to use this service.
 
-Catberry uses [dustjs](https://github.com/linkedin/dustjs) template engine
-for placeholder rendering and if you need to add some 
-[filters](https://github.com/linkedin/dustjs/wiki/Dust-Tutorial#more-on-dust-output-and-dust-filters) 
-or [helpers](https://github.com/linkedin/dustjs/wiki/Dust-Tutorial#writing-a-dust-helper) 
+Catberry uses [dustjs](https://github.com/catberry/catberry-dust) template engine
+for placeholder rendering and if you need to add some filters or helpers 
 in it you can inject it to main module and do everything you need.
 
 #Routing
@@ -652,7 +650,7 @@ template of whole application page (html, head, body etc)
 * Module can optionally have a logic (can just has templates), if so 
 it should have `index.js` that exports module constructor
 * Module can optionally have placeholders, if so it should have `placeholders`
-directory inside with [dustjs](https://github.com/linkedin/dustjs) templates.
+directory inside with [dustjs](https://github.com/catberry/catberry-dust) templates.
 Placeholders can be placed in sub-directories but with unique names
 
 Please keep in mind that module name (directory name) should satisfy regular 
@@ -724,7 +722,7 @@ Placeholder is a block of page that is controlled by a module. In fact every
 placeholder is a template that is stored in module's `placeholders` directory 
 and rendered in any position on page.
 
-Catberry uses [dustjs](https://github.com/linkedin/dustjs) template engine.
+Catberry uses [dustjs](https://github.com/catberry/catberry-dust) template engine.
 All stuff about how to use and what syntax it has you can read [here]
 (https://github.com/linkedin/dustjs/wiki/Dust-Tutorial). Also [dustjs-helpers]
 (https://github.com/linkedin/dustjs-helpers) are included in Catberry.
