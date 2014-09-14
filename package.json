@@ -32,6 +32,16 @@
 	],
 
 	"main": "./index",
+	"browser": {
+		"./lib/Bootstrapper.js": "__BrowserBundle.js",
+		"./lib/Catberry.js": "./browser/Catberry.js",
+		"./lib/CookiesWrapper.js": "./browser/CookiesWrapper.js",
+		"./lib/ModuleApiProvider.js": "./browser/ModuleApiProvider.js",
+		"./lib/ModuleLoader.js": "./browser/ModuleLoader.js",
+		"./lib/PageRenderer.js": "./browser/PageRenderer.js",
+		"./lib/RequestRouter.js": "./browser/RequestRouter.js",
+		"./lib/TemplateProvider.js": "./browser/TemplateProvider.js"
+	},
 	"dependencies": {
 		"glob": "^4.0.0",
 		"glob-watcher": "~0.0.6",
@@ -46,6 +56,8 @@
 		"promise": "^5.0.0"
 	},
 	"devDependencies": {
+		"istanbul-harmony": "~0.3.0",
+		"coveralls": "^2.11.1",
 		"jsdom": "~0.11.0",
 		"mocha": "^1.20.0",
 		"jscs": "~1.4.0",
@@ -55,7 +67,7 @@
 		"node": "~0.10.26"
 	},
 	"scripts": {
-		"test": "jshint ./ && jscs ./ && mocha --recursive"
+		"test": "make"
 	},
 	"licenses": [
 		{
