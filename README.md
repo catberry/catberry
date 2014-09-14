@@ -5,8 +5,8 @@
 ![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##What is it?
-Catberry is a framework for fast and modular 
-[isomorphic web-applications](docs/isomorphic-applications.md) written in 
+Catberry is a framework for fast and modular  
+[isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md#isomorphic-applications) written in 
 JavaScript using [node.js](http://nodejs.org). 
 
 Catberry makes possible to write module once and use it at server and in browser
@@ -26,7 +26,7 @@ To get started with example please proceed to
 ##Advantages
 * Super fast rendering engine using 
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) 
-without in-memory template rendering (powered by [dustjs](https://github.com/linkedin/dustjs))
+without in-memory template rendering (powered by [dustjs](https://github.com/catberry/catberry-dust))
 * You will write code in server-side style 
 (using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) 
 and only once to execute it at server and in browser
