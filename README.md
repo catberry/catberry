@@ -39,7 +39,7 @@ blocks on page and refresh only changed blocks in browser
 structure in browser without reloading of page
 * A click on button or link with `data-event` attribute or hash in `href` 
 raises an event in your modules automatically. Manual hash changing does the same thing.
-* Your application builds version of itself for browser using 
+* Your application builds javascript bundle for browser using 
 [browserify](http://browserify.org) (debug and release modes are supported)
 * All framework architecture is built using 
 [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) 
@@ -58,9 +58,9 @@ will receive parameter's value. Anyway regular expressions are supported too.
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called 
-[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/service-module-placeholder.md) 
-instead Model-View-Controller. 
-SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/isomorphic-applications.md).
+[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md#service-module-placeholder) 
+instead of Model-View-Controller. 
+SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md#isomorphic-applications).
 
 For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md).
 
