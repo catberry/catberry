@@ -47,11 +47,10 @@
 		"glob-watcher": "~0.0.6",
 		"catberry-locator": "^1.0.0",
 		"catberry-uhr": "git://github.com/catberry/catberry-uhr.git#develop",
+		"catberry-dust": "git://github.com/catberry/catberry-dust.git#master",
 		"jquery": "^2.0.0",
 		"uglify-js": "^2.0.0",
 		"browserify": "^4.0.0",
-		"dustjs-linkedin": "~2.3.5",
-		"dustjs-helpers": "~1.2.0",
 		"log4js": "~0.6.0",
 		"promise": "^5.0.0"
 	},
