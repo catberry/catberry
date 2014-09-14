@@ -39,7 +39,7 @@ blocks on page and refresh only changed blocks in browser
 structure in browser without reloading of page
 * A click on button or link with `data-event` attribute or hash in `href` 
 raises an event in your modules automatically. Manual hash changing does the same thing.
-* Your application builds version of itself for browser using 
+* Your application builds javascript bundle for browser using 
 [browserify](http://browserify.org) (debug and release modes are supported)
 * All framework architecture is built using 
 [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) 
@@ -59,7 +59,7 @@ will receive parameter's value. Anyway regular expressions are supported too.
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called 
 [Service-Module-Placeholder](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/service-module-placeholder.md) 
-instead Model-View-Controller. 
+instead of Model-View-Controller. 
 SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/isomorphic-applications.md).
 
 For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/2.0.0-dev/docs/index.md).
@@ -96,8 +96,6 @@ All supported browsers are listed below:
 | Blackberry Browser| 7+			|
 
 ##Not included packages
-* [catberry-module](https://www.npmjs.org/package/catberry-module) - 
-Basic module implementation with "smart method invocation"
 * [catberry-l10n](https://www.npmjs.org/package/catberry-l10n) - 
 Localization support
 * [catberry-lazy-loader](https://www.npmjs.org/package/catberry-lazy-loader) - 

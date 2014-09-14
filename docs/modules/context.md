@@ -15,18 +15,18 @@ assigned by Catberry on module initialization and then refreshed (re-assigned)
 every time when application state is changing.
 
 ##Environment flags
-For some situations you maybe need to determine where current code is executing.
+For some situations you maybe have to determine where current code is executing.
 There are two flags in context for this purpose: `isBrowser` and `isServer`. 
 Both flags are read-only properties.
 
 ##Current URL path
-If you need to determine what is the current URL path then you can use `urlPath` 
-property. Its value is a concatenation of `location.pathname` and 
+If you want to determine what is the current URL path then you can use `urlPath` 
+property. This value is a concatenation of `location.pathname` and 
 `location.search` in browser and `request.url` at server.
 
 ##Referrer
-If you need to know previous browser's page URL you can use `referrer` property. 
-But use it very carefully because at server Catberry uses `Referer` HTTP header 
+If you want to know previous browser's page URL you can use `referrer` property. 
+But use it carefully because at server Catberry uses `Referer` HTTP header 
 and in browser it is just previous URL in History API.
 
 ##User agent
@@ -34,11 +34,11 @@ You can get user agent string whenever you want using `userAgent` property
 of context.
 
 ##State
-Most important thing in context is a `state` property. It is an immutable 
-object that you can use to know what application parameters now are. 
+The most important thing in context is a `state` property. It is an immutable 
+object that you can use to know what application parameters are now. 
 All these parameters are specified by 
 [URL Route Definition](../routing/url-route-definition.md). It is main source 
-of input data for rendering and often is used in module [`render` methods]
+of input data for rendering and is often used in module [`render` methods]
 (render-method.md).
 
 Keep in mind that state object is immutable and every time 
@@ -48,10 +48,10 @@ it can cause unexpected behaviour and memory leaks.
 
 ##Rendered data cache
 Context also has a set of data contexts that were rendered on page in property
-`renderedData`. It can be used to re-use data of other placeholder when 
+`renderedData`. It can be used to re-use data of other placeholders when 
 [`render` method](render-method.md) is working.
 
-It always has last rendered data context for every rendered placeholder. Object
+It always has last rendered data context for every rendered placeholders. Object
 has a structure described below:
 
 ```javascript
@@ -179,7 +179,7 @@ ModuleApiProviderBase.prototype.removeAllListeners = function (eventName) {};
 ```
 
 ##Rendering on demand
-You can update any placeholder any time using `requestRender` or 
+You can update any placeholder at any time using `requestRender` or 
 `requestRefresh` (the same but re-invokes hash event). 
 
 If you need to render placeholder or partial template
