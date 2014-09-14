@@ -1306,3 +1306,232 @@ subscribing on Catberry methods, which are described in details in
 [Event Bus and Diagnostics](#event-bus-and-diagnostics) 
 documentation section.
 
+#Building Browser Bundle
+
+Catberry application object has a method `build` that can be used like this:
+
+```javascript
+var catberry = require('catberry'),
+	cat = catberry.create();
+cat.build(); // returns a promise
+```
+
+This method can be called in `./server.js` script or separately in
+different script and process.
+
+It is highly recommended to use `build` method in separated process 
+(not in server process) because JavaScript minification requires a lot of memory 
+and it looks like your `./server.js` script spends 1GB of RAM, which is not so of 
+course.
+
+For example you can use `./build.js` script with following:
+```
+node ./build.js release
+```
+
+To build browser bundle Catberry uses [browserify](http://browserify.org) which 
+is awesome and can convert your server-side JavaScript to browser code.
+
+##Including packages into browser bundle
+There are some rules according browserify limitations:
+
+* If you want to include some module into browser bundle it should be required
+directly via `require('some/path/to/module')`. If module path is variable it
+will not work
+* If you want to exclude some server-side package from browser bundle or 
+replace it with browser versions just use browserify `browser` field 
+in `package.json` as it is described [here](http://github.com/substack/node-browserify#packagejson).
+
+All modules are defined in `modulesFolder` 
+(details in [Modules](#modules) section) and its placeholders are 
+included into browser bundle automatically as well as [URL Route Definition]
+(#url-route-definition) and [Event Route Definition]
+(#event-route-definition) files.
+
+##Building modes
+There are two modes of building browser bundle:
+
+* Debug mode - when everything is watched by builder and rebuild if something
+is changed
+* Release mode - when there is no watch on files and all code in result bundle 
+is minified using [uglify-js](https://www.npmjs.org/package/uglify-js)
+
+By default it is in debug mode, to switch it to release mode you should pass
+`isRelease: true` parameter in config object like this:
+```javascript
+var isRelease = process.argv.length === 3 ?
+		process.argv[2] === 'release' : undefined,
+	catberry = require('catberry'),
+	cat = catberry.create({isRelease: isRelease});
+
+cat.build();
+```
+
+#Event Bus and Diagnostics
+
+Catberry has a set of events that can be used for diagnostics and userland
+module development. Actually in Catberry it is used for logging all trace, info
+and error messages.
+
+There are two ways for listening to Catberry events:
+
+* Subscribe on it using [module context](#context)
+* Subscribe on it using Catberry application instance directly like this
+
+```javascript
+var catberry = require('catberry'),
+	cat = catberry.create();
+
+cat.API.on('error', function (error) {
+	// some action
+});
+```
+
+And browser you can access Catberry application instance via `window` object
+```javascript
+// catberry object is global because it is a property of window
+catberry.API.on('error', function (error) {
+	// some action
+});
+```
+
+Actually `cat.API` has almost the same interface as [module context]
+(context).
+
+##Event names and arguments
+
+Here is a list of common Catberry events:
+
+| Event					| When happens															| Arguments																											|
+|-----------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| ready					| Catberry has finished initialization									|	no																												|
+| error					| error is happened														|	`Error` object																									|
+| moduleLoaded			| each module is loaded													|	Module name as string																							|
+| placeholderLoaded		| each placeholder is loaded											|	`{name: String, moduleName: String}`																			|
+| allModulesLoaded		| all modules are loaded												|	no																												|
+| templateRegistered	| template of placeholder is registered									|	`{name: String, source: String}`																				|
+| placeholderRender		| Catberry starts rendering placeholder									|	`{name: String, moduleName: String, element: jQuery, context: `[Context](#context)`}`					|
+| placeholderRendered	| Catberry finishes rendering placeholder								|	`{name: String, moduleName: String, element: jQuery, context: `[Context](#context)`, time: Number}`	|
+| pageRendered			| Catberry finishes rendering of all placeholders after state changing	|	[Context](#context) with states of all modules														|
+
+Next list of only-server events:
+
+| Event				| When happens					| Arguments							|
+|-------------------|-------------------------------|-----------------------------------|
+| moduleFound		| each module is found			|	`{name: String, path: String}`	|
+| placeholderFound	| each placeholder is found		|	`{name: String, path: String}`	|
+| bundleBuilt 		| browser bundle is built		|	`{time: Number, path: String}`	|
+
+And list of only-browser events:
+
+| Event				| When happens																| Arguments																																					|
+|-------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| eventRegistered	| event definition is registered											|	`{eventName: String, moduleNames: Array<String>, expression: RegExp}`																					|
+| eventRouted		| Catberry finishes invocation of all handle methods subscribed on event	|	`{string: String, isEnding: Boolean, isHashChanging: Boolean, element: jQuery, eventName: String, args: Object, moduleNames: Array<String>}`			|
+| formSubmitted		| Catberry finishes invocation of submit method for any form on page		|	`{element: jQuery, name: String, moduleName: String, values: Object}`																					|
+| renderRequested	| some module requests refresh of any placeholder							|	`{placeholderName: String, moduleName: String}`																											|
+
+This events can be used for browser extensions, extended logging or module 
+logic, feel free to use them everywhere you want but remember if any event has 
+too many subscribers it can cause performance decrease.
+
+#CLI
+
+Catberry has a Command Line Interface that helps to start a new project and add
+new modules to it.
+
+To start using of Catberry CLI just install it globally from npm
+
+```
+npm -g install catberry-cli
+```
+
+And then follow usage instructions you can find
+[here](https://github.com/catberry/catberry-cli) or just use help of
+catberry utility:
+
+```
+catberry --help
+```
+
+#Catberry Framework Code Style Guide
+
+There are some aspects of our code style below:
+
+ * We use tabs
+ * We use only strict mode
+ * We use only single quotes
+ * We use jsDoc for all functions
+ * We strongly use **camelCase for variables**, **PascalCase for constructors** and **UPPER_CASE with underscores for constants**
+```javascript
+var SOME_CONSTANT = 42;
+
+function Constructor() {
+    var someVariable = 'someValue';
+}
+```
+ * We always use braces where it's possible, first brace on same line and space before it
+
+Right
+```javascript
+if(condition) {
+
+}
+```
+Wrong
+```javascript
+if(condition)
+{
+}
+if(condition2){
+}
+```
+ * We use multiple declaration where it's possible
+
+Right
+```javascript
+var a, b, c, d;
+```
+Wrong
+```javascript
+var a;
+var b;
+var c;
+var d;
+```
+ * We don't use constructor functions for side-effects
+
+Right
+```javascript
+var variable = new Constructor();
+```
+Wrong
+```javascript
+new Constructor();
+```
+ * We use explicit type conversion by Number, Boolean and String functions
+
+Right
+```javascript
+x = Boolean(y);
+x = Number(y);
+x = String(y);
+x = s.indexOf('.') !== -1;
+```
+Wrong
+```javascript
+x = !!y;
+x = +y;
+x = '' + y;
+x = ~s.indexOf('.');
+```
+ * We don't leave trailing whitespaces
+ * We don't use 'with' operator
+ * We don't use multiple line breaks
+ * Maximum length of line  - 85
+ * Maximum arguments in function - 5
+ * Maximum code block depth - 3
+ * Maximum statement count per function - 50
+ * Maximum [cyclomatic complexity](http://en.wikipedia.org/wiki/Cyclomatic_complexity) - 10
+
+Before every commit please use "npm test" command to check code style.
