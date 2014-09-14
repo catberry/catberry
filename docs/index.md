@@ -26,7 +26,7 @@
 * [Building Browser Bundle](#building-browser-bundle) 
 * [Event Bus and Diagnostics](#event-bus-and-diagnostics) 
 * [CLI](#cli) 
-* [Code Style Guide](#code-style-guide)
+* [Code Style Guide](#catberry-framework-code-style-guide)
 
 #Isomorphic Applications
 
@@ -372,7 +372,7 @@ More details [here](https://github.com/nomiddlename/log4js-node#usage).
 
 ###Interface
 
-* Browser: [./lib/client/Logger.js](../../../browser/Logger.js)
+* Browser: [./browser/Logger.js](../../../browser/Logger.js)
 * Server: [log4js](https://www.npmjs.org/package/log4js)
 
 ##Config
