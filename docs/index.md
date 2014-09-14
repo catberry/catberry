@@ -1396,7 +1396,7 @@ catberry.API.on('error', function (error) {
 ```
 
 Actually `cat.API` has almost the same interface as [module context]
-(context).
+(#context).
 
 ##Event names and arguments
 
