@@ -61,9 +61,13 @@ function createModuleLoader(caseName) {
 	locator.registerInstance('eventBus', new events.EventEmitter());
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('templateProvider', {
-		registerSource: function () {
+		compile: function () {
 
-		}});
+		},
+		registerCompiled: function () {
+
+		}
+	});
 
 	return locator.resolveInstance(ModuleLoader, config);
 }
