@@ -677,16 +677,18 @@ describe('browser/PageRenderer', function () {
 						var $ = locator.resolve('jQuery');
 						$(function () {
 							locator.resolveInstance(PageRenderer);
-							assert.strictEqual(
-								rendered['module-first'], true
-							);
-							assert.strictEqual(
-								rendered['module2-second'], true
-							);
-							assert.strictEqual(
-								Object.keys(rendered).length, 2
-							);
-							done();
+							setTimeout(function () {
+								assert.strictEqual(
+									rendered['module-first'], true
+								);
+								assert.strictEqual(
+									rendered['module2-second'], true
+								);
+								assert.strictEqual(
+									Object.keys(rendered).length, 2
+								);
+								done();
+							}, 10);
 						});
 					}
 				});

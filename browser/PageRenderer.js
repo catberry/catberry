@@ -73,8 +73,12 @@ function PageRenderer($serviceLocator, $moduleLoader, $eventBus, isRelease) {
 	this._contextFactory = $serviceLocator.resolve('contextFactory');
 	this._serviceLocator = $serviceLocator;
 	// need to run all afterRender methods and events for placeholders
-	// were rendered at server
-	this._runAfterMethodsAndEvents();
+	// were rendered at server after all modules will be resolved from
+	// Service Locator
+	var self = this;
+	setTimeout(function () {
+		self._runAfterMethodsAndEvents();
+	}, 0);
 }
 
 /**
