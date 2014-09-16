@@ -132,7 +132,7 @@ PageRenderer.prototype.render = function (renderingParameters) {
 			placeholdersByIds[headPlaceholderId] :
 			null;
 
-	if (headPlaceholder) {
+	if (headPlaceholder && (headPlaceholder.moduleName in changedModuleNames)) {
 		renderPromise = this.renderPlaceholder(
 			headPlaceholder, renderingParameters, context
 		);
@@ -323,24 +323,29 @@ PageRenderer.prototype._handleRenderingError =
 	};
 
 /**
- * Gets array of module names which parameters
+ * Gets set of module names which parameters
  * were changed since last rendering process.
  * @param {Object} commonState State map by module names.
- * @returns {Array<string>} Filtered module names.
+ * @returns {Object} Filtered module names.
  * @private
  */
 PageRenderer.prototype._getNamesOfChangedModules = function (commonState) {
 	// some module's parameters can be removed since last time
-	var changed = Object.keys(this._lastState)
+	var changed = {};
+
+	Object.keys(this._lastState)
 		.filter(function (moduleName) {
 			return !(moduleName in commonState);
+		})
+		.forEach(function (name) {
+			changed[name] = true;
 		});
 
 	Object.keys(commonState)
 		.forEach(function (moduleName) {
 			// new parameters were set for module
 			if (!(moduleName in this._lastState)) {
-				changed.push(moduleName);
+				changed[moduleName] = true;
 				return;
 			}
 
@@ -352,14 +357,14 @@ PageRenderer.prototype._getNamesOfChangedModules = function (commonState) {
 
 			if (currentParameterNames.length !==
 				lastParameterNames.length) {
-				changed.push(moduleName);
+				changed[moduleName] = true;
 				return;
 			}
 
 			currentParameterNames.every(function (parameterName) {
 				if (commonState[moduleName][parameterName] !==
 					this._lastState[moduleName][parameterName]) {
-					changed.push(moduleName);
+					changed[moduleName] = true;
 					return false;
 				}
 				return true;
@@ -378,55 +383,51 @@ PageRenderer.prototype._findRenderingRoots = function (moduleNamesToRender) {
 	var placeholdersByIds = this._moduleLoader.getPlaceholdersByIds(),
 		modules = this._moduleLoader.getModulesByNames(),
 		self = this,
-		moduleNamesSet = {},
 		processedPlaceholderIds = {},
 		roots = [];
 
-	moduleNamesToRender.forEach(function (moduleName) {
-		moduleNamesSet[moduleName] = true;
-	});
+	Object.keys(moduleNamesToRender)
+		.forEach(function (moduleName) {
+			Object.keys(modules[moduleName].placeholders)
+				.forEach(function (placeholderName) {
+					var current = modules[moduleName]
+							.placeholders[placeholderName],
+						currentElement = self.$('#' + current.fullName),
+						currentId = current.fullName,
+						lastRoot = current;
 
-	// search rendering root for every module that has changed state.
-	moduleNamesToRender.forEach(function (moduleName) {
-		Object.keys(modules[moduleName].placeholders)
-			.forEach(function (placeholderName) {
-				var current = modules[moduleName].placeholders[placeholderName],
-					currentElement = self.$('#' + current.fullName),
-					currentId = current.fullName,
-					lastRoot = current;
+					processedPlaceholderIds[currentId] = true;
 
-				processedPlaceholderIds[currentId] = true;
-
-				if (currentElement.length !== 1) {
-					return;
-				}
-
-				while (currentElement[0].tagName !== HTML_ELEMENT_NAME) {
-					currentElement = currentElement.parent();
-					currentId = currentElement.attr(ID_ATTRIBUTE_NAME);
-
-					if (currentId in processedPlaceholderIds) {
+					if (currentElement.length !== 1) {
 						return;
 					}
 
-					// if element is not a placeholder
-					if (!(currentId in placeholdersByIds)) {
-						continue;
+					while (currentElement[0].tagName !== HTML_ELEMENT_NAME) {
+						currentElement = currentElement.parent();
+						currentId = currentElement.attr(ID_ATTRIBUTE_NAME);
+
+						if (currentId in processedPlaceholderIds) {
+							return;
+						}
+
+						// if element is not a placeholder
+						if (!(currentId in placeholdersByIds)) {
+							continue;
+						}
+						processedPlaceholderIds[currentId] = true;
+						current = placeholdersByIds[currentId];
+
+						// if placeholder`s module did not change state
+						if (!(current.moduleName in moduleNamesToRender)) {
+							continue;
+						}
+
+						lastRoot = current;
 					}
-					processedPlaceholderIds[currentId] = true;
-					current = placeholdersByIds[currentId];
 
-					// if placeholder`s module did not change state
-					if (!(current.moduleName in moduleNamesSet)) {
-						continue;
-					}
-
-					lastRoot = current;
-				}
-
-				roots.push(lastRoot);
-			});
-	});
+					roots.push(lastRoot);
+				});
+		});
 
 	return roots;
 };
