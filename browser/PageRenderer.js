@@ -414,14 +414,13 @@ PageRenderer.prototype._findRenderingRoots = function (moduleNamesToRender) {
 						if (!(currentId in placeholdersByIds)) {
 							continue;
 						}
-						processedPlaceholderIds[currentId] = true;
 						current = placeholdersByIds[currentId];
 
 						// if placeholder`s module did not change state
 						if (!(current.moduleName in moduleNamesToRender)) {
 							continue;
 						}
-
+						processedPlaceholderIds[currentId] = true;
 						lastRoot = current;
 					}
 
