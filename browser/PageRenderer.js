@@ -303,7 +303,7 @@ PageRenderer.prototype._handleRenderingError =
 		this._eventBus.emit('error', error);
 		element.removeClass(LOADING_CLASS_NAME);
 
-		// do not corrupt existed HEAD when error occours
+		// do not corrupt existed HEAD when error occurs
 		if (element[0].tagName === HEAD_ELEMENT_NAME) {
 			return;
 		}
