@@ -34,7 +34,6 @@ module.exports = ModuleLoader;
 
 var util = require('util'),
 	ModuleLoaderBase = require('../lib/base/ModuleLoaderBase'),
-	propertyHelper = require('../lib/helpers/propertyHelper'),
 	moduleHelper = require('../lib/helpers/moduleHelper');
 
 util.inherits(ModuleLoader, ModuleLoaderBase);
