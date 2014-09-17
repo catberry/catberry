@@ -383,7 +383,7 @@ PageRenderer.prototype._findRenderingRoots = function (moduleNamesToRender) {
 	var placeholdersByIds = this._moduleLoader.getPlaceholdersByIds(),
 		modules = this._moduleLoader.getModulesByNames(),
 		self = this,
-		processedPlaceholderIds = {},
+		rootsSet = {},
 		roots = [];
 
 	Object.keys(moduleNamesToRender)
@@ -396,11 +396,6 @@ PageRenderer.prototype._findRenderingRoots = function (moduleNamesToRender) {
 						currentId = current.fullName,
 						lastRoot = current;
 
-					if (currentId in processedPlaceholderIds) {
-						return;
-					}
-					processedPlaceholderIds[currentId] = true;
-
 					if (currentElement.length !== 1) {
 						return;
 					}
@@ -409,25 +404,23 @@ PageRenderer.prototype._findRenderingRoots = function (moduleNamesToRender) {
 						currentElement = currentElement.parent();
 						currentId = currentElement.attr(ID_ATTRIBUTE_NAME);
 
-						if (currentId in processedPlaceholderIds) {
-							break;
-						}
-
-						// if element is not a placeholder
+						// is not a placeholder
 						if (!(currentId in placeholdersByIds)) {
 							continue;
 						}
-						processedPlaceholderIds[currentId] = true;
-						current = placeholdersByIds[currentId];
 
-						// if placeholder`s module did not change state
+						current = placeholdersByIds[currentId];
+						// module did not change state
 						if (!(current.moduleName in moduleNamesToRender)) {
 							continue;
 						}
 
 						lastRoot = current;
 					}
-
+					if (lastRoot.fullName in rootsSet) {
+						return;
+					}
+					rootsSet[lastRoot.fullName] = true;
 					roots.push(lastRoot);
 				});
 		});
