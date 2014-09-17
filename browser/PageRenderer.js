@@ -375,7 +375,7 @@ PageRenderer.prototype._getNamesOfChangedModules = function (commonState) {
 
 /**
  * Finds all rendering roots on page for all changed modules.
- * @param {Array<string>} moduleNamesToRender Names of modules that are changed.
+ * @param {Object} moduleNamesToRender Set of module names that were changed.
  * @returns {Array} Placeholders which are rendering roots.
  * @private
  */
@@ -396,6 +396,9 @@ PageRenderer.prototype._findRenderingRoots = function (moduleNamesToRender) {
 						currentId = current.fullName,
 						lastRoot = current;
 
+					if (currentId in processedPlaceholderIds) {
+						return;
+					}
 					processedPlaceholderIds[currentId] = true;
 
 					if (currentElement.length !== 1) {
@@ -407,20 +410,21 @@ PageRenderer.prototype._findRenderingRoots = function (moduleNamesToRender) {
 						currentId = currentElement.attr(ID_ATTRIBUTE_NAME);
 
 						if (currentId in processedPlaceholderIds) {
-							return;
+							break;
 						}
 
 						// if element is not a placeholder
 						if (!(currentId in placeholdersByIds)) {
 							continue;
 						}
+						processedPlaceholderIds[currentId] = true;
 						current = placeholdersByIds[currentId];
 
 						// if placeholder`s module did not change state
 						if (!(current.moduleName in moduleNamesToRender)) {
 							continue;
 						}
-						processedPlaceholderIds[currentId] = true;
+
 						lastRoot = current;
 					}
 

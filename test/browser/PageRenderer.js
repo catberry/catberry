@@ -558,9 +558,11 @@ describe('browser/PageRenderer', function () {
 		it('should invoke after methods for rendered placeholders',
 			function (done) {
 				var page = '<div id="module2_second">dummy' +
-						'<div id="module2_first">dummy' +
-						'<div id="module_first">dummy' +
-						'</div></div></div>',
+							'	<div id="module2_first">dummy' +
+							'		<div id="module_first">dummy' +
+							'		</div>' +
+							'	</div>' +
+						'</div>',
 					locator = createLocator(),
 					moduleLoader = locator.resolve('moduleLoader'),
 					modules = moduleLoader.getModulesByNames(),
