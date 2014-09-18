@@ -724,8 +724,7 @@ and rendered in any position on page.
 
 Catberry uses [dustjs](https://github.com/catberry/catberry-dust) template engine.
 All stuff about how to use and what syntax it has you can read [here]
-(https://github.com/linkedin/dustjs/wiki/Dust-Tutorial). Also [dustjs-helpers]
-(https://github.com/linkedin/dustjs-helpers) are included in Catberry.
+(https://github.com/catberry/catberry-dust/blob/master/docs/tutorial.md).
 
 Placeholder is named by its filename, for example, if file is called `some.dust`
 then placeholder name is `some`. But in some cases you will need a full name. 
@@ -822,8 +821,8 @@ from modules.
 
 In some situations you need to render some part of HTML that often repeats
 in your markup but do not have some complex logic for creation of data context.
-In this case it is really handy to use [dustjs partials]
-(https://github.com/linkedin/dustjs/wiki/Dust-Tutorial#partials) 
+In this case it is really handy to use [dust partials]
+(https://github.com/catberry/catberry-dust/blob/master/docs/tutorial.md#partials) 
 not placeholders.
  
 ###Streaming
