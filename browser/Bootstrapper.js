@@ -46,11 +46,12 @@ var placeholders = [
 var util = require('util'),
 	routeDefinitions = '__routeDefinitions' || [],
 	eventDefinitions = '__eventDefinitions' || [],
-	Catberry = require('catberry/browser/Catberry'),
-	Logger = require('catberry/browser/Logger'),
-	EventRouter = require('catberry/browser/EventRouter'),
-	FormSubmitter = require('catberry/browser/FormSubmitter'),
-	BootstrapperBase = require('catberry/lib/base/BootstrapperBase');
+	Catberry = require('./node_modules/catberry/browser/Catberry.js'),
+	Logger = require('./node_modules/catberry/browser/Logger.js'),
+	EventRouter = require('./node_modules/catberry/browser/EventRouter.js'),
+	FormSubmitter = require('./node_modules/catberry/browser/FormSubmitter.js'),
+	BootstrapperBase =
+		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 
 var INFO_EVENT_REGISTERED =
 		'Event "%s" was registered for module(s) %s',
