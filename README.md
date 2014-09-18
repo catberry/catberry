@@ -1,12 +1,12 @@
-#Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry)
+#Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry) [![Coverage Status](https://coveralls.io/repos/catberry/catberry/badge.png?branch=develop)](https://coveralls.io/r/catberry/catberry?branch=develop)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
 ![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
 
 ##What is it?
-Catberry is a framework for fast and modular 
-[isomorphic web-applications](docs/isomorphic-applications.md) written in 
+Catberry is a framework for fast and modular  
+[isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0/docs/index.md#isomorphic-applications) written in 
 JavaScript using [node.js](http://nodejs.org). 
 
 Catberry makes possible to write module once and use it at server and in browser
@@ -18,7 +18,7 @@ using browser
 [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
 Here you can find full 
-[Catberry Documentation](https://github.com/catberry/catberry/blob/1.4.0/docs/index.md).
+[Catberry Documentation](https://github.com/catberry/catberry/blob/2.0.0/docs/index.md).
 
 To get started with example please proceed to 
 [this link](https://github.com/catberry/catberry-cli).
@@ -26,7 +26,7 @@ To get started with example please proceed to
 ##Advantages
 * Super fast rendering engine using 
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) 
-without in-memory template rendering (powered by [dustjs](https://github.com/linkedin/dustjs))
+without in-memory template rendering (powered by [dustjs](https://github.com/catberry/catberry-dust))
 * You will write code in server-side style 
 (using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) 
 and only once to execute it at server and in browser
@@ -39,7 +39,7 @@ blocks on page and refresh only changed blocks in browser
 structure in browser without reloading of page
 * A click on button or link with `data-event` attribute or hash in `href` 
 raises an event in your modules automatically. Manual hash changing does the same thing.
-* Your application builds version of itself for browser using 
+* Your application builds javascript bundle for browser using 
 [browserify](http://browserify.org) (debug and release modes are supported)
 * All framework architecture is built using 
 [Service Locator](http://en.wikipedia.org/wiki/Service_locator_pattern) 
@@ -58,11 +58,11 @@ will receive parameter's value. Anyway regular expressions are supported too.
 `someHashOrDataEvent:parameter->eventName[module1,module2,module3]` 
 syntax with list of modules that will receive event and its parameters.
 * New concept of application architecture is called 
-[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/1.4.0/docs/service-module-placeholder.md) 
-instead Model-View-Controller. 
-SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/1.4.0/docs/isomorphic-applications.md).
+[Service-Module-Placeholder](https://github.com/catberry/catberry/blob/2.0.0/docs/index.md#service-module-placeholder) 
+instead of Model-View-Controller. 
+SMP is the right concept for [isomorphic web-applications](https://github.com/catberry/catberry/blob/2.0.0/docs/index.md#isomorphic-applications).
 
-For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/1.4.0/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/2.0.0/docs/index.md).
 
 Also you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
@@ -96,8 +96,6 @@ All supported browsers are listed below:
 | Blackberry Browser| 7+			|
 
 ##Not included packages
-* [catberry-module](https://www.npmjs.org/package/catberry-module) - 
-Basic module implementation with "smart method invocation"
 * [catberry-l10n](https://www.npmjs.org/package/catberry-l10n) - 
 Localization support
 * [catberry-lazy-loader](https://www.npmjs.org/package/catberry-lazy-loader) - 
@@ -112,7 +110,7 @@ implement test. If you want to propose some improvements just create issue or
 pull request but please do not forget to use `npm test` to be sure that your 
 code is awesome.
 
-All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/1.4.0/docs/code-style-guide.md).
+All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/2.0.0/docs/code-style-guide.md).
 
 Also your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
 

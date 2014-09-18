@@ -32,11 +32,14 @@
 
 module.exports = ModuleLoader;
 
-var moduleContextHelper = require('../../lib/helpers/moduleContextHelper');
+var moduleHelper = require('../../lib/helpers/moduleHelper');
 
 function ModuleLoader(modulesByNames) {
 	this._modulesByNames = modulesByNames;
+	this.lastRenderedData = {};
 }
+
+ModuleLoader.prototype.lastRenderedData = null;
 
 ModuleLoader.prototype.getModulesByNames = function () {
 	return this._modulesByNames;
@@ -49,7 +52,7 @@ ModuleLoader.prototype.getPlaceholdersByIds = function () {
 		.forEach(function (moduleName) {
 			Object.keys(self._modulesByNames[moduleName].placeholders)
 				.forEach(function (placeholderName) {
-					var id = moduleContextHelper.joinModuleNameAndContext(
+					var id = moduleHelper.joinModuleNameAndContext(
 						moduleName, placeholderName);
 					placeholdersByIds[id] =
 						self._modulesByNames[moduleName]

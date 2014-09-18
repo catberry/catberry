@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "1.4.0",
+	"version": "2.0.0",
 	"author": "Denis Rechkunov <denis.rechkunov@gmail.com>",
 	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
 	"homepage": "https://github.com/catberry/catberry",
@@ -32,19 +32,31 @@
 	],
 
 	"main": "./index",
+	"browser": {
+		"./lib/Bootstrapper.js": "__BrowserBundle.js",
+		"./lib/Catberry.js": "./browser/Catberry.js",
+		"./lib/CookiesWrapper.js": "./browser/CookiesWrapper.js",
+		"./lib/ModuleApiProvider.js": "./browser/ModuleApiProvider.js",
+		"./lib/ModuleLoader.js": "./browser/ModuleLoader.js",
+		"./lib/PageRenderer.js": "./browser/PageRenderer.js",
+		"./lib/RequestRouter.js": "./browser/RequestRouter.js",
+		"./lib/TemplateProvider.js": "./browser/TemplateProvider.js"
+	},
 	"dependencies": {
 		"glob": "^4.0.0",
 		"glob-watcher": "~0.0.6",
 		"catberry-locator": "^1.0.0",
-		"catberry-uhr": "^1.1.0",
+		"catberry-uhr": "^2.0.0",
+		"catberry-dust": "^3.0.0",
 		"jquery": "^2.0.0",
 		"uglify-js": "^2.0.0",
 		"browserify": "^4.0.0",
-		"dustjs-linkedin": "~2.3.5",
-		"dustjs-helpers": "~1.2.0",
-		"log4js": "~0.6.0"
+		"log4js": "~0.6.0",
+		"promise": "^5.0.0"
 	},
 	"devDependencies": {
+		"istanbul-harmony": "~0.3.0",
+		"coveralls": "^2.11.1",
 		"jsdom": "~0.11.0",
 		"mocha": "^1.20.0",
 		"jscs": "~1.4.0",
@@ -54,7 +66,7 @@
 		"node": "~0.10.26"
 	},
 	"scripts": {
-		"test": "jshint ./ && jscs ./ && mocha --recursive"
+		"test": "make"
 	},
 	"licenses": [
 		{
