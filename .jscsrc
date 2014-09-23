@@ -63,7 +63,6 @@
 	"requireCapitalizedConstructors": true,
 	"requireDotNotation": true,
 	"disallowYodaConditions": true,
-	"requireSpaceAfterLineComment": true,
 	"disallowNewlineBeforeBlockStatements": true,
 	"validateLineBreaks": "LF",
 	"validateQuoteMarks": "'",
