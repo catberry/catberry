@@ -1,19 +1,12 @@
 {
 	"maxerr": 15,
 
-	"camelcase": true,
-	"immed": true,
-
-	"newcap": true,
 	"nonew": true,
 	"proto": true,
-	"quotmark": "single",
-	"trailing": true,
 	"maxparams": 5,
 	"maxdepth": 3,
 	"maxstatements": 50,
 	"maxcomplexity": 10,
-	"maxlen": 85,
 
 	"globalstrict": true,
 
