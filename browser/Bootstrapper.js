@@ -53,16 +53,12 @@ var util = require('util'),
 	BootstrapperBase =
 		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 
-var INFO_EVENT_REGISTERED =
-		'Event "%s" was registered for module(s) %s',
-	TRACE_EVENT_START_ROUTED =
-		'Starting event "%s" in module(s) %s',
-	TRACE_EVENT_END_ROUTED =
-		'Ending event "%s" in module(s) "%s"',
+var INFO_EVENT_REGISTERED = 'Event "%s" registered for module(s) "%s"',
+	TRACE_EVENT_START_ROUTED = 'Starting event "%s" in module(s) "%s"...',
+	TRACE_EVENT_END_ROUTED = 'Ending event "%s" in module(s) "%s"...',
 	TRACE_RENDER_REQUEST =
-		'Requesting rendering of placeholder "%s", module "%s"',
-	TRACE_FORM_SUBMITTED =
-		'Form "%s" was submitted to module "%s"';
+		'Requesting rendering of placeholder "%s" in module "%s"...',
+	TRACE_FORM_SUBMITTED = 'Form "%s" has been submitted to module "%s"';
 
 util.inherits(Bootstrapper, BootstrapperBase);
 
