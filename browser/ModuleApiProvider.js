@@ -90,13 +90,9 @@ ModuleApiProvider.prototype.requestRefresh =
 				if (!currentHash) {
 					return;
 				}
-				var moduleNameAndContext = moduleHelper
-					.splitModuleNameAndContext(currentHash.substring(1));
-				if (moduleNameAndContext === null ||
-					moduleNameAndContext.moduleName === moduleName) {
-					return self.clearHash()
-						.then(self.redirect.bind(self, currentHash));
-				}
+
+				return self.clearHash()
+					.then(self.redirect.bind(self, currentHash));
 			});
 	};
 
