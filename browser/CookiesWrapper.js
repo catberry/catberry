@@ -58,6 +58,9 @@ CookiesWrapper.prototype._window = null;
  * @returns {string} Cookie value.
  */
 CookiesWrapper.prototype.get = function (name) {
+	if (typeof(name) !== 'string') {
+		return '';
+	}
 	if (!this._window.document.cookie) {
 		return '';
 	}

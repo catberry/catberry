@@ -42,6 +42,12 @@ describe('browser/CookiesWrapper', function () {
 
 			assert.strictEqual(cookiesWrapper.get('some'), '');
 		});
+		it('should return empty string if cookie key is not a string',
+			function () {
+				var locator = createLocator('some=value;'),
+					cookiesWrapper = locator.resolveInstance(CookiesWrapper);
+				assert.strictEqual(cookiesWrapper.get({}), '');
+			});
 		it('should return value if cookie string is right', function () {
 			var locator = createLocator('some=value; some2=value2'),
 				cookiesWrapper = locator.resolveInstance(CookiesWrapper);

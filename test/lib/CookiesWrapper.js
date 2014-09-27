@@ -40,6 +40,12 @@ describe('lib/CookiesWrapper', function () {
 			cookiesWrapper.initWithString(null);
 			assert.strictEqual(cookiesWrapper.get('some'), '');
 		});
+		it('should return empty string if cookie key is not a string',
+			function () {
+				var cookiesWrapper = new CookiesWrapper();
+				cookiesWrapper.initWithString('some=value;');
+				assert.strictEqual(cookiesWrapper.get({}), '');
+			});
 		it('should return value if cookie string is right', function () {
 			var cookiesWrapper = new CookiesWrapper();
 			cookiesWrapper.initWithString('some=value; some2=value2');
