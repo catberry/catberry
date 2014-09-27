@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	CookiesWrapper = require('../../lib/CookiesWrapper');
 
-describe('CookiesWrapper', function () {
+describe('lib/CookiesWrapper', function () {
 	describe('#get', function () {
 		it('should return empty string if cookie string is null', function () {
 			var cookiesWrapper = new CookiesWrapper();
