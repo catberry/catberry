@@ -30,19 +30,14 @@
 
 'use strict';
 
-module.exports = {
-	/**
-	 * Defines read-only property.
-	 * @param {Object} object Object to define property in.
-	 * @param {string} name Name of property.
-	 * @param {*} value Property value.
-	 */
-	defineReadOnly: function (object, name, value) {
-		Object.defineProperty(object, name, {
-			enumerable: false,
-			configurable: false,
-			writable: false,
-			value: value
+var assert = require('assert'),
+	routeHelper = require('../../../lib/helpers/errorHelper');
+
+describe('lib/helpers/errorHelper', function () {
+	describe('#prettyPrint', function () {
+		it('should return empty string if wrong error argument', function () {
+			var result = routeHelper.prettyPrint(null, null);
+			assert.strictEqual(result, '');
 		});
-	}
-};
+	});
+});

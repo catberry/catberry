@@ -34,6 +34,62 @@ var assert = require('assert'),
 	routeHelper = require('../../../lib/helpers/routeHelper');
 
 describe('lib/helpers/routeHelper', function () {
+	describe('#removeEndSlash', function () {
+		it('should remove slash at the end of absolute URL', function () {
+			var url = 'http:///some/ggg/dsd/',
+				expected = 'http:///some/ggg/dsd';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, expected);
+		});
+		it('should remove slash at the end of relative URL', function () {
+			var url = 'ggg/dsd/',
+				expected = 'ggg/dsd';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, expected);
+		});
+		it('should remove slash at the end of URL with hash', function () {
+			var url = 'http:///some/ggg/dsd/#some',
+				expected = 'http:///some/ggg/dsd#some';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, expected);
+		});
+		it('should remove slash at the end of URL with search', function () {
+			var url = 'http:///some/ggg/dsd/?arg=some',
+				expected = 'http:///some/ggg/dsd?arg=some';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, expected);
+		});
+		it('should return empty string if URL is not a string', function () {
+			var url = null,
+				expected = '';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, expected);
+		});
+		it('should return URL as is if URL is a root', function () {
+			var url = '/';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, url);
+		});
+		it('should return URL as is if URL is a root with hash', function () {
+			var url = '/#hash';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, url);
+		});
+		it('should return URL as is if URL is a root with search', function () {
+			var url = '/?arg=some';
+
+			var result = routeHelper.removeEndSlash(url);
+			assert.strictEqual(result, url);
+		});
+	});
+
 	describe('#getUrlMapperByRoute', function () {
 
 		it('should return null if expression is empty', function (done) {
@@ -166,6 +222,11 @@ describe('lib/helpers/routeHelper', function () {
 			mapper = routeHelper.getEventMapperByRule(null);
 			assert.strictEqual(mapper, null);
 			mapper = routeHelper.getEventMapperByRule(undefined);
+			assert.strictEqual(mapper, null);
+		});
+
+		it('should return null for event definition without module', function () {
+			var mapper = routeHelper.getEventMapperByRule('some->some');
 			assert.strictEqual(mapper, null);
 		});
 	});
