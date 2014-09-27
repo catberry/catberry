@@ -70,35 +70,6 @@ describe('lib/streams/ParserDuplex', function () {
 					});
 			});
 
-		it('should properly work when tags do not fit in buffer',
-			function (done) {
-				var concat = '',
-					input = fs.createReadStream(
-						path.join(casePath, 'case1', 'input.html')),
-					expected = fs.readFileSync(
-						path.join(casePath, 'case1', 'expected.html'), {
-							encoding: 'utf8'
-						}),
-					parser = new ParserDuplex({highWaterMark: 1}),
-					result = input.pipe(parser);
-
-				parser.foundTagIdHandler = function (id) {
-					return new ContentReadable('test' + id);
-				};
-
-				result
-					.on('data', function (chunk) {
-						concat += chunk;
-					})
-					.on('end', function () {
-						assert.strictEqual(
-							concat,
-							expected,
-							'Wrong HTML content');
-						done();
-					});
-			});
-
 		it('should properly skip HTML comments', function (done) {
 			var concat = '',
 				input = fs.createReadStream(
@@ -148,5 +119,39 @@ describe('lib/streams/ParserDuplex', function () {
 					done();
 				});
 		});
+
+		it('should properly work when tags do not fit in buffer',
+			function (done) {
+				var concat = '',
+					input = fs.readFileSync(
+						path.join(casePath, 'case4', 'input.html'), {
+							encoding: 'utf8'
+						}),
+					expected = fs.readFileSync(
+						path.join(casePath, 'case4', 'expected.html'), {
+							encoding: 'utf8'
+						}),
+					parser = new ParserDuplex(),
+					contentReadable = new ContentReadable(input, {
+						highWaterMark: 2
+					}),
+					result = contentReadable.pipe(parser);
+
+				parser.foundTagIdHandler = function (id) {
+					return new ContentReadable('test' + id);
+				};
+
+				result
+					.on('data', function (chunk) {
+						concat += chunk;
+					})
+					.on('end', function () {
+						assert.strictEqual(
+							concat,
+							expected,
+							'Wrong HTML content');
+						done();
+					});
+			});
 	});
 });
