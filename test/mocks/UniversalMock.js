@@ -33,7 +33,7 @@
 module.exports = UniversalMock;
 
 var util = require('util'),
-	Promise = require('promise/core'),
+	Promise = require('promise/lib/core'),
 	events = require('events');
 
 util.inherits(UniversalMock, events.EventEmitter);
