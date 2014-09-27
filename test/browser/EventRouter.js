@@ -40,7 +40,220 @@ var assert = require('assert'),
 global.Promise = require('promise');
 
 describe('browser/EventRouter', function () {
-	describe('#route', function () {
+	describe('#routeEvent', function () {
+		it('should not send event to modules without event definitions',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+
+				var eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Module should not receive anything');
+				});
+				modules.module.implementation.once('handle', function () {
+					assert.fail('Module should not receive anything');
+				});
+
+				eventRouter.routeEvent({
+					string: 'someTestEvent',
+					isEnding: false,
+					isHashChanging: false,
+					element: {}
+				})
+					.then(function () {
+						done();
+					},
+					function (error) {
+						done(error);
+					});
+			});
+
+		it('should not send event to modules without correct module names',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+
+				locator.registerInstance('eventDefinition',
+					'someTestEvent->testEvent[wrong,wrong2]');
+
+				var eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Module should not receive anything');
+				});
+				modules.module.implementation.once('handle', function () {
+					assert.fail('Module should not receive anything');
+				});
+
+				eventRouter.routeEvent({
+					string: 'someTestEvent',
+					isEnding: false,
+					isHashChanging: false,
+					element: {}
+				})
+					.then(function () {
+						done();
+					},
+					function (error) {
+						done(error);
+					});
+			});
+		it('should does nothing if event name is not an event definition',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+
+				locator.registerInstance('eventDefinition',
+					'someTestEvent->testEvent[wrong,wrong2]');
+
+				var eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Module should not receive anything');
+				});
+				modules.module.implementation.once('handle', function () {
+					assert.fail('Module should not receive anything');
+				});
+
+				eventRouter.routeEvent({
+					string: 'someWrongEvent',
+					isEnding: false,
+					isHashChanging: false,
+					element: {}
+				})
+					.then(function () {
+						done();
+					},
+					function (error) {
+						done(error);
+					});
+			});
+
+		it('should handle error and return via promise',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+
+				locator.registerInstance('eventDefinition',
+					'someTestEvent->testEvent[module]');
+
+				var eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module.implementation.decorateMethod('handle',
+					function () {
+						throw new Error('hello');
+					});
+
+				eventRouter.routeEvent({
+					string: 'someTestEvent',
+					isEnding: false,
+					isHashChanging: false,
+					element: {}
+				})
+					.then(function () {
+						assert.fail();
+					},
+					function (error) {
+						assert.strictEqual(error.message, 'hello');
+					})
+					.then(function () {
+						done();
+					}, function (error) {
+						done(error);
+					});
+			});
+		it('should suppress error in after method',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+
+				locator.registerInstance('eventDefinition',
+					'someTestEvent->testEvent[module]');
+
+				var eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module.implementation.decorateMethod('afterHandle',
+					function () {
+						throw new Error('hello');
+					});
+
+				var eventBus = locator.resolve('eventBus');
+				eventBus.once('error', function (error) {
+					assert.strictEqual(error.message, 'hello');
+					done();
+				});
+				eventRouter.routeEvent({
+					string: 'someTestEvent',
+					isEnding: false,
+					isHashChanging: false,
+					element: {}
+				})
+					.then(null, function (error) {
+						done(error);
+					});
+			});
+
+		it('should filter wrong event definitions',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+
+				locator.registerInstance('eventDefinition', '');
+
+				var eventRouter = locator.resolveInstance(EventRouter);
+				assert.strictEqual(eventRouter._eventMappers.length, 0);
+				done();
+			});
+	});
+	describe('#routeDataEvent', function () {
+		it('should route data event to module',
+			function (done) {
+				var locator = createLocator(),
+					moduleLoader = locator.resolve('moduleLoader'),
+					modules = moduleLoader.getModulesByNames();
+
+				locator.registerInstance('eventDefinition',
+					'someTestEvent->testEvent[module]');
+				var eventRouter = locator.resolveInstance(EventRouter);
+
+				modules.module2.implementation.once('handle', function () {
+					assert.fail('Second module should not receive anything');
+				});
+				modules.module.implementation.once('handle', function (args) {
+					var eventName = args[0],
+						event = args[1];
+					assert.strictEqual(
+						eventName, 'testEvent', 'Wrong event name'
+					);
+					assert.strictEqual(
+						event.name, 'testEvent', 'Wrong event name'
+					);
+					assert.strictEqual(
+						event.string, 'someTestEvent', 'Wrong event name'
+					);
+					assert.strictEqual(event.isEnding, false);
+					assert.strictEqual(event.isHashChanging, false);
+					assert.strictEqual(Object.keys(event.args).length, 0);
+				});
+
+				eventRouter.routeDataEvent('someTestEvent', {})
+					.then(function () {
+						done();
+					},
+					function (error) {
+						done(error);
+					});
+			});
+
+	});
+	describe('#routeHashChange', function () {
 
 		it('should route event start to module',
 			function (done) {
