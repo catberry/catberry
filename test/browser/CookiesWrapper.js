@@ -34,7 +34,7 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	CookiesWrapper = require('../../browser/CookiesWrapper');
 
-describe('CookiesWrapper', function () {
+describe('browser/CookiesWrapper', function () {
 	describe('#get', function () {
 		it('should return empty string if cookie string is null', function () {
 			var locator = createLocator(null),

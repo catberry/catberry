@@ -40,7 +40,7 @@ var SOURCE_PATH = path.join(
 	__dirname, '..', 'cases', 'server', 'InjectionFinder', 'source.js'
 );
 
-describe('InjectionFinder', function () {
+describe('lib/InjectionFinder', function () {
 	describe('#find', function () {
 		it('should find all dependency injections in source', function (done) {
 			fs.readFile(SOURCE_PATH, {encoding: 'utf8'},
