@@ -134,8 +134,9 @@ describe('lib/streams/ParserDuplex', function () {
 					parser = new ParserDuplex(),
 					contentReadable = new ContentReadable(input, {
 						highWaterMark: 2
-					}),
-					result = contentReadable.pipe(parser);
+					});
+				parser.write('');
+				var result = contentReadable.pipe(parser);
 
 				parser.foundTagIdHandler = function (id) {
 					return new ContentReadable('test' + id);
