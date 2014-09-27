@@ -58,9 +58,12 @@ CookiesWrapper.prototype._window = null;
  * @returns {string} Cookie value.
  */
 CookiesWrapper.prototype.get = function (name) {
+	if (!this._window.document.cookie) {
+		return '';
+	}
 	var cookies = this._parseCookiesString(
 		this._window.document.cookie.toString());
-	return cookies[name];
+	return cookies[name] || '';
 };
 
 /**
