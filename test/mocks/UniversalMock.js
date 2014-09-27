@@ -56,7 +56,7 @@ UniversalMock.prototype.decorateMethod = function (name, method) {
 		return;
 	}
 	this[name] = function () {
-		old();
+		old.apply(this, arguments);
 		return method.apply(this, arguments);
 	};
 };
