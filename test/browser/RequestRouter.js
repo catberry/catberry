@@ -235,12 +235,16 @@ describe('browser/RequestRouter', function () {
 							'&first=firstValue' +
 							'&second=secondValue';
 
-					locator.registerInstance('routeDefinition',
-							'/some/' +
+					locator.registerInstance('routeDefinition', {
+						expression: '/some/' +
 							'?global=:global[first,second]' +
 							'&first=:first[first]' +
-							'&second=:second[second]'
-					);
+							'&second=:second[second]',
+						map: function (state) {
+							state.second.hello = 'world';
+							return state;
+						}
+					});
 					pageRenderer.once('render', function (args) {
 						assert.strictEqual(typeof(args[0]), 'object');
 						assert.strictEqual(args[0].urlPath, link);
@@ -262,6 +266,8 @@ describe('browser/RequestRouter', function () {
 							args[0].state.first.global, 'globalValue');
 						assert.strictEqual(
 							args[0].state.second.global, 'globalValue');
+						assert.strictEqual(
+							args[0].state.second.hello, 'world');
 						assert.strictEqual(currentWindow.location.toString(),
 								'http://local' + link);
 						assert.strictEqual(currentWindow.history.length, 1);
@@ -335,12 +341,19 @@ describe('browser/RequestRouter', function () {
 							'&first=firstValue' +
 							'&second=secondValue';
 
-					locator.registerInstance('routeDefinition',
-							'/some/' +
-							'?global=:global[first,second]' +
-							'&first=:first[first]' +
-							'&second=:second[second]'
-					);
+					locator.registerInstance('routeDefinition', {
+						expression: /\/some.+/,
+						map: function () {
+							return {
+								first: {
+									first: 'firstValue'
+								},
+								second: {
+									second: 'secondValue'
+								}
+							};
+						}
+					});
 
 					jsdom.env({
 						html: '<a href="' + link + '"/>',
