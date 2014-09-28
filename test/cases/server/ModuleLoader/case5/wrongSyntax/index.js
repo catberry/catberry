@@ -30,21 +30,4 @@
 
 'use strict';
 
-module.exports = CorrectModule2;
-
-// correct module
-function CorrectModule2() {
-	this.$context = null;
-}
-
-CorrectModule2.prototype.render = function (placeholder, args, callback) {
-
-};
-
-CorrectModule2.prototype.handle = function (eventName, placeholder, callback) {
-
-};
-
-CorrectModule2.prototype.submit = function (formName, formObject, callback) {
-
-};
+module.exports = require('./WrongSyntax');
