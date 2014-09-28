@@ -33,6 +33,7 @@
 var assert = require('assert'),
 	events = require('events'),
 	Logger = require('../mocks/Logger'),
+	moduleHelper = require('../../lib/helpers/moduleHelper'),
 	ServiceLocator = require('catberry-locator'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	StateProvider = require('../../lib/StateProvider'),
@@ -45,6 +46,9 @@ global.Promise = require('promise');
 
 function Module1() {}
 function Module2() {}
+function Module3() {
+	this.$context = null;
+}
 
 var modules = [
 	{
@@ -54,6 +58,10 @@ var modules = [
 	{
 		name: 'module2',
 		implementation: Module2
+	},
+	{
+		name: 'module3',
+		implementation: Module3
 	}
 ];
 var placeholders = [
@@ -107,8 +115,10 @@ describe('browser/ModuleLoader', function () {
 						userAgent: 'test agent'
 					}
 				});
-				locator.registerInstance('templateProvider',
-					new UniversalMock(['registerCompiled']));
+				var templateProvider = new UniversalMock([
+					'registerCompiled', 'render'
+				]);
+				locator.registerInstance('templateProvider', templateProvider);
 				locator.register('cookiesWrapper', CookiesWrapper);
 				locator.register('moduleApiProvider', ModuleApiProvider);
 				locator.register('stateProvider', StateProvider);
@@ -126,18 +136,86 @@ describe('browser/ModuleLoader', function () {
 				var moduleLoader = locator.resolveInstance(ModuleLoader),
 					modulesByNames = moduleLoader.getModulesByNames();
 
-				assert.strictEqual(Object.keys(modulesByNames).length, 2,
-					'Should be 2 modules');
-				assert.strictEqual(modulesByNames.hasOwnProperty('module1'),
-					true,
-					'Should have module1 in set');
-				assert.strictEqual(modulesByNames.hasOwnProperty('module2'),
-					true,
-					'Should have module2 in set');
-				assert.strictEqual(modulesByNames.module1.name, 'module1',
-					'Wrong module name');
-				assert.strictEqual(modulesByNames.module2.name, 'module2',
-					'Wrong module name');
+				assert.strictEqual(
+					Object.keys(modulesByNames).length, modules.length,
+					'Should be 2 modules'
+				);
+
+				modules
+					.map(function (module) {
+						return module.name;
+					})
+					.forEach(function (moduleName) {
+						assert.strictEqual(
+							modulesByNames.hasOwnProperty(moduleName), true,
+								'Should have ' + moduleName + ' in set'
+						);
+						assert.strictEqual(
+							modulesByNames[moduleName].name, moduleName,
+							'Wrong module name'
+						);
+
+						// check module placeholders
+						placeholders
+							.filter(function (placeholder) {
+								return placeholder.moduleName === moduleName;
+							})
+							.forEach(function (placeholder) {
+								var inModule;
+
+								if (moduleHelper
+									.isRootPlaceholder(placeholder.name)) {
+									assert.strictEqual(
+										modulesByNames[moduleName]
+											.rootPlaceholder, undefined
+									);
+									return;
+								}
+								if (placeholder.name === '__error') {
+									inModule = modulesByNames[moduleName]
+										.errorPlaceholder;
+								} else {
+									inModule = modulesByNames[moduleName]
+										.placeholders[placeholder.name];
+								}
+
+								assert.strictEqual(
+									typeof(inModule), 'object',
+									'Placeholder not found'
+								);
+								assert.strictEqual(
+									inModule.name, placeholder.name
+								);
+								assert.strictEqual(
+									inModule.source, placeholder.source
+								);
+								assert.strictEqual(
+									inModule.moduleName, moduleName
+								);
+								var fullName = moduleHelper
+									.joinModuleNameAndContext(
+									moduleName, placeholder.name
+								);
+								assert.strictEqual(inModule.fullName, fullName);
+
+								assert.strictEqual(
+										inModule.render instanceof Function,
+									true,
+									'Placeholder should have render method'
+								);
+								var rendered = false,
+									dc = {};
+								templateProvider.once('render',
+									function (args) {
+										assert.strictEqual(args[0], fullName);
+										assert.strictEqual(args[1], dc);
+										rendered = true;
+									});
+								inModule.render(dc);
+								assert.strictEqual(rendered, true);
+							});
+					});
+
 				assert.strictEqual(
 						modulesByNames.module1.implementation instanceof
 						Module1, true,
@@ -146,142 +224,35 @@ describe('browser/ModuleLoader', function () {
 						modulesByNames.module2.implementation instanceof
 						Module2, true,
 					'Wrong module implementation');
+				assert.strictEqual(
+						modulesByNames.module3.implementation instanceof
+						Module3, true,
+					'Wrong module implementation');
 
 				// check contexts
 				checkContexts(modulesByNames);
-
-				// check module 1 placeholders
-				var module1Placeholders = modulesByNames.module1.placeholders;
-				assert.strictEqual(typeof(module1Placeholders), 'object',
-					'Placeholders set should be an object');
-				assert.strictEqual(
-					module1Placeholders.hasOwnProperty('placeholder1'), true,
-					'Should have placeholder1 in set');
-				assert.strictEqual(
-					module1Placeholders.hasOwnProperty('placeholder2'), true,
-					'Should have placeholder2 in set');
-				assert.strictEqual(
-					modulesByNames.module1.hasOwnProperty('rootPlaceholder'),
-					false,
-					'module1 should not have root placeholder in browser'
-				);
-				assert.strictEqual(
-					modulesByNames.module1.hasOwnProperty('errorPlaceholder'),
-					true, 'module1 should have error placeholder'
-				);
-				assert.strictEqual(module1Placeholders.placeholder1.name,
-					'placeholder1', 'Wrong placeholder name');
-				assert.strictEqual(module1Placeholders.placeholder2.name,
-					'placeholder2', 'Wrong placeholder name');
-				assert.strictEqual(module1Placeholders.placeholder1.fullName,
-					'module1_placeholder1', 'Wrong placeholder full name');
-				assert.strictEqual(module1Placeholders.placeholder2.fullName,
-					'module1_placeholder2', 'Wrong placeholder full name');
-				assert.strictEqual(modulesByNames.module1.errorPlaceholder.name,
-					'__error', 'Wrong placeholder name');
-				assert.strictEqual(
-					modulesByNames.module1.errorPlaceholder.fullName,
-					'module1___error', 'Wrong placeholder full name');
-				assert.strictEqual(module1Placeholders.placeholder1.moduleName,
-					'module1', 'Wrong module name');
-				assert.strictEqual(module1Placeholders.placeholder2.moduleName,
-					'module1', 'Wrong module name');
-				assert.strictEqual(
-					modulesByNames.module1.errorPlaceholder.moduleName,
-					'module1', 'Wrong module name');
-				assert.strictEqual(
-						module1Placeholders.placeholder1
-							.render instanceof Function, true,
-					'Placeholder should have render method'
-				);
-				assert.strictEqual(
-						module1Placeholders.placeholder2
-							.render instanceof Function, true,
-					'Placeholder should have render method'
-				);
-				assert.strictEqual(
-						modulesByNames.module1.errorPlaceholder
-							.render instanceof Function, true,
-					'Placeholder should have render method'
-				);
-
-				// check module 1 placeholders
-				var module2Placeholders = modulesByNames.module2.placeholders;
-				assert.strictEqual(typeof(module2Placeholders), 'object',
-					'Placeholders set should be an object');
-				assert.strictEqual(
-					module2Placeholders.hasOwnProperty('placeholder1'), true,
-					'Should have placeholder1 in set');
-				assert.strictEqual(
-					module2Placeholders.hasOwnProperty('placeholder2'), true,
-					'Should have placeholder2 in set');
-				assert.strictEqual(
-					modulesByNames.module2.hasOwnProperty('rootPlaceholder'),
-					false,
-					'module1 should not have root placeholder'
-				);
-				assert.strictEqual(
-					modulesByNames.module2.hasOwnProperty('errorPlaceholder'),
-					false, 'module2 should not have error placeholder'
-				);
-
-				assert.strictEqual(module2Placeholders.placeholder1.name,
-					'placeholder1', 'Wrong placeholder name');
-				assert.strictEqual(module2Placeholders.placeholder2.name,
-					'placeholder2', 'Wrong placeholder name');
-				assert.strictEqual(module2Placeholders.placeholder1.fullName,
-					'module2_placeholder1', 'Wrong placeholder full name');
-				assert.strictEqual(module2Placeholders.placeholder2.fullName,
-					'module2_placeholder2', 'Wrong placeholder full name');
-				assert.strictEqual(module2Placeholders.placeholder1.moduleName,
-					'module2', 'Wrong module name');
-				assert.strictEqual(module2Placeholders.placeholder2.moduleName,
-					'module2', 'Wrong module name');
-				assert.strictEqual(
-						module2Placeholders.placeholder1
-							.render instanceof Function, true,
-					'Placeholder should have render method'
-				);
-				assert.strictEqual(
-						module2Placeholders.placeholder2
-							.render instanceof Function, true,
-					'Placeholder should have render method'
-				);
 			});
 	});
 });
 
 function checkContexts(modulesByNames) {
-	assert.strictEqual(
-		typeof(modulesByNames.module1.implementation.$context),
-		'object', true,
-		'Module should have context');
-	assert.strictEqual(
-		typeof(modulesByNames.module2.implementation.$context),
-		'object', true,
-		'Module should have context');
-	assert.strictEqual(
-		typeof(modulesByNames.module1.implementation.$context.state),
-		'object', true,
-		'Module should have state');
-	assert.strictEqual(
-		typeof(modulesByNames.module1
-			.implementation.$context.renderedData),
-		'object', true,
-		'Module should have rendered data cache');
-	assert.strictEqual(
-		typeof(modulesByNames.module2
-			.implementation.$context.renderedData),
-		'object', true,
-		'Module should have rendered data cache');
-	assert.strictEqual(
-		typeof(modulesByNames.module2.implementation.$context.state),
-		'object', true,
-		'Module should have state');
-	assert.strictEqual(modulesByNames.module1
-		.implementation.$context.cookies instanceof
-		CookiesWrapper, true, 'Module should have cookies');
-	assert.strictEqual(modulesByNames.module2
-		.implementation.$context.cookies instanceof
-		CookiesWrapper, true, 'Module should have cookies');
+	Object.keys(modulesByNames)
+		.forEach(function (moduleName) {
+			assert.strictEqual(
+				typeof(modulesByNames[moduleName].implementation.$context),
+				'object', true,
+				'Module should have context');
+			assert.strictEqual(
+				typeof(modulesByNames[moduleName].implementation.$context.state),
+				'object', true,
+				'Module should have state');
+			assert.strictEqual(
+				typeof(modulesByNames[moduleName]
+					.implementation.$context.renderedData),
+				'object', true,
+				'Module should have rendered data cache');
+			assert.strictEqual(modulesByNames[moduleName]
+				.implementation.$context.cookies instanceof
+				CookiesWrapper, true, 'Module should have cookies');
+		});
 }

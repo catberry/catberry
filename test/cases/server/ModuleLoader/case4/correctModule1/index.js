@@ -29,5 +29,3 @@
  */
 
 'use strict';
-
-module.exports = require('./CorrectModule1');

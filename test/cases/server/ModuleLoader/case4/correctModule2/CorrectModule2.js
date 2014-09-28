@@ -34,7 +34,7 @@ module.exports = CorrectModule2;
 
 // correct module
 function CorrectModule2() {
-
+	this.$context = null;
 }
 
 CorrectModule2.prototype.render = function (placeholder, args, callback) {

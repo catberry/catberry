@@ -30,21 +30,9 @@
 
 'use strict';
 
-module.exports = CorrectModule1;
+module.exports = WrongInterface;
 
-// correct module
-function CorrectModule1() {
+// wrong syntax
+WrongInterface() {
 
 }
-
-CorrectModule1.prototype.render = function (placeholder, args, callback) {
-
-};
-
-CorrectModule1.prototype.handle = function (eventName, placeholder, callback) {
-
-};
-
-CorrectModule1.prototype.submit = function (formName, formObject, callback) {
-
-};
