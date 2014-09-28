@@ -183,6 +183,206 @@ describe('lib/streams/ModuleReadable', function () {
 					});
 				moduleReadable.render();
 			});
+
+		it('should render error placeholder if error', function (done) {
+			var content = 'some test',
+				errorContent = 'some error content',
+				module = {
+					name: 'test',
+					implementation: {
+						$context: createContext('test'),
+						render: function () {
+							this.$context.clearHash();
+							throw new Error('hello');
+						}
+					},
+					errorPlaceholder: {
+						name: '__error',
+						getTemplateStream: function () {
+							return new ContentStream(errorContent);
+						}
+					},
+					placeholders: {
+						test: {
+							name: 'test',
+							getTemplateStream: function () {
+								return new ContentStream(content);
+							}
+						}
+					}
+				};
+
+			var expected = '<script class="catberry-inline-script">' +
+				'window.location.hash = \'\';' +
+				'</script>' + errorContent;
+
+			var parameters = createRenderingParameters(module),
+				moduleReadable = new ModuleReadable(module,
+					module.placeholders.test, parameters, true),
+				result = '';
+
+			moduleReadable
+				.on('data', function (chunk) {
+					result += chunk;
+				})
+				.on('error', function (error) {
+					assert.strictEqual(error.message, 'hello');
+					assert.strictEqual(result, expected);
+					done();
+				});
+			moduleReadable.render();
+		});
+
+		it('should render nothing if error', function (done) {
+			var content = 'some test',
+				module = {
+					name: 'test',
+					implementation: {
+						$context: createContext('test'),
+						render: function () {
+							throw new Error('hello');
+						}
+					},
+					placeholders: {
+						test: {
+							name: 'test',
+							getTemplateStream: function () {
+								return new ContentStream(content);
+							}
+						}
+					}
+				};
+
+			var parameters = createRenderingParameters(module),
+				moduleReadable = new ModuleReadable(module,
+					module.placeholders.test, parameters, true),
+				result = '';
+
+			moduleReadable
+				.on('data', function (chunk) {
+					result += chunk;
+				})
+				.on('error', function (error) {
+					assert.strictEqual(error.message, 'hello');
+					assert.strictEqual(result, '');
+					done();
+				});
+			moduleReadable.render();
+		});
+
+		it('should render nothing if error in template', function (done) {
+			var module = {
+				name: 'test',
+				implementation: {
+					$context: createContext('test'),
+					render: function () {
+
+					}
+				},
+				placeholders: {
+					test: {
+						name: 'test',
+						getTemplateStream: function () {
+							throw new Error('hello');
+						}
+					}
+				}
+			};
+
+			var parameters = createRenderingParameters(module),
+				moduleReadable = new ModuleReadable(module,
+					module.placeholders.test, parameters, true),
+				result = '';
+
+			moduleReadable
+				.on('data', function (chunk) {
+					result += chunk;
+				})
+				.on('error', function (error) {
+					assert.strictEqual(error.message, 'hello');
+					assert.strictEqual(result, '');
+					done();
+				});
+			moduleReadable.render();
+		});
+
+		it('should render nothing if error in template stream',
+			function (done) {
+				var content = 'some test',
+					module = {
+						name: 'test',
+						implementation: {
+							$context: createContext('test'),
+							render: function () {
+
+							}
+						},
+						placeholders: {
+							test: {
+								name: 'test',
+								getTemplateStream: function () {
+									var stream = new ContentStream(content);
+									setTimeout(function () {
+										stream.emit(
+											'error', new Error('hello')
+										);
+									}, 0);
+									return stream;
+								}
+							}
+						}
+					};
+
+				var parameters = createRenderingParameters(module),
+					moduleReadable = new ModuleReadable(module,
+						module.placeholders.test, parameters, true),
+					result = '';
+
+				moduleReadable
+					.on('data', function (chunk) {
+						result += chunk;
+					})
+					.on('error', function (error) {
+						assert.strictEqual(error.message, 'hello');
+						assert.strictEqual(result, content);
+						done();
+					});
+				moduleReadable.render();
+			});
+
+		it('should emit error if module not defined',
+			function (done) {
+				var moduleReadable = new ModuleReadable(
+						null, null, {}, true
+					);
+
+				moduleReadable
+					.on('data', function () {
+						assert.fail();
+					})
+					.on('error', function (error) {
+						assert.strictEqual(error.message, 'Module not defined');
+						done();
+					});
+				moduleReadable.render();
+			});
+
+		it('should emit error if placeholder not defined',
+			function (done) {
+				var moduleReadable = new ModuleReadable(
+					{}, null, {}, true
+				);
+
+				moduleReadable
+					.on('data', function () {
+						assert.fail();
+					})
+					.on('error', function (error) {
+						assert.strictEqual(error.message, 'Placeholder not defined');
+						done();
+					});
+				moduleReadable.render();
+			});
 	});
 });
 

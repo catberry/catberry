@@ -36,6 +36,7 @@ var assert = require('assert'),
 	path = require('path'),
 	ServiceLocator = require('catberry-locator'),
 	ContextFactory = require('../../lib/ContextFactory'),
+	ContentReadable = require('../../lib/streams/ContentReadable'),
 	Logger = require('../mocks/Logger'),
 	ModuleApiProvider = require('../../lib/ModuleApiProvider'),
 	CookiesWrapper = require('../../lib/CookiesWrapper'),
@@ -66,6 +67,9 @@ function createModuleLoader(caseName) {
 		},
 		registerCompiled: function () {
 
+		},
+		getStream: function (name, context) {
+			return new ContentReadable(name + JSON.stringify(context));
 		}
 	});
 
@@ -98,16 +102,47 @@ describe('lib/ModuleLoader', function () {
 				}
 
 				assert.equal(counter, 0, 'Too many loaded modules');
-				done();
-			});
+			})
+				.then(function () {
+					done();
+				}, function (reason) {
+					done(reason);
+				});
 		});
 
 		it('should not throw error if module interface is incorrect',
 			function (done) {
 				var moduleLoader = createModuleLoader('case2');
-				moduleLoader.loadModules().then(function () {
-					done();
+				moduleLoader.loadModules()
+					.then(function () {
+						done();
+					}, function (reason) {
+						done(reason);
+					});
+			});
+
+		it('should load only placeholders if module syntax is incorrect',
+			function (done) {
+				var moduleLoader = createModuleLoader('case5');
+				moduleLoader._eventBus.on('error', function (error) {
+					assert.strictEqual(error instanceof SyntaxError, true);
 				});
+				moduleLoader.loadModules()
+					.then(function (modules) {
+						assert.strictEqual(Object.keys(modules).length, 1);
+						var placeholders = modules.wrongSyntax.placeholders;
+						assert.strictEqual(Object.keys(placeholders).length, 1);
+						assert.strictEqual(typeof(placeholders.only), 'object');
+						assert.strictEqual(
+								placeholders.only.getTemplateStream instanceof
+								Function, true
+						);
+					})
+					.then(function () {
+						done();
+					}, function (reason) {
+						done(reason);
+					});
 			});
 
 		it('should skip module folders with wrong module names',
@@ -123,15 +158,20 @@ describe('lib/ModuleLoader', function () {
 					}
 
 					assert.equal(counter, 0, 'Too many loaded modules');
-					done();
-				});
+				})
+					.then(function () {
+						done();
+					}, function (reason) {
+						done(reason);
+					});
 			});
 
 		it('should properly load correct modules', function (done) {
 			var moduleLoader = createModuleLoader('case4');
 
-			moduleLoader.loadModules().then(function (modules) {
-				assert.equal(Object.keys(modules).length, 2,
+			moduleLoader.loadModules().then(function () {
+				var modules = moduleLoader.getModulesByNames();
+				assert.equal(Object.keys(modules).length, 3,
 					'Not all modules were loaded');
 
 				assert.equal('correctModule1' in modules, true,
@@ -140,9 +180,13 @@ describe('lib/ModuleLoader', function () {
 				assert.equal('correctModule2' in modules, true,
 					'correctModule2 not found');
 
+				assert.equal('correctModule3' in modules, true,
+					'correctModule2 not found');
+
 				// check assets
 				var firstModule = modules.correctModule1,
-					secondModule = modules.correctModule2;
+					secondModule = modules.correctModule2,
+					thirdModule = modules.correctModule3;
 
 				// check placeholders
 				var firstPlaceholders = firstModule.placeholders;
@@ -151,10 +195,16 @@ describe('lib/ModuleLoader', function () {
 					'Wrong count of placeholders');
 				assert.equal(firstModule.rootPlaceholder.name, '__index',
 					'Wrong placeholder name');
+				assert.equal(firstModule.errorPlaceholder.name, '__error',
+					'Wrong placeholder name');
 				assert.equal(
 						firstModule.rootPlaceholder.getTemplateStream instanceof
 						Function, true,
 					'Root placeholder not found');
+				assert.equal(
+						firstModule.errorPlaceholder.getTemplateStream instanceof
+						Function, true,
+					'Error placeholder not found');
 				assert.equal(firstPlaceholders.placeholder1.name,
 					'placeholder1',
 					'Wrong placeholder name');
@@ -169,6 +219,7 @@ describe('lib/ModuleLoader', function () {
 				assert.equal(Object.keys(secondPlaceholders).length, 2,
 					'Expect 2 placeholders');
 				assert.strictEqual(secondModule.rootPlaceholder, undefined);
+				assert.strictEqual(secondModule.errorPlaceholder, undefined);
 				assert.equal(secondPlaceholders.placeholder2.name,
 					'placeholder2',
 					'Wrong placeholder name');
@@ -187,8 +238,107 @@ describe('lib/ModuleLoader', function () {
 							.getTemplateStream instanceof Function,
 					true,
 					'Placeholder not found');
+
+				var thirdPlaceholders = thirdModule.placeholders;
+
+				assert.equal(Object.keys(thirdPlaceholders).length, 1,
+					'Expect 1 placeholders');
+				assert.strictEqual(thirdModule.rootPlaceholder, undefined);
+				assert.strictEqual(thirdModule.errorPlaceholder, undefined);
+				assert.equal(thirdPlaceholders.placeholder4.name,
+					'placeholder4',
+					'Wrong placeholder name');
+				assert.equal(
+						thirdPlaceholders
+							.placeholder4
+							.getTemplateStream instanceof Function,
+					true,
+					'Placeholder not found');
+				var dc = {hello: 'world'};
+				return new Promise(function (fulfill, reject) {
+					var stream = thirdPlaceholders.placeholder4
+						.getTemplateStream({hello: 'world'});
+
+					var result = '';
+					stream
+						.on('data', function (chunk) {
+							result += chunk;
+						})
+						.on('error', function (error) {
+							reject(error);
+						})
+						.on('end', function () {
+							try {
+								assert.strictEqual(
+									result, thirdPlaceholders
+										.placeholder4.fullName +
+										JSON.stringify(dc)
+								);
+							} catch (e) {
+								reject(e);
+							}
+							fulfill();
+						});
+				});
+			})
+				.then(function () {
+					done();
+				}, function (reason) {
+					done(reason);
+				});
+		});
+	});
+
+	describe('#getPlaceholdersByIds', function () {
+		it('should return empty object if modules not loaded yet',
+			function (done) {
+				var moduleLoader = createModuleLoader('case1'),
+					placeholders = moduleLoader.getPlaceholdersByIds();
+				assert.strictEqual(Object.keys(placeholders).length, 0);
 				done();
 			});
+
+		it('should return empty object if modules list is empty',
+			function (done) {
+				var moduleLoader = createModuleLoader('case1');
+
+				moduleLoader.loadModules()
+					.then(function () {
+						var placeholders = moduleLoader.getPlaceholdersByIds();
+						assert.strictEqual(Object.keys(placeholders).length, 0);
+					})
+					.then(function () {
+						done();
+					}, function (reason) {
+						done(reason);
+					});
+			});
+
+		it('should return proper list of placeholders', function (done) {
+			var moduleLoader = createModuleLoader('case4');
+
+			moduleLoader.loadModules()
+				.then(function () {
+					var placeholders = moduleLoader.getPlaceholdersByIds();
+					assert.strictEqual(Object.keys(placeholders).length, 4);
+					assert.strictEqual(
+							'correctModule1_placeholder1' in placeholders, true
+					);
+					assert.strictEqual(
+							'correctModule2_placeholder2' in placeholders, true
+					);
+					assert.strictEqual(
+							'correctModule2_placeholder3' in placeholders, true
+					);
+					assert.strictEqual(
+							'correctModule3_placeholder4' in placeholders, true
+					);
+				})
+				.then(function () {
+					done();
+				}, function (reason) {
+					done(reason);
+				});
 		});
 	});
 });

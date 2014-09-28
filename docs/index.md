@@ -311,6 +311,10 @@ directly.
 It is really important not to make loops in resolving dependencies. It causes
 infinite recursion and just kill your application.
 
+Please keep in mind that config sections could be injected only with service
+injections. If you want to inject only config section alone it will not work
+after code minification in release mode.
+
 Read also:
 
 Userland Services

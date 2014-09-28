@@ -299,6 +299,13 @@ describe('lib/PageRenderer', function () {
 					done();
 				});
 			});
+
+		it('should properly render cycle-references',
+			function (done) {
+				checkCase('case4').then(function () {
+					done();
+				});
+			});
 	});
 });
 

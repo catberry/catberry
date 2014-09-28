@@ -79,6 +79,35 @@ describe('lib/helpers/moduleHelper', function () {
 			assert.strictEqual(camelCaseName2, '');
 		});
 	});
+
+	describe('#splitModuleAndContext', function () {
+		it('should return object with only module if context not found',
+			function () {
+				var result = moduleHelper.splitModuleNameAndContext('some_');
+				assert.strictEqual(result.moduleName, 'some');
+				assert.strictEqual(result.context, '');
+			});
+		it('should return object with only module if separator is not found',
+			function () {
+				var result = moduleHelper.splitModuleNameAndContext('some');
+				assert.strictEqual(result.moduleName, 'some');
+				assert.strictEqual(result.context, '');
+			});
+		it('should return null if argument is not a string',
+			function () {
+				var result = moduleHelper.splitModuleNameAndContext(null);
+				assert.strictEqual(result, null);
+			});
+		it('should return object if argument is a right string',
+			function () {
+				var result = moduleHelper.splitModuleNameAndContext(
+					'module-cool_placeholder-nice'
+				);
+				assert.strictEqual(result.moduleName, 'module-cool');
+				assert.strictEqual(result.context, 'placeholder-nice');
+			});
+	});
+
 	describe('#getMethodToInvoke', function () {
 		it('should find method in module', function () {
 			var module = {
@@ -115,6 +144,18 @@ describe('lib/helpers/moduleHelper', function () {
 				var module = {
 					},
 					name = 'method-to-invoke',
+					method = moduleHelper.getMethodToInvoke(
+						module, 'some', name
+					);
+
+				assert.strictEqual(typeof(method), 'function');
+				assert.strictEqual(method() instanceof Promise, true);
+			});
+
+		it('should return method with promise if arguments are wrong',
+			function () {
+				var module = null,
+					name = '',
 					method = moduleHelper.getMethodToInvoke(
 						module, 'some', name
 					);
