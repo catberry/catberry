@@ -120,6 +120,32 @@ describe('lib/streams/ParserDuplex', function () {
 				});
 		});
 
+		it('should re-emit found tag errors', function (done) {
+			var concat = '',
+				input = new ContentReadable('<some id="1"></some>'),
+				expected = '<some id="1">test1</some>',
+				parser = new ParserDuplex(),
+				result = input.pipe(parser);
+
+			parser.foundTagIdHandler = function (id) {
+				var stream = new ContentReadable('test' + id);
+				setTimeout(function () {
+					stream.emit('error', new Error('hello'));
+				});
+				return stream;
+			};
+
+			result
+				.on('data', function (chunk) {
+					concat += chunk;
+				})
+				.on('error', function (error) {
+					assert.strictEqual(error.message, 'hello');
+					assert.strictEqual(concat, expected, 'Wrong HTML content');
+					done();
+				});
+		});
+
 		it('should properly work when tags do not fit in buffer',
 			function (done) {
 				var concat = '',
