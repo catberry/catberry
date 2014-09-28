@@ -50,7 +50,7 @@
 		"catberry-dust": "^3.0.0",
 		"jquery": "^2.0.0",
 		"uglify-js": "^2.0.0",
-		"browserify": "^4.0.0",
+		"browserify": "^5.0.0",
 		"log4js": "~0.6.0",
 		"promise": "^6.0.0"
 	},
