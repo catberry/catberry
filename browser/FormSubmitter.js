@@ -136,7 +136,7 @@ FormSubmitter.prototype.submit = function (form) {
 		.then(function () {
 			var dependents = getDataDependents(form, modulesByNames),
 				promises = dependents.map(function (dependent) {
-					return self._apiProvider.requestRefresh(
+					return self._apiProvider.requestRender(
 						dependent.moduleName, dependent.name
 					);
 				});
