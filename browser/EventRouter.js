@@ -107,11 +107,11 @@ EventRouter.prototype.routeHashChange = function (eventString) {
 			Promise.resolve();
 
 	return promise.then(function () {
+		self._lastEvent = eventString;
 		// if error or we just clear the hash
 		if (!eventString) {
 			return;
 		}
-		self._lastEvent = eventString;
 		return self.routeEvent({
 			string: self._lastEvent,
 			isEnding: false,
