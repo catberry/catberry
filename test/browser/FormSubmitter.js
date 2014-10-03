@@ -384,7 +384,7 @@ function createLocator() {
 	locator.register('logger', Logger);
 	locator.registerInstance('moduleLoader', moduleLoader);
 	locator.registerInstance('moduleApiProvider',
-		new UniversalMock(['requestRefresh']));
+		new UniversalMock(['requestRender']));
 	return locator;
 }
 
