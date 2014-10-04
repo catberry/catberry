@@ -364,6 +364,7 @@ operator. In some cases it can cause [performance degradation](https://speakerde
  - [slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
  - [splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
 
+
 	```javascript
 	var array = [1, 2, 3]; 
 	
@@ -385,6 +386,7 @@ operator. In some cases it can cause [performance degradation](https://speakerde
  - [reverse](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)
  - [some](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
  - [sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+
 
 	```javascript
 	var array = [1, 2, 3, 4, 5];
