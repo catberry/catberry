@@ -23,20 +23,20 @@ There are some aspects of Catberry code style below:
 - Never use multiple line breaks
 - Maximum length of line &mdash; 80
 - Always use semicolons
-- Always use space after keywords and before curly braces except `else` and `catch`
+- Always use space after keywords and before curly braces
 
 	```javascript
 	// bad
 	if(some){
 	
-	} else {
+	}else{
 		
 	}
 	
 	// good
 	if (some) {
 	
-	}else{
+	} else {
 	
 	}
 	```
