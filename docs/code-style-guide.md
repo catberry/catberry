@@ -402,7 +402,7 @@ for (var i = 0; i < array.length; i++) {
 var hasGreaterThanThree = array.some(function (item) {
 	return item > 3;
 });
-	```
+```
 
 - To convert an array-like object to an array, use [slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) like this
 
