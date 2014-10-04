@@ -364,16 +364,15 @@ operator. In some cases it can cause [performance degradation](https://speakerde
  - [slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
  - [splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
 
+```javascript
+var array = [1, 2, 3]; 
 
-	```javascript
-	var array = [1, 2, 3]; 
-	
-	// bad
-	array[array.length] = 'some';
-	
-	// good
-	array.push('some');
-	```
+// bad
+array[array.length] = 'some';
+
+// good
+array.push('some');
+```
 
 - Use functional approach when working with arrays. Use methods like:
  - [every](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
@@ -387,23 +386,22 @@ operator. In some cases it can cause [performance degradation](https://speakerde
  - [some](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
  - [sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
 
+```javascript
+var array = [1, 2, 3, 4, 5];
 
-	```javascript
-	var array = [1, 2, 3, 4, 5];
-	
-	// bad
-	var hasGreaterThanThree = false;
-	for (var i = 0; i < array.length; i++) {
-		if (array[i] > 3) {
-			hasGreaterThanThree = true;
-			break;
-		}
+// bad
+var hasGreaterThanThree = false;
+for (var i = 0; i < array.length; i++) {
+	if (array[i] > 3) {
+		hasGreaterThanThree = true;
+		break;
 	}
-	
-	// good
-	var hasGreaterThanThree = array.some(function (item) {
-		return item > 3;
-	});
+}
+
+// good
+var hasGreaterThanThree = array.some(function (item) {
+	return item > 3;
+});
 	```
 
 - To convert an array-like object to an array, use [slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) like this
