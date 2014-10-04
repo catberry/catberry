@@ -33,7 +33,6 @@ There are some aspects of Catberry code style below:
 		
 	}
 	
-	
 	// good
 	if (some) {
 	
@@ -104,9 +103,9 @@ There are some aspects of Catberry code style below:
 - Use ECMAScript 5.1 syntax ([ECMA-262](http://www.ecma-international.org/ecma-262/5.1/))
 - Always use [JavaScript Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) 
 in the beginning of each .js file. 
-- Never use `[with](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with)`, 
-`[let](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let)` or 
-`[void](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void)` operator
+- Never use [with](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with), 
+[let](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let) or 
+[void](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void) operator
 - Maximum arguments in function &mdash; 5
 - Maximum code block depth &mdash; 3
 - Maximum statement count per function &mdash; 50
@@ -116,8 +115,8 @@ in the beginning of each .js file.
 
 ##Naming
 
-- Always use **camelCase for variables**, **PascalCase for constructors** 
-and **UPPER_CASE with underscores for constants**
+- Always use `camelCase` for variables, `PascalCase` for constructors 
+and `UPPER_CASE` with underscores for constants
 
 	```javascript
 	var SOME_CONSTANT = 42;
@@ -152,7 +151,7 @@ and **UPPER_CASE with underscores for constants**
 	this._firstName = 'Panda';
 	```
 	
-- When saving a reference to `this` use `self`.
+- When saving a reference to `this` use name `self`.
 
 	```javascript
 	// bad
@@ -171,18 +170,18 @@ and **UPPER_CASE with underscores for constants**
 	}
 	```
 
-- If variable is boolean start its name with `is` or `has` prefix
+- If variable is boolean type then start its name with `is` or `has` prefix
+
+	```javascript
+	// bad
+	var success = true;
+	
+	// good
+	var isSuccess = true;
+	```
 
 - If JavaScript file has definition of constructor it should has name of this
 constructor in PascalCase like `Constructor.js`
-
-```javascript
-// bad
-var success = true;
-
-// good
-var isSuccess = true;
-```
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -310,7 +309,7 @@ variable declaration and assignment hoisting related issues.
 	var item = {};
 	```
 
-- When possible do not use `[delete](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete)` 
+- When possible do not use [delete](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete) 
 operator. In some cases it can cause [performance degradation](https://speakerdeck.com/addyosmani/javascript-memory-management-masterclass).
 
 - Use dot notation when accessing properties.
@@ -357,7 +356,7 @@ operator. In some cases it can cause [performance degradation](https://speakerde
 	var array = [];
 	```
 
-- Edit array items only using: 
+- Edit array items only using:
  - [push](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push)
  - [pop](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop)
  - [shift](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)
@@ -440,7 +439,7 @@ operator. In some cases it can cause [performance degradation](https://speakerde
 		hasDot = string.indexOf('.') !== -1;
 	```
 
-- Use only [strict equal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Identity_.2F_strict_equality_(.3D.3D.3D))([!==](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Non-identity_.2F_strict_not_equal_(!.3D.3D))) operator
+- Use only [===](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Identity_.2F_strict_equality_(.3D.3D.3D))([!==](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Non-identity_.2F_strict_not_equal_(!.3D.3D))) operator
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -469,8 +468,8 @@ operator. In some cases it can cause [performance degradation](https://speakerde
 Assign the function to a variable instead. Browsers will allow you to do it, 
 but they all interpret it differently.
 
-**Note:** ECMA-262 defines a `block` as a list of statements. 
-A function declaration is not a statement. [Read ECMA-262's note on this issue](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf#page=97).
+	**Note:** ECMA-262 defines a `block` as a list of statements. 
+	A function declaration is not a statement. [Read ECMA-262's note on this issue](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf#page=97).
 
 	```javascript
 	// bad
@@ -530,7 +529,7 @@ the `arguments` object that is given to every function scope.
 		.forEach(handler);
 	```
 
-- Separate function arguments with space after coma `, `
+- Separate function arguments with space after coma
 
 	```javascript
 	// bad
@@ -596,7 +595,8 @@ local state like this:
 	```
 
 - Use [bind](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) 
-for [partial application](http://en.wikipedia.org/wiki/Partial_application) or to specify `this`.
+for [partial application](http://en.wikipedia.org/wiki/Partial_application) 
+or to specify `this` inside the method.
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -677,3 +677,5 @@ this [.jscsrc](https://github.com/catberry/catberry/blob/master/.jscsrc) file
 [.jshintrc](https://github.com/catberry/catberry/blob/master/.jshintrc) file
 
 These tools should be called before tests by command `npm test`.
+
+**[⬆ back to top](#table-of-contents)**
