@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "2.1.4",
+	"version": "2.1.5",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -63,7 +63,7 @@
 	"devDependencies": {
 		"istanbul-harmony": "~0.3.0",
 		"coveralls": "^2.11.0",
-		"jsdom": "~0.11.0",
+		"jsdom": "^1.0.0",
 		"mocha": "^1.20.0",
 		"jscs": "^1.6.0",
 		"jshint": "^2.5.0"
