@@ -1111,7 +1111,13 @@ For some situations you maybe have to determine where current code is executing.
 There are two flags in context for this purpose: `isBrowser` and `isServer`. 
 Both flags are read-only properties.
 
-###Current URL and URL path
+###Current Host, URL and URL path
+You can get current host from module context by `host` property.
+At server it is a value of Host HTTP header and in browser it is value of
+`window.location.host`.
+
+For example `some.domain:3000`.
+
 If you want to determine what is the current URL or just URL path then you can 
 use `url` and `urlPath` properties respectively. 
 

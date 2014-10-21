@@ -217,6 +217,7 @@ RequestRouter.prototype.route = function () {
 			self._serviceLocator.resolve('cookiesWrapper'),
 			state, {
 				referrer: self._referrer,
+				host: self._window.location.host,
 				url: '//' + self._window.location.host +
 					self._window.location.pathname +
 					self._window.location.search,
@@ -309,6 +310,7 @@ RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
 			this._serviceLocator.resolve('cookiesWrapper'),
 			currentState, {
 				referrer: this._referrer,
+				host: this._window.location.host,
 				url: '//' + this._window.location.host +
 					this._window.location.pathname +
 					this._window.location.search,
