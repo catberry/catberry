@@ -599,6 +599,10 @@ PageRenderer.prototype._runAfterMethodsAndEvents = function () {
 		lastRenderedData, this._serviceLocator.resolve('cookiesWrapper'),
 		this._lastState, {
 			referrer: this._window.document.referrer,
+			host: this._window.location.host,
+			url: '//' + this._window.location.host +
+				this._window.location.pathname +
+				this._window.location.search,
 			urlPath: this._window.location.pathname +
 				this._window.location.search,
 			userAgent: this._window.navigator.userAgent
