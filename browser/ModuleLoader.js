@@ -144,6 +144,9 @@ ModuleLoader.prototype._initModules = function () {
 			self.lastRenderedData, cookiesWrapper,
 				currentState || {},
 			{
+				url: '//' + self._window.location.host +
+					self._window.location.pathname +
+					self._window.location.search,
 				urlPath: self._window.location.pathname +
 					self._window.location.search,
 				referrer: self._window.document.referrer,
