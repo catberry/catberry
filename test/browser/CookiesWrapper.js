@@ -70,12 +70,12 @@ describe('browser/CookiesWrapper', function () {
 					expiration = new Date(),
 					window = locator.resolve('window'),
 					expected = 'some=value' +
-						'; max-age=100' +
-						'; expire=' +
+						'; Max-Age=100' +
+						'; Expire=' +
 						expiration.toUTCString() +
-						'; path=/some' +
-						'; domain=.new.domain' +
-						'; secure; HttpOnly';
+						'; Path=/some' +
+						'; Domain=.new.domain' +
+						'; Secure; HttpOnly';
 
 				cookiesWrapper.set({
 					key: 'some',
@@ -97,8 +97,8 @@ describe('browser/CookiesWrapper', function () {
 					expiration = new Date(Date.now() + 3600000),
 					window = locator.resolve('window'),
 					expected = 'some=value' +
-						'; max-age=3600' +
-						'; expire=' +
+						'; Max-Age=3600' +
+						'; Expire=' +
 						expiration.toUTCString();
 
 				cookiesWrapper.set({

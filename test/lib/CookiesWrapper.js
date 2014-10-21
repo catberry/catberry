@@ -64,12 +64,12 @@ describe('lib/CookiesWrapper', function () {
 				var cookiesWrapper = new CookiesWrapper(),
 					expiration = new Date(),
 					expected = 'some=value' +
-						'; max-age=100' +
-						'; expire=' +
+						'; Max-Age=100' +
+						'; Expire=' +
 						expiration.toUTCString() +
-						'; path=/some' +
-						'; domain=.new.domain' +
-						'; secure; HttpOnly';
+						'; Path=/some' +
+						'; Domain=.new.domain' +
+						'; Secure; HttpOnly';
 
 				cookiesWrapper.initWithString(null);
 
@@ -113,8 +113,8 @@ describe('lib/CookiesWrapper', function () {
 				var cookiesWrapper = new CookiesWrapper(),
 					expiration = new Date(Date.now() + 3600000),
 					expected = 'some=value' +
-						'; max-age=3600' +
-						'; expire=' +
+						'; Max-Age=3600' +
+						'; Expire=' +
 						expiration.toUTCString();
 
 				cookiesWrapper.set({
