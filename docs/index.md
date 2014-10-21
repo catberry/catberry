@@ -1111,10 +1111,20 @@ For some situations you maybe have to determine where current code is executing.
 There are two flags in context for this purpose: `isBrowser` and `isServer`. 
 Both flags are read-only properties.
 
-###Current URL path
-If you want to determine what is the current URL path then you can use `urlPath` 
-property. This value is a concatenation of `location.pathname` and 
+###Current URL and URL path
+If you want to determine what is the current URL or just URL path then you can 
+use `url` and `urlPath` properties respectively. 
+
+`url` is a concatenation of `location.host`, `location.pathname` 
+and `location.search` in browser and `request.headers.host` and `request.url` at
+ server. 
+ 
+For example `//some.domain:3000/some/path?and=query&add=query`.
+
+`urlPath` value is a concatenation of `location.pathname` and 
 `location.search` in browser and `request.url` at server.
+
+For example `/some/path?and=query&add=query`.
 
 ###Referrer
 If you want to know previous browser's page URL you can use `referrer` property. 
