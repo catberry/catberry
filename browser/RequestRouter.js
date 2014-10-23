@@ -45,6 +45,7 @@ var MOUSE_KEYS = {
 	A_TAG_NAME = 'A',
 	BUTTON_TAG_NAME = 'BUTTON',
 	PROTOCOL_REGEXP = /^\w+:/,
+	CURRENT_PROTOCOL_REGEXP = /^\/\//,
 	HASH_REGEXP = /^#.+$/,
 	ERROR_WRONG_MODULE_NAME = 'Wrong module name "%s"',
 	ERROR_WRONG_PLACEHOLDER_NAME = 'Wrong placeholder name "%s"';
@@ -66,12 +67,12 @@ function RequestRouter($serviceLocator) {
 	this._moduleLoader = $serviceLocator.resolve('moduleLoader');
 	this._contextFactory = $serviceLocator.resolve('contextFactory');
 	this._historySupported = this._window.history &&
-		this._window.history.pushState instanceof Function;
+	this._window.history.pushState instanceof Function;
 	this._serviceLocator = $serviceLocator;
 
 	var self = this;
 	this._currentPath = this._window.location.pathname +
-		this._window.location.search;
+	this._window.location.search;
 	this._currentHost = this._window.location.host;
 
 	// if invoke this method now it can cause infinite recursion
@@ -219,8 +220,8 @@ RequestRouter.prototype.route = function () {
 				referrer: self._referrer,
 				host: self._window.location.host,
 				url: '//' + self._window.location.host +
-					self._window.location.pathname +
-					self._window.location.search,
+				self._window.location.pathname +
+				self._window.location.search,
 				urlPath: urlPath,
 				userAgent: self._window.navigator.userAgent
 			}
@@ -262,8 +263,8 @@ RequestRouter.prototype.go = function (location) {
 	// to internal state URL
 	if (locationInfo.protocol && locationInfo.host &&
 		(locationInfo.protocol !== self._window.location.protocol ||
-			locationInfo.host !== self._currentHost) ||
-		!self._historySupported || !state) {
+		locationInfo.host !== self._currentHost) || !self._historySupported ||
+		!state) {
 		self._window.location.assign(location);
 		return Promise.resolve();
 	}
@@ -312,10 +313,10 @@ RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
 				referrer: this._referrer,
 				host: this._window.location.host,
 				url: '//' + this._window.location.host +
-					this._window.location.pathname +
-					this._window.location.search,
+				this._window.location.pathname +
+				this._window.location.search,
 				urlPath: this._window.location.pathname +
-					this._window.location.search,
+				this._window.location.search,
 				userAgent: this._window.navigator.userAgent
 			}
 		);
@@ -488,7 +489,8 @@ RequestRouter.prototype._normalizeLocation = function (location) {
 	}
 
 	// if it has protocol then it is absolute URL
-	if (PROTOCOL_REGEXP.test(location)) {
+	if (PROTOCOL_REGEXP.test(location) ||
+		CURRENT_PROTOCOL_REGEXP.test(location)) {
 		return location;
 	}
 
