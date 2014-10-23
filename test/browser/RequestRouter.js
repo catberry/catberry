@@ -168,7 +168,7 @@ describe('browser/RequestRouter', function () {
 		});
 		describe('link event handle', function () {
 			it('should catch link click and ' +
-					'raise event if data-event attribute',
+				'raise event if data-event attribute',
 				function (done) {
 					var locator = createLocator(),
 						eventRouter = locator.resolve('eventRouter');
@@ -200,10 +200,10 @@ describe('browser/RequestRouter', function () {
 
 					jsdom.env({
 						html: '<a data-event="test1">' +
-							'<div>' +
-							'<span><span id="click-here"></span></span>' +
-							'</div>' +
-							'</a>',
+						'<div>' +
+						'<span><span id="click-here"></span></span>' +
+						'</div>' +
+						'</a>',
 						done: function (errors, window) {
 							prepareWindow(window, locator);
 							var $ = locator.resolve('jQuery');
@@ -237,9 +237,9 @@ describe('browser/RequestRouter', function () {
 
 					locator.registerInstance('routeDefinition', {
 						expression: '/some/' +
-							'?global=:global[first,second]' +
-							'&first=:first[first]' +
-							'&second=:second[second]',
+						'?global=:global[first,second]' +
+						'&first=:first[first]' +
+						'&second=:second[second]',
 						map: function (state) {
 							state.second.hello = 'world';
 							return state;
@@ -269,7 +269,7 @@ describe('browser/RequestRouter', function () {
 						assert.strictEqual(
 							args[0].state.second.hello, 'world');
 						assert.strictEqual(currentWindow.location.toString(),
-								'http://local' + link);
+							'http://local' + link);
 						assert.strictEqual(currentWindow.history.length, 1);
 						done();
 					});
@@ -301,10 +301,10 @@ describe('browser/RequestRouter', function () {
 							'&second=secondValue';
 
 					locator.registerInstance('routeDefinition',
-							'/some/' +
-							'?global=:global[first,second]' +
-							'&first=:first[first]' +
-							'&second=:second[second]'
+						'/some/' +
+						'?global=:global[first,second]' +
+						'&first=:first[first]' +
+						'&second=:second[second]'
 					);
 
 					jsdom.env({
@@ -319,10 +319,10 @@ describe('browser/RequestRouter', function () {
 								$('a').trigger('click');
 								assert.strictEqual(
 									currentWindow.location.toString(),
-										'http://local:9090/some/' +
-										'?global=globalValue' +
-										'&first=firstValue' +
-										'&second=secondValue'
+									'http://local:9090/some/' +
+									'?global=globalValue' +
+									'&first=firstValue' +
+									'&second=secondValue'
 								);
 								done();
 							});
@@ -367,7 +367,7 @@ describe('browser/RequestRouter', function () {
 								$('a').trigger('click');
 								assert.strictEqual(
 									currentWindow.location.toString(),
-										'http://local:9090/a/b/' + link);
+									'http://local:9090/a/b/' + link);
 								done();
 							});
 						}
@@ -386,15 +386,15 @@ describe('browser/RequestRouter', function () {
 							'&second=secondValue';
 
 					locator.registerInstance('routeDefinition',
-							'/some/' +
-							'?global=:global[first,second]' +
-							'&first=:first[first]' +
-							'&second=:second[second]'
+						'/some/' +
+						'?global=:global[first,second]' +
+						'&first=:first[first]' +
+						'&second=:second[second]'
 					);
 
 					pageRenderer.once('render', function () {
 						assert.fail('If link changes page this event ' +
-							'should not be triggered');
+						'should not be triggered');
 					});
 
 					jsdom.env({
@@ -411,6 +411,50 @@ describe('browser/RequestRouter', function () {
 								setTimeout(function () {
 									assert.strictEqual(
 										window.location.toString(), link);
+									done();
+								}, 100);
+							});
+						}
+					});
+				}
+			);
+			it('should catch link click and pass through if link starts with //',
+				function (done) {
+					var locator = createLocator(),
+						pageRenderer = locator.resolve('pageRenderer'),
+						currentWindow,
+						link = '//local1.com/some/' +
+							'?global=globalValue' +
+							'&first=firstValue' +
+							'&second=secondValue';
+
+					locator.registerInstance('routeDefinition',
+						'/some/' +
+						'?global=:global[first,second]' +
+						'&first=:first[first]' +
+						'&second=:second[second]'
+					);
+
+					pageRenderer.once('render', function () {
+						assert.fail('If link changes page this event ' +
+						'should not be triggered');
+					});
+
+					jsdom.env({
+						html: '<a href="' + link + '"/>',
+						done: function (errors, window) {
+							currentWindow = window;
+							prepareWindow(window, locator);
+							var $ = locator.resolve('jQuery');
+							$(function () {
+								window.location
+									.assign('https://local1.com/some');
+								locator.resolveInstance(RequestRouter);
+								$('a').trigger('click');
+								setTimeout(function () {
+									assert.strictEqual(
+										window.location.toString(),
+										'https:' + link);
 									done();
 								}, 100);
 							});
@@ -467,7 +511,7 @@ describe('browser/RequestRouter', function () {
 
 					formSubmitter.once('submit', function () {
 						assert.fail('This event should not be triggered ' +
-							'because button is not in form');
+						'because button is not in form');
 					});
 
 					jsdom.env({
@@ -505,7 +549,7 @@ describe('browser/RequestRouter', function () {
 					});
 					formSubmitter.once('submit', function () {
 						assert.fail('This event should not be triggered ' +
-							'because submitter can not handle request');
+						'because submitter can not handle request');
 					});
 
 					jsdom.env({
