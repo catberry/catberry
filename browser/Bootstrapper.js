@@ -91,8 +91,8 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	var loggerConfig = configObject.logger || {},
 		logger = new Logger(loggerConfig.levels);
 	locator.registerInstance('logger', logger);
-	window.onerror = function errorHandler(msg, url, line) {
-		logger.fatal(url + ':' + line + ' ' + msg);
+	window.onerror = function errorHandler(msg, uri, line) {
+		logger.fatal(uri + ':' + line + ' ' + msg);
 		return true;
 	};
 	var eventBus = locator.resolve('eventBus');

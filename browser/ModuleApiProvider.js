@@ -55,13 +55,13 @@ function ModuleApiProvider($serviceLocator) {
 }
 
 /**
- * Redirects current page to specified URL.
- * @param {string} locationUrl URL to direct.
+ * Redirects current page to specified URI.
+ * @param {string} uriString URI to direct.
  * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.redirect = function (locationUrl) {
+ModuleApiProvider.prototype.redirect = function (uriString) {
 	var requestRouter = this._serviceLocator.resolve('requestRouter');
-	return requestRouter.go(locationUrl);
+	return requestRouter.go(uriString);
 };
 
 /**

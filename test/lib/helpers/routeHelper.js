@@ -35,69 +35,69 @@ var assert = require('assert'),
 
 describe('lib/helpers/routeHelper', function () {
 	describe('#removeEndSlash', function () {
-		it('should remove slash at the end of absolute URL', function () {
-			var url = 'http:///some/ggg/dsd/',
+		it('should remove slash at the end of absolute URI', function () {
+			var uri = 'http:///some/ggg/dsd/',
 				expected = 'http:///some/ggg/dsd';
 
-			var result = routeHelper.removeEndSlash(url);
+			var result = routeHelper.removeEndSlash(uri);
 			assert.strictEqual(result, expected);
 		});
-		it('should remove slash at the end of relative URL', function () {
-			var url = 'ggg/dsd/',
+		it('should remove slash at the end of relative URI', function () {
+			var uri = 'ggg/dsd/',
 				expected = 'ggg/dsd';
 
-			var result = routeHelper.removeEndSlash(url);
+			var result = routeHelper.removeEndSlash(uri);
 			assert.strictEqual(result, expected);
 		});
-		it('should remove slash at the end of URL with hash', function () {
-			var url = 'http:///some/ggg/dsd/#some',
+		it('should remove slash at the end of URI with hash', function () {
+			var uri = 'http:///some/ggg/dsd/#some',
 				expected = 'http:///some/ggg/dsd#some';
 
-			var result = routeHelper.removeEndSlash(url);
+			var result = routeHelper.removeEndSlash(uri);
 			assert.strictEqual(result, expected);
 		});
-		it('should remove slash at the end of URL with search', function () {
-			var url = 'http:///some/ggg/dsd/?arg=some',
+		it('should remove slash at the end of URI with search', function () {
+			var uri = 'http:///some/ggg/dsd/?arg=some',
 				expected = 'http:///some/ggg/dsd?arg=some';
 
-			var result = routeHelper.removeEndSlash(url);
+			var result = routeHelper.removeEndSlash(uri);
 			assert.strictEqual(result, expected);
 		});
-		it('should return empty string if URL is not a string', function () {
-			var url = null,
+		it('should return empty string if URI is not a string', function () {
+			var uri = null,
 				expected = '';
 
-			var result = routeHelper.removeEndSlash(url);
+			var result = routeHelper.removeEndSlash(uri);
 			assert.strictEqual(result, expected);
 		});
-		it('should return URL as is if URL is a root', function () {
-			var url = '/';
+		it('should return URI as is if URI is a root', function () {
+			var uri = '/';
 
-			var result = routeHelper.removeEndSlash(url);
-			assert.strictEqual(result, url);
+			var result = routeHelper.removeEndSlash(uri);
+			assert.strictEqual(result, uri);
 		});
-		it('should return URL as is if URL is a root with hash', function () {
-			var url = '/#hash';
+		it('should return URI as is if URI is a root with hash', function () {
+			var uri = '/#hash';
 
-			var result = routeHelper.removeEndSlash(url);
-			assert.strictEqual(result, url);
+			var result = routeHelper.removeEndSlash(uri);
+			assert.strictEqual(result, uri);
 		});
-		it('should return URL as is if URL is a root with search', function () {
-			var url = '/?arg=some';
+		it('should return URI as is if URI is a root with search', function () {
+			var uri = '/?arg=some';
 
-			var result = routeHelper.removeEndSlash(url);
-			assert.strictEqual(result, url);
+			var result = routeHelper.removeEndSlash(uri);
+			assert.strictEqual(result, uri);
 		});
 	});
 
-	describe('#getUrlMapperByRoute', function () {
+	describe('#getUriMapperByRoute', function () {
 
 		it('should return null if expression is empty', function (done) {
-			var mapper = routeHelper.getUrlMapperByRoute(undefined);
+			var mapper = routeHelper.getUriMapperByRoute(undefined);
 			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getUrlMapperByRoute(null);
+			mapper = routeHelper.getUriMapperByRoute(null);
 			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getUrlMapperByRoute('');
+			mapper = routeHelper.getUriMapperByRoute('');
 			assert.strictEqual(mapper, null);
 			done();
 		});
@@ -110,17 +110,17 @@ describe('lib/helpers/routeHelper', function () {
 						'/:prefix[module3]details' +
 						'?filter=:filter[module2]' +
 						'&:query[module3]=:value[module3]',
-					mapper = routeHelper.getUrlMapperByRoute(expression1);
+					mapper = routeHelper.getUriMapperByRoute(expression1);
 
-				var testUrl1 = '/firstValue' +
+				var testUri1 = '/firstValue' +
 					'/somePostfixValue' +
 					'/simpleValue' +
 					'/SomePrefixValuedetails' +
 					'?filter=byDate' +
 					'&someQuery=someValue';
 
-				assert.strictEqual(mapper.expression.test(testUrl1), true);
-				var state1 = mapper.map(testUrl1);
+				assert.strictEqual(mapper.expression.test(testUri1), true);
+				var state1 = mapper.map(testUri1);
 				assert.strictEqual(Object.keys(state1).length, 3);
 
 				assert.strictEqual(Object.keys(state1.module1).length, 3);
@@ -139,23 +139,23 @@ describe('lib/helpers/routeHelper', function () {
 				assert.strictEqual(state1.module3.query, 'someQuery');
 				assert.strictEqual(state1.module3.value, 'someValue');
 
-				var testUrl2 = '/firstValue' +
+				var testUri2 = '/firstValue' +
 					'/somePostfixValue' +
 					'/simpleValue' +
 					'/SomePrefixValuedetails';
 
-				var state2 = mapper.map(testUrl2);
+				var state2 = mapper.map(testUri2);
 				assert.strictEqual(typeof(state2), 'object');
 				assert.strictEqual(Object.keys(state2).length, 0);
 
 				var expression2 = ':first[module1]' +
 						':second[module1,module2]' +
 						':third[module3]',
-					mapper2 = routeHelper.getUrlMapperByRoute(expression2),
-					testUrl3 = 'some';
+					mapper2 = routeHelper.getUriMapperByRoute(expression2),
+					testUri3 = 'some';
 
-				assert.strictEqual(mapper2.expression.test(testUrl3), true);
-				var state3 = mapper.map(testUrl3);
+				assert.strictEqual(mapper2.expression.test(testUri3), true);
+				var state3 = mapper.map(testUri3);
 				assert.strictEqual(typeof(state3), 'object');
 				assert.strictEqual(Object.keys(state3).length, 0);
 
@@ -164,11 +164,11 @@ describe('lib/helpers/routeHelper', function () {
 
 		it('should return correct mapper for non-parametrized string',
 			function (done) {
-				var url = '/some/test?filter=date',
-					mapper = routeHelper.getUrlMapperByRoute(url);
+				var uri = '/some/test?filter=date',
+					mapper = routeHelper.getUriMapperByRoute(uri);
 
-				assert.strictEqual(mapper.expression.test(url), true);
-				var state = mapper.map(url);
+				assert.strictEqual(mapper.expression.test(uri), true);
+				var state = mapper.map(uri);
 				assert.strictEqual(typeof(state), 'object');
 				assert.strictEqual(Object.keys(state).length, 0);
 				done();
