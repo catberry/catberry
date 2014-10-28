@@ -40,7 +40,7 @@ global.Promise = require('promise');
 
 describe('lib/ModuleApiProvider', function () {
 	describe('#redirect', function () {
-		it('should redirect to URL', function (done) {
+		it('should redirect to URI', function (done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider),
 				requestRouter = locator.resolve('requestRouter');
@@ -52,7 +52,7 @@ describe('lib/ModuleApiProvider', function () {
 		});
 	});
 	describe('#clearHash', function () {
-		it('should clear URL hash', function (done) {
+		it('should clear URI hash', function (done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider),
 				requestRouter = locator.resolve('requestRouter');

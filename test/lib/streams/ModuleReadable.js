@@ -43,7 +43,7 @@ describe('lib/streams/ModuleReadable', function () {
 	describe('#render', function () {
 		it('should render script element if module called redirect',
 			function (done) {
-				var location = 'some/url',
+				var location = 'some/uri',
 					content = 'some test',
 					module = {
 						name: 'test',

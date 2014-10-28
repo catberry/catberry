@@ -33,6 +33,7 @@
 module.exports = ModuleLoader;
 
 var util = require('util'),
+	URI = require('../lib/URI'),
 	ModuleLoaderBase = require('../lib/base/ModuleLoaderBase'),
 	moduleHelper = require('../lib/helpers/moduleHelper');
 
@@ -136,21 +137,16 @@ ModuleLoader.prototype._initModules = function () {
 			});
 		});
 
-	var currentState = this._stateProvider.getStateByUrl(
-			this._window.location.toString()
-		),
+	var location = new URI(this._window.location.toString()),
+		referrer = new URI(this._window.document.referrer),
+		currentState = this._stateProvider.getStateByUri(location),
 		cookiesWrapper = this._serviceLocator.resolve('cookiesWrapper'),
 		context = self._contextFactory.create(
 			self.lastRenderedData, cookiesWrapper,
 				currentState || {},
 			{
-				host: self._window.location.host,
-				url: '//' + self._window.location.host +
-					self._window.location.pathname +
-					self._window.location.search,
-				urlPath: self._window.location.pathname +
-					self._window.location.search,
-				referrer: self._window.document.referrer,
+				referrer: referrer,
+				location: location,
 				userAgent: self._window.navigator.userAgent
 			}
 		);

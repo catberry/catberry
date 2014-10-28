@@ -247,7 +247,10 @@ describe('browser/RequestRouter', function () {
 					});
 					pageRenderer.once('render', function (args) {
 						assert.strictEqual(typeof(args[0]), 'object');
-						assert.strictEqual(args[0].urlPath, link);
+						assert.strictEqual(
+							args[0].location.toString(),
+							'http://local' + link
+						);
 						assert.strictEqual(
 							typeof(args[0].state), 'object');
 						assert.strictEqual(
@@ -290,7 +293,7 @@ describe('browser/RequestRouter', function () {
 				}
 			);
 
-			it('should properly handle relative URLs with ..',
+			it('should properly handle relative URIs with ..',
 				function (done) {
 					var locator = createLocator(),
 						pageRenderer = locator.resolve('pageRenderer'),
@@ -331,7 +334,7 @@ describe('browser/RequestRouter', function () {
 				}
 			);
 
-			it('should properly handle relative URLs without ..',
+			it('should properly handle relative URIs without ..',
 				function (done) {
 					var locator = createLocator(),
 						pageRenderer = locator.resolve('pageRenderer'),
@@ -362,7 +365,7 @@ describe('browser/RequestRouter', function () {
 							prepareWindow(window, locator);
 							var $ = locator.resolve('jQuery');
 							$(function () {
-								window.location.assign('http://local:9090/a/b');
+								window.location.assign('http://local:9090/a/b/');
 								locator.resolveInstance(RequestRouter);
 								$('a').trigger('click');
 								assert.strictEqual(

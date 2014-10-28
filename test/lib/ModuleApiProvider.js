@@ -167,7 +167,7 @@ describe('lib/ModuleApiProvider', function () {
 		});
 	});
 	describe('#redirect', function () {
-		it('should save last redirected URL', function () {
+		it('should save last redirected URI', function () {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 			assert.strictEqual(api.redirect('/some1') instanceof Promise, true);

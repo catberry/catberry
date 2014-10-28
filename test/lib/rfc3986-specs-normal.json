@@ -1,0 +1,97 @@
+{
+	"baseUri": "http://a/b/c/d;p?q",
+	"tests": [
+		{
+			"test": "g:h",
+			"expected": "g:h"
+		},
+		{
+			"test": "g",
+			"expected": "http://a/b/c/g"
+		},
+		{
+			"test": "./g",
+			"expected": "http://a/b/c/g"
+		},
+		{
+			"test": "g/",
+			"expected": "http://a/b/c/g/"
+		},
+		{
+			"test": "/g",
+			"expected": "http://a/g"
+		},
+		{
+			"test": "//g",
+			"expected": "http://g"
+		},
+		{
+			"test": "?y",
+			"expected": "http://a/b/c/d;p?y"
+		},
+		{
+			"test": "g?y",
+			"expected": "http://a/b/c/g?y"
+		},
+		{
+			"test": "#s",
+			"expected": "http://a/b/c/d;p?q#s"
+		},
+		{
+			"test": "g#s",
+			"expected": "http://a/b/c/g#s"
+		},
+		{
+			"test": "g?y#s",
+			"expected": "http://a/b/c/g?y#s"
+		},
+		{
+			"test": ";x",
+			"expected": "http://a/b/c/;x"
+		},
+		{
+			"test": "g;x",
+			"expected": "http://a/b/c/g;x"
+		},
+		{
+			"test": "g;x?y#s",
+			"expected": "http://a/b/c/g;x?y#s"
+		},
+		{
+			"test": "",
+			"expected": "http://a/b/c/d;p?q"
+		},
+		{
+			"test": ".",
+			"expected": "http://a/b/c/"
+		},
+		{
+			"test": "./",
+			"expected": "http://a/b/c/"
+		},
+		{
+			"test": "..",
+			"expected": "http://a/b/"
+		},
+		{
+			"test": "../",
+			"expected": "http://a/b/"
+		},
+		{
+			"test": "../g",
+			"expected": "http://a/b/g"
+		},
+		{
+			"test": "../..",
+			"expected": "http://a/"
+		},
+		{
+			"test": "../../",
+			"expected": "http://a/"
+		},
+		{
+			"test": "../../g",
+			"expected": "http://a/g"
+		}
+	]
+}
