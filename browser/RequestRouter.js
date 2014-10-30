@@ -187,14 +187,24 @@ RequestRouter.prototype.route = function () {
 	// different browsers handle `popstate` differently
 	// we need to do route in next iteration of event loop
 	return new Promise(function (fulfill, reject) {
-		var newLocation = new URI(self._window.location.toString());
-		if (newLocation.authority.toString() !==
-			self._location.authority.toString()) {
+		var newLocation = new URI(self._window.location.toString()),
+			newAuthority = newLocation.authority ?
+				newLocation.authority.toString() : null,
+			currentAuthority = self._location.authority ?
+				self._location.authority.toString() : null;
+
+		if (newLocation.scheme !== self._location.scheme ||
+			newAuthority !== currentAuthority) {
 			return;
 		}
 
+		var newQuery = newLocation.query ?
+			newLocation.query.toString() : null,
+			currentQuery = self._location.query ?
+				self._location.query.toString() : null;
 		if (newLocation.path === self._location.path &&
-			newLocation.query.toString() === self._location.query.toString()) {
+			newQuery === currentQuery) {
+			self._location = newLocation;
 			return self._raiseHashChangeEvent().then(fulfill, reject);
 		}
 
@@ -241,12 +251,15 @@ RequestRouter.prototype.go = function (locationString) {
 	location = location.resolveRelative(this._location);
 	locationString = location.toString();
 
+	var currentAuthority = this._location.authority ?
+			this._location.authority.toString() : null,
+		newAuthority = location.authority ?
+			location.authority.toString() : null;
 	// we must check if this is an external link before map URI
 	// to internal application state
 	if (!this._historySupported ||
 		location.scheme !== this._location.scheme ||
-		location.authority.toString() !==
-		this._location.authority.toString()) {
+		newAuthority !== currentAuthority) {
 		this._window.location.assign(locationString);
 		return Promise.resolve();
 	}
