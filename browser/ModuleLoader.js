@@ -33,7 +33,7 @@
 module.exports = ModuleLoader;
 
 var util = require('util'),
-	URI = require('../lib/URI'),
+	URI = require('catberry-uri').URI,
 	ModuleLoaderBase = require('../lib/base/ModuleLoaderBase'),
 	moduleHelper = require('../lib/helpers/moduleHelper');
 

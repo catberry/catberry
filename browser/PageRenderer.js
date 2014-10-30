@@ -33,7 +33,7 @@
 module.exports = PageRenderer;
 
 var util = require('util'),
-	URI = require('../lib/URI'),
+	URI = require('catberry-uri').URI,
 	errorHelper = require('../lib/helpers/errorHelper'),
 	moduleHelper = require('../lib/helpers/moduleHelper'),
 	PageRendererBase = require('../lib/base/PageRendererBase');

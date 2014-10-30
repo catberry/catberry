@@ -33,7 +33,7 @@
 module.exports = RequestRouter;
 
 var util = require('util'),
-	URI = require('../lib/URI');
+	URI = require('catberry-uri').URI;
 
 var MOUSE_KEYS = {
 		LEFT: 0,
@@ -188,12 +188,13 @@ RequestRouter.prototype.route = function () {
 	// we need to do route in next iteration of event loop
 	return new Promise(function (fulfill, reject) {
 		var newLocation = new URI(self._window.location.toString());
-		if (newLocation.authority !== self._location.authority) {
+		if (newLocation.authority.toString() !==
+			self._location.authority.toString()) {
 			return;
 		}
 
 		if (newLocation.path === self._location.path &&
-			newLocation.query === self._location.query) {
+			newLocation.query.toString() === self._location.query.toString()) {
 			return self._raiseHashChangeEvent().then(fulfill, reject);
 		}
 
@@ -244,7 +245,8 @@ RequestRouter.prototype.go = function (locationString) {
 	// to internal application state
 	if (!this._historySupported ||
 		location.scheme !== this._location.scheme ||
-		location.authority !== this._location.authority) {
+		location.authority.toString() !==
+		this._location.authority.toString()) {
 		this._window.location.assign(locationString);
 		return Promise.resolve();
 	}
