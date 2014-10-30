@@ -53,7 +53,7 @@
 		"gaze": "~0.6.0",
 		"catberry-locator": "^1.0.0",
 		"catberry-uhr": "^2.0.0",
-		"catberry-uri": "^1.0.0",
+		"catberry-uri": "git://github.com/catberry/catberry-uri.git#develop",
 		"catberry-dust": "^3.0.0",
 		"jquery": "^2.0.0",
 		"uglify-js": "^2.0.0",
