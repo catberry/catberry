@@ -1111,31 +1111,12 @@ For some situations you maybe have to determine where current code is executing.
 There are two flags in context for this purpose: `isBrowser` and `isServer`. 
 Both flags are read-only properties.
 
-###Current Host, URL and URL path
-You can get current host from module context by `host` property.
-At server it is a value of Host HTTP header and in browser it is value of
-`window.location.host`.
-
-For example `some.domain:3000`.
-
-If you want to determine what is the current URL or just URL path then you can 
-use `url` and `urlPath` properties respectively. 
-
-`url` is a concatenation of `location.host`, `location.pathname` 
-and `location.search` in browser and `request.headers.host` and `request.url` at
- server. 
- 
-For example `//some.domain:3000/some/path?and=query&add=query`.
-
-`urlPath` value is a concatenation of `location.pathname` and 
-`location.search` in browser and `request.url` at server.
-
-For example `/some/path?and=query&add=query`.
-
-###Referrer
-If you want to know previous browser's page URL you can use `referrer` property. 
-But use it carefully because at server Catberry uses `Referer` HTTP header 
-and in browser it is just previous URL in History API.
+###Current location and referrer URI
+You can get whole information about current or referrer application URI.
+It is in `location` and `referrer` fields of module context.
+These fields are instances of [URI](https://github.com/catberry/catberry-uri)
+constructor and you can read all documents about it
+[here](https://github.com/catberry/catberry-uri).
 
 ###User agent
 You can get user agent string whenever you want using `userAgent` property
