@@ -33,20 +33,18 @@
 module.exports = RequestRouter;
 
 var util = require('util'),
-	url = require('url');
+	URI = require('catberry-uri').URI;
 
 var MOUSE_KEYS = {
 		LEFT: 0,
 		MIDDLE: 1
 	},
+
 	HREF_ATTRIBUTE_NAME = 'href',
 	TARGET_ATTRIBUTE_NAME = 'target',
 	DATA_EVENT_ATTRIBUTE_NAME = 'data-event',
 	A_TAG_NAME = 'A',
 	BUTTON_TAG_NAME = 'BUTTON',
-	PROTOCOL_REGEXP = /^\w+:/,
-	CURRENT_PROTOCOL_REGEXP = /^\/\//,
-	HASH_REGEXP = /^#.+$/,
 	ERROR_WRONG_MODULE_NAME = 'Wrong module name "%s"',
 	ERROR_WRONG_PLACEHOLDER_NAME = 'Wrong placeholder name "%s"';
 
@@ -59,24 +57,22 @@ function RequestRouter($serviceLocator) {
 	this.$ = $serviceLocator.resolve('jQuery');
 	this._eventBus = $serviceLocator.resolve('eventBus');
 	this._window = $serviceLocator.resolve('window');
-	this._referrer = this._window.location.toString();
 	this._eventRouter = $serviceLocator.resolve('eventRouter');
 	this._pageRenderer = $serviceLocator.resolve('pageRenderer');
 	this._formSubmitter = $serviceLocator.resolve('formSubmitter');
 	this._stateProvider = $serviceLocator.resolve('stateProvider');
 	this._moduleLoader = $serviceLocator.resolve('moduleLoader');
 	this._contextFactory = $serviceLocator.resolve('contextFactory');
-	this._historySupported = this._window.history &&
-	this._window.history.pushState instanceof Function;
 	this._serviceLocator = $serviceLocator;
 
-	var self = this;
-	this._currentPath = this._window.location.pathname +
-	this._window.location.search;
-	this._currentHost = this._window.location.host;
+	this._historySupported = this._window.history &&
+		this._window.history.pushState instanceof Function;
+	this._location = new URI(this._window.location.toString());
+	this._referrer = this._location;
 
 	// if invoke this method now it can cause infinite recursion
 	// when module will use clearHash method
+	var self = this;
 	setTimeout(function () {
 		self._raiseHashChangeEvent();
 	}, 0);
@@ -86,10 +82,24 @@ function RequestRouter($serviceLocator) {
 
 /**
  * Current referrer.
- * @type {string}
+ * @type {URI}
  * @private
  */
 RequestRouter.prototype._referrer = '';
+
+/**
+ * Current location.
+ * @type {URI}
+ * @private
+ */
+RequestRouter.prototype._location = null;
+
+/**
+ * Current application event.
+ * @type {string}
+ * @private
+ */
+RequestRouter.prototype._currentEvent = '';
 
 /**
  * Current event bus.
@@ -141,27 +151,6 @@ RequestRouter.prototype._pageRenderer = null;
 RequestRouter.prototype._window = null;
 
 /**
- * Current location path.
- * @type {string}
- * @private
- */
-RequestRouter.prototype._currentPath = '';
-
-/**
- * Current host.
- * @type {string}
- * @private
- */
-RequestRouter.prototype._currentHost = '';
-
-/**
- * Current hash tag
- * @type {string}
- * @private
- */
-RequestRouter.prototype._currentHash = '';
-
-/**
  * True if current browser supports history API.
  * @type {boolean}
  * @private
@@ -198,38 +187,42 @@ RequestRouter.prototype.route = function () {
 	// different browsers handle `popstate` differently
 	// we need to do route in next iteration of event loop
 	return new Promise(function (fulfill, reject) {
-		if (self._window.location.host !== self._currentHost) {
+		var newLocation = new URI(self._window.location.toString()),
+			newAuthority = newLocation.authority ?
+				newLocation.authority.toString() : null,
+			currentAuthority = self._location.authority ?
+				self._location.authority.toString() : null;
+
+		if (newLocation.scheme !== self._location.scheme ||
+			newAuthority !== currentAuthority) {
 			return;
 		}
 
-		var state = self._stateProvider.getStateByUrl(
-				self._window.location.toString()
-			),
-			urlPath = self._window.location.pathname +
-				self._window.location.search;
-
-		if (urlPath === self._currentPath) {
+		var newQuery = newLocation.query ?
+			newLocation.query.toString() : null,
+			currentQuery = self._location.query ?
+				self._location.query.toString() : null;
+		if (newLocation.path === self._location.path &&
+			newQuery === currentQuery) {
+			self._location = newLocation;
 			return self._raiseHashChangeEvent().then(fulfill, reject);
 		}
 
-		self._currentPath = urlPath;
-		var renderingParameters = self._contextFactory.create(
-			self._moduleLoader.lastRenderedData,
-			self._serviceLocator.resolve('cookiesWrapper'),
-			state, {
-				referrer: self._referrer,
-				host: self._window.location.host,
-				url: '//' + self._window.location.host +
-				self._window.location.pathname +
-				self._window.location.search,
-				urlPath: urlPath,
-				userAgent: self._window.navigator.userAgent
-			}
-		);
+		self._location = newLocation;
+		var state = self._stateProvider.getStateByUri(newLocation),
+			renderingParameters = self._contextFactory.create(
+				self._moduleLoader.lastRenderedData,
+				self._serviceLocator.resolve('cookiesWrapper'),
+				state, {
+					referrer: self._referrer,
+					location: self._location,
+					userAgent: self._window.navigator.userAgent
+				}
+			);
 
 		return self._pageRenderer.render(renderingParameters)
 			.then(function () {
-				self._referrer = self._window.location.toString();
+				self._referrer = self._location;
 				self._eventBus.emit('stateChanged', renderingParameters);
 				return self._raiseHashChangeEvent();
 			})
@@ -249,27 +242,35 @@ RequestRouter.prototype.clearHash = function () {
 };
 
 /**
- * Sets application state to specified URL.
- * @param {string} location URL to go.
+ * Sets application state to specified URI.
+ * @param {string} locationString URI to go.
  * @returns {Promise} Promise for nothing.
  */
-RequestRouter.prototype.go = function (location) {
-	location = this._normalizeLocation(location);
-	var locationInfo = url.parse(location),
-		state = this._stateProvider.getStateByUrl(location),
-		self = this;
+RequestRouter.prototype.go = function (locationString) {
+	var location = new URI(locationString);
+	location = location.resolveRelative(this._location);
+	locationString = location.toString();
 
-	// we must check if this is an external link before map URL
-	// to internal state URL
-	if (locationInfo.protocol && locationInfo.host &&
-		(locationInfo.protocol !== self._window.location.protocol ||
-		locationInfo.host !== self._currentHost) || !self._historySupported ||
-		!state) {
-		self._window.location.assign(location);
+	var currentAuthority = this._location.authority ?
+			this._location.authority.toString() : null,
+		newAuthority = location.authority ?
+			location.authority.toString() : null;
+	// we must check if this is an external link before map URI
+	// to internal application state
+	if (!this._historySupported ||
+		location.scheme !== this._location.scheme ||
+		newAuthority !== currentAuthority) {
+		this._window.location.assign(locationString);
 		return Promise.resolve();
 	}
 
-	self._window.history.pushState(state, '', location);
+	var state = this._stateProvider.getStateByUri(location);
+	if (!state) {
+		this._window.location.assign(locationString);
+		return Promise.resolve();
+	}
+
+	this._window.history.pushState(state, '', locationString);
 	return this.route();
 };
 
@@ -303,20 +304,13 @@ RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
 		moduleName: module.name
 	});
 
-	var currentState = this._stateProvider.getStateByUrl(
-			this._window.location.toString()
-		),
+	var currentState = this._stateProvider.getStateByUri(this._location),
 		renderingParameters = this._contextFactory.create(
 			this._moduleLoader.lastRenderedData,
 			this._serviceLocator.resolve('cookiesWrapper'),
 			currentState, {
 				referrer: this._referrer,
-				host: this._window.location.host,
-				url: '//' + this._window.location.host +
-				this._window.location.pathname +
-				this._window.location.search,
-				urlPath: this._window.location.pathname +
-				this._window.location.search,
+				location: this._location,
 				userAgent: this._window.navigator.userAgent
 			}
 		);
@@ -343,12 +337,12 @@ RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
  * @private
  */
 RequestRouter.prototype._raiseHashChangeEvent = function () {
-	var hash = this._window.location.hash;
-	if (hash === this._currentHash) {
+	var event = this._location.fragment || '';
+	if (event === this._currentEvent) {
 		return Promise.resolve();
 	}
-	this._currentHash = hash;
-	return this._eventRouter.routeHashChange(hash ? hash.substring(1) : hash);
+	this._currentEvent = event;
+	return this._eventRouter.routeHashChange(event);
 };
 
 /**
@@ -360,6 +354,7 @@ RequestRouter.prototype._wrapDocument = function () {
 		window = this.$(this._window);
 
 	window.on('hashchange', function () {
+		self._location = new URI(self._window.location.toString());
 		self._raiseHashChangeEvent().then(null, self._errorHandler.bind(self));
 	});
 
@@ -425,19 +420,14 @@ RequestRouter.prototype._linkClickHandler = function (event, wrappedTarget) {
 		return Promise.resolve();
 	}
 
-	var location = wrappedTarget.attr(HREF_ATTRIBUTE_NAME);
+	var locationString = wrappedTarget.attr(HREF_ATTRIBUTE_NAME);
 
-	if (HASH_REGEXP.test(location)) {
-		this._window.location.hash = location;
-		location = this._window.location.toString();
-	}
-
-	if (!location) {
+	if (!locationString) {
 		return Promise.resolve();
 	}
 
 	event.preventDefault();
-	return this.go(location);
+	return this.go(locationString);
 };
 
 /**
@@ -475,45 +465,4 @@ RequestRouter.prototype._submitClickHandler = function (event) {
  */
 RequestRouter.prototype._errorHandler = function (error) {
 	this._eventBus.emit('error', error);
-};
-
-/**
- * Normalizes URL and converts relative URL to absolute.
- * @param {string} location URL to normalize.
- * @returns {string} Normalized URL.
- * @private
- */
-RequestRouter.prototype._normalizeLocation = function (location) {
-	if (!location || location.length === 0) {
-		return this._window.location.toString();
-	}
-
-	// if it has protocol then it is absolute URL
-	if (PROTOCOL_REGEXP.test(location) ||
-		CURRENT_PROTOCOL_REGEXP.test(location)) {
-		return location;
-	}
-
-	// otherwise it is relative URL
-	var current = location[0] !== '/' ?
-			this._window.location.pathname.split('/') : [],
-		newLocation = location.split('/');
-
-	newLocation.forEach(function (part) {
-		if (part.length === 0 || part === '.') {
-			return;
-		}
-		if (part === '..') {
-			current.pop();
-		} else {
-			current.push(part);
-		}
-	});
-
-	current = current.filter(function (part) {
-		return part.length !== 0;
-	});
-
-	return this._window.location.protocol + '//' +
-		this._window.location.host + '/' + current.join('/');
 };
