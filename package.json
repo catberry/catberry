@@ -50,7 +50,7 @@
 	},
 	"dependencies": {
 		"glob": "^4.0.0",
-		"gaze": "~0.6.0",
+		"gaze": "~0.5.0",
 		"catberry-locator": "^1.0.0",
 		"catberry-uhr": "^3.0.0",
 		"catberry-uri": "^1.1.0",
