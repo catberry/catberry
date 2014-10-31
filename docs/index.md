@@ -1112,10 +1112,10 @@ There are two flags in context for this purpose: `isBrowser` and `isServer`.
 Both flags are read-only properties.
 
 ###Current location and referrer URI
-You can get whole information about current or referrer application URI.
-It is in `location` and `referrer` fields of module context.
+You can get whole information about current or referrer URI.
+It is in `location` and `referrer` fields of context respectively.
 These fields are instances of [URI](https://github.com/catberry/catberry-uri)
-constructor and you can read all documents about it
+constructor and you can read more about it
 [here](https://github.com/catberry/catberry-uri).
 
 ###User agent
