@@ -33,6 +33,7 @@
 module.exports = PageRenderer;
 
 var util = require('util'),
+	URI = require('catberry-uri').URI,
 	errorHelper = require('../lib/helpers/errorHelper'),
 	moduleHelper = require('../lib/helpers/moduleHelper'),
 	PageRendererBase = require('../lib/base/PageRendererBase');
@@ -66,10 +67,9 @@ function PageRenderer($serviceLocator, $moduleLoader, $eventBus, isRelease) {
 	PageRendererBase.call(this, $moduleLoader, $eventBus, isRelease);
 	this._window = $serviceLocator.resolve('window');
 	this.$ = $serviceLocator.resolve('jQuery');
-	var stateProvider = $serviceLocator.resolve('stateProvider');
-	this._lastState = stateProvider.getStateByUrl(
-		this._window.location.toString()
-	);
+	var stateProvider = $serviceLocator.resolve('stateProvider'),
+		location = new URI(this._window.location.toString());
+	this._lastState = stateProvider.getStateByUri(location);
 	this._contextFactory = $serviceLocator.resolve('contextFactory');
 	this._serviceLocator = $serviceLocator;
 	// need to run all afterRender methods and events for placeholders
@@ -595,18 +595,15 @@ PageRenderer.prototype._runAfterMethodsAndEvents = function () {
 				});
 		});
 
-	var context = this._contextFactory.create(
-		lastRenderedData, this._serviceLocator.resolve('cookiesWrapper'),
-		this._lastState, {
-			referrer: this._window.document.referrer,
-			host: this._window.location.host,
-			url: '//' + this._window.location.host +
-				this._window.location.pathname +
-				this._window.location.search,
-			urlPath: this._window.location.pathname +
-				this._window.location.search,
-			userAgent: this._window.navigator.userAgent
-		}
-	);
+	var location = new URI(this._window.location.toString()),
+		referrer = new URI(this._window.document.referrer),
+		context = this._contextFactory.create(
+			lastRenderedData, this._serviceLocator.resolve('cookiesWrapper'),
+			this._lastState, {
+				referrer: referrer,
+				location: location,
+				userAgent: this._window.navigator.userAgent
+			}
+		);
 	self._eventBus.emit('pageRendered', context);
 };
