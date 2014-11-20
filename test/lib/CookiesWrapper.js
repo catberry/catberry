@@ -65,7 +65,7 @@ describe('lib/CookiesWrapper', function () {
 					expiration = new Date(),
 					expected = 'some=value' +
 						'; Max-Age=100' +
-						'; Expire=' +
+						'; Expires=' +
 						expiration.toUTCString() +
 						'; Path=/some' +
 						'; Domain=.new.domain' +
@@ -114,7 +114,7 @@ describe('lib/CookiesWrapper', function () {
 					expiration = new Date(Date.now() + 3600000),
 					expected = 'some=value' +
 						'; Max-Age=3600' +
-						'; Expire=' +
+						'; Expires=' +
 						expiration.toUTCString();
 
 				cookiesWrapper.set({
