@@ -71,7 +71,7 @@ describe('browser/CookiesWrapper', function () {
 					window = locator.resolve('window'),
 					expected = 'some=value' +
 						'; Max-Age=100' +
-						'; Expire=' +
+						'; Expires=' +
 						expiration.toUTCString() +
 						'; Path=/some' +
 						'; Domain=.new.domain' +
@@ -98,7 +98,7 @@ describe('browser/CookiesWrapper', function () {
 					window = locator.resolve('window'),
 					expected = 'some=value' +
 						'; Max-Age=3600' +
-						'; Expire=' +
+						'; Expires=' +
 						expiration.toUTCString();
 
 				cookiesWrapper.set({
