@@ -279,7 +279,7 @@ PageRenderer.prototype.renderPlaceholder =
 PageRenderer.prototype._handleDataContext =
 	function (element, placeholder, dataContext) {
 		var self = this;
-		return new placeholder.render(dataContext)
+		return placeholder.render(dataContext)
 			.then(function (html) {
 				if (element[0].tagName === HEAD_ELEMENT_NAME) {
 					self._mergeHead(element, html);
