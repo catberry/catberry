@@ -64,6 +64,10 @@ describe('lib/streams/ModuleReadable', function () {
 					};
 
 				var expected = '<script class="catberry-inline-script">' +
+					'if(!window.__cache){window.__cache = {};}' +
+					'if(!window.__cache[\'test\'])' +
+					'{window.__cache[\'test\'] = {};}' +
+					'window.__cache[\'test\'][\'test\']={};' +
 					'window.location.assign(\'' +
 					location +
 					'\');' +
@@ -119,6 +123,10 @@ describe('lib/streams/ModuleReadable', function () {
 					};
 
 				var expected = '<script class="catberry-inline-script">' +
+					'if(!window.__cache){window.__cache = {};}' +
+					'if(!window.__cache[\'test\'])' +
+					'{window.__cache[\'test\'] = {};}' +
+					'window.__cache[\'test\'][\'test\']={};' +
 					'window.document.cookie = \'' +
 					cookie1Name + '=' + cookie1Value + '\';' +
 					'window.document.cookie = \'' +
@@ -164,6 +172,10 @@ describe('lib/streams/ModuleReadable', function () {
 					};
 
 				var expected = '<script class="catberry-inline-script">' +
+					'if(!window.__cache){window.__cache = {};}' +
+					'if(!window.__cache[\'test\'])' +
+					'{window.__cache[\'test\'] = {};}' +
+					'window.__cache[\'test\'][\'test\']={};' +
 					'window.location.hash = \'\';' +
 					'</script>' +
 					content;
@@ -292,6 +304,12 @@ describe('lib/streams/ModuleReadable', function () {
 			var parameters = createRenderingParameters(module),
 				moduleReadable = new ModuleReadable(module,
 					module.placeholders.test, parameters, true),
+				expected = '<script class="catberry-inline-script">' +
+					'if(!window.__cache){window.__cache = {};}' +
+					'if(!window.__cache[\'test\'])' +
+					'{window.__cache[\'test\'] = {};}' +
+					'window.__cache[\'test\'][\'test\']={};' +
+					'</script>',
 				result = '';
 
 			moduleReadable
@@ -300,7 +318,7 @@ describe('lib/streams/ModuleReadable', function () {
 				})
 				.on('error', function (error) {
 					assert.strictEqual(error.message, 'hello');
-					assert.strictEqual(result, '');
+					assert.strictEqual(result, expected);
 					done();
 				});
 			moduleReadable.render();
@@ -336,6 +354,12 @@ describe('lib/streams/ModuleReadable', function () {
 				var parameters = createRenderingParameters(module),
 					moduleReadable = new ModuleReadable(module,
 						module.placeholders.test, parameters, true),
+					expected = '<script class="catberry-inline-script">' +
+						'if(!window.__cache){window.__cache = {};}' +
+						'if(!window.__cache[\'test\'])' +
+						'{window.__cache[\'test\'] = {};}' +
+						'window.__cache[\'test\'][\'test\']={};' +
+						'</script>' + content,
 					result = '';
 
 				moduleReadable
@@ -344,7 +368,7 @@ describe('lib/streams/ModuleReadable', function () {
 					})
 					.on('error', function (error) {
 						assert.strictEqual(error.message, 'hello');
-						assert.strictEqual(result, content);
+						assert.strictEqual(result, expected);
 						done();
 					});
 				moduleReadable.render();

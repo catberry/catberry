@@ -81,7 +81,7 @@ describe('browser/CookiesWrapper', function () {
 					key: 'some',
 					value: 'value',
 					maxAge: 100,
-					expire: expiration,
+					expires: expiration,
 					domain: '.new.domain',
 					path: '/some',
 					secure: true,

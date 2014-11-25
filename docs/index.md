@@ -1190,7 +1190,7 @@ CookiesWrapper.prototype.get = function (name) { }
  * @param {string} cookieSetup.key Cookie key.
  * @param {string} cookieSetup.value Cookie value.
  * @param {number?} cookieSetup.maxAge Max cookie age in seconds.
- * @param {Date?} cookieSetup.expire Expire date.
+ * @param {Date?} cookieSetup.expires Expire date.
  * @param {string?} cookieSetup.path URL path for cookie.
  * @param {string?} cookieSetup.domain Cookie domain.
  * @param {boolean?} cookieSetup.secure Is cookie secured.
