@@ -462,8 +462,10 @@ Default definition syntax is following:
 /some/:id[module1,module2]/actions?someParameter=:parameter[module1]
 ```
 
-All parameters must be marked with colon at start and followed by list of 
-module names that will receive value of this parameter to its state object.
+All parameters must be marked with colon at start and optionally followed by
+list of module names that will receive value of this parameter to its
+state object. Such modules are called modules-dependants. This list can be also
+empty.
 
 In previous example `id` value will be set to state of modules 
 `module1`, `module2`; and `parameter` value will be set only to state of module
@@ -1425,7 +1427,7 @@ And list of only-browser events:
 | Event				| When happens																| Arguments																																					|
 |-------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | eventRegistered	| event definition is registered											|	`{eventName: String, moduleNames: Array<String>, expression: RegExp}`																					|
-| eventRouted		| Catberry finishes invocation of all handle methods subscribed on event	|	`{string: String, isEnding: Boolean, isHashChanging: Boolean, element: jQuery, eventName: String, args: Object, moduleNames: Array<String>}`			|
+| eventRouted		| Catberry finishes invocation of all handle methods subscribed on event	|	`{string: String, isEnding: Boolean, isHashChanging: Boolean, element: jQuery, name: String, args: Object, moduleNames: Array<String>}`					|
 | formSubmitted		| Catberry finishes invocation of submit method for any form on page		|	`{element: jQuery, name: String, moduleName: String, values: Object}`																					|
 | renderRequested	| some module requests refresh of any placeholder							|	`{placeholderName: String, moduleName: String}`																											|
 
