@@ -173,6 +173,45 @@ describe('lib/helpers/routeHelper', function () {
 				assert.strictEqual(Object.keys(state).length, 0);
 				done();
 			});
+
+		it('should return correct mapper for parameters without module list',
+			function (done) {
+				var uri = '/some/test?filter=date',
+					expression = '/some/:some?filter=:filter',
+					mapper = routeHelper.getUriMapperByRoute(expression);
+
+				assert.strictEqual(mapper.expression.test(uri), true);
+				var state = mapper.map(uri);
+				assert.strictEqual(typeof(state), 'object');
+				assert.strictEqual(Object.keys(state).length, 0);
+				done();
+			});
+
+		it('should return correct mapper for parameters with empty module list',
+			function (done) {
+				var uri = '/some/test?filter=date',
+					expression = '/some/:test[]?filter=:filter[]',
+					mapper = routeHelper.getUriMapperByRoute(expression);
+
+				assert.strictEqual(mapper.expression.test(uri), true);
+				var state = mapper.map(uri);
+				assert.strictEqual(typeof(state), 'object');
+				assert.strictEqual(Object.keys(state).length, 0);
+				done();
+			});
+
+		it('should return correct mapper for parameters when list with spaces',
+			function (done) {
+				var uri = '/some/test?filter=date',
+					expression = '/some/:test[       ]?filter=:filter[  ]',
+					mapper = routeHelper.getUriMapperByRoute(expression);
+
+				assert.strictEqual(mapper.expression.test(uri), true);
+				var state = mapper.map(uri);
+				assert.strictEqual(typeof(state), 'object');
+				assert.strictEqual(Object.keys(state).length, 0);
+				done();
+			});
 	});
 	describe('#getEventMapperByRule', function () {
 		it('should return correct mapper for parametrized string', function () {
