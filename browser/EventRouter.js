@@ -110,7 +110,7 @@ EventRouter.prototype.routeHashChange = function (eventString) {
 		self._lastEvent = eventString;
 		// if error or we just clear the hash
 		if (!eventString) {
-			return;
+			return false;
 		}
 		return self.routeEvent({
 			string: self._lastEvent,
@@ -148,7 +148,7 @@ EventRouter.prototype.routeEvent = function (event) {
 	var self = this,
 		eventMapper = this._getMapper(event.string);
 	if (!eventMapper || eventMapper.moduleNames.length === 0) {
-		return Promise.resolve();
+		return Promise.resolve(false);
 	}
 
 	event.name = eventMapper.eventName;
