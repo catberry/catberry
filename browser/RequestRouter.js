@@ -337,12 +337,22 @@ RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
  * @private
  */
 RequestRouter.prototype._raiseHashChangeEvent = function () {
-	var event = this._location.fragment || '';
+	var event = this._location.fragment || '',
+		element = this.$('#' + event)[0];
+
 	if (event === this._currentEvent) {
+		if (element) {
+			element.scrollIntoView(true);
+		}
 		return Promise.resolve();
 	}
 	this._currentEvent = event;
-	return this._eventRouter.routeHashChange(event);
+	return this._eventRouter.routeHashChange(event)
+		.then(function (isHandled) {
+			if (isHandled === false && element) {
+				element.scrollIntoView(true);
+			}
+		});
 };
 
 /**
