@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "3.2.1",
+	"version": "4.0.0-dev",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -49,6 +49,9 @@
 		"./lib/TemplateProvider.js": "./browser/TemplateProvider.js"
 	},
 	"dependencies": {
+		"htmlparser2": "^3.8.2",
+		"view-engine": "^1.0.9",
+		"view-engine-marko": "^1.0.0",
 		"glob": "^4.0.0",
 		"gaze": "~0.5.0",
 		"catberry-locator": "^1.0.0",
@@ -73,7 +76,7 @@
 		"node": "~0.10.26"
 	},
 	"scripts": {
-		"test": "make"
+		"test": "echo \"Test are still in development\""
 	},
 	"licenses": [
 		{
