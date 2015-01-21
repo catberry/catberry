@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	events = require('events'),
 	ServiceLocator = require('catberry-locator'),
-	ModuleApiProvider = require('../../lib/ModuleApiProvider');
+	ModuleApiProvider = require('../../lib/providers/ModuleApiProvider');
 
 global.Promise = require('promise');
 
@@ -179,9 +179,9 @@ describe('lib/ModuleApiProvider', function () {
 		it('should save flag that hash has been cleared', function () {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
-			assert.strictEqual(api.isHashCleared, false);
+			assert.strictEqual(api.isFragmentCleared, false);
 			assert.strictEqual(api.clearHash() instanceof Promise, true);
-			assert.strictEqual(api.isHashCleared, true);
+			assert.strictEqual(api.isFragmentCleared, true);
 		});
 	});
 	describe('#requestRefresh', function () {
