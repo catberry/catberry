@@ -40,8 +40,8 @@ var casePath = path.join(__dirname, '..', '..', 'cases',
 	'server', 'streams', 'ParserDuplex');
 
 describe('lib/streams/ParserDuplex', function () {
-	describe('#foundTagIdHandler', function () {
-		it('should find HTML tags with ids and replace its content',
+	describe('#foundComponentHandler', function () {
+		it('should find component tags and replace its content',
 			function (done) {
 				var concat = '',
 					input = fs.createReadStream(
@@ -53,8 +53,8 @@ describe('lib/streams/ParserDuplex', function () {
 					parser = new ParserDuplex(),
 					result = input.pipe(parser);
 
-				parser.foundTagIdHandler = function (id) {
-					return new ContentReadable('test' + id);
+				parser.foundComponentHandler = function (tagDetails) {
+					return new ContentReadable('content-' + tagDetails.name);
 				};
 
 				result
@@ -81,8 +81,8 @@ describe('lib/streams/ParserDuplex', function () {
 				parser = new ParserDuplex(),
 				result = input.pipe(parser);
 
-			parser.foundTagIdHandler = function (id) {
-				return new ContentReadable('test' + id);
+			parser.foundComponentHandler = function (tagDetails) {
+				return new ContentReadable('content-' + tagDetails.name);
 			};
 
 			result
@@ -106,8 +106,8 @@ describe('lib/streams/ParserDuplex', function () {
 				parser = new ParserDuplex(),
 				result = input.pipe(parser);
 
-			parser.foundTagIdHandler = function (id) {
-				return new ContentReadable('test' + id);
+			parser.foundComponentHandler = function (tagDetails) {
+				return new ContentReadable('content-' + tagDetails.name);
 			};
 
 			result
@@ -120,15 +120,18 @@ describe('lib/streams/ParserDuplex', function () {
 				});
 		});
 
+		//
 		it('should re-emit found tag errors', function (done) {
 			var concat = '',
-				input = new ContentReadable('<some id="1"></some>'),
-				expected = '<some id="1">test1</some>',
+				input = new ContentReadable('<cat-some id="1"></cat-some>'),
+				expected = '<cat-some id="1">test1</cat-some>',
 				parser = new ParserDuplex(),
 				result = input.pipe(parser);
 
-			parser.foundTagIdHandler = function (id) {
-				var stream = new ContentReadable('test' + id);
+			parser.foundComponentHandler = function (tagDetails) {
+				var stream = new ContentReadable(
+					'test' + tagDetails.attributes.id
+				);
 				setTimeout(function () {
 					stream.emit('error', new Error('hello'));
 				});
@@ -164,8 +167,11 @@ describe('lib/streams/ParserDuplex', function () {
 				parser.write('');
 				var result = contentReadable.pipe(parser);
 
-				parser.foundTagIdHandler = function (id) {
-					return new ContentReadable('test' + id);
+				parser.foundComponentHandler = function (tagDetails) {
+					return new ContentReadable(
+						'test' + tagDetails.name + (tagDetails.attributes.id ?
+							tagDetails.attributes.id : '')
+					);
 				};
 
 				result
