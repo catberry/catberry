@@ -31,7 +31,7 @@
 'use strict';
 
 var assert = require('assert'),
-	testCases = require('../../cases/server/streams/ParserDuplex.json'),
+	testCases = require('../../cases/lib/streams/ParserDuplex.json'),
 	ContentReadable = require('../../../lib/streams/ContentReadable'),
 	ParserDuplex = require('../../../lib/streams/ParserDuplex');
 

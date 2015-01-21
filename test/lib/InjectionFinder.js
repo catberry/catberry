@@ -37,7 +37,7 @@ var assert = require('assert'),
 	InjectionFinder = require('../../lib/finders/InjectionFinder');
 
 var SOURCE_PATH = path.join(
-	__dirname, '..', 'cases', 'server', 'InjectionFinder', 'source.js'
+	__dirname, '..', 'cases', 'lib', 'InjectionFinder', 'source.js'
 );
 
 describe('lib/InjectionFinder', function () {
