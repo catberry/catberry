@@ -33,6 +33,7 @@
 var assert = require('assert'),
 	events = require('events'),
 	ServiceLocator = require('catberry-locator'),
+	CookieWrapper = require('../../lib/CookieWrapper'),
 	ModuleApiProvider = require('../../lib/providers/ModuleApiProvider');
 
 global.Promise = require('promise');
@@ -189,6 +190,7 @@ describe('lib/ModuleApiProvider', function () {
 function createLocator() {
 	var locator = new ServiceLocator();
 
+	locator.register('cookieWrapper', CookieWrapper);
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('eventBus', new events.EventEmitter());
 
