@@ -175,34 +175,13 @@ describe('lib/ModuleApiProvider', function () {
 			assert.strictEqual(api.redirectedTo, '/some2');
 		});
 	});
-	describe('#clearHash', function () {
+	describe('#clearFragment', function () {
 		it('should save flag that hash has been cleared', function () {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 			assert.strictEqual(api.isFragmentCleared, false);
-			assert.strictEqual(api.clearHash() instanceof Promise, true);
+			assert.strictEqual(api.clearFragment() instanceof Promise, true);
 			assert.strictEqual(api.isFragmentCleared, true);
-		});
-	});
-	describe('#requestRefresh', function () {
-		it('should just return promise', function () {
-			var locator = createLocator(),
-				api = locator.resolveInstance(ModuleApiProvider);
-			assert.strictEqual(api.requestRefresh() instanceof Promise, true);
-		});
-	});
-	describe('#requestRender', function () {
-		it('should just return promise', function () {
-			var locator = createLocator(),
-				api = locator.resolveInstance(ModuleApiProvider);
-			assert.strictEqual(api.requestRender() instanceof Promise, true);
-		});
-	});
-	describe('#render', function () {
-		it('should just return promise', function () {
-			var locator = createLocator(),
-				api = locator.resolveInstance(ModuleApiProvider);
-			assert.strictEqual(api.render() instanceof Promise, true);
 		});
 	});
 });
