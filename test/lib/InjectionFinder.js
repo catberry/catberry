@@ -34,7 +34,7 @@ var assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
 	UglifyJS = require('uglify-js'),
-	InjectionFinder = require('../../lib/InjectionFinder');
+	InjectionFinder = require('../../lib/finders/InjectionFinder');
 
 var SOURCE_PATH = path.join(
 	__dirname, '..', 'cases', 'server', 'InjectionFinder', 'source.js'
@@ -55,8 +55,8 @@ describe('lib/InjectionFinder', function () {
 					eval(source);
 
 					var ast = UglifyJS.parse(source),
-						finder = new InjectionFinder(ast),
-						names = finder.find();
+						finder = new InjectionFinder(),
+						names = finder.find(ast);
 					var expected = {
 						$inj1: true,
 						$inj2: true,
