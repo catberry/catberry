@@ -80,34 +80,6 @@ describe('lib/helpers/moduleHelper', function () {
 		});
 	});
 
-	describe('#splitModuleAndContext', function () {
-		it('should return object with only module if context not found',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext('some_');
-				assert.strictEqual(result.moduleName, 'some');
-				assert.strictEqual(result.context, '');
-			});
-		it('should return object with only module if separator is not found',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext('some');
-				assert.strictEqual(result.moduleName, 'some');
-				assert.strictEqual(result.context, '');
-			});
-		it('should return null if argument is not a string',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext(null);
-				assert.strictEqual(result, null);
-			});
-		it('should return object if argument is a right string',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext(
-					'module-cool_placeholder-nice'
-				);
-				assert.strictEqual(result.moduleName, 'module-cool');
-				assert.strictEqual(result.context, 'placeholder-nice');
-			});
-	});
-
 	describe('#getMethodToInvoke', function () {
 		it('should find method in module', function () {
 			var module = {
