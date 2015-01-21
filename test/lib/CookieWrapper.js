@@ -31,37 +31,37 @@
 'use strict';
 
 var assert = require('assert'),
-	CookiesWrapper = require('../../lib/CookiesWrapper');
+	CookieWrapper = require('../../lib/CookieWrapper');
 
-describe('lib/CookiesWrapper', function () {
+describe('lib/CookieWrapper', function () {
 	describe('#get', function () {
 		it('should return empty string if cookie string is null', function () {
-			var cookiesWrapper = new CookiesWrapper();
-			cookiesWrapper.initWithString(null);
-			assert.strictEqual(cookiesWrapper.get('some'), '');
+			var cookieWrapper = new CookieWrapper();
+			cookieWrapper.initWithString(null);
+			assert.strictEqual(cookieWrapper.get('some'), '');
 		});
 		it('should return empty string if cookie key is not a string',
 			function () {
-				var cookiesWrapper = new CookiesWrapper();
-				cookiesWrapper.initWithString('some=value;');
-				assert.strictEqual(cookiesWrapper.get({}), '');
+				var cookieWrapper = new CookieWrapper();
+				cookieWrapper.initWithString('some=value;');
+				assert.strictEqual(cookieWrapper.get({}), '');
 			});
 		it('should return value if cookie string is right', function () {
-			var cookiesWrapper = new CookiesWrapper();
-			cookiesWrapper.initWithString('some=value; some2=value2');
-			assert.strictEqual(cookiesWrapper.get('some'), 'value');
-			assert.strictEqual(cookiesWrapper.get('some2'), 'value2');
+			var cookieWrapper = new CookieWrapper();
+			cookieWrapper.initWithString('some=value; some2=value2');
+			assert.strictEqual(cookieWrapper.get('some'), 'value');
+			assert.strictEqual(cookieWrapper.get('some2'), 'value2');
 		});
 		it('should return empty string if cookie string is wrong', function () {
-			var cookiesWrapper = new CookiesWrapper();
-			cookiesWrapper.initWithString('fasdfa/gafg-sgafga');
-			assert.strictEqual(cookiesWrapper.get('fasdfa/gafg-sgafga'), '');
+			var cookieWrapper = new CookieWrapper();
+			cookieWrapper.initWithString('fasdfa/gafg-sgafga');
+			assert.strictEqual(cookieWrapper.get('fasdfa/gafg-sgafga'), '');
 		});
 	});
 	describe('#set', function () {
 		it('should set cookie by specified parameters',
 			function () {
-				var cookiesWrapper = new CookiesWrapper(),
+				var cookieWrapper = new CookieWrapper(),
 					expiration = new Date(),
 					expected = 'some=value' +
 						'; Max-Age=100' +
@@ -71,9 +71,9 @@ describe('lib/CookiesWrapper', function () {
 						'; Domain=.new.domain' +
 						'; Secure; HttpOnly';
 
-				cookiesWrapper.initWithString(null);
+				cookieWrapper.initWithString(null);
 
-				cookiesWrapper.set({
+				cookieWrapper.set({
 					key: 'some',
 					value: 'value',
 					maxAge: 100,
@@ -84,64 +84,64 @@ describe('lib/CookiesWrapper', function () {
 					httpOnly: true
 				});
 
-				assert.strictEqual(cookiesWrapper.setCookies.length, 1);
-				assert.strictEqual(cookiesWrapper.setCookies[0], expected);
+				assert.strictEqual(cookieWrapper.setCookies.length, 1);
+				assert.strictEqual(cookieWrapper.setCookies[0], expected);
 			});
 		it('should set several cookies by specified parameters',
 			function () {
-				var cookiesWrapper = new CookiesWrapper(),
+				var cookieWrapper = new CookieWrapper(),
 					expected1 = 'some=value',
 					expected2 = 'some2=value2';
 
-				cookiesWrapper.initWithString(null);
+				cookieWrapper.initWithString(null);
 
-				cookiesWrapper.set({
+				cookieWrapper.set({
 					key: 'some',
 					value: 'value'
 				});
-				cookiesWrapper.set({
+				cookieWrapper.set({
 					key: 'some2',
 					value: 'value2'
 				});
 
-				assert.strictEqual(cookiesWrapper.setCookies.length, 2);
-				assert.strictEqual(cookiesWrapper.setCookies[0], expected1);
-				assert.strictEqual(cookiesWrapper.setCookies[1], expected2);
+				assert.strictEqual(cookieWrapper.setCookies.length, 2);
+				assert.strictEqual(cookieWrapper.setCookies[0], expected1);
+				assert.strictEqual(cookieWrapper.setCookies[1], expected2);
 			});
 		it('should set default expire date by max age',
 			function () {
-				var cookiesWrapper = new CookiesWrapper(),
+				var cookieWrapper = new CookieWrapper(),
 					expiration = new Date(Date.now() + 3600000),
 					expected = 'some=value' +
 						'; Max-Age=3600' +
 						'; Expires=' +
 						expiration.toUTCString();
 
-				cookiesWrapper.set({
+				cookieWrapper.set({
 					key: 'some',
 					value: 'value',
 					maxAge: 3600
 				});
 
-				assert.strictEqual(cookiesWrapper.setCookies.length, 1);
-				assert.strictEqual(cookiesWrapper.setCookies[0], expected);
+				assert.strictEqual(cookieWrapper.setCookies.length, 1);
+				assert.strictEqual(cookieWrapper.setCookies[0], expected);
 			});
 		it('should throw error if wrong key',
 			function () {
-				var cookiesWrapper = new CookiesWrapper();
+				var cookieWrapper = new CookieWrapper();
 
 				assert.throws(function () {
-					cookiesWrapper.set({
+					cookieWrapper.set({
 						key: {}
 					});
 				}, Error);
 			});
 		it('should throw error if wrong value',
 			function () {
-				var cookiesWrapper = new CookiesWrapper();
+				var cookieWrapper = new CookieWrapper();
 
 				assert.throws(function () {
-					cookiesWrapper.set({
+					cookieWrapper.set({
 						key: 'some',
 						value: {}
 					});
