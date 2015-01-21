@@ -30,47 +30,12 @@
 
 'use strict';
 
-module.exports = StoreDispatcher;
+module.exports = ErrorStore;
 
-var moduleHelper = require('../../lib/helpers/moduleHelper');
+function ErrorStore() {
 
-function StoreDispatcher(stores) {
-	this._stores = stores;
 }
 
-StoreDispatcher.prototype.getStoreData = function (storeName, basicContext) {
-	return this._stores[storeName].load();
-};
-
-StoreDispatcher.prototype.sendAction =
-	function (basicContext, storeName, actionName, arg) {
-		if (this._stores[storeName]) {
-			var method = moduleHelper.getMethodToInvoke(
-				this._stores, 'handle', actionName
-			);
-			var promise;
-			try {
-				promise = Promise.resolve(method(arg));
-			}catch(e) {
-				promise.reject(e);
-			}
-
-			return promise;
-		}
-	};
-
-StoreDispatcher.prototype.sendBroadcastAction =
-	function (basicContext, actionName, arg) {
-		var self = this,
-			promises = Object
-			.keys(this._stores)
-			.map(function (storeName) {
-				return self.sendAction(
-					basicContext, storeName, actionName, arg
-				);
-			});
-		return Promise.all(promises);
-	};
-
-StoreDispatcher.prototype.setState = function () {
+ErrorStore.prototype.load = function () {
+	throw new Error(this.$context.name);
 };
