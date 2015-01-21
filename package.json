@@ -76,7 +76,7 @@
 		"node": "~0.10.26"
 	},
 	"scripts": {
-		"test": "echo \"Test are still in development\""
+		"test": "make"
 	},
 	"licenses": [
 		{
