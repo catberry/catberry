@@ -1,0 +1,27 @@
+{
+	"cases": [
+		{
+			"name": "should find component tags and replace its content",
+			"input": "<!DOCTYPE html>\n<html>\n<head>\n\t<title>Some title</title>\n</head>\n<body>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<cat-test1 id=\"1\" cat-store=\"some\"></cat-test1>\n<div></div>\n<cat-test2 data-bind=\"test\" id=\"2\" class=\"test\"/>\n<cat-test3 id=\"3\">content</cat-test3>\n\n</body>\n</html>",
+			"expected": "<!DOCTYPE html>\n<html>\n<head>content-head\n\t<title>Some title</title>\n</head>\n<body>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<cat-test1 id=\"1\" cat-store=\"some\">content-cat-test11</cat-test1>\n<div></div>\n<cat-test2 data-bind=\"test\" id=\"2\" class=\"test\">content-cat-test22</cat-test2>\n<cat-test3 id=\"3\">content-cat-test33content</cat-test3>\n\n</body>\n</html>"
+		},
+		{
+			"name": "should properly skip HTML comments",
+			"input": "<!DOCTYPE html>\n<html>\n<head>\n\t<title>Some title</title>\n</head>\n<body>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<!--<cat-test1 id=\"1\" cat-store=\"some\"></cat-test1>-->\n<div></div>\n<cat-test2 data-bind=\"test\" class=\"test\"/>\n<cat-test3 id=\"3\">content</cat-test3>\n\n</body>\n</html>",
+			"expected": "<!DOCTYPE html>\n<html>\n<head>content-head\n\t<title>Some title</title>\n</head>\n<body>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<!--<cat-test1 id=\"1\" cat-store=\"some\"></cat-test1>-->\n<div></div>\n<cat-test2 data-bind=\"test\" class=\"test\">content-cat-test2</cat-test2>\n<cat-test3 id=\"3\">content-cat-test33content</cat-test3>\n\n</body>\n</html>"
+		},
+		{
+			"name": "should ignore incorrect HTML syntax",
+			"input": "<!DOCTYPE html>\n<html>\n<head>\n\t<titleSome title\n\t</title\n</head>\nbody><\n<div></div>\n<cat-test1 id=\"1\"></cat-test1>\n<div></div>\n<!-\n<cat-test2 data-bind=\"test\" id=\"2\" class=\"test\"></cat-test2>\n-->\n<cat-test3 id=\"3\">content</cat-test3>\n\n</html>",
+			"expected": "<!DOCTYPE html>\n<html>\n<head>content-head\n\t<titleSome title\n\t</title\n</head>\nbody><\n<div></div>\n<cat-test1 id=\"1\">content-cat-test11</cat-test1>\n<div></div>\n<!-\n<cat-test2 data-bind=\"test\" id=\"2\" class=\"test\"></cat-test2>\n-->\n<cat-test3 id=\"3\">content-cat-test33content</cat-test3>\n\n</html>"
+		},
+		{
+			"name": "should properly work when tags do not fit in buffer",
+			"input": "<!DOCTYPE html>\n<html>\n<head>\n\t<title>Some title</title>\n</head>\n<body>\n<div></div>\n<div></div>\n<div></div>\n<!--<div></div><div></div>-->\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<cat-tag1 id=\"1\"></cat-tag1>\n<div>Super content here. Place for your advertisements.</div>\n<cat-tag2 data-bind=\"test\" id=\"2\" class=\"test\"></cat-tag2>\n<cat-tag3 id=\"3\">content</cat-tag3>\n\n</body>\n</html>",
+			"inputStreamOptions": {
+				"highWaterMark": 2
+			},
+			"expected": "<!DOCTYPE html>\n<html>\n<head>content-head\n\t<title>Some title</title>\n</head>\n<body>\n<div></div>\n<div></div>\n<div></div>\n<!--<div></div><div></div>-->\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<div></div>\n<cat-tag1 id=\"1\">content-cat-tag11</cat-tag1>\n<div>Super content here. Place for your advertisements.</div>\n<cat-tag2 data-bind=\"test\" id=\"2\" class=\"test\">content-cat-tag22</cat-tag2>\n<cat-tag3 id=\"3\">content-cat-tag33content</cat-tag3>\n\n</body>\n</html>"
+		}
+	]
+}
