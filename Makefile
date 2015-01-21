@@ -3,7 +3,6 @@ SRC = lib/*.js \
 	browser/*.js
 
 TESTS = test/lib/* \
-	test/browser/* \
 
 all: lint test
 
