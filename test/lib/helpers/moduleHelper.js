@@ -71,12 +71,34 @@ describe('lib/helpers/moduleHelper', function () {
 				assert.strictEqual(camelCaseName, 'awesomeModuleName');
 			});
 
+		it('should handle separators at the end',
+			function () {
+				var camelCaseName = moduleHelper.getCamelCaseName(
+					null, 'awesome-module-name-'
+				);
+
+				assert.strictEqual(camelCaseName, 'awesomeModuleName');
+			});
+
 		it('should return empty string if input is empty', function () {
 			var camelCaseName1 = moduleHelper.getCamelCaseName(null, null),
 				camelCaseName2 = moduleHelper.getCamelCaseName('', '');
 
 			assert.strictEqual(camelCaseName1, '');
 			assert.strictEqual(camelCaseName2, '');
+		});
+	});
+
+	describe('#getOriginalComponentName', function () {
+		it('should return name without prefix', function () {
+			var originalName = moduleHelper.getOriginalComponentName(
+				'cat-some'
+			);
+			assert.strictEqual(originalName, 'some');
+		});
+		it('should return empty string for null value', function () {
+			var originalName = moduleHelper.getOriginalComponentName(null);
+			assert.strictEqual(originalName, '');
 		});
 	});
 
