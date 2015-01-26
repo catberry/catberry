@@ -18,6 +18,7 @@ else
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		$(TESTS) \
 		--bail
+		--timeout 10000
 endif
 
 test-cov:
@@ -29,6 +30,7 @@ ifeq ($(TRAVIS),true)
 		--report lcovonly \
 		-- -u exports \
 		$(TESTS) \
+		--timeout 10000
 		--bail
 else
 	@echo "Getting coverage report..."
@@ -38,6 +40,7 @@ else
 		-- -u exports \
 		$(TESTS) \
 		--bail
+		--timeout 10000
 endif
 
 coveralls: test-cov
