@@ -1,0 +1,5 @@
+{
+	"name": "cool",
+	"logic": "./logic.js",
+	"additional" : "some2"
+}
