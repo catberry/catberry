@@ -54,7 +54,7 @@ describe('lib/StoreFinder', function () {
 			var expectedPath = path.join(
 					process.cwd(), CASE_PATH, 'expected.json'
 				),
-				expected = require(expectedPath).stores;
+				expected = require(expectedPath);
 
 			finder
 				.find()
