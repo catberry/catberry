@@ -43,7 +43,7 @@ var CASE_PATH = path.join(
 	'test', 'cases', 'lib', 'finders', 'StoreFinder'
 );
 
-describe('lib/StoreFinder', function () {
+describe('lib/finders/StoreFinder', function () {
 	describe('#find', function () {
 		it('should find all valid stores', function (done) {
 			var locator = createLocator({

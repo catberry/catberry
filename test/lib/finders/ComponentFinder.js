@@ -43,7 +43,7 @@ var CASE_PATH = path.join(
 	'test', 'cases', 'lib', 'finders', 'ComponentFinder'
 );
 
-describe('lib/ComponentFinder', function () {
+describe('lib/finders/ComponentFinder', function () {
 	describe('#find', function () {
 		it('should find all valid components', function (done) {
 			var locator = createLocator({}),
