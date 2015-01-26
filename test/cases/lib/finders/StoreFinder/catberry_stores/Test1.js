@@ -30,22 +30,8 @@
 
 'use strict';
 
-module.exports = {
-	/**
-	 * Clears node.js require cache.
-	 */
-	clearCache: function () {
-		Object.keys(require.cache)
-			.forEach(function (key) {
-				delete require.cache[key];
-			});
-	},
-	/**
-	 * Gets valid require path replacing all backslashes with slashes.
-	 * @param {String} path Path to file.
-	 * @returns {String} Valid require path.
-	 */
-	getValidPath: function (path) {
-		return typeof(path) === 'string' ? path.replace(/\\/g, '\\\\') : '';
-	}
-};
+module.exports = Test1;
+
+function Test1() {
+
+}
