@@ -32,6 +32,7 @@
 
 var assert = require('assert'),
 	path = require('path'),
+	fs = require('fs'),
 	events = require('events'),
 	ServiceLocator = require('catberry-locator'),
 	Logger = require('../../mocks/Logger'),
@@ -46,8 +47,7 @@ describe('lib/StoreFinder', function () {
 	describe('#find', function () {
 		it('should find all valid stores', function (done) {
 			var locator = createLocator({
-					storesDirectory: path.join(CASE_PATH, 'catberry_stores'),
-					isRelease: true
+					storesDirectory: path.join(CASE_PATH, 'catberry_stores')
 				}),
 				finder = locator.resolve('storeFinder');
 
@@ -79,6 +79,34 @@ describe('lib/StoreFinder', function () {
 							);
 						});
 					done();
+				})
+				.catch(done);
+		});
+
+		it('should watch stores for changes', function (done) {
+			var locator = createLocator({
+					storesDirectory: path.join(CASE_PATH, 'catberry_stores')
+				}),
+				finder = locator.resolve('storeFinder');
+
+			finder
+				.find()
+				.then(function (found) {
+					finder.watch(function () {
+						done();
+					});
+					var key = Object.keys(found)[0],
+						componentPath = path.join(
+							process.cwd(),
+							found[key].path
+						);
+					fs.readFile(componentPath,
+						function (error, data) {
+							if (error) {
+								done(error);
+							}
+							fs.writeFile(componentPath, data);
+						});
 				})
 				.catch(done);
 		});
