@@ -17,7 +17,7 @@ else
 	@echo "Running tests..."
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		$(TESTS) \
-		--bail
+		--bail \
 		--timeout 10000
 endif
 
@@ -30,8 +30,8 @@ ifeq ($(TRAVIS),true)
 		--report lcovonly \
 		-- -u exports \
 		$(TESTS) \
+		--bail \
 		--timeout 10000
-		--bail
 else
 	@echo "Getting coverage report..."
 	@NODE_ENV=test node ./node_modules/.bin/istanbul cover \
@@ -39,7 +39,7 @@ else
 		--harmony-generators \
 		-- -u exports \
 		$(TESTS) \
-		--bail
+		--bail \
 		--timeout 10000
 endif
 
