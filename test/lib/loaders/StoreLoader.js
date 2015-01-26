@@ -71,14 +71,37 @@ describe('lib/loaders/StoreLoader', function () {
 					path: 'test/cases/lib/loaders/StoreLoader/Wrong.js'
 				}
 			},
-			locator = createLocator({isRelease: true}, stores),
+			errorHandler = function (error) {
+				assert.strictEqual(error instanceof Error, true);
+				done();
+			},
+			locator = createLocator({isRelease: true}, stores, errorHandler),
 			eventBus = locator.resolve('eventBus'),
 			loader = locator.resolve('storeLoader');
 
-		eventBus.on('error', function (error) {
-			assert.strictEqual(error instanceof Error, true);
-			done();
-		});
+		loader
+			.load()
+			.then(function (stores) {
+				assert.strictEqual(stores, loader.getStoresByNames());
+				var storeNames = Object.keys(stores);
+				assert.strictEqual(storeNames.length, 0);
+			})
+			.catch(done);
+	});
+	it('should emit error when wrong path', function (done) {
+		var stores = {
+				Wrong: {
+					name: 'Wrong',
+					path: 'wrong/path'
+				}
+			},
+			errorHandler = function (error) {
+				assert.strictEqual(error instanceof Error, true);
+				done();
+			},
+			locator = createLocator({isRelease: true}, stores, errorHandler),
+			eventBus = locator.resolve('eventBus'),
+			loader = locator.resolve('storeLoader');
 
 		loader
 			.load()
@@ -91,11 +114,15 @@ describe('lib/loaders/StoreLoader', function () {
 	});
 });
 
-function createLocator(config, stores) {
+function createLocator(config, stores, errorHandler) {
 	var locator = new ServiceLocator();
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
-	locator.registerInstance('eventBus', new events.EventEmitter());
+	var eventBus = new events.EventEmitter();
+	if (errorHandler) {
+		eventBus.on('error', errorHandler);
+	}
+	locator.registerInstance('eventBus', eventBus);
 	locator.registerInstance('storeFinder', new StoreFinder(stores));
 	locator.register('contextFactory', ContextFactory);
 	locator.register('moduleApiProvider', ModuleApiProvider);
