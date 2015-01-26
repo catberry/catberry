@@ -34,10 +34,11 @@ var assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
 	UglifyJS = require('uglify-js'),
-	InjectionFinder = require('../../lib/finders/InjectionFinder');
+	InjectionFinder = require('../../../lib/finders/InjectionFinder');
 
 var SOURCE_PATH = path.join(
-	__dirname, '..', 'cases', 'lib', 'InjectionFinder', 'source.js'
+	__dirname, '..', '..', 'cases', 'lib', 'finders',
+	'InjectionFinder', 'source.js'
 );
 
 describe('lib/InjectionFinder', function () {
