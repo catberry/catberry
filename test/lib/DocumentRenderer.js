@@ -33,7 +33,7 @@
 var assert = require('assert'),
 	events = require('events'),
 	stream = require('stream'),
-	util = require('util'),
+	errorHelper = require('../../lib/helpers/errorHelper'),
 	URI = require('catberry-uri').URI,
 	Component = require('../mocks/components/Component'),
 	ComponentError = require('../mocks/components/ComponentError'),
@@ -43,7 +43,6 @@ var assert = require('assert'),
 	DataAsyncStore = require('../mocks/stores/DataAsyncStore'),
 	ErrorStore = require('../mocks/stores/ErrorStore'),
 	ErrorAsyncStore = require('../mocks/stores/ErrorAsyncStore'),
-	ContentStream = require('../../lib/streams/ContentReadable'),
 	ModuleApiProvider = require('../../lib/providers/ModuleApiProvider'),
 	CookieWrapper = require('../../lib/CookieWrapper'),
 	ServiceLocator = require('catberry-locator'),
@@ -53,7 +52,121 @@ var assert = require('assert'),
 
 describe('lib/DocumentRenderer', function () {
 	describe('#render', function () {
-		it('should render properly components without stores', function (done) {
+		it('should render nothing if no such component', function (done) {
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head><title>Hello</title></head>' +
+								'<body>' +
+								'document – ' + context.name +
+								'<cat-comp id="1"></cat-comp>' +
+								'<cat-async-comp id="2"/>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({}, {}, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head><title>Hello</title></head>' +
+					'<body>' +
+					'document – document' +
+					'<cat-comp id=\"1\"></cat-comp>' +
+					'<cat-async-comp id=\"2\"/>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should ignore second head and document tags', function (done) {
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head></head>' +
+								'<body>' +
+								'document – ' + context.name +
+								'<head></head>' +
+								'<document></document>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({}, {}, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head><title>head – head</title></head>' +
+					'<body>' +
+					'document – document' +
+					'<head></head>' +
+					'<document></document>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should properly render components without stores', function (done) {
 			var components = {
 				document: {
 					name: 'document',
@@ -142,7 +255,7 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should render properly components with stores', function (done) {
+		it('should properly render components with stores', function (done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -161,7 +274,7 @@ describe('lib/DocumentRenderer', function () {
 						render: function (context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
-								'<head></head>' +
+								'<head cat-store="folder/store2"></head>' +
 								'<body>' +
 								'document – ' + context.name + ' - ' +
 								context.storeData.name +
@@ -221,7 +334,9 @@ describe('lib/DocumentRenderer', function () {
 				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
-					'<head><title>head – head – undefined</title></head>' +
+					'<head cat-store="folder/store2">' +
+					'<title>head – head – folder/store2</title>' +
+					'</head>' +
 					'<body>document – document - undefined' +
 					'<cat-comp id=\"1\" cat-store=\"store1\">' +
 					'<div>content – comp – store1</div>' +
@@ -245,6 +360,622 @@ describe('lib/DocumentRenderer', function () {
 				.on('error', done)
 				.on('end', function () {
 					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should render errors with wrong stores', function (done) {
+			var errorTemplate = {
+					render: function (context) {
+						return Promise.resolve('Error: ' + context.message);
+					}
+				};
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head cat-store="folder/store2"></head>' +
+								'<body>' +
+								'document – ' + context.name + ' - ' +
+								context.storeData.name +
+								'<cat-comp id="1" cat-store="store1">' +
+								'</cat-comp>' +
+								'<cat-async-comp id="2" ' +
+								'cat-store="folder/store2">' +
+								'</cat-async-comp>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentAsync,
+					errorTemplate: errorTemplate,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				comp: {
+					name: 'comp',
+					constructor: Component,
+					errorTemplate: errorTemplate,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'content – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				'async-comp': {
+					name: 'async-comp',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'test – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({
+					isRelease: true
+				}, {}, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head cat-store="folder/store2">' +
+					'Error: Store folder/store2 not found' +
+					'</head>' +
+					'<body>document – document - undefined' +
+					'<cat-comp id=\"1\" cat-store=\"store1\">' +
+					'Error: Store store1 not found' +
+					'</cat-comp>' +
+					'<cat-async-comp id=\"2\" cat-store=\"folder/store2\">' +
+					'</cat-async-comp>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should properly render nested components' , function (done) {
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: DataStore
+				},
+				'folder/store2': {
+					name: 'folder/store2',
+					constructor: DataAsyncStore
+				}
+			};
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head cat-store="folder/store2"></head>' +
+								'<body>' +
+								'document – ' + context.name + ' - ' +
+								context.storeData.name +
+								'<cat-comp id="1" cat-store="store1">' +
+								'</cat-comp>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				comp: {
+					name: 'comp',
+					constructor: Component,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'content – ' + context.name + ' – ' +
+								context.storeData.name +
+								'<cat-async-comp id="2" ' +
+								'cat-store="folder/store2">' +
+								'</cat-async-comp>' +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				'async-comp': {
+					name: 'async-comp',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'test – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({}, stores, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head cat-store="folder/store2">' +
+					'<title>head – head – folder/store2</title>' +
+					'</head>' +
+					'<body>document – document - undefined' +
+					'<cat-comp id=\"1\" cat-store=\"store1\">' +
+					'<div>' +
+					'content – comp – store1' +
+					'<cat-async-comp id=\"2\" cat-store=\"folder/store2\">' +
+					'<div>test – async-comp – folder/store2</div>' +
+					'</cat-async-comp>' +
+					'</div>' +
+					'</cat-comp>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should properly render errors in components', function (done) {
+			var errorTemplate = {
+					render: function (context) {
+						return Promise.resolve('Error: ' + context.message);
+					}
+				},
+				components = {
+					document: {
+						name: 'document',
+						constructor: ComponentAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<!DOCTYPE html>' +
+									'<html>' +
+									'<head></head>' +
+									'<body>' +
+									'document – ' + context.name +
+									'<cat-comp id="1"></cat-comp>' +
+									'<cat-async-comp id="2"></cat-async-comp>' +
+									'</body>' +
+									'</html>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					head: {
+						name: 'head',
+						constructor: ComponentErrorAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<title>' +
+									'head – ' + context.name +
+									'</title>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					comp: {
+						name: 'comp',
+						constructor: ComponentError,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<div>' +
+									'content – ' + context.name +
+									'</div>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					'async-comp': {
+						name: 'async-comp',
+						constructor: ComponentErrorAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<div>' +
+									'test – ' + context.name +
+									'</div>';
+								return Promise.resolve(template);
+							}
+						}
+					}
+				};
+			var routingContext = createRoutingContext({
+					isRelease: true
+				}, {}, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head>Error: head</head>' +
+					'<body>' +
+					'document – document' +
+					'<cat-comp id=\"1\">Error: comp</cat-comp>' +
+					'<cat-async-comp id=\"2\">' +
+					'Error: async-comp' +
+					'</cat-async-comp>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should properly render errors in stores', function (done) {
+			var errorTemplate = {
+					render: function (context) {
+						return Promise.resolve('Error: ' + context.message);
+					}
+				};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: ErrorStore
+				},
+				'folder/store2': {
+					name: 'folder/store2',
+					constructor: ErrorAsyncStore
+				}
+			};
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					errorTemplate: errorTemplate,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head cat-store="folder/store2"></head>' +
+								'<body>' +
+								'document – ' + context.name + ' - ' +
+								context.storeData.name +
+								'<cat-comp id="1" cat-store="store1">' +
+								'</cat-comp>' +
+								'<cat-async-comp id="2" ' +
+								'cat-store="folder/store2">' +
+								'</cat-async-comp>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentAsync,
+					errorTemplate: errorTemplate,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				comp: {
+					name: 'comp',
+					constructor: Component,
+					errorTemplate: errorTemplate,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'content – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				'async-comp': {
+					name: 'async-comp',
+					constructor: ComponentAsync,
+					errorTemplate: errorTemplate,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'test – ' + context.name + ' – ' +
+								context.storeData.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({
+					isRelease: true
+				}, stores, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head cat-store="folder/store2">' +
+					'Error: folder/store2' +
+					'</head>' +
+					'<body>document – document - undefined' +
+					'<cat-comp id=\"1\" cat-store=\"store1\">' +
+					'Error: store1' +
+					'</cat-comp>' +
+					'<cat-async-comp id=\"2\" cat-store=\"folder/store2\">' +
+					'Error: folder/store2' +
+					'</cat-async-comp>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should properly render nothing ' +
+		'if error in error template', function (done) {
+			var errorTemplate = {
+					render: function (context) {
+						throw new Error('template');
+					}
+				},
+				components = {
+					document: {
+						name: 'document',
+						constructor: ComponentAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<!DOCTYPE html>' +
+									'<html>' +
+									'<head></head>' +
+									'<body>' +
+									'document – ' + context.name +
+									'<cat-comp id="1"></cat-comp>' +
+									'<cat-async-comp id="2"></cat-async-comp>' +
+									'</body>' +
+									'</html>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					head: {
+						name: 'head',
+						constructor: ComponentErrorAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<title>' +
+									'head – ' + context.name +
+									'</title>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					comp: {
+						name: 'comp',
+						constructor: ComponentError,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<div>' +
+									'content – ' + context.name +
+									'</div>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					'async-comp': {
+						name: 'async-comp',
+						constructor: ComponentErrorAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<div>' +
+									'test – ' + context.name +
+									'</div>';
+								return Promise.resolve(template);
+							}
+						}
+					}
+				};
+			var routingContext = createRoutingContext({
+					isRelease: true
+				}, {}, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head></head>' +
+					'<body>' +
+					'document – document' +
+					'<cat-comp id=\"1\"></cat-comp>' +
+					'<cat-async-comp id=\"2\">' +
+					'</cat-async-comp>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output, expected, 'Wrong HTML');
+					done();
+				});
+		});
+
+		it('should properly render debug info', function (done) {
+			var components = {
+					document: {
+						name: 'document',
+						constructor: ComponentAsync,
+						template: {
+							render: function (context) {
+								var template = '<!DOCTYPE html>' +
+									'<html>' +
+									'<head></head>' +
+									'<body>' +
+									'document – ' + context.name +
+									'<cat-comp id="1"></cat-comp>' +
+									'<cat-async-comp id="2"></cat-async-comp>' +
+									'</body>' +
+									'</html>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					head: {
+						name: 'head',
+						constructor: ComponentErrorAsync,
+						template: {
+							render: function (context) {
+								var template = '<title>' +
+									'head – ' + context.name +
+									'</title>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					comp: {
+						name: 'comp',
+						constructor: ComponentError,
+						template: {
+							render: function (context) {
+								var template = '<div>' +
+									'content – ' + context.name +
+									'</div>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					'async-comp': {
+						name: 'async-comp',
+						constructor: ComponentErrorAsync,
+						template: {
+							render: function (context) {
+								var template = '<div>' +
+									'test – ' + context.name +
+									'</div>';
+								return Promise.resolve(template);
+							}
+						}
+					}
+				};
+			var routingContext = createRoutingContext({}, {}, components),
+				outputStream = new stream.PassThrough(),
+				output = '',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			// stub for HTTP response method
+			outputStream.writeHead = function () {};
+
+			documentRenderer.render(routingContext, {}, outputStream);
+			outputStream
+				.on('data', function (chunk) {
+					output += chunk;
+				})
+				.on('error', done)
+				.on('end', function () {
+					assert.strictEqual(output.length > 0, true, 'Wrong HTML');
 					done();
 				});
 		});
@@ -276,7 +1007,9 @@ function createRoutingContext(config, stores, components) {
 	});
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
-	locator.registerInstance('eventBus', new events.EventEmitter());
+	var eventBus = new events.EventEmitter();
+	eventBus.on('error', function () {});
+	locator.registerInstance('eventBus', eventBus);
 
 	var contextFactory = locator.resolve('contextFactory');
 	return contextFactory.create({
