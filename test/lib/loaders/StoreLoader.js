@@ -73,6 +73,11 @@ describe('lib/loaders/StoreLoader', function () {
 			},
 			errorHandler = function (error) {
 				assert.strictEqual(error instanceof Error, true);
+				assert.strictEqual(
+					error.message,
+					'Store file test/cases/lib/loaders/StoreLoader/Wrong.js ' +
+					'should export a constructor function'
+				);
 				done();
 			},
 			locator = createLocator({isRelease: true}, stores, errorHandler),
