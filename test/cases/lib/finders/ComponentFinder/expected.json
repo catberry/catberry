@@ -10,7 +10,7 @@
 	"cool": {
 		"name": "cool",
 		"properties": {
-			"name": "cool",
+			"name": "Cool",
 			"logic": "./logic.js",
 			"additional" : "some2"
 		},

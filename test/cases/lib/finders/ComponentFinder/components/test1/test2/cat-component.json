@@ -1,5 +1,5 @@
 {
-	"name": "cool",
+	"name": "Cool",
 	"logic": "./logic.js",
 	"additional" : "some2"
 }
