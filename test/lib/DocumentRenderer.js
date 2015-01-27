@@ -272,20 +272,23 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<!DOCTYPE html>' +
-								'<html>' +
-								'<head cat-store="folder/store2"></head>' +
-								'<body>' +
-								'document – ' + context.name + ' - ' +
-								context.storeData.name +
-								'<cat-comp id="1" cat-store="store1">' +
-								'</cat-comp>' +
-								'<cat-async-comp id="2" ' +
-								'cat-store="folder/store2">' +
-								'</cat-async-comp>' +
-								'</body>' +
-								'</html>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<!DOCTYPE html>' +
+										'<html>' +
+										'<head cat-store="folder/store2">' +
+										'</head>' +
+										'<body>' +
+										'document – ' + context.name + ' - ' +
+										(storeData ? storeData.name : '') +
+										'<cat-comp id="1" cat-store="store1">' +
+										'</cat-comp>' +
+										'<cat-async-comp id="2" ' +
+										'cat-store="folder/store2">' +
+										'</cat-async-comp>' +
+										'</body>' +
+										'</html>';
+								});
 						}
 					}
 				},
@@ -294,11 +297,13 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<title>' +
-								'head – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</title>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<title>' +
+										'head – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</title>';
+								});
 						}
 					}
 				},
@@ -307,11 +312,13 @@ describe('lib/DocumentRenderer', function () {
 					constructor: Component,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'content – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'content – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</div>';
+								});
 						}
 					}
 				},
@@ -320,11 +327,13 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'test – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'test – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</div>';
+								});
 						}
 					}
 				}
@@ -337,7 +346,7 @@ describe('lib/DocumentRenderer', function () {
 					'<head cat-store="folder/store2">' +
 					'<title>head – head – folder/store2</title>' +
 					'</head>' +
-					'<body>document – document - undefined' +
+					'<body>document – document - ' +
 					'<cat-comp id=\"1\" cat-store=\"store1\">' +
 					'<div>content – comp – store1</div>' +
 					'</cat-comp>' +
@@ -376,20 +385,22 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<!DOCTYPE html>' +
-								'<html>' +
-								'<head cat-store="folder/store2"></head>' +
-								'<body>' +
-								'document – ' + context.name + ' - ' +
-								context.storeData.name +
-								'<cat-comp id="1" cat-store="store1">' +
-								'</cat-comp>' +
-								'<cat-async-comp id="2" ' +
-								'cat-store="folder/store2">' +
-								'</cat-async-comp>' +
-								'</body>' +
-								'</html>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<!DOCTYPE html>' +
+									'<html>' +
+									'<head cat-store="folder/store2"></head>' +
+									'<body>' +
+									'document – ' + context.name + ' - ' +
+									(storeData ? storeData.name : '') +
+									'<cat-comp id="1" cat-store="store1">' +
+									'</cat-comp>' +
+									'<cat-async-comp id="2" ' +
+									'cat-store="folder/store2">' +
+									'</cat-async-comp>' +
+									'</body>' +
+									'</html>';
+								});
 						}
 					}
 				},
@@ -399,11 +410,13 @@ describe('lib/DocumentRenderer', function () {
 					errorTemplate: errorTemplate,
 					template: {
 						render: function (context) {
-							var template = '<title>' +
-								'head – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</title>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<title>' +
+										'head – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</title>';
+								});
 						}
 					}
 				},
@@ -413,11 +426,13 @@ describe('lib/DocumentRenderer', function () {
 					errorTemplate: errorTemplate,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'content – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'content – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</div>';
+								});
 						}
 					}
 				},
@@ -426,11 +441,13 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'test – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'test – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</div>';
+								});
 						}
 					}
 				}
@@ -445,7 +462,7 @@ describe('lib/DocumentRenderer', function () {
 					'<head cat-store="folder/store2">' +
 					'Error: Store folder/store2 not found' +
 					'</head>' +
-					'<body>document – document - undefined' +
+					'<body>document – document - ' +
 					'<cat-comp id=\"1\" cat-store=\"store1\">' +
 					'Error: Store store1 not found' +
 					'</cat-comp>' +
@@ -488,17 +505,19 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<!DOCTYPE html>' +
-								'<html>' +
-								'<head cat-store="folder/store2"></head>' +
-								'<body>' +
-								'document – ' + context.name + ' - ' +
-								context.storeData.name +
-								'<cat-comp id="1" cat-store="store1">' +
-								'</cat-comp>' +
-								'</body>' +
-								'</html>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<!DOCTYPE html>' +
+										'<html>' +
+										'<head cat-store="folder/store2"></head>' +
+										'<body>' +
+										'document – ' + context.name + ' - ' +
+										(storeData ? storeData.name : '') +
+										'<cat-comp id="1" cat-store="store1">' +
+										'</cat-comp>' +
+										'</body>' +
+										'</html>';
+								});
 						}
 					}
 				},
@@ -507,11 +526,13 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<title>' +
-								'head – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</title>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<title>' +
+									'head – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+									'</title>';
+								});
 						}
 					}
 				},
@@ -520,14 +541,16 @@ describe('lib/DocumentRenderer', function () {
 					constructor: Component,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'content – ' + context.name + ' – ' +
-								context.storeData.name +
-								'<cat-async-comp id="2" ' +
-								'cat-store="folder/store2">' +
-								'</cat-async-comp>' +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'content – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'<cat-async-comp id="2" ' +
+										'cat-store="folder/store2">' +
+										'</cat-async-comp>' +
+										'</div>';
+								});
 						}
 					}
 				},
@@ -536,11 +559,13 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'test – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'test – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</div>';
+								});
 						}
 					}
 				}
@@ -553,7 +578,7 @@ describe('lib/DocumentRenderer', function () {
 					'<head cat-store="folder/store2">' +
 					'<title>head – head – folder/store2</title>' +
 					'</head>' +
-					'<body>document – document - undefined' +
+					'<body>document – document - ' +
 					'<cat-comp id=\"1\" cat-store=\"store1\">' +
 					'<div>' +
 					'content – comp – store1' +
@@ -705,20 +730,23 @@ describe('lib/DocumentRenderer', function () {
 					errorTemplate: errorTemplate,
 					template: {
 						render: function (context) {
-							var template = '<!DOCTYPE html>' +
-								'<html>' +
-								'<head cat-store="folder/store2"></head>' +
-								'<body>' +
-								'document – ' + context.name + ' - ' +
-								context.storeData.name +
-								'<cat-comp id="1" cat-store="store1">' +
-								'</cat-comp>' +
-								'<cat-async-comp id="2" ' +
-								'cat-store="folder/store2">' +
-								'</cat-async-comp>' +
-								'</body>' +
-								'</html>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<!DOCTYPE html>' +
+										'<html>' +
+										'<head cat-store="folder/store2">' +
+										'</head>' +
+										'<body>' +
+										'document – ' + context.name + ' - ' +
+										(storeData ? storeData.name : '') +
+										'<cat-comp id="1" cat-store="store1">' +
+										'</cat-comp>' +
+										'<cat-async-comp id="2" ' +
+										'cat-store="folder/store2">' +
+										'</cat-async-comp>' +
+										'</body>' +
+										'</html>';
+								});
 						}
 					}
 				},
@@ -728,11 +756,13 @@ describe('lib/DocumentRenderer', function () {
 					errorTemplate: errorTemplate,
 					template: {
 						render: function (context) {
-							var template = '<title>' +
-								'head – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</title>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<title>' +
+										'head – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</title>';
+								});
 						}
 					}
 				},
@@ -742,11 +772,13 @@ describe('lib/DocumentRenderer', function () {
 					errorTemplate: errorTemplate,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'content – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'content – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</div>';
+								});
 						}
 					}
 				},
@@ -756,11 +788,13 @@ describe('lib/DocumentRenderer', function () {
 					errorTemplate: errorTemplate,
 					template: {
 						render: function (context) {
-							var template = '<div>' +
-								'test – ' + context.name + ' – ' +
-								context.storeData.name +
-								'</div>';
-							return Promise.resolve(template);
+							return context.getStoreData()
+								.then(function (storeData) {
+									return '<div>' +
+										'test – ' + context.name + ' – ' +
+										(storeData ? storeData.name : '') +
+										'</div>';
+								});
 						}
 					}
 				}
@@ -775,7 +809,7 @@ describe('lib/DocumentRenderer', function () {
 					'<head cat-store="folder/store2">' +
 					'Error: folder/store2' +
 					'</head>' +
-					'<body>document – document - undefined' +
+					'<body>document – document - ' +
 					'<cat-comp id=\"1\" cat-store=\"store1\">' +
 					'Error: store1' +
 					'</cat-comp>' +
