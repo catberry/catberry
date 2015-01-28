@@ -460,11 +460,11 @@ describe('lib/DocumentRenderer', function () {
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head cat-store="folder/store2">' +
-					'Error: Store folder/store2 not found' +
+					'Error: Store "folder/store2" not found' +
 					'</head>' +
 					'<body>document – document - ' +
 					'<cat-comp id=\"1\" cat-store=\"store1\">' +
-					'Error: Store store1 not found' +
+					'Error: Store "store1" not found' +
 					'</cat-comp>' +
 					'<cat-async-comp id=\"2\" cat-store=\"folder/store2\">' +
 					'</cat-async-comp>' +
