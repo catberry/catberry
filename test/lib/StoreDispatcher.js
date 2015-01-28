@@ -521,12 +521,137 @@ describe('lib/StoreDispatcher', function () {
 				});
 		});
 	});
+
+	describe('#sendAction', function () {
+		it('should send action to store if it has handler', function (done) {
+			function Store() {}
+			Store.prototype.handleSomeAction = function (args) {
+				return {
+					args: args,
+					result: 'result'
+				};
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store
+				}
+			};
+			var actionParameters = {},
+				locator = createLocator(stores),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, {});
+			dispatcher.sendAction(
+				stores.store1.name, 'some-action', actionParameters
+			)
+				.then(function (result) {
+					assert.strictEqual(result.args, actionParameters);
+					assert.strictEqual(result.result, 'result');
+					done();
+				})
+				.catch(done);
+		});
+		it('should response with undefined ' +
+		'if there is no such action handler', function (done) {
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: DataStore
+				}
+			};
+			var actionParameters = {},
+				locator = createLocator(stores),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, {});
+			dispatcher.sendAction(
+				stores.store1.name, 'some-action', actionParameters
+			)
+				.then(function (result) {
+					assert.strictEqual(result, undefined);
+					done();
+				})
+				.catch(done);
+		});
+		it('should pass error from action handler', function (done) {
+			function Store() {}
+			Store.prototype.handleSomeAction = function () {
+				throw new Error('error');
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store
+				}
+			};
+			var actionParameters = {},
+				locator = createLocator(stores),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, {});
+			dispatcher.sendAction(
+				stores.store1.name, 'some-action', actionParameters
+			)
+				.then(function () {
+					done(new Error('Should fail'));
+				})
+				.catch(function (reason) {
+					assert.strictEqual(reason.message, 'error');
+					done();
+				});
+		});
+	});
+	describe('#sendBroadcastAction', function () {
+		it('should send action to all stores with handlers', function (done) {
+			function Store() {}
+			Store.prototype.handleSomeAction = function (args) {
+				return {
+					args: args,
+					result: this.$context.name
+				};
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store
+				},
+				store2: {
+					name: 'store2',
+					constructor: DataStore
+				},
+				store3: {
+					name: 'store3',
+					constructor: Store
+				}
+			};
+			var actionParameters = {},
+				locator = createLocator(stores),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, {});
+			dispatcher.sendBroadcastAction(
+				'some-action', actionParameters
+			)
+				.then(function (results) {
+					assert.strictEqual(results.length, 2);
+					assert.strictEqual(results[0].args, actionParameters);
+					assert.strictEqual(results[0].result, 'store1');
+					assert.strictEqual(results[1].args, actionParameters);
+					assert.strictEqual(results[1].result, 'store3');
+					done();
+				})
+				.catch(done);
+		});
+	});
 });
 
 function createLocator(stores, config) {
-	var locator = new ServiceLocator();
+	var locator = new ServiceLocator(),
+		eventBus = new events.EventEmitter();
+	eventBus.on('error', function () {});
 	locator.registerInstance('serviceLocator', locator);
-	locator.registerInstance('eventBus', new events.EventEmitter());
+	locator.registerInstance('eventBus', eventBus);
 	locator.registerInstance('config', config || {});
 	locator.registerInstance('storeLoader', {
 		load: function () {
