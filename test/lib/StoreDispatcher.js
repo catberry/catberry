@@ -394,6 +394,132 @@ describe('lib/StoreDispatcher', function () {
 				})
 				.catch(done);
 		});
+		it('should reject promise when initial state ' +
+		'is not state', function (done) {
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: DataStore
+				}
+			};
+			var locator = createLocator(stores),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.getStoreData(stores.store1.name)
+				.then(function () {
+					done(new Error('Should fail'));
+				})
+				.catch(function (reason) {
+					assert.strictEqual(
+						reason.message, 'State should be set before any request'
+					);
+					done();
+				});
+		});
+	});
+	describe('#setState', function () {
+		it('should set initial state and return empty array', function (done) {
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: DataStore
+				},
+				store2: {
+					name: 'store2',
+					constructor: DataStore
+				}
+			};
+			var locator = createLocator(stores),
+				context = {hello: 'world'},
+				eventBus = locator.resolve('eventBus'),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			var names = dispatcher.setState({}, context);
+			assert.strictEqual(names.length, 0);
+			done();
+		});
+		it('should return names of changed stores', function (done) {
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: DataStore
+				},
+				store2: {
+					name: 'store2',
+					constructor: DataStore
+				},
+				store3: {
+					name: 'store3',
+					constructor: DataStore
+				},
+				store4: {
+					name: 'store4',
+					constructor: DataStore
+				},
+				store5: {
+					name: 'store5',
+					constructor: DataStore
+				}
+			};
+			var locator = createLocator(stores),
+				context = {hello: 'world'},
+				eventBus = locator.resolve('eventBus'),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			var initState = {
+				// to remove
+				store1: {
+					some: 'value'
+				},
+				// to change value
+				store2: {
+					some1: 'value1',
+					some2: 2
+				},
+				// to change count of properties
+				store3: {
+					some1: 'value1',
+					some2: 2,
+					some3: true
+				},
+				// to keep the same
+				store4: {
+					some: 'value'
+				}
+				// store5 is absent at all
+			};
+
+			var newState = {
+				store2: {
+					some1: 'value2',
+					some2: 1
+				},
+				store3: {
+					some1: 'value1',
+					some2: 3
+				},
+				store4: {
+					some: 'value'
+				},
+				store5: {
+					some: 'value'
+				}
+			};
+			var names = dispatcher.setState(initState, context);
+			assert.strictEqual(names.length, 0);
+			dispatcher.getStoreData(stores.store2.name)
+				.then(function () {
+					var newContext = {hello: 'world2'},
+						updatedNames = dispatcher.setState(
+							newState, newContext
+						);
+					assert.strictEqual(updatedNames.length, 4);
+					assert.deepEqual(updatedNames, [
+						'store1', 'store2', 'store3', 'store5'
+					]);
+					done();
+				});
+		});
 	});
 });
 
