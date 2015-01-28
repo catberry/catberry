@@ -41,6 +41,6 @@ DataAsyncStore.prototype.load = function () {
 	return new Promise(function (fulfill, reject) {
 		setTimeout(function () {
 			fulfill(self.$context);
-		}, 100);
+		}, 10);
 	});
 };
