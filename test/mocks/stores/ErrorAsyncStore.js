@@ -41,6 +41,6 @@ ErrorAsyncStore.prototype.load = function () {
 	return new Promise(function (fulfill, reject) {
 		setTimeout(function () {
 			reject(new Error(self.$context.name));
-		}, 100);
+		}, 10);
 	});
 };
