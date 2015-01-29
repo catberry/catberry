@@ -47,8 +47,6 @@ var util = require('util'),
 	routeDefinitions = '__routeDefinitions' || [],
 	Catberry = require('./node_modules/catberry/browser/Catberry.js'),
 	Logger = require('./node_modules/catberry/browser/Logger.js'),
-	EventRouter = require('./node_modules/catberry/browser/EventRouter.js'),
-	FormSubmitter = require('./node_modules/catberry/browser/FormSubmitter.js'),
 	BootstrapperBase =
 		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 
@@ -77,8 +75,6 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	}
 
 	locator.registerInstance('window', window);
-	locator.register('eventRouter', EventRouter, configObject, true);
-	locator.register('formSubmitter', FormSubmitter, configObject, true);
 
 	var loggerConfig = configObject.logger || {},
 		logger = new Logger(loggerConfig.levels);

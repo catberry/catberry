@@ -32,41 +32,41 @@
 
 var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
-	CookiesWrapper = require('../../browser/CookiesWrapper');
+	CookieWrapper = require('../../browser/CookieWrapper');
 
-describe('browser/CookiesWrapper', function () {
+describe('browser/CookieWrapper', function () {
 	describe('#get', function () {
 		it('should return empty string if cookie string is null', function () {
 			var locator = createLocator(null),
-				cookiesWrapper = locator.resolveInstance(CookiesWrapper);
+				cookieWrapper = locator.resolveInstance(CookieWrapper);
 
-			assert.strictEqual(cookiesWrapper.get('some'), '');
+			assert.strictEqual(cookieWrapper.get('some'), '');
 		});
 		it('should return empty string if cookie key is not a string',
 			function () {
 				var locator = createLocator('some=value;'),
-					cookiesWrapper = locator.resolveInstance(CookiesWrapper);
-				assert.strictEqual(cookiesWrapper.get({}), '');
+					cookieWrapper = locator.resolveInstance(CookieWrapper);
+				assert.strictEqual(cookieWrapper.get({}), '');
 			});
 		it('should return value if cookie string is right', function () {
 			var locator = createLocator('some=value; some2=value2'),
-				cookiesWrapper = locator.resolveInstance(CookiesWrapper);
+				cookieWrapper = locator.resolveInstance(CookieWrapper);
 
-			assert.strictEqual(cookiesWrapper.get('some'), 'value');
-			assert.strictEqual(cookiesWrapper.get('some2'), 'value2');
+			assert.strictEqual(cookieWrapper.get('some'), 'value');
+			assert.strictEqual(cookieWrapper.get('some2'), 'value2');
 		});
 		it('should return empty string if cookie string is wrong', function () {
 			var locator = createLocator('fasdfa/gafg-sgafga'),
-				cookiesWrapper = locator.resolveInstance(CookiesWrapper);
+				cookieWrapper = locator.resolveInstance(CookieWrapper);
 
-			assert.strictEqual(cookiesWrapper.get('fasdfa/gafg-sgafga'), '');
+			assert.strictEqual(cookieWrapper.get('fasdfa/gafg-sgafga'), '');
 		});
 	});
 	describe('#set', function () {
 		it('should set cookie by specified parameters',
 			function () {
 				var locator = createLocator(null),
-					cookiesWrapper = locator.resolveInstance(CookiesWrapper),
+					cookieWrapper = locator.resolveInstance(CookieWrapper),
 					expiration = new Date(),
 					window = locator.resolve('window'),
 					expected = 'some=value' +
@@ -77,7 +77,7 @@ describe('browser/CookiesWrapper', function () {
 						'; Domain=.new.domain' +
 						'; Secure; HttpOnly';
 
-				cookiesWrapper.set({
+				cookieWrapper.set({
 					key: 'some',
 					value: 'value',
 					maxAge: 100,
@@ -93,7 +93,7 @@ describe('browser/CookiesWrapper', function () {
 		it('should set default expire date by max age',
 			function () {
 				var locator = createLocator(null),
-					cookiesWrapper = locator.resolveInstance(CookiesWrapper),
+					cookieWrapper = locator.resolveInstance(CookieWrapper),
 					expiration = new Date(Date.now() + 3600000),
 					window = locator.resolve('window'),
 					expected = 'some=value' +
@@ -101,7 +101,7 @@ describe('browser/CookiesWrapper', function () {
 						'; Expires=' +
 						expiration.toUTCString();
 
-				cookiesWrapper.set({
+				cookieWrapper.set({
 					key: 'some',
 					value: 'value',
 					maxAge: 3600
@@ -112,10 +112,10 @@ describe('browser/CookiesWrapper', function () {
 		it('should throw error if wrong key',
 			function () {
 				var locator = createLocator(null),
-					cookiesWrapper = locator.resolveInstance(CookiesWrapper);
+					cookieWrapper = locator.resolveInstance(CookieWrapper);
 
 				assert.throws(function () {
-					cookiesWrapper.set({
+					cookieWrapper.set({
 						key: {}
 					});
 				}, Error);
@@ -123,10 +123,10 @@ describe('browser/CookiesWrapper', function () {
 		it('should throw error if wrong value',
 			function () {
 				var locator = createLocator(null),
-					cookiesWrapper = locator.resolveInstance(CookiesWrapper);
+					cookieWrapper = locator.resolveInstance(CookieWrapper);
 
 				assert.throws(function () {
-					cookiesWrapper.set({
+					cookieWrapper.set({
 						key: 'some',
 						value: {}
 					});

@@ -43,10 +43,10 @@
 		"./lib/Catberry.js": "./browser/Catberry.js",
 		"./lib/CookiesWrapper.js": "./browser/CookiesWrapper.js",
 		"./lib/ModuleApiProvider.js": "./browser/ModuleApiProvider.js",
-		"./lib/ModuleLoader.js": "./browser/ModuleLoader.js",
-		"./lib/PageRenderer.js": "./browser/PageRenderer.js",
-		"./lib/RequestRouter.js": "./browser/RequestRouter.js",
-		"./lib/TemplateProvider.js": "./browser/TemplateProvider.js"
+		"./lib/ComponentLoader.js": "./browser/ComponentLoader.js",
+		"./lib/StoreLoader.js": "./browser/StoreLoader.js",
+		"./lib/DocumentRenderer.js": "./browser/DocumentRenderer.js",
+		"./lib/RequestRouter.js": "./browser/RequestRouter.js"
 	},
 	"dependencies": {
 		"ncp": "^1.0.1",
