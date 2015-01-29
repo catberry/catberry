@@ -33,12 +33,12 @@
 var assert = require('assert'),
 	events = require('events'),
 	ServiceLocator = require('catberry-locator'),
-	CookieWrapper = require('../../lib/CookieWrapper'),
-	ModuleApiProvider = require('../../lib/providers/ModuleApiProvider');
+	CookieWrapper = require('../../../lib/CookieWrapper'),
+	ModuleApiProvider = require('../../../lib/providers/ModuleApiProvider');
 
 global.Promise = require('promise');
 
-describe('lib/ModuleApiProvider', function () {
+describe('lib/providers/ModuleApiProvider', function () {
 	describe('#on', function () {
 		it('should throw error if handler is not a function', function () {
 			var locator = createLocator(),
@@ -183,6 +183,47 @@ describe('lib/ModuleApiProvider', function () {
 			assert.strictEqual(api.isFragmentCleared, false);
 			assert.strictEqual(api.clearFragment() instanceof Promise, true);
 			assert.strictEqual(api.isFragmentCleared, true);
+		});
+	});
+	describe('#getInlineScript', function () {
+		it('should return browser script for redirection', function (done) {
+			var locator = createLocator(),
+				api = locator.resolveInstance(ModuleApiProvider);
+			api.redirect('http://some');
+			var expected = '<script>' +
+				'window.location.assign(\'http://some\');' +
+				'</script>';
+			assert.strictEqual(api.getInlineScript(), expected);
+			done();
+		});
+		it('should return browser script for cookies', function (done) {
+			var locator = createLocator(),
+				api = locator.resolveInstance(ModuleApiProvider);
+			api.cookie.set({
+				key: 'some1',
+				value: 'value1'
+			});
+			api.cookie.set({
+				key: 'some2',
+				value: 'value2'
+			});
+			var expected = '<script>' +
+				'window.document.cookie = \'some1=value1\';' +
+				'window.document.cookie = \'some2=value2\';' +
+				'</script>';
+			assert.strictEqual(api.getInlineScript(), expected);
+			done();
+		});
+		it('should return browser script ' +
+		'for clearing fragment', function (done) {
+			var locator = createLocator(),
+				api = locator.resolveInstance(ModuleApiProvider);
+			api.clearFragment();
+			var expected = '<script>' +
+				'window.location.hash = \'\';' +
+				'</script>';
+			assert.strictEqual(api.getInlineScript(), expected);
+			done();
 		});
 	});
 });
