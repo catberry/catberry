@@ -36,8 +36,6 @@ var util = require('util'),
 	CatberryBase = require('../lib/base/CatberryBase'),
 	ServiceLocator = require('catberry-locator');
 
-var INLINE_SCRIPTS_CLASS = 'catberry-inline-script';
-
 util.inherits(Catberry, CatberryBase);
 
 /**
@@ -71,13 +69,10 @@ Catberry.prototype.startWhenReady = function () {
 	if (window.catberry) {
 		return Promise.resolve();
 	}
-	var self = this,
-		jQuery = this.locator.resolve('jQuery');
-	// for jQuery plugins
-	window.jQuery = window.$ = jQuery;
+	var self = this;
+
 	return new Promise(function (fulfill) {
-		jQuery(function () {
-			jQuery('.' + INLINE_SCRIPTS_CLASS).remove();
+		window.document.addEventListener('DOMContentLoaded', function () {
 			self.wrapDocument();
 			window.catberry = self;
 			fulfill();
