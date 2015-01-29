@@ -29,19 +29,19 @@
  */
 
 'use strict';
-module.exports = CookiesWrapper;
+module.exports = CookieWrapper;
 
 var util = require('util'),
-	CookiesWrapperBase = require('../lib/base/CookiesWrapperBase');
+	CookieWrapperBase = require('../lib/base/CookieWrapperBase');
 
-util.inherits(CookiesWrapper, CookiesWrapperBase);
+util.inherits(CookieWrapper, CookieWrapperBase);
 
 /**
  * Creates new instance of browser cookies wrapper.
  * @constructor
  */
-function CookiesWrapper($window) {
-	CookiesWrapperBase.call(this);
+function CookieWrapper($window) {
+	CookieWrapperBase.call(this);
 	this._window = $window;
 }
 
@@ -50,14 +50,14 @@ function CookiesWrapper($window) {
  * @type {Window}
  * @private
  */
-CookiesWrapper.prototype._window = null;
+CookieWrapper.prototype._window = null;
 
 /**
  * Gets cookie value by name.
  * @param {string} name Cookie name.
  * @returns {string} Cookie value.
  */
-CookiesWrapper.prototype.get = function (name) {
+CookieWrapper.prototype.get = function (name) {
 	if (typeof(name) !== 'string') {
 		return '';
 	}
@@ -82,7 +82,7 @@ CookiesWrapper.prototype.get = function (name) {
  * @param {boolean?} cookieSetup.httpOnly Is cookie HTTP only.
  * @returns {string} Cookie setup string.
  */
-CookiesWrapper.prototype.set = function (cookieSetup) {
+CookieWrapper.prototype.set = function (cookieSetup) {
 	var cookie = this._convertToCookieSetup(cookieSetup);
 	this._window.document.cookie = cookie;
 	return cookie;
