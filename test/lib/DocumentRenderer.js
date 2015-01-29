@@ -91,7 +91,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -154,7 +154,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -243,7 +243,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -361,7 +361,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -476,7 +476,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -595,7 +595,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -695,7 +695,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -824,7 +824,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -924,7 +924,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
@@ -1002,7 +1002,7 @@ describe('lib/DocumentRenderer', function () {
 			// stub for HTTP response method
 			outputStream.writeHead = function () {};
 
-			documentRenderer.render(routingContext, {}, outputStream);
+			documentRenderer.render({}, routingContext, outputStream);
 			outputStream
 				.on('data', function (chunk) {
 					output += chunk;
