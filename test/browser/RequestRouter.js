@@ -36,567 +36,285 @@ var assert = require('assert'),
 	Logger = require('../mocks/Logger'),
 	UniversalMock = require('../mocks/UniversalMock'),
 	ServiceLocator = require('catberry-locator'),
-	StateProvider = require('../../lib/StateProvider'),
+	StateProvider = require('../../lib/providers/StateProvider'),
 	ContextFactory = require('../../lib/ContextFactory'),
-	CookiesWrapper = require('../../browser/CookiesWrapper'),
+	CookieWrapper = require('../../browser/CookieWrapper'),
 	RequestRouter = require('../../browser/RequestRouter');
 
 describe('browser/RequestRouter', function () {
 	describe('#route', function () {
-		describe('hash handle', function () {
-			it('should catch hash on start and request event routing',
-				function (done) {
-					var locator = createLocator(),
-						eventRouter = locator.resolve('eventRouter');
-					eventRouter.once('routeHashChange', function (args) {
-						assert.strictEqual(args[0], 'test-hash',
-							'Wrong event name');
-						done();
-					});
+		it('should catch link click and request rendering',
+			function (done) {
+				var locator = createLocator(),
+					documentRenderer = locator.resolve('documentRenderer'),
+					eventBus = locator.resolve('eventBus'),
+					currentWindow,
+					link = '/some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
 
-					jsdom.env({
-						html: ' ',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location
-									.assign('http://local/some#test-hash');
-								locator.resolveInstance(RequestRouter);
-							});
-						}
-					});
-				}
-			);
-
-			it('should not catch empty hash on start',
-				function (done) {
-					var locator = createLocator(),
-						eventRouter = locator.resolve('eventRouter');
-					eventRouter.once('routeHashChange', function () {
-						assert.fail('Should not handle this event');
-					});
-
-					jsdom.env({
-						html: ' ',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-								setTimeout(done, 100);
-							});
-						}
-					});
-				}
-			);
-
-			it('should always catch hash change and request event routing',
-				function (done) {
-					var locator = createLocator(),
-						eventRouter = locator.resolve('eventRouter');
-
-					jsdom.env({
-						html: ' ',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-
-								new Promise(function (fulfill) {
-									eventRouter.once('routeHashChange',
-										function (args) {
-											assert.strictEqual(
-												args[0], 'test1'
-											);
-											fulfill();
-										});
-
-									// first set hash to test1
-									window.location.assign(
-										'http://local/some#test1'
-									);
-									$(window).trigger('hashchange');
-								})
-									.then(function () {
-										return new Promise(function (fulfill) {
-											eventRouter.once('routeHashChange',
-												function (args) {
-													assert.strictEqual(
-														args[0], 'test2'
-													);
-													fulfill();
-												});
-
-											// second set to test2
-											window.location.assign(
-												'http://local/some#test2'
-											);
-											$(window).trigger('hashchange');
-
-										});
-									})
-									.then(function () {
-										return new Promise(function (fulfill) {
-											eventRouter.once('routeHashChange',
-												function (args) {
-													assert.strictEqual(
-														args[0], ''
-													);
-													fulfill();
-												});
-											// at last remove any hash
-											window.location.assign(
-												'http://local/some'
-											);
-											$(window).trigger('hashchange');
-										});
-									})
-									.then(function () {
-										done();
-									}, function (error) {
-										done(error);
-									});
-							});
-						}
-					});
-				}
-			);
-		});
-		describe('link event handle', function () {
-			it('should catch link click and ' +
-				'raise event if data-event attribute',
-				function (done) {
-					var locator = createLocator(),
-						eventRouter = locator.resolve('eventRouter');
-
-					jsdom.env({
-						html: '<a id="link" data-event="test1"></a>',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-
-								eventRouter.once('routeDataEvent',
-									function (args) {
-										assert.strictEqual(args[0], 'test1');
-										done();
-									});
-
-								$('#link').trigger('click');
-							});
-						}
-					});
+				locator.registerInstance('routeDefinition', {
+					expression: '/some/' +
+					'?global=:global[first,second]' +
+					'&first=:first[first]' +
+					'&second=:second[second]',
+					map: function (state) {
+						state.second.hello = 'world';
+						return state;
+					}
 				});
-			it('should catch link click in child element and raise event',
-				function (done) {
-					var locator = createLocator(),
-						eventRouter = locator.resolve('eventRouter');
-
-					jsdom.env({
-						html: '<a data-event="test1">' +
-						'<div>' +
-						'<span><span id="click-here"></span></span>' +
-						'</div>' +
-						'</a>',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-
-								eventRouter.once('routeDataEvent',
-									function (args) {
-										assert.strictEqual(args[0], 'test1');
-										done();
-									});
-
-								$('#click-here').trigger('click');
-							});
-						}
-					});
+				eventBus.on('error', done);
+				eventBus.once('pageRendered', function (context) {
+					assert.strictEqual(typeof(context), 'object');
+					assert.strictEqual(
+						context.location.toString(),
+						'http://local' + link
+					);
+					assert.strictEqual(
+						typeof(context.cookie), 'object');
+					assert.strictEqual(
+						typeof(documentRenderer.state), 'object');
+					assert.strictEqual(
+						typeof(documentRenderer.state.first), 'object');
+					assert.strictEqual(
+						typeof(documentRenderer.state.second), 'object');
+					assert.strictEqual(
+						documentRenderer.state.first.first, 'firstValue');
+					assert.strictEqual(
+						documentRenderer.state.second.second, 'secondValue');
+					assert.strictEqual(
+						documentRenderer.state.first.global, 'globalValue');
+					assert.strictEqual(
+						documentRenderer.state.second.global, 'globalValue');
+					assert.strictEqual(
+						documentRenderer.state.second.hello, 'world');
+					assert.strictEqual(currentWindow.location.toString(),
+						'http://local' + link);
+					assert.strictEqual(currentWindow.history.length, 2);
+					done();
 				});
-		});
 
-		describe('link render', function () {
-			it('should catch link click and request rendering',
-				function (done) {
-					var locator = createLocator(),
-						pageRenderer = locator.resolve('pageRenderer'),
-						currentWindow,
-						link = '/some/' +
+				jsdom.env({
+					html: '<a href="' + link + '"/>',
+					done: function (errors, window) {
+						currentWindow = window;
+						prepareWindow(window, locator);
+						window.location.assign('http://local/some');
+						locator.resolveInstance(RequestRouter);
+
+						var event = window.document.createEvent();
+						event.initEvent('click', true, true);
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+					}
+				});
+			}
+		);
+
+		it('should properly handle relative URIs with ..',
+			function (done) {
+				var locator = createLocator(),
+					documentRenderer = locator.resolve('documentRenderer'),
+					eventBus = locator.resolve('eventBus'),
+					currentWindow,
+					link = '../../some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
+
+				locator.registerInstance('routeDefinition',
+					'/some/' +
+					'?global=:global[first,second]' +
+					'&first=:first[first]' +
+					'&second=:second[second]'
+				);
+
+				eventBus.on('error', done);
+
+				jsdom.env({
+					html: '<a href="' + link + '"/>',
+					done: function (errors, window) {
+						currentWindow = window;
+						prepareWindow(window, locator);
+						window.location.assign('http://local:9090/a/b');
+						locator.resolveInstance(RequestRouter);
+						var event = window.document.createEvent();
+						event.initEvent('click', true, true);
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						assert.strictEqual(
+							currentWindow.location.toString(),
+							'http://local:9090/some/' +
 							'?global=globalValue' +
 							'&first=firstValue' +
-							'&second=secondValue';
-
-					locator.registerInstance('routeDefinition', {
-						expression: '/some/' +
-						'?global=:global[first,second]' +
-						'&first=:first[first]' +
-						'&second=:second[second]',
-						map: function (state) {
-							state.second.hello = 'world';
-							return state;
-						}
-					});
-					pageRenderer.once('render', function (args) {
-						assert.strictEqual(typeof(args[0]), 'object');
-						assert.strictEqual(
-							args[0].location.toString(),
-							'http://local' + link
+							'&second=secondValue'
 						);
-						assert.strictEqual(
-							typeof(args[0].state), 'object');
-						assert.strictEqual(
-							typeof(args[0].renderedData), 'object');
-						assert.strictEqual(
-							typeof(args[0].cookies), 'object');
-						assert.strictEqual(
-							typeof(args[0].state.first), 'object');
-						assert.strictEqual(
-							typeof(args[0].state.second), 'object');
-						assert.strictEqual(
-							args[0].state.first.first, 'firstValue');
-						assert.strictEqual(
-							args[0].state.second.second, 'secondValue');
-						assert.strictEqual(
-							args[0].state.first.global, 'globalValue');
-						assert.strictEqual(
-							args[0].state.second.global, 'globalValue');
-						assert.strictEqual(
-							args[0].state.second.hello, 'world');
-						assert.strictEqual(currentWindow.location.toString(),
-							'http://local' + link);
-						assert.strictEqual(currentWindow.history.length, 1);
 						done();
-					});
+					}
+				});
+			}
+		);
 
-					jsdom.env({
-						html: '<a href="' + link + '"/>',
-						done: function (errors, window) {
-							currentWindow = window;
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-								$('a').trigger('click');
-							});
-						}
-					});
-				}
-			);
+		it('should properly handle relative URIs without ..',
+			function (done) {
+				var locator = createLocator(),
+					documentRenderer = locator.resolve('documentRenderer'),
+					currentWindow,
+					link = 'some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
 
-			it('should properly handle relative URIs with ..',
-				function (done) {
-					var locator = createLocator(),
-						pageRenderer = locator.resolve('pageRenderer'),
-						currentWindow,
-						link = '../../some/' +
-							'?global=globalValue' +
-							'&first=firstValue' +
-							'&second=secondValue';
+				locator.registerInstance('routeDefinition', {
+					expression: /\/some.+/,
+					map: function () {
+						return {
+							first: {
+								first: 'firstValue'
+							},
+							second: {
+								second: 'secondValue'
+							}
+						};
+					}
+				});
 
-					locator.registerInstance('routeDefinition',
-						'/some/' +
-						'?global=:global[first,second]' +
-						'&first=:first[first]' +
-						'&second=:second[second]'
-					);
-
-					jsdom.env({
-						html: '<a href="' + link + '"/>',
-						done: function (errors, window) {
-							currentWindow = window;
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local:9090/a/b');
-								locator.resolveInstance(RequestRouter);
-								$('a').trigger('click');
-								assert.strictEqual(
-									currentWindow.location.toString(),
-									'http://local:9090/some/' +
-									'?global=globalValue' +
-									'&first=firstValue' +
-									'&second=secondValue'
-								);
-								done();
-							});
-						}
-					});
-				}
-			);
-
-			it('should properly handle relative URIs without ..',
-				function (done) {
-					var locator = createLocator(),
-						pageRenderer = locator.resolve('pageRenderer'),
-						currentWindow,
-						link = 'some/' +
-							'?global=globalValue' +
-							'&first=firstValue' +
-							'&second=secondValue';
-
-					locator.registerInstance('routeDefinition', {
-						expression: /\/some.+/,
-						map: function () {
-							return {
-								first: {
-									first: 'firstValue'
-								},
-								second: {
-									second: 'secondValue'
-								}
-							};
-						}
-					});
-
-					jsdom.env({
-						html: '<a href="' + link + '"/>',
-						done: function (errors, window) {
-							currentWindow = window;
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local:9090/a/b/');
-								locator.resolveInstance(RequestRouter);
-								$('a').trigger('click');
-								assert.strictEqual(
-									currentWindow.location.toString(),
-									'http://local:9090/a/b/' + link);
-								done();
-							});
-						}
-					});
-				}
-			);
-
-			it('should catch link click and pass through if link changes host',
-				function (done) {
-					var locator = createLocator(),
-						pageRenderer = locator.resolve('pageRenderer'),
-						currentWindow,
-						link = 'http://local1.com/some/' +
-							'?global=globalValue' +
-							'&first=firstValue' +
-							'&second=secondValue';
-
-					locator.registerInstance('routeDefinition',
-						'/some/' +
-						'?global=:global[first,second]' +
-						'&first=:first[first]' +
-						'&second=:second[second]'
-					);
-
-					pageRenderer.once('render', function () {
-						assert.fail('If link changes page this event ' +
-						'should not be triggered');
-					});
-
-					jsdom.env({
-						html: '<a href="' + link + '"/>',
-						done: function (errors, window) {
-							currentWindow = window;
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location
-									.assign('http://local2.com/some');
-								locator.resolveInstance(RequestRouter);
-								$('a').trigger('click');
-								setTimeout(function () {
-									assert.strictEqual(
-										window.location.toString(), link);
-									done();
-								}, 100);
-							});
-						}
-					});
-				}
-			);
-			it('should catch link click and pass through if link starts with //',
-				function (done) {
-					var locator = createLocator(),
-						pageRenderer = locator.resolve('pageRenderer'),
-						currentWindow,
-						link = '//local1.com/some/' +
-							'?global=globalValue' +
-							'&first=firstValue' +
-							'&second=secondValue';
-
-					locator.registerInstance('routeDefinition',
-						'/some/' +
-						'?global=:global[first,second]' +
-						'&first=:first[first]' +
-						'&second=:second[second]'
-					);
-
-					pageRenderer.once('render', function () {
-						assert.fail('If link changes page this event ' +
-						'should not be triggered');
-					});
-
-					jsdom.env({
-						html: '<a href="' + link + '"/>',
-						done: function (errors, window) {
-							currentWindow = window;
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location
-									.assign('https://local1.com/some');
-								locator.resolveInstance(RequestRouter);
-								$('a').trigger('click');
-								setTimeout(function () {
-									assert.strictEqual(
-										window.location.toString(),
-										'https:' + link);
-									done();
-								}, 100);
-							});
-						}
-					});
-				}
-			);
-		});
-
-		describe('form submit', function () {
-			it('should catch submit click and request module data submitting',
-				function (done) {
-					var form = '<form name="write_some" ' +
-						'action="/some/?some_arg=value" ' +
-						'data-module="receiver" ' +
-						'data-dependents="some_first&receiver_second">' +
-						'<input type="text" name="text">' +
-						'<input type="submit" value="Submit">' +
-						'</form>';
-
-					var locator = createLocator(),
-						formSubmitter = locator.resolve('formSubmitter');
-
-					formSubmitter.canSubmit = function () {
-						return true;
-					};
-
-					formSubmitter.once('submit', function (args) {
-						assert.strictEqual(args[0].length, 1);
-						assert.strictEqual(args[0].attr('name'), 'write_some');
+				jsdom.env({
+					html: '<a href="' + link + '"/>',
+					done: function (errors, window) {
+						currentWindow = window;
+						prepareWindow(window, locator);
+						window.location.assign('http://local:9090/a/b/');
+						locator.resolveInstance(RequestRouter);
+						var event = window.document.createEvent();
+						event.initEvent('click', true, true);
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						assert.strictEqual(
+							currentWindow.location.toString(),
+							'http://local:9090/a/b/' + link);
 						done();
-					});
+					}
+				});
+			}
+		);
 
-					jsdom.env({
-						html: '<div id="form"></div>',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-								$('#form').html(form);
-								$('form').trigger('submit');
-							});
-						}
-					});
+		it('should catch link click and pass through if link changes host',
+			function (done) {
+				var locator = createLocator(),
+					eventBus = locator.resolve('eventBus'),
+					documentRenderer = locator.resolve('documentRenderer'),
+					currentWindow,
+					link = 'http://local1.com/some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
+
+				locator.registerInstance('routeDefinition',
+					'/some/' +
+					'?global=:global[first,second]' +
+					'&first=:first[first]' +
+					'&second=:second[second]'
+				);
+
+				eventBus.on('error', done);
+				eventBus.once('pageRendered', function () {
+					assert.fail('If link changes page this event ' +
+					'should not be triggered');
 				});
 
-			it('should not catch submit click if input is not inside form',
-				function (done) {
-					var input = '<input type="submit" value="Submit">',
-						locator = createLocator(),
-						formSubmitter = locator.resolve('formSubmitter');
-
-					formSubmitter.once('submit', function () {
-						assert.fail('This event should not be triggered ' +
-						'because button is not in form');
-					});
-
-					jsdom.env({
-						html: '<div id="form"></div>',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-								$('#form').html(input);
-								$('form').trigger('submit');
-								setTimeout(function () {
-									done();
-								}, 100);
-							});
-						}
-					});
+				jsdom.env({
+					html: '<a href="' + link + '"/>',
+					done: function (errors, window) {
+						currentWindow = window;
+						prepareWindow(window, locator);
+						window.location
+							.assign('http://local2.com/some');
+						locator.resolveInstance(RequestRouter);
+						var event = window.document.createEvent();
+						event.initEvent('click', true, true);
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						setTimeout(function () {
+							assert.strictEqual(
+								window.location.toString(), link);
+							done();
+						}, 100);
+					}
 				});
+			}
+		);
+		it('should catch link click and pass through if link starts with //',
+			function (done) {
+				var locator = createLocator(),
+					eventBus = locator.resolve('eventBus'),
+					documentRenderer = locator.resolve('documentRenderer'),
+					link = '//local1.com/some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
 
-			it('should not catch submit click if submitter can not handle it',
-				function (done) {
-					var form = '<form name="write_some" ' +
-						'action="/some/?some_arg=value" ' +
-						'data-module="receiver" ' +
-						'data-dependents="some_first&receiver_second">' +
-						'<input type="text" name="text">' +
-						'<input type="submit" value="Submit">' +
-						'</form>';
-					var locator = createLocator(),
-						formSubmitter = locator.resolve('formSubmitter');
+				locator.registerInstance('routeDefinition',
+					'/some/' +
+					'?global=:global[first,second]' +
+					'&first=:first[first]' +
+					'&second=:second[second]'
+				);
 
-					formSubmitter.decorateMethod('canSubmit', function () {
-						return false;
-					});
-					formSubmitter.once('submit', function () {
-						assert.fail('This event should not be triggered ' +
-						'because submitter can not handle request');
-					});
+				eventBus.on('error', done);
 
-					jsdom.env({
-						html: '<div id="form"></div>',
-						done: function (errors, window) {
-							prepareWindow(window, locator);
-							var $ = locator.resolve('jQuery');
-							$(function () {
-								window.location.assign('http://local/some');
-								locator.resolveInstance(RequestRouter);
-								$('#form').html(form);
-								$('form').trigger('submit');
-								setTimeout(function () {
-									done();
-								}, 100);
-							});
-						}
-					});
+				jsdom.env({
+					html: '<a href="' + link + '"/>',
+					done: function (errors, window) {
+						prepareWindow(window, locator);
+						window.location
+							.assign('https://local1.com/some');
+						locator.resolveInstance(RequestRouter);
+						var event = window.document.createEvent();
+						event.initEvent('click', true, true);
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						setTimeout(function () {
+							assert.strictEqual(
+								window.location.toString(),
+								'https:' + link);
+							done();
+						}, 100);
+					}
 				});
-		});
+			}
+		);
 	});
 });
 
 function createLocator() {
-	var locator = new ServiceLocator(),
-		moduleLoader = {
-			getModulesByNames: function () {
-				return {};
-			},
-			lastRenderedData: {}
-		};
+	var locator = new ServiceLocator();
 
-	locator.registerInstance('eventBus', new events.EventEmitter());
+	var eventBus = new events.EventEmitter();
+	locator.registerInstance('eventBus', eventBus);
 	locator.registerInstance('serviceLocator', locator);
 	locator.register('logger', Logger);
-	locator.register('cookiesWrapper', CookiesWrapper);
-	locator.registerInstance('pageRenderer', new UniversalMock(['render']));
-	locator.registerInstance('eventRouter',
-		new UniversalMock(['routeDataEvent', 'routeHashChange']));
+	locator.register('cookieWrapper', CookieWrapper);
+	var documentRenderer = {
+		render: function (state, context) {
+			var last = documentRenderer.context;
+			documentRenderer.state = state;
+			documentRenderer.context = context;
+			if (last) {
+				eventBus.emit('pageRendered', context);
+			}
+			return Promise.resolve();
+		}
+	};
+	locator.registerInstance('documentRenderer', documentRenderer);
 	locator.registerInstance('moduleApiProvider',
 		new UniversalMock(['redirect']));
-	locator.registerInstance('formSubmitter',
-		new UniversalMock(['submit', 'canSubmit']));
-	locator.registerInstance('moduleLoader', moduleLoader);
 	locator.register('stateProvider', StateProvider);
 	locator.register('contextFactory', ContextFactory);
 	return locator;
@@ -604,8 +322,5 @@ function createLocator() {
 
 function prepareWindow(window, locator) {
 	window.location.assign = window.location.replace;
-	delete require.cache.jquery;
-	var $ = require('jquery')(window);
 	locator.registerInstance('window', window);
-	locator.registerInstance('jQuery', $);
 }

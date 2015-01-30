@@ -42,11 +42,8 @@ var MOUSE_KEYS = {
 
 	HREF_ATTRIBUTE_NAME = 'href',
 	TARGET_ATTRIBUTE_NAME = 'target',
-	DATA_EVENT_ATTRIBUTE_NAME = 'data-event',
 	A_TAG_NAME = 'A',
-	BUTTON_TAG_NAME = 'BUTTON',
-	ERROR_WRONG_MODULE_NAME = 'Wrong module name "%s"',
-	ERROR_WRONG_PLACEHOLDER_NAME = 'Wrong placeholder name "%s"';
+	BODY_TAG_NAME = 'BODY';
 
 /**
  * Creates new instance of browser request router.
@@ -54,30 +51,20 @@ var MOUSE_KEYS = {
  * @constructor
  */
 function RequestRouter($serviceLocator) {
-	this.$ = $serviceLocator.resolve('jQuery');
 	this._eventBus = $serviceLocator.resolve('eventBus');
 	this._window = $serviceLocator.resolve('window');
-	this._eventRouter = $serviceLocator.resolve('eventRouter');
-	this._pageRenderer = $serviceLocator.resolve('pageRenderer');
-	this._formSubmitter = $serviceLocator.resolve('formSubmitter');
+	this._documentRenderer = $serviceLocator.resolve('documentRenderer');
 	this._stateProvider = $serviceLocator.resolve('stateProvider');
-	this._moduleLoader = $serviceLocator.resolve('moduleLoader');
 	this._contextFactory = $serviceLocator.resolve('contextFactory');
-	this._serviceLocator = $serviceLocator;
 
-	this._historySupported = this._window.history &&
+	this._isHistorySupported = this._window.history &&
 		this._window.history.pushState instanceof Function;
-	this._location = new URI(this._window.location.toString());
-	this._referrer = this._location;
-
-	// if invoke this method now it can cause infinite recursion
-	// when module will use clearHash method
-	var self = this;
-	setTimeout(function () {
-		self._raiseHashChangeEvent();
-	}, 0);
 	this._wrapDocument();
-	this._eventBus.emit('ready');
+	var self = this;
+	this._changeState(new URI(this._window.location.toString()))
+		.then(function () {
+			self._eventBus.emit('ready');
+		});
 }
 
 /**
@@ -95,25 +82,11 @@ RequestRouter.prototype._referrer = '';
 RequestRouter.prototype._location = null;
 
 /**
- * Current application event.
- * @type {string}
- * @private
- */
-RequestRouter.prototype._currentEvent = '';
-
-/**
  * Current event bus.
  * @type {EventEmitter}
  * @private
  */
 RequestRouter.prototype._eventBus = null;
-
-/**
- * Current service locator.
- * @type {ServiceLocator}
- * @private
- */
-RequestRouter.prototype._serviceLocator = null;
 
 /**
  * Current context factory.
@@ -123,13 +96,6 @@ RequestRouter.prototype._serviceLocator = null;
 RequestRouter.prototype._contextFactory = null;
 
 /**
- * Current module loader.
- * @type {ModuleLoader}
- * @private
- */
-RequestRouter.prototype._moduleLoader = null;
-
-/**
  * Current state provider.
  * @type {StateProvider}
  * @private
@@ -137,11 +103,11 @@ RequestRouter.prototype._moduleLoader = null;
 RequestRouter.prototype._stateProvider = null;
 
 /**
- * Current page renderer.
- * @type {PageRenderer}
+ * Current document renderer.
+ * @type {DocumentRenderer}
  * @private
  */
-RequestRouter.prototype._pageRenderer = null;
+RequestRouter.prototype._documentRenderer = null;
 
 /**
  * Current browser window.
@@ -155,27 +121,7 @@ RequestRouter.prototype._window = null;
  * @type {boolean}
  * @private
  */
-RequestRouter.prototype._historySupported = false;
-
-/**
- * Current event router.
- * @type {EventRouter}
- * @private
- */
-RequestRouter.prototype._eventRouter = null;
-
-/**
- * Current form submitter
- * @type {FormSubmitter}
- * @private
- */
-RequestRouter.prototype._formSubmitter = null;
-
-/**
- * Current instance of jQuery library.
- * @type {jQuery}
- */
-RequestRouter.prototype.$ = null;
+RequestRouter.prototype._isHistorySupported = false;
 
 /**
  * Routes browser render request.
@@ -195,9 +141,11 @@ RequestRouter.prototype.route = function () {
 
 		if (newLocation.scheme !== self._location.scheme ||
 			newAuthority !== currentAuthority) {
+			fulfill();
 			return;
 		}
 
+		// if only URI fragment is changed
 		var newQuery = newLocation.query ?
 			newLocation.query.toString() : null,
 			currentQuery = self._location.query ?
@@ -205,40 +153,14 @@ RequestRouter.prototype.route = function () {
 		if (newLocation.path === self._location.path &&
 			newQuery === currentQuery) {
 			self._location = newLocation;
-			return self._raiseHashChangeEvent().then(fulfill, reject);
+			fulfill();
+			return;
 		}
 
-		self._location = newLocation;
-		var state = self._stateProvider.getStateByUri(newLocation),
-			renderingParameters = self._contextFactory.create(
-				self._moduleLoader.lastRenderedData,
-				self._serviceLocator.resolve('cookiesWrapper'),
-				state, {
-					referrer: self._referrer,
-					location: self._location,
-					userAgent: self._window.navigator.userAgent
-				}
-			);
-
-		return self._pageRenderer.render(renderingParameters)
-			.then(function () {
-				self._referrer = self._location;
-				self._eventBus.emit('stateChanged', renderingParameters);
-				return self._raiseHashChangeEvent();
-			})
-			.then(fulfill, reject);
+		self._changeState(newLocation)
+			.then(fulfill)
+			.catch(reject);
 	});
-};
-
-/**
- * Clears current location hash and invokes route.
- */
-RequestRouter.prototype.clearHash = function () {
-	var wrappedWindow = this.$(this._window),
-	// save current scroll position to restore it after hash will be cleared
-		position = wrappedWindow.scrollTop();
-	this._window.location.hash = '';
-	wrappedWindow.scrollTop(position);
 };
 
 /**
@@ -257,7 +179,7 @@ RequestRouter.prototype.go = function (locationString) {
 			location.authority.toString() : null;
 	// we must check if this is an external link before map URI
 	// to internal application state
-	if (!this._historySupported ||
+	if (!this._isHistorySupported ||
 		location.scheme !== this._location.scheme ||
 		newAuthority !== currentAuthority) {
 		this._window.location.assign(locationString);
@@ -275,83 +197,25 @@ RequestRouter.prototype.go = function (locationString) {
 };
 
 /**
- * Requests render of specified placeholder.
- * @param {string} moduleName Name of module.
- * @param {string} placeholderName Name of placeholder.
- * @returns {Promise} Promise for nothing.
- */
-RequestRouter.prototype.requestRender = function (moduleName, placeholderName) {
-	var modulesByNames = this._moduleLoader.getModulesByNames(),
-		module = modulesByNames[moduleName];
-	if (!module) {
-		return Promise.reject(
-			new Error(util.format(ERROR_WRONG_MODULE_NAME, moduleName))
-		);
-	}
-
-	var placeholder = module.placeholders[placeholderName];
-	if (!placeholder) {
-		return Promise.reject(
-			new Error(util.format(
-				ERROR_WRONG_PLACEHOLDER_NAME,
-				placeholderName
-			))
-		);
-	}
-
-	this._eventBus.emit('renderRequested', {
-		placeholderName: placeholder.name,
-		moduleName: module.name
-	});
-
-	var currentState = this._stateProvider.getStateByUri(this._location),
-		renderingParameters = this._contextFactory.create(
-			this._moduleLoader.lastRenderedData,
-			this._serviceLocator.resolve('cookiesWrapper'),
-			currentState, {
-				referrer: this._referrer,
-				location: this._location,
-				userAgent: this._window.navigator.userAgent
-			}
-		);
-
-	return this._pageRenderer.renderPlaceholder(
-		placeholder, renderingParameters
-	)
-		.then(function (context) {
-			var afterPromises = context.afterMethods
-				.map(function (afterMethod) {
-					try {
-						return Promise.resolve(afterMethod());
-					} catch (e) {
-						return Promise.reject(e);
-					}
-				});
-			return Promise.all(afterPromises);
-		});
-};
-
-/**
- * Raises event route if hash was specified.
+ * Changes current application state with new location.
+ * @param {URI} newLocation New location.
  * @returns {Promise} Promise for nothing.
  * @private
  */
-RequestRouter.prototype._raiseHashChangeEvent = function () {
-	var event = this._location.fragment || '',
-		element = this.$('#' + event)[0];
+RequestRouter.prototype._changeState = function (newLocation) {
+	this._location = newLocation;
+	var state = this._stateProvider.getStateByUri(newLocation),
+		routingContext = this._contextFactory.create({
+			referrer: this._referrer || this._window.document.referrer,
+			location: this._location,
+			userAgent: this._window.navigator.userAgent
+		});
 
-	if (event === this._currentEvent) {
-		if (element) {
-			element.scrollIntoView(true);
-		}
-		return Promise.resolve();
-	}
-	this._currentEvent = event;
-	return this._eventRouter.routeHashChange(event)
-		.then(function (isHandled) {
-			if (isHandled === false && element) {
-				element.scrollIntoView(true);
-			}
+	var self = this;
+	return this._documentRenderer
+		.render(state, routingContext)
+		.then(function () {
+			self._referrer = self._location;
 		});
 };
 
@@ -360,59 +224,45 @@ RequestRouter.prototype._raiseHashChangeEvent = function () {
  * @private
  */
 RequestRouter.prototype._wrapDocument = function () {
-	var self = this,
-		window = this.$(this._window);
+	var self = this;
 
-	window.on('hashchange', function () {
-		self._location = new URI(self._window.location.toString());
-		self._raiseHashChangeEvent().then(null, self._errorHandler.bind(self));
-	});
-
-	if (!this._historySupported) {
+	if (!this._isHistorySupported) {
 		return;
 	}
 
-	window.on('popstate', function () {
-		self.route().then(null, self._errorHandler.bind(self));
+	this._window.addEventListener('popstate', function () {
+		self.route().catch(self._errorHandler.bind(self));
 	});
 
-	this.$(this._window.document.body)
-		.click(function (event) {
-			var wrappedTarget = self.$(event.target);
-			switch (event.target.tagName) {
-				case A_TAG_NAME:
-				case BUTTON_TAG_NAME:
-					self._linkClickHandler(event, wrappedTarget)
-						.then(null, self._errorHandler.bind(self));
-					break;
-				default:
-					var link = wrappedTarget.closest('a');
-					if (link.length !== 1) {
-						return;
-					}
-					self._linkClickHandler(event, link)
-						.then(null, self._errorHandler.bind(self));
-					break;
+	this._window.document.body.addEventListener('click', function (event) {
+		if (event.target.tagName === A_TAG_NAME) {
+			self._linkClickHandler(event, event.target)
+				.catch(self._errorHandler.bind(self));
+		} else {
+			var link = closestLink(event.target);
+			if (!link) {
+				return;
 			}
-		})
-		.submit(function (event) {
-			self._submitClickHandler(event)
-				.then(null, self._errorHandler.bind(self));
-		});
+			self._linkClickHandler(event, link)
+				.catch(self._errorHandler.bind(self));
+		}
+	});
 };
 
 /**
  * Handles link click on page.
- * @param {EventObject} event Event-related object.
- * @param {jQuery} wrappedTarget jQuery wrapper for target element.
+ * @param {Event} event Event-related object.
+ * @param {Element} element Link element.
  * @returns {Promise} Promise for nothing.
  * @private
  */
-RequestRouter.prototype._linkClickHandler = function (event, wrappedTarget) {
-	var target = wrappedTarget.attr(TARGET_ATTRIBUTE_NAME),
-		dataEvent = wrappedTarget.attr(DATA_EVENT_ATTRIBUTE_NAME);
+RequestRouter.prototype._linkClickHandler = function (event, element) {
+	if (!element) {
+		return Promise.resolve();
+	}
 
-	if (target) {
+	var targetAttribute = element.getAttribute(TARGET_ATTRIBUTE_NAME);
+	if (targetAttribute) {
 		return Promise.resolve();
 	}
 
@@ -421,51 +271,13 @@ RequestRouter.prototype._linkClickHandler = function (event, wrappedTarget) {
 		return Promise.resolve();
 	}
 
-	if (dataEvent) {
-		event.preventDefault();
-		return this._eventRouter.routeDataEvent(dataEvent, wrappedTarget);
-	}
-
-	if (event.target.tagName === BUTTON_TAG_NAME) {
-		return Promise.resolve();
-	}
-
-	var locationString = wrappedTarget.attr(HREF_ATTRIBUTE_NAME);
-
+	var locationString = element.getAttribute(HREF_ATTRIBUTE_NAME);
 	if (!locationString) {
 		return Promise.resolve();
 	}
 
 	event.preventDefault();
 	return this.go(locationString);
-};
-
-/**
- * Handles submit input clicks.
- * @param {EventObject} event Event-related object.
- * @returns {Promise} Promise for nothing.
- * @private
- */
-RequestRouter.prototype._submitClickHandler = function (event) {
-	var self = this,
-		form = this.$(event.target);
-
-	if (!form.is('form')) {
-		return Promise.resolve();
-	}
-
-	if (!this._formSubmitter.canSubmit(form)) {
-		return Promise.resolve();
-	}
-
-	event.preventDefault();
-	return this._formSubmitter.submit(form)
-		.then(function () {
-			var action = form.attr('action');
-			if (action) {
-				return self.go(action);
-			}
-		});
 };
 
 /**
@@ -476,3 +288,16 @@ RequestRouter.prototype._submitClickHandler = function (event) {
 RequestRouter.prototype._errorHandler = function (error) {
 	this._eventBus.emit('error', error);
 };
+
+/**
+ * Finds the closest parent "A" element node.
+ * @param {Node} element Dom element.
+ * @returns {Node|null} The closest "A" element or null.
+ */
+function closestLink(element) {
+	while(element.nodeName !== A_TAG_NAME &&
+		element.nodeName !== BODY_TAG_NAME) {
+		element = element.parentNode;
+	}
+	return element.nodeName === A_TAG_NAME ? element : null;
+}
