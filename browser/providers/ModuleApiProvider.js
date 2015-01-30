@@ -33,9 +33,9 @@
 module.exports = ModuleApiProvider;
 
 var util = require('util'),
-	propertyHelper = require('../lib/helpers/propertyHelper'),
-	ModuleApiProviderBase = require('../lib/base/ModuleApiProviderBase'),
-	moduleHelper = require('../lib/helpers/moduleHelper');
+	propertyHelper = require('../../lib/helpers/propertyHelper'),
+	ModuleApiProviderBase = require('../../lib/base/ModuleApiProviderBase'),
+	moduleHelper = require('../../lib/helpers/moduleHelper');
 
 util.inherits(ModuleApiProvider, ModuleApiProviderBase);
 
@@ -48,8 +48,6 @@ util.inherits(ModuleApiProvider, ModuleApiProviderBase);
  */
 function ModuleApiProvider($serviceLocator) {
 	ModuleApiProviderBase.call(this, $serviceLocator);
-	this._window = $serviceLocator.resolve('window');
-
 	propertyHelper.defineReadOnly(this, 'isBrowser', true);
 	propertyHelper.defineReadOnly(this, 'isServer', false);
 }
@@ -68,57 +66,10 @@ ModuleApiProvider.prototype.redirect = function (uriString) {
  * Clears current location's hash.
  * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.clearHash = function () {
-	var requestRouter = this._serviceLocator.resolve('requestRouter');
-	requestRouter.clearHash();
+ModuleApiProvider.prototype.clearFragment = function () {
+	var window = this._serviceLocator.resolve('window'),
+		position = window.document.body.scrollTop;
+	window.location.hash = '';
+	window.document.body.scrollTop = position;
 	return Promise.resolve();
-};
-
-/**
- * Requests refresh of module's placeholder.
- * Refresh also re-handles current hash event.
- * @param {string} moduleName Name of module to render.
- * @param {string} placeholderName Name of placeholder to refresh.
- * @returns {Promise} Promise for nothing.
- */
-ModuleApiProvider.prototype.requestRefresh =
-	function (moduleName, placeholderName) {
-		var self = this;
-		return this.requestRender(moduleName, placeholderName)
-			.then(function () {
-				var currentHash = self._window.location.hash;
-				if (!currentHash) {
-					return;
-				}
-
-				return self.clearHash()
-					.then(self.redirect.bind(self, currentHash));
-			});
-	};
-
-/**
- * Requests render of module's placeholder.
- * @param {string} moduleName Name of module to render.
- * @param {string} placeholderName Name of placeholder to refresh.
- * @returns {Promise} Promise for nothing.
- */
-ModuleApiProvider.prototype.requestRender =
-	function (moduleName, placeholderName) {
-		var requestRouter = this._serviceLocator.resolve('requestRouter');
-		return requestRouter.requestRender(moduleName, placeholderName);
-	};
-
-/**
- * Renders specified template with data.
- * @param {string} moduleName Name of module, template owner.
- * @param {string} templateName Name of template.
- * @param {Object} data Data context for template.
- * @returns {Promise<string>} Promise for rendered template.
- */
-ModuleApiProvider.prototype.render = function (moduleName, templateName, data) {
-	var templateProvider = this._serviceLocator.resolve('templateProvider');
-	return templateProvider.render(
-		moduleHelper.joinModuleNameAndContext(moduleName, templateName),
-		data
-	);
 };

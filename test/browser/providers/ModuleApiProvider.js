@@ -32,13 +32,14 @@
 
 var assert = require('assert'),
 	events = require('events'),
-	UniversalMock = require('../mocks/UniversalMock'),
+	jsdom = require('jsdom'),
+	UniversalMock = require('../../mocks/UniversalMock'),
 	ServiceLocator = require('catberry-locator'),
-	ModuleApiProvider = require('../../browser/ModuleApiProvider');
+	ModuleApiProvider = require('../../../browser/providers/ModuleApiProvider');
 
 global.Promise = require('promise');
 
-describe('lib/ModuleApiProvider', function () {
+describe('lib/providers/ModuleApiProvider', function () {
 	describe('#redirect', function () {
 		it('should redirect to URI', function (done) {
 			var locator = createLocator(),
@@ -51,89 +52,32 @@ describe('lib/ModuleApiProvider', function () {
 			assert.strictEqual(api.redirect('/some1') instanceof Promise, true);
 		});
 	});
-	describe('#clearHash', function () {
+	describe('#clearFragment', function () {
 		it('should clear URI hash', function (done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider),
 				requestRouter = locator.resolve('requestRouter');
-			requestRouter.on('clearHash', function (args) {
+			requestRouter.on('clearFragment', function (args) {
 				assert.strictEqual(args.length, 0);
-				done();
 			});
-			assert.strictEqual(api.clearHash() instanceof Promise, true);
-		});
-	});
-	describe('#requestRefresh', function () {
-		it('should requests render and not reset hash',
-			function () {
-				var locator = createLocator(),
-					api = locator.resolveInstance(ModuleApiProvider),
-					requestRouter = locator.resolve('requestRouter'),
-					rendered = false,
-					cleared = false;
-				requestRouter.on('requestRender', function () {
-					rendered = true;
-				});
-				requestRouter.on('clearHash', function () {
-					cleared = true;
-				});
-				assert.strictEqual(
-						api.requestRefresh('some', 'placeholder') instanceof
-						Promise,
-					true
-				);
-				assert.strictEqual(rendered, true);
-				assert.strictEqual(cleared, false);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					window.location.replace('http://local#some');
+					locator.registerInstance('window', window);
+					assert.strictEqual(
+						window.location.toString(), 'http://local/#some'
+					);
+					api.clearFragment()
+						.then(function () {
+							assert.strictEqual(
+								window.location.toString(), 'http://local/#'
+							);
+							done();
+						})
+						.catch(done);
+				}
 			});
-		it('should requests render and reset hash when it is set',
-			function (done) {
-				var locator = createLocator(),
-					api = locator.resolveInstance(ModuleApiProvider),
-					requestRouter = locator.resolve('requestRouter'),
-					window = locator.resolve('window'),
-					rendered = false;
-				window.location.hash = 'some';
-				requestRouter.on('requestRender', function () {
-					rendered = true;
-				});
-				requestRouter.on('clearHash', function (args) {
-					assert.strictEqual(rendered, true);
-					assert.strictEqual(args.length, 0);
-					done();
-				});
-				assert.strictEqual(
-						api.requestRefresh('some', 'placeholder') instanceof
-						Promise,
-					true
-				);
-			});
-	});
-	describe('#requestRender', function () {
-		it('should just return promise', function (done) {
-			var locator = createLocator(),
-				api = locator.resolveInstance(ModuleApiProvider),
-				requestRouter = locator.resolve('requestRouter');
-			requestRouter.on('requestRender', function () {
-				done();
-			});
-
-			assert.strictEqual(
-					api.requestRender('some', 'placeholder') instanceof Promise,
-				true
-			);
-		});
-	});
-	describe('#render', function () {
-		it('should just return promise', function (done) {
-			var locator = createLocator(),
-				api = locator.resolveInstance(ModuleApiProvider),
-				templateProvider = locator.resolve('templateProvider');
-			templateProvider.on('render', function () {
-				done();
-			});
-			assert.strictEqual(
-					api.render('some-template') instanceof Promise, true
-			);
 		});
 	});
 });
@@ -142,12 +86,9 @@ function createLocator() {
 	var locator = new ServiceLocator();
 
 	var requestRouter = new UniversalMock([
-		'go', 'clearHash', 'requestRender'
+		'go', 'clearFragment'
 	]);
 	requestRouter.decorateMethod('go', function () {
-		return Promise.resolve();
-	});
-	requestRouter.decorateMethod('requestRender', function () {
 		return Promise.resolve();
 	});
 	locator.registerInstance('requestRouter', requestRouter);
@@ -157,11 +98,6 @@ function createLocator() {
 	});
 	locator.registerInstance('templateProvider', templateProvider);
 	locator.registerInstance('serviceLocator', locator);
-	locator.registerInstance('window', {
-		location: {
-			hash: ''
-		}
-	});
 	locator.registerInstance('eventBus', new events.EventEmitter());
 
 	return locator;
