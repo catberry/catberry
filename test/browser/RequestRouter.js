@@ -87,7 +87,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '"/>',
+					html: '<a href="' + link + '"></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local/some');
@@ -213,7 +213,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '"/>',
+					html: '<a href="' + link + '"></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location
@@ -276,7 +276,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '"/>',
+					html: '<a href="' + link + '"></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b');
@@ -342,7 +342,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '"/>',
+					html: '<a href="' + link + '"></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b/');
@@ -388,7 +388,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '"/>',
+					html: '<a href="' + link + '"></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location
@@ -435,7 +435,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '" target="_blank"/>',
+					html: '<a href="' + link + '" target="_blank"></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location
@@ -483,7 +483,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '" target="_blank"/>' +
+					html: '<a href="' + link + '"></a>' +
 					'<span><div></div></span>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
@@ -532,7 +532,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a href="' + link + '" />',
+					html: '<a href="' + link + '"></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location
@@ -576,7 +576,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				jsdom.env({
-					html: '<a/>',
+					html: '<a></a>',
 					done: function (errors, window) {
 						locator.registerInstance('window', window);
 						window.location
