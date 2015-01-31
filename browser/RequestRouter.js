@@ -257,10 +257,6 @@ RequestRouter.prototype._wrapDocument = function () {
  * @private
  */
 RequestRouter.prototype._linkClickHandler = function (event, element) {
-	if (!element) {
-		return Promise.resolve();
-	}
-
 	var targetAttribute = element.getAttribute(TARGET_ATTRIBUTE_NAME);
 	if (targetAttribute) {
 		return Promise.resolve();
