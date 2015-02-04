@@ -272,7 +272,7 @@ DocumentRenderer.prototype.renderComponent =
 				return self._handleError(element, component, reason);
 			})
 			.then(function () {
-				self._eventBus.emit('componentBound', componentName);
+				self._eventBus.emit('componentBound', id);
 				if (!hadChildren) {
 					return;
 				}
@@ -775,9 +775,9 @@ DocumentRenderer.prototype._initialWrap = function () {
 		});
 
 	var promises = Object.keys(this._componentInstances)
-		.map(function (componentName) {
+		.map(function (id) {
 			var bindMethod = moduleHelper.getMethodToInvoke(
-				self._componentInstances[componentName], 'bind'
+				self._componentInstances[id], 'bind'
 			);
 			var bindPromise;
 			try {
@@ -787,7 +787,7 @@ DocumentRenderer.prototype._initialWrap = function () {
 			}
 			return bindPromise
 				.then(function () {
-					self._eventBus.emit('componentBound', componentName);
+					self._eventBus.emit('componentBound', id);
 				})
 				.catch(function (reason) {
 					self._eventBus.emit('error', reason);
