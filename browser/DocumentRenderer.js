@@ -182,6 +182,9 @@ DocumentRenderer.prototype.render = function (state, routingContext) {
 				self._renderedPromise = null;
 			}
 			self._eventBus.emit('pageRendered', self._currentRoutingContext);
+		})
+		.catch(function (reason) {
+			self._eventBus.emit('error', reason);
 		});
 	this._renderedPromise = renderedPromise;
 	return renderedPromise;
@@ -269,6 +272,7 @@ DocumentRenderer.prototype.renderComponent =
 				return self._handleError(element, component, reason);
 			})
 			.then(function () {
+				self._eventBus.emit('componentBound', componentName);
 				if (!hadChildren) {
 					return;
 				}
