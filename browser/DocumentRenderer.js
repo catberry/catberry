@@ -288,9 +288,11 @@ DocumentRenderer.prototype.getComponentById = function (id) {
 /**
  * Checks that every instance of component has element on the page and
  * removes all references to removed components.
+ * @returns {Promise} Promise for nothing.
  */
 DocumentRenderer.prototype.collectGarbage = function () {
-	var self = this;
+	var self = this,
+		promises = [];
 	Object.keys(this._componentElements)
 		.forEach(function (id) {
 			if (id === HEAD_ID) {
@@ -301,11 +303,15 @@ DocumentRenderer.prototype.collectGarbage = function () {
 				return;
 			}
 
-			self._unbindComponent(element);
-			delete self._componentElements[id];
-			delete self._componentInstances[id];
-			delete self._componentBindings[id];
+			var promise = self._unbindComponent(element)
+				.then(function () {
+					delete self._componentElements[id];
+					delete self._componentInstances[id];
+					delete self._componentBindings[id];
+				});
+			promises.push(promise);
 		});
+	return Promise.all(promises);
 };
 
 /**
@@ -417,7 +423,10 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 		delete this._componentBindings[id];
 	}
 	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
-	return moduleHelper.getSafePromise(unbindMethod);
+	return moduleHelper.getSafePromise(unbindMethod)
+		.catch(function (reason) {
+			self._eventBus.emit('error', reason);
+		});
 };
 
 /**
