@@ -61,6 +61,7 @@ var HEAD_ID = '$$head',
 function DocumentRenderer($serviceLocator) {
 	DocumentRendererBase.call(this, $serviceLocator);
 	this._componentInstances = {};
+	this._componentBindings = {};
 	this._currentChangedStores = [];
 	this._window = $serviceLocator.resolve('window');
 	this._config = $serviceLocator.resolve('config');
@@ -101,6 +102,13 @@ DocumentRenderer.prototype._storeDispatcher = null;
  * @private
  */
 DocumentRenderer.prototype._componentInstances = null;
+
+/**
+ * Current set of component bindings by unique keys.
+ * @type {Object}
+ * @private
+ */
+DocumentRenderer.prototype._componentBindings = null;
 
 /**
  * Current routing context.
@@ -180,10 +188,9 @@ DocumentRenderer.prototype.renderComponent =
 			componentName = moduleHelper.getOriginalComponentName(
 					element.tagName
 			),
+			hadChildren = element.hasChildNodes(),
 			component = renderingContext.components[componentName],
-			id = element.tagName === TAG_NAMES.HEAD ?
-				HEAD_ID :
-				element.getAttribute(moduleHelper.ATTRIBUTE_ID),
+			id = getId(element),
 			instance = this._componentInstances[id];
 
 		if (!id || renderingContext.renderedIds[id]) {
@@ -246,6 +253,12 @@ DocumentRenderer.prototype.renderComponent =
 			})
 			.catch(function (reason) {
 				return self._handleError(element, component, reason);
+			})
+			.then(function () {
+				if (!hadChildren) {
+					return;
+				}
+				self._collectGarbage(renderingContext);
 			});
 	};
 
@@ -259,6 +272,26 @@ DocumentRenderer.prototype.getComponentById = function (id) {
 };
 
 /**
+ * Clears all references to removed components.
+ * @param {Object} renderingContext Context of rendering.
+ * @private
+ */
+DocumentRenderer.prototype._collectGarbage = function (renderingContext) {
+	var self = this;
+	Object.keys(renderingContext.unboundIds)
+		.forEach(function (id) {
+			// this component has been rendered again and we do not need to
+			// remove it.
+			if (renderingContext.renderedIds[id]) {
+				return;
+			}
+
+			self._componentInstances[id] = null;
+			self._componentBindings[id] = null;
+		});
+};
+
+/**
  * Unbinds all event handlers from every inner component in DOM.
  * @param {Element} element Component HTML element.
  * @param {Object} renderingContext Context of rendering.
@@ -266,13 +299,20 @@ DocumentRenderer.prototype.getComponentById = function (id) {
  * @private
  */
 DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
-	var self = this;
+	var self = this,
+		rootPromise = this._unbindComponent(element);
 
-	return this._unbindComponent(element)
+	if (!element.hasChildNodes()) {
+		return rootPromise;
+	}
+
+	return rootPromise
 		.then(function () {
 			var promises = self._findComponents(element, renderingContext)
-				.map(function (innerComponent) {
-					return self._unbindComponent(innerComponent);
+				.map(function (innerElement) {
+					var id = getId(innerElement);
+					renderingContext.unboundIds[id] = true;
+					return self._unbindComponent(innerElement);
 				});
 			return Promise.all(promises);
 		});
@@ -285,15 +325,21 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
  * @private
  */
 DocumentRenderer.prototype._unbindComponent = function (element) {
-	var id = element.tagName === TAG_NAMES.HEAD ?
-			HEAD_ID :
-			element.getAttribute(moduleHelper.ATTRIBUTE_ID),
+	var id = getId(element),
+		self = this,
 		instance = this._componentInstances[id];
 	if (!instance) {
 		return Promise.resolve();
 	}
-
-	// TODO add support for binding object and removing event handlers
+	if (this._componentBindings[id]) {
+		Object.keys(this._componentBindings[id])
+			.forEach(function (eventName) {
+				element.removeEventListener(
+					eventName, self._componentBindings[id].handler, true
+				);
+			});
+		this._componentBindings[id] = null;
+	}
 	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
 	return moduleHelper.getSafePromise(unbindMethod);
 };
@@ -305,17 +351,84 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
  * @private
  */
 DocumentRenderer.prototype._bindComponent = function (element) {
-	var id = element.tagName === TAG_NAMES.HEAD ?
-			HEAD_ID :
-			element.getAttribute(moduleHelper.ATTRIBUTE_ID),
+	var id = getId(element),
+		self = this,
 		instance = this._componentInstances[id];
 	if (!instance) {
 		return Promise.resolve();
 	}
 
-	// TODO add support for binding object
-	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'bind');
-	return moduleHelper.getSafePromise(unbindMethod);
+	var bindMethod = moduleHelper.getMethodToInvoke(instance, 'bind');
+	return moduleHelper.getSafePromise(bindMethod)
+		.then(function (bindings) {
+			if (!bindings || typeof(bindings) !== 'object') {
+				return;
+			}
+			self._componentBindings[id] = {};
+			Object.keys(bindings)
+				.forEach(function (eventName) {
+					var selectorHandlers = {};
+					Object.keys(bindings[eventName])
+						.forEach(function (selector) {
+							var handler = bindings[eventName][selector];
+							if (typeof(handler) !== 'function') {
+								return;
+							}
+							selectorHandlers[selector] = handler.bind(instance);
+						});
+					self._componentBindings[id][eventName] = {
+						handler: self._createBindingHandler(selectorHandlers),
+						selectorHandlers: selectorHandlers
+					};
+					element.addEventListener(
+						eventName,
+						self._componentBindings[id][eventName].handler, true
+					);
+				});
+		});
+};
+
+/**
+ * Creates universal event handler for delegated events.
+ * @param {Object} selectorHandlers Map of event handlers by CSS selectors.
+ * @returns {Function} Universal event handler for delegated events.
+ * @private
+ */
+DocumentRenderer.prototype._createBindingHandler = function (selectorHandlers) {
+	var selectors = Object.keys(selectorHandlers);
+	return function (event) {
+		var element = event.target,
+			targetMatches = getMatchesMethod(element),
+			isHandled = false;
+		selectors.every(function (selector) {
+			if (!targetMatches(selector)) {
+				return true;
+			}
+			isHandled = true;
+			selectorHandlers[selector](event);
+			return false;
+		});
+		if (isHandled) {
+			return;
+		}
+
+		while(element.nodeName !== TAG_NAMES.HTML) {
+			element = element.parentNode;
+			targetMatches = getMatchesMethod(element);
+			for (var i = 0; i < selectors.length; i++) {
+				if (!targetMatches(selectors[i])) {
+					continue;
+				}
+				isHandled = true;
+				selectorHandlers[selectors[i]](event);
+				break;
+			}
+
+			if (isHandled) {
+				break;
+			}
+		}
+	};
 };
 
 /**
@@ -702,6 +815,7 @@ DocumentRenderer.prototype._getRenderedPromise = function () {
  * @returns {{
  *   config: Object,
  *   renderedIds: {},
+ *   unboundIds: {},
  *   isHeadRendered: Boolean,
  *   bindMethods: Array,
  *   routingContext: Object,
@@ -720,6 +834,7 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
 	return {
 		config: this._config,
 		renderedIds: {},
+		unboundIds: {},
 		isHeadRendered: false,
 		bindMethods: [],
 		routingContext: this._currentRoutingContext,
@@ -740,4 +855,28 @@ function attributesToObject(attributes) {
 		result[attributes[i].name] = attributes[i].value;
 	}
 	return result;
+}
+
+/**
+ * Gets ID of the element.
+ * @param {Element} element HTML element of component.
+ * @returns {string} ID.
+ */
+function getId(element) {
+	return element.tagName === TAG_NAMES.HEAD ?
+		HEAD_ID :
+		element.getAttribute(moduleHelper.ATTRIBUTE_ID);
+}
+
+/**
+ * Gets cross-browser "matches" method for the element.
+ * @param {Element} element HTML element.
+ * @returns {Function} "matches" method.
+ */
+function getMatchesMethod(element) {
+	return (element.matches ||
+		element.webkitMatchesSelector ||
+		element.mozMatchesSelector ||
+		element.oMatchesSelector ||
+		element.msMatchesSelector);
 }
