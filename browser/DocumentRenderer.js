@@ -377,7 +377,9 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 							selectorHandlers[selector] = handler.bind(instance);
 						});
 					self._componentBindings[id][eventName] = {
-						handler: self._createBindingHandler(selectorHandlers),
+						handler: self._createBindingHandler(
+							element, selectorHandlers
+						),
 						selectorHandlers: selectorHandlers
 					};
 					element.addEventListener(
@@ -390,46 +392,48 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 
 /**
  * Creates universal event handler for delegated events.
+ * @param {Element} componentRoot Root element of component.
  * @param {Object} selectorHandlers Map of event handlers by CSS selectors.
  * @returns {Function} Universal event handler for delegated events.
  * @private
  */
-DocumentRenderer.prototype._createBindingHandler = function (selectorHandlers) {
-	var selectors = Object.keys(selectorHandlers);
-	return function (event) {
-		var element = event.target,
-			targetMatches = getMatchesMethod(element),
-			isHandled = false;
-		selectors.every(function (selector) {
-			if (!targetMatches(selector)) {
-				return true;
-			}
-			isHandled = true;
-			selectorHandlers[selector](event);
-			return false;
-		});
-		if (isHandled) {
-			return;
-		}
-
-		while(element.nodeName !== TAG_NAMES.HTML) {
-			element = element.parentNode;
-			targetMatches = getMatchesMethod(element);
-			for (var i = 0; i < selectors.length; i++) {
-				if (!targetMatches(selectors[i])) {
-					continue;
+DocumentRenderer.prototype._createBindingHandler =
+	function (componentRoot, selectorHandlers) {
+		var selectors = Object.keys(selectorHandlers);
+		return function (event) {
+			var element = event.target,
+				targetMatches = getMatchesMethod(element),
+				isHandled = false;
+			selectors.every(function (selector) {
+				if (!targetMatches(selector)) {
+					return true;
 				}
 				isHandled = true;
-				selectorHandlers[selectors[i]](event);
-				break;
+				selectorHandlers[selector](event);
+				return false;
+			});
+			if (isHandled) {
+				return;
 			}
 
-			if (isHandled) {
-				break;
+			while(element !== componentRoot) {
+				element = element.parentNode;
+				targetMatches = getMatchesMethod(element);
+				for (var i = 0; i < selectors.length; i++) {
+					if (!targetMatches(selectors[i])) {
+						continue;
+					}
+					isHandled = true;
+					selectorHandlers[selectors[i]](event);
+					break;
+				}
+
+				if (isHandled) {
+					break;
+				}
 			}
-		}
+		};
 	};
-};
 
 /**
  * Finds all components that are children of specified element.
