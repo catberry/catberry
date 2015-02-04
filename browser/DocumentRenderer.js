@@ -40,6 +40,10 @@ var util = require('util'),
 util.inherits(DocumentRenderer, DocumentRendererBase);
 
 var HEAD_ID = '$$head',
+	ERROR_CREATE_WRONG_ARGUMENTS = 'Tag name should be a string ' +
+		'and attributes should be an object',
+	ERROR_CREATE_WRONG_NAME = 'Component for tag "%s" not found',
+	ERROR_CREATE_WRONG_ID = 'The ID "%s" is already used',
 	TAG_NAMES = {
 		TITLE: 'TITLE',
 		HTML: 'HTML',
@@ -61,6 +65,7 @@ var HEAD_ID = '$$head',
 function DocumentRenderer($serviceLocator) {
 	DocumentRendererBase.call(this, $serviceLocator);
 	this._componentInstances = {};
+	this._componentElements = {};
 	this._componentBindings = {};
 	this._currentChangedStores = [];
 	this._window = $serviceLocator.resolve('window');
@@ -102,6 +107,13 @@ DocumentRenderer.prototype._storeDispatcher = null;
  * @private
  */
 DocumentRenderer.prototype._componentInstances = null;
+
+/**
+ * Current set of component elements by unique keys.
+ * @type {Object}
+ * @private
+ */
+DocumentRenderer.prototype._componentElements = null;
 
 /**
  * Current set of component bindings by unique keys.
@@ -193,7 +205,7 @@ DocumentRenderer.prototype.renderComponent =
 			id = getId(element),
 			instance = this._componentInstances[id];
 
-		if (!id || renderingContext.renderedIds[id]) {
+		if (!id || renderingContext.renderedIds.hasOwnProperty(id)) {
 			return Promise.resolve();
 		}
 
@@ -215,6 +227,8 @@ DocumentRenderer.prototype.renderComponent =
 		};
 
 		renderingContext.renderedIds[id] = true;
+		this._componentElements[id] = element;
+
 		var startTime = Date.now();
 		this._eventBus.emit('componentRender', eventArgs);
 
@@ -258,7 +272,7 @@ DocumentRenderer.prototype.renderComponent =
 				if (!hadChildren) {
 					return;
 				}
-				self._collectGarbage(renderingContext);
+				self._collectRenderingGarbage(renderingContext);
 			});
 	};
 
@@ -272,24 +286,86 @@ DocumentRenderer.prototype.getComponentById = function (id) {
 };
 
 /**
- * Clears all references to removed components.
- * @param {Object} renderingContext Context of rendering.
- * @private
+ * Checks that every instance of component has element on the page and
+ * removes all references to removed components.
  */
-DocumentRenderer.prototype._collectGarbage = function (renderingContext) {
+DocumentRenderer.prototype.collectGarbage = function () {
 	var self = this;
-	Object.keys(renderingContext.unboundIds)
+	Object.keys(this._componentElements)
 		.forEach(function (id) {
-			// this component has been rendered again and we do not need to
-			// remove it.
-			if (renderingContext.renderedIds[id]) {
+			if (id === HEAD_ID) {
+				return;
+			}
+			var element = self._window.document.getElementById(id);
+			if (element) {
 				return;
 			}
 
-			self._componentInstances[id] = null;
-			self._componentBindings[id] = null;
+			self._unbindComponent(element);
+			delete self._componentElements[id];
+			delete self._componentInstances[id];
+			delete self._componentBindings[id];
 		});
 };
+
+/**
+ * Creates and renders component element.
+ * @param {String} tagName Name of HTML tag.
+ * @param {Object} attributes Element attributes.
+ * @returns {Promise<Element>} Promise for HTML element with rendered component.
+ */
+DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
+	if (typeof(tagName) !== 'string' || !attributes ||
+		typeof(attributes) !== 'object') {
+		throw new Error(ERROR_CREATE_WRONG_ARGUMENTS);
+	}
+
+	var components = this._componentLoader.getComponentsByNames(),
+		componentName = moduleHelper.getOriginalComponentName(tagName);
+	if (moduleHelper.isHeadComponent(componentName) ||
+		moduleHelper.isDocumentComponent(componentName) ||
+		!components.hasOwnProperty(componentName)) {
+		throw new Error(util.format(ERROR_CREATE_WRONG_NAME, tagName));
+	}
+
+	var id = attributes[moduleHelper.ATTRIBUTE_ID];
+	if (!id || this._componentInstances.hasOwnProperty(id)) {
+		throw new Error(util.format(ERROR_CREATE_WRONG_ID, id));
+	}
+
+	var element = this._window.document.createElement(tagName);
+	Object.keys(attributes)
+		.forEach(function (attributeName) {
+			element.setAttribute(attributeName, attributes[attributeName]);
+		});
+
+	return this.renderComponent(element)
+		.then(function () {
+			return element;
+		});
+};
+
+/**
+ * Clears all references to removed components during rendering.
+ * @param {Object} renderingContext Context of rendering.
+ * @private
+ */
+DocumentRenderer.prototype._collectRenderingGarbage =
+	function (renderingContext) {
+		var self = this;
+		Object.keys(renderingContext.unboundIds)
+			.forEach(function (id) {
+				// this component has been rendered again and we do not need to
+				// remove it.
+				if (renderingContext.renderedIds.hasOwnProperty(id)) {
+					return;
+				}
+
+				delete self._componentElements[id];
+				delete self._componentInstances[id];
+				delete self._componentBindings[id];
+			});
+	};
 
 /**
  * Unbinds all event handlers from every inner component in DOM.
@@ -331,14 +407,14 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 	if (!instance) {
 		return Promise.resolve();
 	}
-	if (this._componentBindings[id]) {
+	if (this._componentBindings.hasOwnProperty(id)) {
 		Object.keys(this._componentBindings[id])
 			.forEach(function (eventName) {
 				element.removeEventListener(
 					eventName, self._componentBindings[id].handler, true
 				);
 			});
-		this._componentBindings[id] = null;
+		delete this._componentBindings[id];
 	}
 	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
 	return moduleHelper.getSafePromise(unbindMethod);
@@ -547,9 +623,7 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 	for (i = 0; i < newHead.childNodes.length; i++) {
 		current = newHead.childNodes[i];
 
-		//var wrapped = self.$(this), key, oldKey, oldItem;
-
-		if (!(current.tagName in map)) {
+		if (!map.hasOwnProperty(current.tagName)) {
 			map[current.tagName] = {};
 		}
 
@@ -572,7 +646,7 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 			// but we should not delete and append same elements
 			case TAG_NAMES.META:
 				key = self._getElementKey(current);
-				if (key in map[current.tagName]) {
+				if (map[current.tagName].hasOwnProperty(key)) {
 					sameMetaElements[key] = true;
 				} else {
 					head.appendChild(current);
@@ -585,18 +659,18 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 			case TAG_NAMES.LINK:
 			case TAG_NAMES.SCRIPT:
 				key = self._getElementKey(current);
-				if (!(key in map[current.tagName])) {
+				if (map[current.tagName].hasOwnProperty(key)) {
 					head.appendChild(current);
 				}
 				break;
 		}
 	}
 
-	if (TAG_NAMES.META in map) {
+	if (map.hasOwnProperty(TAG_NAMES.META)) {
 		// remove meta tags which a not in a new head state
 		Object.keys(map[TAG_NAMES.META])
 			.forEach(function (metaKey) {
-				if (metaKey in sameMetaElements) {
+				if (sameMetaElements.hasOwnProperty(metaKey)) {
 					return;
 				}
 
@@ -620,7 +694,7 @@ DocumentRenderer.prototype._getHeadMap = function (headChildren) {
 
 	for (i = 0; i < headChildren.length; i++) {
 		current = headChildren[i];
-		if (!(current.tagName in map)) {
+		if (map.hasOwnProperty(current.tagName)) {
 			map[current.tagName] = {};
 		}
 		map[current.tagName][self._getElementKey(current)] = current;
@@ -726,11 +800,17 @@ DocumentRenderer.prototype._getComponentContext =
 			componentContext = Object.create(this._currentRoutingContext);
 
 		componentContext.element = element;
-		componentContext.getElementById = function (id) {
-			self.getComponentById(id);
-		};
 		componentContext.name = component.name;
 		componentContext.attributes = attributesToObject(element.attributes);
+		componentContext.getComponentById = function (id) {
+			return self.getComponentById(id);
+		};
+		componentContext.createComponent = function (tagName, attributes) {
+			return self.createComponent(tagName, attributes);
+		};
+		componentContext.collectGarbage = function () {
+			return self.collectGarbage();
+		};
 		componentContext.getStoreData = function () {
 			return self._renderingContext.storeDispatcher
 				.getStoreData(storeName);
@@ -785,20 +865,21 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 					currentId = current.getAttribute(moduleHelper.ATTRIBUTE_ID);
 
 					// is not a component
-					if (!(currentId in self._componentInstances)) {
+					if (self._componentInstances.hasOwnProperty(currentId)) {
 						continue;
 					}
 
 					// store did not change state
-					if (!(current.getAttribute(moduleHelper.ATTRIBUTE_STORE) in
-						changedStoreNames)) {
+					if (!changedStoreNames.hasOwnProperty(
+							current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
+						)) {
 						continue;
 					}
 
 					lastRoot = current;
 					lastRootId = currentId;
 				}
-				if (lastRootId in rootsSet) {
+				if (rootsSet.hasOwnProperty(lastRootId)) {
 					return;
 				}
 				rootsSet[lastRootId] = true;
