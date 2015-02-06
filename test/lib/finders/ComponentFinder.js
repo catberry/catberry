@@ -114,6 +114,7 @@ describe('lib/finders/ComponentFinder', function () {
 
 function createLocator(config) {
 	var locator = new ServiceLocator();
+	config.componentsGlob = '**/test-cat-component.json';
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	locator.registerInstance('eventBus', new events.EventEmitter());
