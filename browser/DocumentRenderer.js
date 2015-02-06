@@ -208,13 +208,15 @@ DocumentRenderer.prototype.renderComponent =
 			id = getId(element),
 			instance = this._componentInstances[id];
 
+		if (!component) {
+			return Promise.resolve();
+		}
+
 		if (!id || renderingContext.renderedIds.hasOwnProperty(id)) {
 			return Promise.resolve();
 		}
 
-		if (!component) {
-			return Promise.resolve();
-		}
+		renderingContext.renderedIds[id] = true;
 
 		if (!instance) {
 			instance = this._serviceLocator.resolveInstance(
@@ -229,7 +231,6 @@ DocumentRenderer.prototype.renderComponent =
 			context: instance.$context
 		};
 
-		renderingContext.renderedIds[id] = true;
 		this._componentElements[id] = element;
 
 		var startTime = Date.now();
@@ -272,7 +273,6 @@ DocumentRenderer.prototype.renderComponent =
 				return self._handleError(element, component, reason);
 			})
 			.then(function () {
-				self._eventBus.emit('componentBound', id);
 				if (!hadChildren) {
 					return;
 				}
@@ -421,7 +421,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 		Object.keys(this._componentBindings[id])
 			.forEach(function (eventName) {
 				element.removeEventListener(
-					eventName, self._componentBindings[id].handler, true
+					eventName, self._componentBindings[id][eventName].handler
 				);
 			});
 		delete this._componentBindings[id];
@@ -473,9 +473,10 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 					};
 					element.addEventListener(
 						eventName,
-						self._componentBindings[id][eventName].handler, true
+						self._componentBindings[id][eventName].handler
 					);
 				});
+			self._eventBus.emit('componentBound', id);
 		});
 };
 
@@ -502,6 +503,7 @@ DocumentRenderer.prototype._createBindingHandler =
 				return false;
 			});
 			if (isHandled) {
+				event.stopPropagation();
 				return;
 			}
 
@@ -518,6 +520,7 @@ DocumentRenderer.prototype._createBindingHandler =
 				}
 
 				if (isHandled) {
+					event.stopPropagation();
 					break;
 				}
 			}
@@ -535,9 +538,10 @@ DocumentRenderer.prototype._findComponents =
 		var components = [];
 		renderingContext.componentTags
 			.forEach(function (tag) {
-				components = components.concat(
-					element.getElementsByTagName(tag)
-				);
+				var nodes = element.getElementsByTagName(tag);
+				for(var i = 0; i < nodes.length; i++) {
+					components.push(nodes[i]);
+				}
 			});
 		return components;
 	};
@@ -640,7 +644,7 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 			map[current.tagName] = {};
 		}
 
-		switch (this.tagName) {
+		switch (current.tagName) {
 			// these elements can be only replaced
 			case TAG_NAMES.TITLE:
 			case TAG_NAMES.BASE:
@@ -653,6 +657,9 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 				} else {
 					head.appendChild(current);
 				}
+				// when we do replace or append current is removed from newHead
+				// therefore we need to decrement index
+				i--;
 				break;
 
 			// meta elements can be deleted
@@ -663,6 +670,7 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 					sameMetaElements[key] = true;
 				} else {
 					head.appendChild(current);
+					i--;
 				}
 				break;
 
@@ -672,8 +680,9 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 			case TAG_NAMES.LINK:
 			case TAG_NAMES.SCRIPT:
 				key = self._getElementKey(current);
-				if (map[current.tagName].hasOwnProperty(key)) {
+				if (!map[current.tagName].hasOwnProperty(key)) {
 					head.appendChild(current);
+					i--;
 				}
 				break;
 		}
@@ -707,7 +716,7 @@ DocumentRenderer.prototype._getHeadMap = function (headChildren) {
 
 	for (i = 0; i < headChildren.length; i++) {
 		current = headChildren[i];
-		if (map.hasOwnProperty(current.tagName)) {
+		if (!map.hasOwnProperty(current.tagName)) {
 			map[current.tagName] = {};
 		}
 		map[current.tagName][self._getElementKey(current)] = current;
@@ -722,8 +731,7 @@ DocumentRenderer.prototype._getHeadMap = function (headChildren) {
  * @private
  */
 DocumentRenderer.prototype._getElementKey = function (element) {
-	var content = element ? element.innerHTML : '',
-		current, i,
+	var current, i,
 		attributes = [];
 
 	if (element.hasAttributes()) {
@@ -735,7 +743,7 @@ DocumentRenderer.prototype._getElementKey = function (element) {
 
 	return attributes
 			.sort()
-			.join('|') + content;
+			.join('|') + '>' + element.textContent;
 };
 
 /**
@@ -745,7 +753,9 @@ DocumentRenderer.prototype._getElementKey = function (element) {
 DocumentRenderer.prototype._initialWrap = function () {
 	var self = this,
 		current, i, id, instance,
-		components = this._componentLoader.getComponentsByNames();
+		components = this._componentLoader.getComponentsByNames(),
+		bindPromises = [];
+
 	Object.keys(components)
 		.forEach(function (componentName) {
 			var tagName = moduleHelper
@@ -771,29 +781,11 @@ DocumentRenderer.prototype._initialWrap = function () {
 					attributes: instance.$context.attributes,
 					context: instance.$context
 				});
+				bindPromises.push(self._bindComponent(current));
 			}
 		});
 
-	var promises = Object.keys(this._componentInstances)
-		.map(function (id) {
-			var bindMethod = moduleHelper.getMethodToInvoke(
-				self._componentInstances[id], 'bind'
-			);
-			var bindPromise;
-			try {
-				bindPromise = Promise.resolve(bindMethod());
-			} catch (e) {
-				bindPromise = Promise.reject(e);
-			}
-			return bindPromise
-				.then(function () {
-					self._eventBus.emit('componentBound', id);
-				})
-				.catch(function (reason) {
-					self._eventBus.emit('error', reason);
-				});
-		});
-	return Promise.all(promises)
+	return Promise.all(bindPromises)
 		.then(function () {
 			self._eventBus.emit('pageRendered', self._currentRoutingContext);
 		});
@@ -972,9 +964,11 @@ function getId(element) {
  * @returns {Function} "matches" method.
  */
 function getMatchesMethod(element) {
-	return (element.matches ||
+	var method =  (element.matches ||
 		element.webkitMatchesSelector ||
 		element.mozMatchesSelector ||
 		element.oMatchesSelector ||
 		element.msMatchesSelector);
+
+	return method.bind(element);
 }

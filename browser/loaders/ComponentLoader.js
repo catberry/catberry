@@ -126,7 +126,7 @@ ComponentLoader.prototype.load = function () {
 		});
 	this._loadedComponents = components;
 	this._eventBus.emit('allComponentsLoaded', components);
-	return components;
+	return Promise.resolve(components);
 };
 
 /**

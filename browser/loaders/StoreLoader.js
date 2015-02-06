@@ -87,7 +87,7 @@ StoreLoader.prototype.load = function () {
 		});
 	this._loadedStores = stores;
 	this._eventBus.emit('allStoresLoaded', stores);
-	return stores;
+	return Promise.resolve(stores);
 };
 
 /**
