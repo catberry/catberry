@@ -43,7 +43,7 @@ var HEAD_ID = '$$head',
 	ERROR_CREATE_WRONG_ARGUMENTS = 'Tag name should be a string ' +
 		'and attributes should be an object',
 	ERROR_CREATE_WRONG_NAME = 'Component for tag "%s" not found',
-	ERROR_CREATE_WRONG_ID = 'The ID "%s" is already used',
+	ERROR_CREATE_WRONG_ID = 'The ID is not specified or already used',
 	TAG_NAMES = {
 		TITLE: 'TITLE',
 		HTML: 'HTML',
@@ -327,7 +327,9 @@ DocumentRenderer.prototype.collectGarbage = function () {
 DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 	if (typeof(tagName) !== 'string' || !attributes ||
 		typeof(attributes) !== 'object') {
-		throw new Error(ERROR_CREATE_WRONG_ARGUMENTS);
+		return Promise.reject(
+			new Error(ERROR_CREATE_WRONG_ARGUMENTS)
+		);
 	}
 
 	var components = this._componentLoader.getComponentsByNames(),
@@ -335,12 +337,14 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 	if (moduleHelper.isHeadComponent(componentName) ||
 		moduleHelper.isDocumentComponent(componentName) ||
 		!components.hasOwnProperty(componentName)) {
-		throw new Error(util.format(ERROR_CREATE_WRONG_NAME, tagName));
+		return Promise.reject(
+			new Error(util.format(ERROR_CREATE_WRONG_NAME, tagName))
+		);
 	}
 
 	var id = attributes[moduleHelper.ATTRIBUTE_ID];
 	if (!id || this._componentInstances.hasOwnProperty(id)) {
-		throw new Error(util.format(ERROR_CREATE_WRONG_ID, id));
+		return Promise.reject(new Error(ERROR_CREATE_WRONG_ID));
 	}
 
 	var element = this._window.document.createElement(tagName);
