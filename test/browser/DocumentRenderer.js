@@ -33,6 +33,7 @@
 var assert = require('assert'),
 	events = require('events'),
 	jsdom = require('jsdom'),
+	StoreDispatcher = require('../../lib/StoreDispatcher'),
 	Component = require('../mocks/components/Component'),
 	DataStore = require('../mocks/stores/DataStore'),
 	ComponentAsync = require('../mocks/components/ComponentAsync'),
@@ -950,27 +951,664 @@ describe('browser/DocumentRenderer', function () {
 
 		it('should use the same component instance ' +
 		'if it\'s element recreated after rendering', function (done) {
-			done();
+			var instances = {
+				first: [],
+				second: [],
+				third: []
+			};
+			function Component1() {
+				instances.first.push(this);
+			}
+			Component1.prototype.render = function () {
+				return this.$context;
+			};
+			function Component2() {
+				instances.second.push(this);
+			}
+			Component2.prototype.render = function () {
+				return this.$context;
+			};
+			function Component3() {
+				instances.third.push(this);
+			}
+			Component3.prototype.render = function () {
+				return this.$context;
+			};
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component1,
+					templateSource: '<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2"/>'
+				},
+				{
+					name: 'test2',
+					constructor: Component2,
+					templateSource: '<span>' +
+					'Hello from test2' +
+					'<cat-test3 id="unique3"/>' +
+					'</span>'
+				},
+				{
+					name: 'test3',
+					constructor: Component3,
+					templateSource: 'Hello from test3'
+
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer),
+						element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique1');
+					renderer.renderComponent(element)
+						.then(function () {
+							return renderer.renderComponent(element);
+						})
+						.then(function () {
+							return renderer.renderComponent(element);
+						})
+						.then(function () {
+							assert.strictEqual(instances.first.length, 1);
+							assert.strictEqual(instances.second.length, 1);
+							assert.strictEqual(instances.third.length, 1);
+							done();
+						})
+						.catch(done);
+				}
+			});
 		});
 
 		it('should use new component instance ' +
 		'if it\'s element removed after rendering', function (done) {
-			done();
+			var instances = {
+				first: [],
+				second: [],
+				third: []
+			};
+			var templates = {},
+				counter = 0,
+				templateProvider = {
+					registerCompiled: function (name, source) {
+						templates[name] = source;
+					},
+					render: function (name, data) {
+						if (counter % 2 === 0) {
+							return Promise.resolve('');
+						}
+
+						return Promise.resolve(templates[name]);
+					}
+				};
+			function Component1() {
+				instances.first.push(this);
+			}
+			Component1.prototype.render = function () {
+				return this.$context;
+			};
+			function Component2() {
+				instances.second.push(this);
+			}
+			Component2.prototype.render = function () {
+				return this.$context;
+			};
+			function Component3() {
+				instances.third.push(this);
+			}
+			Component3.prototype.render = function () {
+				return this.$context;
+			};
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component1,
+					templateSource: '<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2"/>'
+				},
+				{
+					name: 'test2',
+					constructor: Component2,
+					templateSource: '<span>' +
+					'Hello from test2' +
+					'<cat-test3 id="unique3"/>' +
+					'</span>'
+				},
+				{
+					name: 'test3',
+					constructor: Component3,
+					templateSource: 'Hello from test3'
+
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					locator.registerInstance(
+						'templateProvider', templateProvider
+					);
+					var renderer = locator.resolveInstance(DocumentRenderer),
+						element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique1');
+					counter++;
+					renderer.renderComponent(element)
+						.then(function () {
+							counter++;
+							return renderer.renderComponent(element);
+						})
+						.then(function () {
+							counter++;
+							return renderer.renderComponent(element);
+						})
+						.then(function () {
+							assert.strictEqual(instances.first.length, 1);
+							assert.strictEqual(instances.second.length, 2);
+							assert.strictEqual(instances.third.length, 2);
+							done();
+						})
+						.catch(done);
+				}
+			});
 		});
 	});
 
 	describe('#render', function () {
 		it('should update all components ' +
-		'that depend on changed stores', function (done) {
-			done();
+		'that depend on changed stores in descending order', function (done) {
+			var renders = [];
+			function Component1() {}
+			Component1.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component2() {}
+			Component2.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component3() {}
+			Component3.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component1,
+					templateSource: '<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2"/>'
+				},
+				{
+					name: 'test2',
+					constructor: Component2,
+					templateSource: '<span>' +
+					'Hello from test2' +
+					'<cat-test3 id="unique3"/>' +
+					'</span>'
+				},
+				{
+					name: 'test3',
+					constructor: Component3,
+					templateSource: 'Hello from test3'
+				}
+			];
+
+			var stores = [
+				{name: 'store1', constructor: DataStore},
+				{name: 'store2', constructor: DataStore},
+				{name: 'store3', constructor: DataStore}
+			];
+			var html = '<cat-test1 id="unique1" cat-store="store2">' +
+					'test1<br>' +
+					'<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2">' +
+						'test2<br>' +
+						'<span>' +
+						'Hello from test2' +
+							'<cat-test3 id="unique3" cat-store="store1">' +
+							'test3<br>' +
+							'Hello from test3' +
+							'</cat-test3>' +
+						'</span>' +
+					'</cat-test2>' +
+				'</cat-test1>' +
+				'<cat-test3 id="unique4" cat-store="store1">' +
+					'test3<br>' +
+					'Hello from test3' +
+				'</cat-test3>';
+
+			var locator = createLocator(components, {}, stores),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: html,
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+
+					renderer.render({}, {})
+						.then(function () {
+							return renderer.render(
+								{store1: {}, store2: {}, store3: {}}, {}
+							);
+						})
+						.then(function () {
+							assert.strictEqual(renders.length, 4);
+							assert.strictEqual(renders[0], 'unique4');
+							assert.strictEqual(renders[1], 'unique1');
+							assert.strictEqual(renders[2], 'unique2');
+							assert.strictEqual(renders[3], 'unique3');
+							done();
+						})
+						.catch(done);
+				}
+			});
+		});
+
+		it('should update all components ' +
+		'that depend on changed store by .changed() method', function (done) {
+			var renders = [];
+			function Component1() {
+				var self = this;
+				setTimeout(function () {
+					self.$context.sendAction('test');
+				}, 10);
+			}
+			Component1.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component2() {}
+			Component2.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component3() {}
+			Component3.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function TimerStore() {}
+			TimerStore.prototype.handleTest = function () {
+				var self = this;
+				setTimeout(function () {
+					self.$context.changed();
+				}, 10);
+			};
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component1,
+					templateSource: '<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2"/>'
+				},
+				{
+					name: 'test2',
+					constructor: Component2,
+					templateSource: '<span>' +
+					'Hello from test2' +
+					'<cat-test3 id="unique3"/>' +
+					'</span>'
+				},
+				{
+					name: 'test3',
+					constructor: Component3,
+					templateSource: 'Hello from test3'
+				}
+			];
+
+			var stores = [
+				{name: 'store1', constructor: DataStore},
+				{name: 'store2', constructor: TimerStore},
+				{name: 'store3', constructor: DataStore}
+			];
+			var html = '<cat-test1 id="unique1" cat-store="store2">' +
+					'test1<br>' +
+					'<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2">' +
+						'test2<br>' +
+						'<span>' +
+						'Hello from test2' +
+						'<cat-test3 id="unique3" cat-store="store1">' +
+							'test3<br>' +
+							'Hello from test3' +
+						'</cat-test3>' +
+						'</span>' +
+					'</cat-test2>' +
+					'</cat-test1>' +
+				'<cat-test3 id="unique4" cat-store="store2">' +
+				'test3<br>' +
+				'Hello from test3' +
+				'</cat-test3>';
+
+			var locator = createLocator(components, {}, stores),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: html,
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.render({}, {})
+						.then(function () {
+							eventBus.on('pageRendered', function () {
+								assert.strictEqual(renders.length, 4);
+								assert.strictEqual(renders[0], 'unique4');
+								assert.strictEqual(renders[1], 'unique1');
+								assert.strictEqual(renders[2], 'unique2');
+								assert.strictEqual(renders[3], 'unique3');
+								done();
+							});
+						});
+				}
+			});
+		});
+
+		it('should update all components ' +
+		'that depend on changed stores by .changed() method', function (done) {
+			var renders = [];
+			function Component1() {
+				var self = this;
+				setTimeout(function () {
+					self.$context.sendBroadcastAction('test', 10);
+				}, 10);
+			}
+			Component1.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component2() {}
+			Component2.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component3() {}
+			Component3.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function TimerStore() {}
+			TimerStore.prototype.handleTest = function (delay) {
+				var self = this;
+				setTimeout(function () {
+					self.$context.changed();
+				}, delay);
+			};
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component1,
+					templateSource: '<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2"/>'
+				},
+				{
+					name: 'test2',
+					constructor: Component2,
+					templateSource: '<span>' +
+					'Hello from test2' +
+					'<cat-test3 id="unique3"/>' +
+					'</span>'
+				},
+				{
+					name: 'test3',
+					constructor: Component3,
+					templateSource: 'Hello from test3'
+				}
+			];
+
+			var stores = [
+				{name: 'store1', constructor: TimerStore},
+				{name: 'store2', constructor: TimerStore},
+				{name: 'store3', constructor: TimerStore}
+			];
+			var html = '<cat-test1 id="unique1" cat-store="store2">' +
+					'test1<br>' +
+					'<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2">' +
+						'test2<br>' +
+						'<span>' +
+						'Hello from test2' +
+						'<cat-test3 id="unique3" cat-store="store1">' +
+							'test3<br>' +
+							'Hello from test3' +
+						'</cat-test3>' +
+						'</span>' +
+					'</cat-test2>' +
+					'</cat-test1>' +
+					'<cat-test3 id="unique4" cat-store="store3">' +
+					'test3<br>' +
+					'Hello from test3' +
+				'</cat-test3>';
+
+			var locator = createLocator(components, {}, stores),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: html,
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.render({}, {});
+					setTimeout(function () {
+						assert.strictEqual(renders.length, 4);
+						assert.strictEqual(renders[0], 'unique4');
+						assert.strictEqual(renders[1], 'unique1');
+						assert.strictEqual(renders[2], 'unique2');
+						assert.strictEqual(renders[3], 'unique3');
+						done();
+					}, 1000);
+				}
+			});
 		});
 
 		it('should do nothing if nothing changes', function (done) {
-			done();
+			var renders = [];
+			function Component1() {}
+			Component1.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component2() {}
+			Component2.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			function Component3() {}
+			Component3.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				return this.$context;
+			};
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component1,
+					templateSource: '<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2"/>'
+				},
+				{
+					name: 'test2',
+					constructor: Component2,
+					templateSource: '<span>' +
+					'Hello from test2' +
+					'<cat-test3 id="unique3"/>' +
+					'</span>'
+				},
+				{
+					name: 'test3',
+					constructor: Component3,
+					templateSource: 'Hello from test3'
+				}
+			];
+
+			var stores = [
+				{name: 'store1', constructor: DataStore},
+				{name: 'store2', constructor: DataStore},
+				{name: 'store3', constructor: DataStore}
+			];
+			var html = '<cat-test1 id="unique1" cat-store="store2">' +
+				'test1<br>' +
+				'<div>Hello from test1</div>' +
+				'<cat-test2 id="unique2">' +
+				'test2<br>' +
+				'<span>' +
+				'Hello from test2' +
+				'<cat-test3 id="unique3" cat-store="store1">' +
+				'test3<br>' +
+				'Hello from test3' +
+				'</cat-test3>' +
+				'</span>' +
+				'</cat-test2>' +
+				'</cat-test1>' +
+				'<cat-test3 id="unique4" cat-store="store1">' +
+				'test3<br>' +
+				'Hello from test3' +
+				'</cat-test3>';
+
+			var state = {store1: {}, store2: {}, store3: {}},
+				locator = createLocator(components, {}, stores),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: html,
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+
+					renderer.render(state, {})
+						.then(function () {
+							return renderer.render(state, {});
+						})
+						.then(function () {
+							assert.strictEqual(renders.length, 0);
+							done();
+						})
+						.catch(done);
+				}
+			});
 		});
 
 		it('should not do rendering concurrently', function (done) {
-			done();
+			var renders = [];
+			function Component1() {}
+			Component1.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				var self = this;
+				return new Promise(function (fulfill) {
+					setTimeout(function () {
+						fulfill(self.$context);
+					}, 10);
+				});
+			};
+			function Component2() {}
+			Component2.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				var self = this;
+				return new Promise(function (fulfill) {
+					setTimeout(function () {
+						fulfill(self.$context);
+					}, 10);
+				});
+			};
+			function Component3() {}
+			Component3.prototype.render = function () {
+				renders.push(this.$context.attributes.id);
+				var self = this;
+				return new Promise(function (fulfill) {
+					setTimeout(function () {
+						fulfill(self.$context);
+					}, 10);
+				});
+			};
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component1,
+					templateSource: '<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2"/>'
+				},
+				{
+					name: 'test2',
+					constructor: Component2,
+					templateSource: '<span>' +
+					'Hello from test2' +
+					'<cat-test3 id="unique3"/>' +
+					'</span>'
+				},
+				{
+					name: 'test3',
+					constructor: Component3,
+					templateSource: 'Hello from test3'
+				}
+			];
+
+			var stores = [
+				{name: 'store1', constructor: DataStore},
+				{name: 'store2', constructor: DataStore},
+				{name: 'store3', constructor: DataStore}
+			];
+			var html = '<cat-test1 id="unique1" cat-store="store2">' +
+					'test1<br>' +
+					'<div>Hello from test1</div>' +
+					'<cat-test2 id="unique2" cat-store="store3">' +
+						'test2<br>' +
+						'<span>' +
+						'Hello from test2' +
+						'<cat-test3 id="unique3" cat-store="store1">' +
+							'test3<br>' +
+							'Hello from test3' +
+						'</cat-test3>' +
+						'</span>' +
+					'</cat-test2>' +
+					'</cat-test1>' +
+				'<cat-test3 id="unique4" cat-store="store1">' +
+				'test3<br>' +
+				'Hello from test3' +
+				'</cat-test3>';
+
+			var locator = createLocator(components, {}, stores),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: html,
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+
+					renderer.render({}, {})
+						.then(function () {
+							renderer.render({store1: {}}, {});
+							renderer.render({store1: {}, store2: {}}, {});
+							return renderer.render(
+								{store1: {}, store2: {}, store3: {}}, {}
+							);
+						})
+						.then(function () {
+							assert.strictEqual(renders.length, 5);
+							assert.strictEqual(renders[0], 'unique3');
+							assert.strictEqual(renders[1], 'unique4');
+							assert.strictEqual(renders[2], 'unique1');
+							assert.strictEqual(renders[3], 'unique2');
+							assert.strictEqual(renders[4], 'unique3');
+							done();
+						})
+						.catch(done);
+				}
+			});
 		});
 	});
 
@@ -1172,29 +1810,69 @@ describe('browser/DocumentRenderer', function () {
 			});
 		});
 	});
+
+	describe('#collectGarbage', function () {
+		it('should unlink component if it is not in DOM', function (done) {
+			var components = [
+				{
+					name: 'test',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			var expected = 'test<br><div>Hello, World!</div>';
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer),
+						element = window.document.createElement('cat-test');
+					element.setAttribute('id', 'unique');
+					renderer.renderComponent(element)
+						.then(function () {
+							var instance = renderer.getComponentById('unique');
+							assert.strictEqual(
+								instance instanceof Component, true
+							);
+							return renderer.collectGarbage();
+						})
+						.then(function () {
+							var instance = renderer.getComponentById('unique');
+							assert.strictEqual(instance, null);
+							done();
+						})
+						.catch(done);
+				}
+			});
+		});
+	});
 });
 
-function createLocator(components, config) {
+function createLocator(components, config, stores) {
 	var locator = new ServiceLocator();
 	components.forEach(function (component) {
 		locator.registerInstance('component', component);
 	});
 
-	locator.registerInstance('Store', {name: 'store', constructor: DataStore});
+	if (stores) {
+		stores.forEach(function (store) {
+			locator.registerInstance('store', store);
+		});
+	}
 
-	locator.register('componentLoader', ComponentLoader, config);
-	locator.register('storeLoader', StoreLoader, config);
-	locator.register('contextFactory', ContextFactory, config);
+	locator.register('componentLoader', ComponentLoader, config, true);
+	locator.register('storeLoader', StoreLoader, config, true);
+	locator.register('contextFactory', ContextFactory, config, true);
 	locator.register('moduleApiProvider', ModuleApiProvider, config);
 	locator.register('cookieWrapper', CookieWrapper, config);
+	locator.register('storeDispatcher', StoreDispatcher);
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	locator.registerInstance('eventBus', new events.EventEmitter());
-	locator.registerInstance('storeDispatcher', {
-		setState: function () {
-			return [];
-		}
-	});
 
 	var templates = {};
 	locator.registerInstance('templateProvider', {

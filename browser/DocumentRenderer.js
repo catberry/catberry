@@ -67,17 +67,18 @@ function DocumentRenderer($serviceLocator) {
 	this._componentInstances = {};
 	this._componentElements = {};
 	this._componentBindings = {};
-	this._currentChangedStores = [];
+	this._currentChangedStores = {};
 	this._window = $serviceLocator.resolve('window');
 	this._config = $serviceLocator.resolve('config');
 	this._storeDispatcher = $serviceLocator.resolve('storeDispatcher');
 
 	var self = this;
 	this._eventBus.on('storeChanged', function (storeName) {
+		self._currentChangedStores[storeName] = true;
 		if (self._isStateChanging) {
 			return;
 		}
-		self._updateStoreComponents(storeName);
+		self._updateStoreComponents();
 	});
 	// need to run all bind methods and events for components
 	// have been rendered at server after all modules will be resolved from
@@ -130,25 +131,25 @@ DocumentRenderer.prototype._componentBindings = null;
 DocumentRenderer.prototype._currentRoutingContext = null;
 
 /**
- * Current queue of changed stores.
- * @type {Array}
+ * Current set of changed stores.
+ * @type {Object}
  * @private
  */
 DocumentRenderer.prototype._currentChangedStores = null;
 
 /**
- * Current promise for rendered data.
+ * Current promise for rendered page.
  * @type {Promise}
  * @private
  */
 DocumentRenderer.prototype._renderedPromise = null;
 
 /**
- * Determines the process of changing application state.
+ * Current state of updating components.
  * @type {boolean}
  * @private
  */
-DocumentRenderer.prototype._isStateChanging = false;
+DocumentRenderer.prototype._isUpdating = false;
 
 /**
  * Renders new state of application.
@@ -157,37 +158,44 @@ DocumentRenderer.prototype._isStateChanging = false;
  * @returns {Promise} Promise for nothing.
  */
 DocumentRenderer.prototype.render = function (state, routingContext) {
-	var self = this;
-	var renderedPromise = this._getRenderedPromise()
-		.then(function () {
-			var components = this._componentLoader.getComponentsByNames();
-			// we have to update all contexts of all components
-			self._currentRoutingContext = routingContext;
-			Object.keys(self._componentInstances)
-				.forEach(function (id) {
-					var instance = self._componentInstances[id];
-					instance.$context = self._getComponentContext(
-						components[instance.$context.name], instance.$context.element
-					);
-				});
-			// we should set this flag to avoid "storeChanged" event handling for now
-			self._isStateChanging = true;
-			var changedStores = self._storeDispatcher.setState(state, routingContext);
-			self._isStateChanging = false;
-			// and then we update all components of these stores in a batch.
-			return self._updateStoreComponents(changedStores);
-		})
-		.then(function () {
-			if (self._renderedPromise === renderedPromise) {
-				self._renderedPromise = null;
-			}
-			self._eventBus.emit('pageRendered', self._currentRoutingContext);
-		})
+	var self = this,
+		components = this._componentLoader.getComponentsByNames();
+	// we have to update all contexts of all components
+	this._currentRoutingContext = routingContext;
+	Object.keys(this._componentInstances)
+		.forEach(function (id) {
+			var instance = self._componentInstances[id];
+			instance.$context = self._getComponentContext(
+				components[instance.$context.name],
+				instance.$context.element
+			);
+		});
+
+	if (this._isStateChanging) {
+		var changedAgain = this._storeDispatcher.setState(
+			state, routingContext
+		);
+		changedAgain.forEach(function (name) {
+			self._currentChangedStores[name] = true;
+		});
+		return this._renderedPromise;
+	}
+
+	// we should set this flag to avoid "storeChanged"
+	// event handling for now
+	this._isStateChanging = true;
+	this._storeDispatcher.setState(state, routingContext);
+
+	// and then we update all components of these stores in a batch.
+	this._renderedPromise = self._updateStoreComponents()
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
+		})
+		.then(function () {
+			self._isStateChanging = false;
 		});
-	this._renderedPromise = renderedPromise;
-	return renderedPromise;
+
+	return this._renderedPromise;
 };
 
 /**
@@ -286,7 +294,7 @@ DocumentRenderer.prototype.renderComponent =
  * @returns {Object} Component instance.
  */
 DocumentRenderer.prototype.getComponentById = function (id) {
-	return this._componentInstances[id];
+	return this._componentInstances[id] || null;
 };
 
 /**
@@ -307,7 +315,7 @@ DocumentRenderer.prototype.collectGarbage = function () {
 				return;
 			}
 
-			var promise = self._unbindComponent(element)
+			var promise = self._unbindComponent(self._componentElements[id])
 				.then(function () {
 					delete self._componentElements[id];
 					delete self._componentInstances[id];
@@ -583,45 +591,34 @@ DocumentRenderer.prototype._handleError = function (element, component, error) {
 };
 
 /**
- * Updates all components that depends on changed stores.
- * @param {Array<String>|String|null} storeNames Names of stores which
- * have been changed.
+ * Updates all components that depend on changed stores.
  * @returns {Promise} Promise for nothing.
  * @private
  */
-DocumentRenderer.prototype._updateStoreComponents = function (storeNames) {
-	if (storeNames instanceof Array && storeNames.length > 0) {
-		this._currentChangedStores = this._currentChangedStores
-			.concat(storeNames);
-	}
-	if (typeof(storeNames) === 'string') {
-		this._currentChangedStores.push(storeNames);
-	}
-
-	if (this._renderedPromise) {
+DocumentRenderer.prototype._updateStoreComponents = function () {
+	if (this._isUpdating) {
 		return Promise.resolve();
 	}
-
-	if (this._currentChangedStores.length === 0) {
+	var changed = Object.keys(this._currentChangedStores);
+	if (changed.length === 0) {
 		return Promise.resolve();
 	}
-
-	var changedStores = this._currentChangedStores;
-	this._currentChangedStores = [];
-
+	this._currentChangedStores = {};
 	var self = this,
-		renderingContext = this._createRenderingContext(changedStores),
+		renderingContext = this._createRenderingContext(changed),
 		promises = renderingContext.roots.map(function (root) {
 			return self.renderComponent(root, renderingContext);
 		});
 
+	this._isUpdating = true;
 	return Promise.all(promises)
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
 		})
 		.then(function () {
-			self._isRendering = false;
-			return self._updateStoreComponents(null);
+			self._isUpdating = false;
+			self._eventBus.emit('pageRendered', self._currentRoutingContext);
+			return self._updateStoreComponents();
 		});
 };
 
@@ -821,15 +818,15 @@ DocumentRenderer.prototype._getComponentContext =
 			return self.collectGarbage();
 		};
 		componentContext.getStoreData = function () {
-			return self._renderingContext.storeDispatcher
+			return self._storeDispatcher
 				.getStoreData(storeName);
 		};
 		componentContext.sendAction = function (name, args) {
-			return self._renderingContext.storeDispatcher
+			return self._storeDispatcher
 				.sendAction(storeName, name, args);
 		};
 		componentContext.sendBroadcastAction = function (name, args) {
-			return self._renderingContext.storeDispatcher
+			return self._storeDispatcher
 				.sendBroadcastAction(name, args);
 		};
 
@@ -844,44 +841,60 @@ DocumentRenderer.prototype._getComponentContext =
  */
 DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 	var self = this,
-		components = {},
+		components = this._componentLoader.getComponentsByNames(),
+		componentsElements = {},
+		storeNamesSet = {},
 		rootsSet = {},
 		roots = [];
 
-	Object.keys(changedStoreNames)
+	// we should find all components and then looking for roots
+	changedStoreNames
 		.forEach(function (storeName) {
-			components[storeName] = self._window.document.querySelectorAll(
-				'[' +
-				moduleHelper.ATTRIBUTE_ID +
-				']' +
-				'[' +
-				moduleHelper.ATTRIBUTE_STORE +
-				'=' +
-				storeName +
-				']'
-			);
+			storeNamesSet[storeName] = true;
+			componentsElements[storeName] = self._window.document
+				.querySelectorAll(
+					'[' +
+					moduleHelper.ATTRIBUTE_ID +
+					']' +
+					'[' +
+					moduleHelper.ATTRIBUTE_STORE +
+					'="' +
+					storeName +
+					'"]'
+				);
 		});
-	Object.keys(changedStoreNames)
+
+	changedStoreNames
 		.forEach(function (storeName) {
-			components[storeName].forEach(function (element) {
-				var current = element,
-					currentId = element.getAttribute(moduleHelper.ATTRIBUTE_ID),
-					lastRoot = current,
-					lastRootId = currentId;
+			var current, currentId,
+				lastRoot, lastRootId,
+				currentStore, currentComponentName;
+
+			for (var i = 0; i < componentsElements[storeName].length; i++) {
+				current = componentsElements[storeName][i];
+				currentId = componentsElements[storeName][i]
+					.getAttribute(moduleHelper.ATTRIBUTE_ID);
+				lastRoot = current;
+				lastRootId = currentId;
+				currentComponentName = moduleHelper.getOriginalComponentName(
+					current.tagName
+				);
 
 				while (current.tagName !== TAG_NAMES.HTML) {
 					current = current.parentNode;
-					currentId = current.getAttribute(moduleHelper.ATTRIBUTE_ID);
+					currentId = getId(current);
+					currentStore = current.getAttribute(
+						moduleHelper.ATTRIBUTE_STORE
+					);
 
-					// is not a component
-					if (self._componentInstances.hasOwnProperty(currentId)) {
+					// store did not change state
+					if (!currentStore ||
+						!storeNamesSet.hasOwnProperty(currentStore)) {
 						continue;
 					}
 
-					// store did not change state
-					if (!changedStoreNames.hasOwnProperty(
-							current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
-						)) {
+					//// is not an active component
+					if (!components.hasOwnProperty(currentComponentName)) {
 						continue;
 					}
 
@@ -889,18 +902,14 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 					lastRootId = currentId;
 				}
 				if (rootsSet.hasOwnProperty(lastRootId)) {
-					return;
+					continue;
 				}
 				rootsSet[lastRootId] = true;
 				roots.push(lastRoot);
-			});
+			}
 		});
 
 	return roots;
-};
-
-DocumentRenderer.prototype._getRenderedPromise = function () {
-	return this._renderedPromise ? this._renderedPromise : Promise.resolve();
 };
 
 /**
