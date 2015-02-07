@@ -45,6 +45,7 @@ var components = [
 
 var util = require('util'),
 	routeDefinitions = '__routeDefinitions' || [],
+	moduleHelper = require('./node_modules/catberry/lib/helpers/moduleHelper.js'),
 	Catberry = require('./node_modules/catberry/browser/Catberry.js'),
 	Logger = require('./node_modules/catberry/browser/Logger.js'),
 	BootstrapperBase =
@@ -96,6 +97,10 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 
 	components.forEach(function (component) {
 		locator.registerInstance('component', component);
+		// we have to do this for old browsers, otherwise they will not be
+		// able to show content of custom tags
+		var tagName = moduleHelper.getTagNameForComponentName(component.name);
+		window.document.createElement(tagName);
 	});
 };
 
