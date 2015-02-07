@@ -82,7 +82,8 @@ ComponentLoader.prototype._templateProvider = null;
 ComponentLoader.prototype._loadedComponents = null;
 
 /**
- * Loads components when in browser.
+ * Loads components when it is in a browser.
+ * @returns {Promise} Promise for nothing.
  */
 ComponentLoader.prototype.load = function () {
 	var self = this,

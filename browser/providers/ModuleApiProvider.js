@@ -42,7 +42,7 @@ util.inherits(ModuleApiProvider, ModuleApiProviderBase);
 /**
  * Creates new instance of module API provider.
  * @param {ServiceLocator} $serviceLocator Service locator
- * to resolve a lot of services.
+ * to resolve dependencies.
  * @constructor
  * @extends ModuleApiProviderBase
  */
@@ -54,7 +54,7 @@ function ModuleApiProvider($serviceLocator) {
 
 /**
  * Redirects current page to specified URI.
- * @param {string} uriString URI to direct.
+ * @param {string} uriString URI to redirect.
  * @returns {Promise} Promise for nothing.
  */
 ModuleApiProvider.prototype.redirect = function (uriString) {
@@ -63,7 +63,7 @@ ModuleApiProvider.prototype.redirect = function (uriString) {
 };
 
 /**
- * Clears current location's hash.
+ * Clears current location URI's fragment.
  * @returns {Promise} Promise for nothing.
  */
 ModuleApiProvider.prototype.clearFragment = function () {

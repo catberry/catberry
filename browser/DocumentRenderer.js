@@ -299,7 +299,7 @@ DocumentRenderer.prototype.getComponentById = function (id) {
 
 /**
  * Checks that every instance of component has element on the page and
- * removes all references to removed components.
+ * removes all references to components removed from DOM.
  * @returns {Promise} Promise for nothing.
  */
 DocumentRenderer.prototype.collectGarbage = function () {
@@ -368,7 +368,7 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 };
 
 /**
- * Clears all references to removed components during rendering.
+ * Clears all references to removed components during rendering process.
  * @param {Object} renderingContext Context of rendering.
  * @private
  */
@@ -390,7 +390,7 @@ DocumentRenderer.prototype._collectRenderingGarbage =
 	};
 
 /**
- * Unbinds all event handlers from every inner component in DOM.
+ * Unbinds all event handlers from specified component and all it's descendants.
  * @param {Element} element Component HTML element.
  * @param {Object} renderingContext Context of rendering.
  * @returns {Promise} Promise for nothing.
@@ -417,7 +417,7 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 };
 
 /**
- * Unbinds all event handlers from component.
+ * Unbinds all event handlers from specified component.
  * @param {Element} element Component HTML element.
  * @returns {Promise} Promise for nothing.
  * @private
@@ -446,7 +446,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 };
 
 /**
- * Binds all event handlers from component.
+ * Binds all required event handlers to component.
  * @param {Element} element Component HTML element.
  * @returns {Promise} Promise for nothing.
  * @private
@@ -540,8 +540,8 @@ DocumentRenderer.prototype._createBindingHandler =
 	};
 
 /**
- * Finds all components that are children of specified element.
- * @param {Element} element Parent element to search.
+ * Finds all descendant components of specified component element.
+ * @param {Element} element Root component HTML element to begin search with.
  * @param {Object} renderingContext Context of rendering.
  * @private
  */
@@ -591,7 +591,7 @@ DocumentRenderer.prototype._handleError = function (element, component, error) {
 };
 
 /**
- * Updates all components that depend on changed stores.
+ * Updates all components that depend on current set of changed stores.
  * @returns {Promise} Promise for nothing.
  * @private
  */
@@ -726,7 +726,7 @@ DocumentRenderer.prototype._getHeadMap = function (headChildren) {
 };
 
 /**
- * Gets unique element key using attributes and its content.
+ * Gets unique element key using element's attributes and its content.
  * @param {Element} element HTML element.
  * @returns {string} Unique key for element.
  * @private
@@ -748,7 +748,7 @@ DocumentRenderer.prototype._getElementKey = function (element) {
 };
 
 /**
- * Does initial wrapping for every component.
+ * Does initial wrapping for every component on the page.
  * @private
  */
 DocumentRenderer.prototype._initialWrap = function () {
@@ -949,7 +949,7 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
 
 /**
  * Converts NamedNodeMap of Attr items to key-value object map.
- * @param {NamedNodeMap} attributes
+ * @param {NamedNodeMap} attributes List of Element attributes.
  * @returns {Object} Map of attribute values by names.
  */
 function attributesToObject(attributes) {

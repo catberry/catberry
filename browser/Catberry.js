@@ -39,7 +39,7 @@ var util = require('util'),
 util.inherits(Catberry, CatberryBase);
 
 /**
- * Creates new instance of browser catberry.
+ * Creates new instance of browser version of Catberry.
  * @constructor
  * @extends CatberryBase
  */
@@ -62,7 +62,7 @@ Catberry.prototype.wrapDocument = function () {
 };
 
 /**
- * Starts catberry application when document is ready.
+ * Starts Catberry application when DOM is ready.
  * @returns {Promise} Promise for nothing.
  */
 Catberry.prototype.startWhenReady = function () {
