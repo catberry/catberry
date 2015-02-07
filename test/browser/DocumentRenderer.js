@@ -34,6 +34,7 @@ var assert = require('assert'),
 	events = require('events'),
 	jsdom = require('jsdom'),
 	Component = require('../mocks/components/Component'),
+	DataStore = require('../mocks/stores/DataStore'),
 	ComponentAsync = require('../mocks/components/ComponentAsync'),
 	ComponentError = require('../mocks/components/ComponentError'),
 	ComponentErrorAsync = require('../mocks/components/ComponentErrorAsync'),
@@ -41,6 +42,7 @@ var assert = require('assert'),
 	ModuleApiProvider = require('../../lib/providers/ModuleApiProvider'),
 	CookieWrapper = require('../../browser/CookieWrapper'),
 	ComponentLoader = require('../../browser/loaders/ComponentLoader'),
+	StoreLoader = require('../../browser/loaders/StoreLoader'),
 	DocumentRenderer = require('../../browser/DocumentRenderer'),
 	ServiceLocator = require('catberry-locator');
 
@@ -1178,7 +1180,10 @@ function createLocator(components, config) {
 		locator.registerInstance('component', component);
 	});
 
+	locator.registerInstance('Store', {name: 'store', constructor: DataStore});
+
 	locator.register('componentLoader', ComponentLoader, config);
+	locator.register('storeLoader', StoreLoader, config);
 	locator.register('contextFactory', ContextFactory, config);
 	locator.register('moduleApiProvider', ModuleApiProvider, config);
 	locator.register('cookieWrapper', CookieWrapper, config);
