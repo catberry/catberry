@@ -72,7 +72,8 @@ StoreLoader.prototype._serviceLocator = null;
 StoreLoader.prototype._loadedStores = null;
 
 /**
- * Loads all stores when in a browser.
+ * Loads all stores when it is in a browser.
+ * @returns {Promise} Promise for nothing.
  */
 StoreLoader.prototype.load = function () {
 	var self = this,

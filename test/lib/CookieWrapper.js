@@ -84,8 +84,8 @@ describe('lib/CookieWrapper', function () {
 					httpOnly: true
 				});
 
-				assert.strictEqual(cookieWrapper.setCookies.length, 1);
-				assert.strictEqual(cookieWrapper.setCookies[0], expected);
+				assert.strictEqual(cookieWrapper.setCookie.length, 1);
+				assert.strictEqual(cookieWrapper.setCookie[0], expected);
 			});
 		it('should set several cookies by specified parameters',
 			function () {
@@ -104,9 +104,9 @@ describe('lib/CookieWrapper', function () {
 					value: 'value2'
 				});
 
-				assert.strictEqual(cookieWrapper.setCookies.length, 2);
-				assert.strictEqual(cookieWrapper.setCookies[0], expected1);
-				assert.strictEqual(cookieWrapper.setCookies[1], expected2);
+				assert.strictEqual(cookieWrapper.setCookie.length, 2);
+				assert.strictEqual(cookieWrapper.setCookie[0], expected1);
+				assert.strictEqual(cookieWrapper.setCookie[1], expected2);
 			});
 		it('should set default expire date by max age',
 			function () {
@@ -123,8 +123,8 @@ describe('lib/CookieWrapper', function () {
 					maxAge: 3600
 				});
 
-				assert.strictEqual(cookieWrapper.setCookies.length, 1);
-				assert.strictEqual(cookieWrapper.setCookies[0], expected);
+				assert.strictEqual(cookieWrapper.setCookie.length, 1);
+				assert.strictEqual(cookieWrapper.setCookie[0], expected);
 			});
 		it('should throw error if wrong key',
 			function () {

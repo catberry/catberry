@@ -231,26 +231,26 @@ RequestRouter.prototype._wrapDocument = function () {
 	}
 
 	this._window.addEventListener('popstate', function () {
-		self.route().catch(self._errorHandler.bind(self));
+		self.route().catch(self._handleError.bind(self));
 	});
 
 	this._window.document.body.addEventListener('click', function (event) {
 		if (event.target.tagName === A_TAG_NAME) {
 			self._linkClickHandler(event, event.target)
-				.catch(self._errorHandler.bind(self));
+				.catch(self._handleError.bind(self));
 		} else {
 			var link = closestLink(event.target);
 			if (!link) {
 				return;
 			}
 			self._linkClickHandler(event, link)
-				.catch(self._errorHandler.bind(self));
+				.catch(self._handleError.bind(self));
 		}
 	});
 };
 
 /**
- * Handles link click on page.
+ * Handles link click on the page.
  * @param {Event} event Event-related object.
  * @param {Element} element Link element.
  * @returns {Promise} Promise for nothing.
@@ -281,13 +281,13 @@ RequestRouter.prototype._linkClickHandler = function (event, element) {
  * @param {Error} error Error to handle.
  * @private
  */
-RequestRouter.prototype._errorHandler = function (error) {
+RequestRouter.prototype._handleError = function (error) {
 	this._eventBus.emit('error', error);
 };
 
 /**
- * Finds the closest parent "A" element node.
- * @param {Node} element Dom element.
+ * Finds the closest ascending "A" element node.
+ * @param {Node} element DOM element.
  * @returns {Node|null} The closest "A" element or null.
  */
 function closestLink(element) {
