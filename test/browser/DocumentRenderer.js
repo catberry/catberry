@@ -956,6 +956,7 @@ describe('browser/DocumentRenderer', function () {
 			done();
 		});
 	});
+
 	describe('#render', function () {
 		it('should update all components ' +
 		'that depend on changed stores', function (done) {
@@ -970,13 +971,203 @@ describe('browser/DocumentRenderer', function () {
 			done();
 		});
 	});
+
 	describe('#createComponent', function () {
 		it('should properly create and render component', function (done) {
-			done();
+			var components = [
+				{
+					name: 'test',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			var expected = 'test<br><div>Hello, World!</div>';
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent('cat-test', {id: 'unique'})
+						.then(function (element) {
+							assert.strictEqual(element.innerHTML, expected);
+							done();
+						})
+						.catch(done);
+				}
+			});
 		});
 
-		it('should reject promise if error', function (done) {
-			done();
+		it('should reject promise if wrong component', function (done) {
+			var components = [
+				{
+					name: 'test',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent('cat-wrong', {id: 'unique'})
+						.then(function () {
+							done(new Error('Should fail'));
+						})
+						.catch(function (reason) {
+							assert.strictEqual(
+								reason.message,
+								'Component for tag "cat-wrong" not found'
+							);
+							done();
+						});
+				}
+			});
+		});
+
+		it('should reject promise if ID is not specefied', function (done) {
+			var components = [
+				{
+					name: 'test',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent('cat-test', {})
+						.then(function () {
+							done(new Error('Should fail'));
+						})
+						.catch(function (reason) {
+							assert.strictEqual(
+								reason.message,
+								'The ID is not specified or already used'
+							);
+							done();
+						});
+				}
+			});
+		});
+
+		it('should reject promise if ID is already used', function (done) {
+			var components = [
+				{
+					name: 'test',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent('cat-test', {id: 'some'})
+						.then(function () {
+							return renderer.createComponent(
+								'cat-test', {id: 'some'}
+							);
+						})
+						.then(function () {
+							done(new Error('Should fail'));
+						})
+						.catch(function (reason) {
+							assert.strictEqual(
+								reason.message,
+								'The ID is not specified or already used'
+							);
+							done();
+						});
+				}
+			});
+		});
+
+		it('should reject promise if tag name ' +
+		'is not a string', function (done) {
+			var components = [
+				{
+					name: 'test',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent(500, {id: 'some'})
+						.then(function () {
+							done(new Error('Should fail'));
+						})
+						.catch(function (reason) {
+							assert.strictEqual(
+								reason.message,
+								'Tag name should be a string ' +
+								'and attributes should be an object'
+							);
+							done();
+						});
+				}
+			});
+		});
+
+		it('should reject promise if attributes set ' +
+		'is not an object', function (done) {
+			var components = [
+				{
+					name: 'test',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent('cat-test', 100)
+						.then(function () {
+							done(new Error('Should fail'));
+						})
+						.catch(function (reason) {
+							assert.strictEqual(
+								reason.message,
+								'Tag name should be a string ' +
+								'and attributes should be an object'
+							);
+							done();
+						});
+				}
+			});
 		});
 	});
 });
