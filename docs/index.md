@@ -273,7 +273,7 @@ method.
 Catberry uses following parameters from it:
 
 * componentsGlob – glob expression for searching cat-components
-("**/cat-component.json" by default
+("**/cat-component.json" by default)
 * storesDirectory – relative path to directory with stores
 ("./catberry_stores" by default)
 * publicDirectoryPath – path to public directory
@@ -513,7 +513,7 @@ When Catberry initializes it does recursively search of such directories
 starting with your application root. It means you can publish and use
 cat-components from [npm](http://npmjs.org/).
 
-`cat-package.json` consists of following:
+`cat-component.json` consists of following:
 
 * name – name of the component and postfix of custom tag
 (optional, by default it is the name of the directory).
