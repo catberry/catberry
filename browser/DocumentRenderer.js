@@ -57,7 +57,7 @@ var HEAD_ID = '$$head',
 	};
 
 /**
- * Creates new instance of document renderer.
+ * Creates new instance of the document renderer.
  * @param {ServiceLocator} $serviceLocator Locator to resolve dependencies.
  * @constructor
  * @extends DocumentRendererBase

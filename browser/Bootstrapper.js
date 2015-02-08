@@ -54,7 +54,7 @@ var util = require('util'),
 util.inherits(Bootstrapper, BootstrapperBase);
 
 /**
- * Creates new instance of browser catberry bootstrapper.
+ * Creates new instance of the browser Catberry's bootstrapper.
  * @constructor
  * @extends BootstrapperBase
  */
@@ -63,7 +63,7 @@ function Bootstrapper() {
 }
 
 /**
- * Configures catberry service locator.
+ * Configures Catberry's service locator.
  * @param {Object} configObject Application config object.
  * @param {ServiceLocator} locator Service locator to configure.
  */

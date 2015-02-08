@@ -46,7 +46,7 @@ var MOUSE_KEYS = {
 	BODY_TAG_NAME = 'BODY';
 
 /**
- * Creates new instance of browser request router.
+ * Creates new instance of the browser request router.
  * @param {ServiceLocator} $serviceLocator Service locator to resolve services.
  * @constructor
  */
