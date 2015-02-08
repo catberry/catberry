@@ -488,7 +488,10 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 						self._componentBindings[id][eventName].handler
 					);
 				});
-			self._eventBus.emit('componentBound', id);
+			self._eventBus.emit('componentBound', {
+				element: element,
+				id: id
+			});
 		});
 };
 
@@ -617,7 +620,7 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 		})
 		.then(function () {
 			self._isUpdating = false;
-			self._eventBus.emit('pageRendered', self._currentRoutingContext);
+			self._eventBus.emit('documentUpdated', changed);
 			return self._updateStoreComponents();
 		});
 };
@@ -788,7 +791,7 @@ DocumentRenderer.prototype._initialWrap = function () {
 
 	return Promise.all(bindPromises)
 		.then(function () {
-			self._eventBus.emit('pageRendered', self._currentRoutingContext);
+			self._eventBus.emit('documentRendered', self._currentRoutingContext);
 		});
 };
 
