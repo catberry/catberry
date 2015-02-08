@@ -831,8 +831,8 @@ Here is a list of common Catberry events:
 | componentRendered		| Catberry finishes rendering component			|	`{name: String, context: Object, time: Number}`															|
 | storeDataLoad			| Catberry starts loading data from store		|	`{name: String}`																						|
 | storeDataLoaded		| Catberry finishes loading data from store		|	`{name: String, data: Object, lifetime: Number}`														|
-| actionSend			| Catberry sends action to store				|	`{storeName: String, actionName: String, args: Object}`														|
-| actionSent			| Action is sent to store						|	`{storeName: String, actionName: String, args: Object}`														|
+| actionSend			| Catberry sends action to store				|	`{storeName: String, actionName: String, args: Object}`													|
+| actionSent			| Action is sent to store						|	`{storeName: String, actionName: String, args: Object}`													|
 | documentRendered		| Catberry finishes rendering of all components	|	Routing context with location, referrer, userAgent etc.													|
 | storeChanged			| Catberry application's store is changed		|	Name of store																							|
 | stateChanged			| Catberry application changed state			|	`{oldState: Object, newState: Object}`																	|
