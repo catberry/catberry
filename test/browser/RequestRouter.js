@@ -65,7 +65,7 @@ describe('browser/RequestRouter', function () {
 					}
 				});
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function (context) {
+				eventBus.once('documentRendered', function (context) {
 					assert.strictEqual(typeof(context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -132,7 +132,7 @@ describe('browser/RequestRouter', function () {
 					}
 				});
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function (context) {
+				eventBus.once('documentRendered', function (context) {
 					assert.strictEqual(typeof(context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -196,7 +196,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function () {
+				eventBus.once('documentRendered', function () {
 					assert.strictEqual(
 						documentRenderer.state.first.first, 'firstValue'
 					);
@@ -255,7 +255,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function (context) {
+				eventBus.once('documentRendered', function (context) {
 					assert.strictEqual(typeof(context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -328,7 +328,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function (context) {
+				eventBus.once('documentRendered', function (context) {
 					assert.strictEqual(typeof(context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -382,7 +382,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function () {
+				eventBus.once('documentRendered', function () {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
@@ -429,7 +429,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function () {
+				eventBus.once('documentRendered', function () {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
@@ -477,7 +477,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function () {
+				eventBus.once('documentRendered', function () {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
@@ -526,7 +526,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function () {
+				eventBus.once('documentRendered', function () {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
@@ -570,7 +570,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('pageRendered', function () {
+				eventBus.once('documentRendered', function () {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
@@ -615,7 +615,7 @@ function createLocator() {
 			documentRenderer.state = state;
 			documentRenderer.context = context;
 			if (last) {
-				eventBus.emit('pageRendered', context);
+				eventBus.emit('documentRendered', context);
 			}
 			return Promise.resolve();
 		}

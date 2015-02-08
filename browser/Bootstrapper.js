@@ -51,6 +51,9 @@ var util = require('util'),
 	BootstrapperBase =
 		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 
+var INFO_DOCUMENT_UPDATED = 'Document updated (%d stores changed)',
+	INFO_COMPONENT_BOUND = 'Component "%s" is bound';
+
 util.inherits(Bootstrapper, BootstrapperBase);
 
 /**
@@ -102,6 +105,26 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 		var tagName = moduleHelper.getTagNameForComponentName(component.name);
 		window.document.createElement(tagName);
 	});
+};
+
+/**
+ * Wraps event bus with log messages.
+ * @param {EventEmitter} eventBus Event emitter that implements event bus.
+ * @param {Logger} logger Logger to write messages.
+ * @protected
+ */
+Bootstrapper.prototype._wrapEventsWithLogger = function (eventBus, logger) {
+	BootstrapperBase.prototype._wrapEventsWithLogger
+		.call(this, eventBus, logger);
+	eventBus
+		.on('documentUpdated', function (args) {
+			logger.info(util.format(INFO_DOCUMENT_UPDATED, args.length));
+		})
+		.on('componentBound', function (args) {
+			logger.info(util.format(
+				INFO_COMPONENT_BOUND, args.element.tagName + '#' + args.id
+			));
+		});
 };
 
 module.exports = new Bootstrapper();

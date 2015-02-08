@@ -1303,7 +1303,7 @@ describe('browser/DocumentRenderer', function () {
 					var renderer = locator.resolveInstance(DocumentRenderer);
 					renderer.render({}, {})
 						.then(function () {
-							eventBus.on('pageRendered', function () {
+							eventBus.on('documentUpdated', function () {
 								assert.strictEqual(renders.length, 4);
 								assert.strictEqual(renders[0], 'unique4');
 								assert.strictEqual(renders[1], 'unique1');
