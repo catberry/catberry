@@ -37,7 +37,7 @@ var util = require('util'),
 util.inherits(CookieWrapper, CookieWrapperBase);
 
 /**
- * Creates new instance of browser cookie wrapper.
+ * Creates new instance of the browser cookie wrapper.
  * @constructor
  */
 function CookieWrapper($window) {

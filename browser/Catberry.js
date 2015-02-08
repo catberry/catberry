@@ -39,7 +39,7 @@ var util = require('util'),
 util.inherits(Catberry, CatberryBase);
 
 /**
- * Creates new instance of browser version of Catberry.
+ * Creates new instance of the browser version of Catberry.
  * @constructor
  * @extends CatberryBase
  */
@@ -55,7 +55,7 @@ function Catberry() {
 Catberry.prototype._router = null;
 
 /**
- * Wraps current HTML document with catberry event handlers.
+ * Wraps current HTML document with Catberry event handlers.
  */
 Catberry.prototype.wrapDocument = function () {
 	this._router = this.locator.resolve('requestRouter');

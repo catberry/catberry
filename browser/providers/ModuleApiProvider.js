@@ -40,7 +40,7 @@ var util = require('util'),
 util.inherits(ModuleApiProvider, ModuleApiProviderBase);
 
 /**
- * Creates new instance of module API provider.
+ * Creates new instance of the module API provider.
  * @param {ServiceLocator} $serviceLocator Service locator
  * to resolve dependencies.
  * @constructor

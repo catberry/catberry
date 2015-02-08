@@ -35,7 +35,7 @@ module.exports = ComponentLoader;
 var moduleHelper = require('../../lib/helpers/moduleHelper');
 
 /**
- * Creates new instance of component loader.
+ * Creates new instance of the component loader.
  * @param {ServiceLocator} $serviceLocator Locator to resolve dependencies.
  * @constructor
  */

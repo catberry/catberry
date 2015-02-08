@@ -33,7 +33,7 @@
 module.exports = StoreLoader;
 
 /**
- * Creates instance of store loader.
+ * Creates instance of the store loader.
  * @param {ServiceLocator} $serviceLocator Locator to resolve stores.
  * @constructor
  */
