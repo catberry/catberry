@@ -227,10 +227,12 @@ DocumentRenderer.prototype.renderComponent =
 		renderingContext.renderedIds[id] = true;
 
 		if (!instance) {
+			component.constructor.prototype.$context =
+				this._getComponentContext(component, element);
 			instance = this._serviceLocator.resolveInstance(
 				component.constructor, renderingContext.config
 			);
-			instance.$context = this._getComponentContext(component, element);
+			instance.$context = component.constructor.prototype.$context;
 			this._componentInstances[id] = instance;
 		}
 
@@ -765,7 +767,8 @@ DocumentRenderer.prototype._initialWrap = function () {
 			var tagName = moduleHelper
 					.getTagNameForComponentName(componentName),
 				elements = self._window.document
-					.getElementsByTagName(tagName);
+					.getElementsByTagName(tagName),
+				constructor = components[componentName].constructor;
 
 			for (i = 0; i < elements.length; i++) {
 				current = elements[i];
@@ -773,12 +776,15 @@ DocumentRenderer.prototype._initialWrap = function () {
 				if (!id) {
 					continue;
 				}
-				instance = self._serviceLocator.resolveInstance(
-					components[componentName].constructor, self._config
-				);
-				instance.$context = self._getComponentContext(
+
+				constructor.prototype.$context = self._getComponentContext(
 					components[componentName], current
 				);
+				instance = self._serviceLocator.resolveInstance(
+					constructor, self._config
+				);
+				instance.$context = constructor.prototype.$context;
+
 				self._componentInstances[id] = instance;
 				self._eventBus.emit('componentRendered', {
 					name: componentName,
