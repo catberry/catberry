@@ -17,7 +17,7 @@
 * [Example of Application Structure](#example-of-application-structure)
 * [Cookie](#cookie)
 * [Template Engines](#template-engines)
-* [Browser Bundle](#building-browser-bundle)
+* [Browser Bundle](#browser-bundle)
 * [Event Bus and Diagnostics](#event-bus-and-diagnostics) 
 * [CLI](#cli) 
 * [Code Style Guide](code-style-guide.md)
@@ -98,7 +98,7 @@ Entire architecture of Catberry framework is based on
 [Service Locator pattern](http://en.wikipedia.org/wiki/Service_locator_pattern) 
 and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection).
 
-###Registration of Own Services
+##Registration of Own Services
 There is only one service locator (singleton) in a Catberry application
 and all Catberry services are resolved from this locator.
 It happens when you use `getMiddleware` method on the server or `startWhenReady`
@@ -270,6 +270,15 @@ Service Locator directly.
 This service is just a full config object which was passed to `catberry.create()`
 method.
 
+Catberry uses following parameters from it:
+
+* componentsGlob – glob expression for searching cat-components
+("**/cat-component.json" by default
+* storesDirectory – relative path to directory with stores
+("./catberry_stores" by default)
+* publicDirectoryPath – path to public directory
+("./public" by default)
+
 ##UHR (Universal HTTP(S) Request)
 Catberry has Universal HTTP(S) Request service registered as "uhr" in 
 [Service Locator](#service-locator) and it is accessible via
@@ -279,7 +288,7 @@ This is isomorphic implementation of HTTP request.
 All details you can find in UHR read me file [here]
 (https://github.com/catberry/catberry-uhr/blob/master/README.md).
 
-##Routing
+#Routing
 Catberry's routing system triggers the "changed" event in every
 [store](#stores) that depends on changed arguments in routed URI.
 Those arguments are set by route definitions in file './routes.js'.
@@ -295,7 +304,7 @@ Route definition is a rule that describes which URIs are handled by Catberry,
 what parameters Catberry can parse from these URIs and what stores will
 receive parsed parameters.
 
-### Colon-marked parameters in string
+## Colon-marked parameters in string
 Default definition syntax is following:
 
 ```
@@ -315,7 +324,7 @@ Please keep in mind that parameter **name** in route definition should satisfy
 regular expression `[^\[\],]+` and parameter **value** should satisfy
 regular expression `[^\/\\&\?=]*`.
 
-### Colon-marked parameters with additional `map` function
+## Colon-marked parameters with additional `map` function
 Also you can define mapper object, that allows you to modify application
 state object before it will be processed by Catberry.
 
@@ -339,7 +348,7 @@ and return it from map function.
 In this example store `news` will receive additional state parameter `pageType`
 with value `userNews`.
 
-### Regular expression
+## Regular expression
 For some rare cases you may need to parse parameters
 by regular expressions. In these cases you can define mapper
 object as listed below:
@@ -361,7 +370,7 @@ object as listed below:
 In this example the store `order` will receive parameter `orderId` with value
 matched with number in URL.
 
-### File example
+## File example
 Here is example of `./routes.js` file with all 3 cases of route definition:
 
 ```javascript
@@ -386,7 +395,7 @@ module.exports = [
 ];
 ```
 
-##Flux
+#Flux
 Catberry uses [Flux](https://facebook.github.io/flux/docs/overview.html)
 architecture. It defines that you should use [store](#stores) as data source
 and some kind of view that gets data from the store. So, Catberry uses
@@ -453,7 +462,7 @@ store2
 
 Please, keep in mind that all store names are case-sensitive.
 
-###Store interface
+##Store interface
 As it is said every store should export a constructor function. Also you can
 define such methods and properties into constructor prototype,
 but all of them are optional.
@@ -466,7 +475,7 @@ the result (or Promise for it). You can submit data to remote resource here or
 just change some internal parameters in the store and then
 call `this.$context.changed()`
 
-###Store Context
+##Store Context
 Every store always has a context. Catberry sets the property `$context`
 to every instance of each store. It has following properties and methods.
 
@@ -488,7 +497,7 @@ Every time router computes new application state it re-creates and re-assigns
 context to each store therefore do not save references to `this.$context`
 objects.
 
-##Cat Components
+#Cat Components
 You may think cat components are mustaches, paws or tail but they are not.
 
 Cat component is an isomorphic implementation of
@@ -555,7 +564,7 @@ It can not depend on any store. `cat-store` attribute is just ignored.
 diff/merge mode otherwise all styles and scripts are re-processed every time. It
 can depend on store and works as usual cat-component except rendering approach.
 
-###Cat-component interface
+##Cat-component interface
 As store component's logic file should export a constructor function for
 creating instances for every custom tag on page. Also you can
 define such methods and properties into constructor prototype,
@@ -595,7 +604,7 @@ the component and then unbind it manually in `unbind` method.
 After component is removed from the DOM all event listeners will be removed
 correctly and then `unbind` method will be called (if it exists).
 
-###Cat-component Context
+##Cat-component Context
 Every component always has a context. Catberry sets the property `$context`
 to every instance of each store. It has following properties and methods.
 
@@ -630,7 +639,7 @@ Every time router computes new application state, it re-creates and re-assigns
 context to each component therefore do not save references to `this.$context`
 objects.
 
-##Example of application structure
+#Example of Application Structure
 Typically directory structure of your application should look like this:
 
 ```
@@ -687,7 +696,7 @@ Typically directory structure of your application should look like this:
 If you want to see finished application as an example then please proceed to 
 [example directory](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
-##Cookie
+#Cookie
 As you may notice, store and cat-component context have property `cookie` that
 allows you to control cookie in isomorphic way.
 Actually, it is an universal wrapper that can `get` and `set` cookie
@@ -719,10 +728,10 @@ CookiesWrapper.prototype.get = function (name) { }
 CookiesWrapper.prototype.set = function (cookieSetup) { }
 ```
 
-##Template engine
+#Template engines
 This section is in progress...
 
-##Browser Bundle
+#Browser Bundle
 The Catberry application object has a method `build` that can be used like this:
 
 ```javascript
@@ -747,7 +756,7 @@ node ./build.js release
 To build browser bundle Catberry uses [browserify](http://browserify.org) which 
 is awesome and can convert your server-side JavaScript to browser code.
 
-###Including packages into browser bundle
+##Including packages into browser bundle
 There are some rules according browserify limitations:
 
 * If you want to include some module into browser bundle it should be required
@@ -757,7 +766,7 @@ browserify just skips it or throws an error.
 replace it with browser version just use browserify `browser` field
 in `package.json` as it has been described [here](http://github.com/substack/node-browserify#packagejson).
 
-###Module code watch and reload
+##Module code watch and reload
 By default, Catberry works in debug mode and it means that all changes in code
 of your stores or components will automatically reload everything.
 You can switch application to release mode passing `isRelease: true` parameter
@@ -774,7 +783,7 @@ So, the difference between modes is:
 * Release mode - there is no watch on files and all code in the browser bundle
 is minified using [uglify-js](https://www.npmjs.org/package/uglify-js)
 
-##Event Bus and Diagnostics
+#Event Bus and Diagnostics
 Catberry has a set of events that can be used for diagnostics or
 in components and stores. Catberry uses the same events for logging all trace,
 info and error messages.
@@ -806,7 +815,7 @@ catberry.events.on('error', function (error) {
 
 Actually `cat.events` has interface similar with [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter).
 
-###Event names and arguments
+##Event names and arguments
 
 Here is a list of common Catberry events:
 
@@ -849,7 +858,7 @@ or component/store logic, feel free to use them everywhere you want
 but remember if any event has too many subscribers it can cause
 performance degradation.
 
-##CLI
+#CLI
 
 Catberry has a Command Line Interface that helps to start a new project and add
 new stores and components to it.
