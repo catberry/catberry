@@ -72,7 +72,7 @@
 		"jshint": "^2.5.0"
 	},
 	"engines": {
-		"node": "~0.10.26"
+		"node": "0.10.x || 0.12.x"
 	},
 	"scripts": {
 		"test": "make"
