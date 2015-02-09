@@ -609,7 +609,7 @@ but all these injections will stay as is and will not be broken.
 Also you can inject just `$serviceLocator` and resolve everything you want
 directly from locator.
 
-It is really important not to make loops in grapth of dependencies. It causes
+It is really important not to make loops in graph of dependencies. It causes
 infinite recursion and just kills your application.
 
 Please keep in mind that config fields can be injected only side by side
