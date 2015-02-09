@@ -46,7 +46,7 @@ For more details please proceed to [Catberry Documentation](https://github.com/c
 
 Also you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
-##Browser support
+##Browser Support
 Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 
 and some HTML5 features like [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history)
 therefore it does not support old browsers at all. Catberry can render pages
