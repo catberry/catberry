@@ -35,35 +35,29 @@
 
 'use strict';
 
-var modules = [
-/**__modules**/
+var stores = [
+/**__stores**/
 ];
 
-var placeholders = [
-/**__placeholders**/
+var components = [
+/**__components**/
 ];
 
 var util = require('util'),
 	routeDefinitions = '__routeDefinitions' || [],
-	eventDefinitions = '__eventDefinitions' || [],
+	moduleHelper = require('./node_modules/catberry/lib/helpers/moduleHelper.js'),
 	Catberry = require('./node_modules/catberry/browser/Catberry.js'),
 	Logger = require('./node_modules/catberry/browser/Logger.js'),
-	EventRouter = require('./node_modules/catberry/browser/EventRouter.js'),
-	FormSubmitter = require('./node_modules/catberry/browser/FormSubmitter.js'),
 	BootstrapperBase =
 		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 
-var INFO_EVENT_REGISTERED = 'Event "%s" registered for module(s) "%s"',
-	TRACE_EVENT_START_ROUTED = 'Starting event "%s" in module(s) "%s"...',
-	TRACE_EVENT_END_ROUTED = 'Ending event "%s" in module(s) "%s"...',
-	TRACE_RENDER_REQUEST =
-		'Requesting rendering of placeholder "%s" in module "%s"...',
-	TRACE_FORM_SUBMITTED = 'Form "%s" has been submitted to module "%s"';
+var INFO_DOCUMENT_UPDATED = 'Document updated (%d stores changed)',
+	INFO_COMPONENT_BOUND = 'Component "%s" is bound';
 
 util.inherits(Bootstrapper, BootstrapperBase);
 
 /**
- * Creates new instance of browser catberry bootstrapper.
+ * Creates new instance of the browser Catberry's bootstrapper.
  * @constructor
  * @extends BootstrapperBase
  */
@@ -72,7 +66,7 @@ function Bootstrapper() {
 }
 
 /**
- * Configures catberry service locator.
+ * Configures Catberry's service locator.
  * @param {Object} configObject Application config object.
  * @param {ServiceLocator} locator Service locator to configure.
  */
@@ -85,8 +79,6 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	}
 
 	locator.registerInstance('window', window);
-	locator.register('eventRouter', EventRouter, configObject, true);
-	locator.register('formSubmitter', FormSubmitter, configObject, true);
 
 	var loggerConfig = configObject.logger || {},
 		logger = new Logger(loggerConfig.levels);
@@ -101,16 +93,17 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	routeDefinitions.forEach(function (routeDefinition) {
 		locator.registerInstance('routeDefinition', routeDefinition);
 	});
-	eventDefinitions.forEach(function (eventDefinition) {
-		locator.registerInstance('eventDefinition', eventDefinition);
+
+	stores.forEach(function (store) {
+		locator.registerInstance('store', store);
 	});
 
-	modules.forEach(function (module) {
-		locator.registerInstance('module', module);
-	});
-
-	placeholders.forEach(function (placeholder) {
-		locator.registerInstance('placeholder', placeholder);
+	components.forEach(function (component) {
+		locator.registerInstance('component', component);
+		// we have to do this for old browsers, otherwise they will not be
+		// able to show content of custom tags
+		var tagName = moduleHelper.getTagNameForComponentName(component.name);
+		window.document.createElement(tagName);
 	});
 };
 
@@ -123,35 +116,13 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 Bootstrapper.prototype._wrapEventsWithLogger = function (eventBus, logger) {
 	BootstrapperBase.prototype._wrapEventsWithLogger
 		.call(this, eventBus, logger);
-
 	eventBus
-		.on('eventRegistered', function (args) {
+		.on('documentUpdated', function (args) {
+			logger.info(util.format(INFO_DOCUMENT_UPDATED, args.length));
+		})
+		.on('componentBound', function (args) {
 			logger.info(util.format(
-				INFO_EVENT_REGISTERED,
-				args.eventName,
-				args.moduleNames.join(', ')
-			));
-		})
-		.on('eventRouted', function (event) {
-			var messageFormat = event.isEnding ?
-				TRACE_EVENT_END_ROUTED :
-				TRACE_EVENT_START_ROUTED;
-
-			logger.trace(util.format(
-				messageFormat,
-				event.name, event.moduleNames.join(', ')
-			));
-		})
-		.on('renderRequested', function (args) {
-			logger.trace(util.format(
-				TRACE_RENDER_REQUEST,
-				args.placeholderName, args.moduleName
-			));
-		})
-		.on('formSubmitted', function (args) {
-			logger.trace(util.format(
-				TRACE_FORM_SUBMITTED,
-				args.name, args.moduleName
+				INFO_COMPONENT_BOUND, args.element.tagName + '#' + args.id
 			));
 		});
 };
