@@ -1,0 +1,22 @@
+{
+	"Test1": {
+		"name": "Test1",
+		"path": "test/cases/lib/finders/StoreFinder/catberry_stores/Test1.js"
+	},
+	"ErrorTest": {
+		"name": "ErrorTest",
+		"path": "test/cases/lib/finders/StoreFinder/catberry_stores/ErrorTest.js"
+	},
+	"folder/Test2": {
+		"name": "folder/Test2",
+		"path": "test/cases/lib/finders/StoreFinder/catberry_stores/folder/Test2.js"
+	},
+	"folder/subfolder/Test3": {
+		"name": "folder/subfolder/Test3",
+		"path": "test/cases/lib/finders/StoreFinder/catberry_stores/folder/subfolder/Test3.js"
+	},
+	"folder2/Test4": {
+		"name": "folder2/Test4",
+		"path": "test/cases/lib/finders/StoreFinder/catberry_stores/folder2/Test4.js"
+	}
+}
