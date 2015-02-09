@@ -6,7 +6,7 @@
 * [Isomorphic Applications](#isomorphic-applications)
 * [Flux](#flux)
 * [Stores](#stores)
-* [Cat-Components](#cat-components)
+* [Cat-components](#cat-components)
 * [Example of Application Structure](#example-of-application-structure)
 * [Routing](#routing)
 * [Catberry Services](#catberry-services)
@@ -173,14 +173,14 @@ objects.
 
 **[⬆ back to top](#table-of-contents)**
 
-#Cat Components
-You may think cat components are mustaches, paws or tail but they are not.
+#Cat-components
+You may think cat-components are mustaches, paws or tail but they are not.
 
-Cat component is an isomorphic implementation of
+Cat-component is an isomorphic implementation of
 [Google Web-Components](http://webcomponents.org/). If dig deeper it is a
 subset of features that web-components specification declares.
 
-The main point is that cat component is a declaration of custom tag that can
+The main point is that cat-component is a declaration of custom tag that can
 have own template (any template engine), own logic in JavaScript and own assets.
 
 Cat component is declared as a directory with `cat-component.json`
@@ -193,7 +193,7 @@ cat-components from [npm](http://npmjs.org/).
 
 * name – name of the component and postfix of custom tag
 (optional, by default it is the name of the directory).
-* description – some additional information about cat component (optional)
+* description – some additional information about cat-component (optional)
 * template – relative path to component template (required)
 * errorTemplate – relative path to component template for error state (optional)
 * logic – relative path to file that exports constructor for logic object
@@ -204,7 +204,7 @@ For example:
 ```json
 {
 	"name": "cool",
-	"description": "Some awesome and cool cat component",
+	"description": "Some awesome and cool cat-component",
 	"template": "./template.hbs",
 	"errorTemplate": "./errorTemplate.hbs",
 	"logic": "./Cool.js"
@@ -586,7 +586,7 @@ If you want to know how to use registered services, please read
 
 ##Dependency Injection
 If you need to use some registered service you just inject it into constructor
-of [Store](#stores) or [Cat-Component](#cat-components).
+of [Store](#stores) or [Cat-component](#cat-components).
 
 For example, you have the store called "AwesomeStore".
 In Catberry every store is a constructor with prototype,
@@ -895,7 +895,7 @@ And then follow usage instructions you can find
 catberry utility:
 
 ```
-catberry --help
+сcatberry --help
 ```
 
 **[⬆ back to top](#table-of-contents)**
