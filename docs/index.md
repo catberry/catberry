@@ -183,7 +183,7 @@ subset of features that web-components specification declares.
 The main point is that cat-component is a declaration of custom tag that can
 have own template (any template engine), own logic in JavaScript and own assets.
 
-Cat component is declared as a directory with `cat-component.json`
+Cat-component is declared as a directory with `cat-component.json`
 file by default. But you can change it in [config](#config).
 When Catberry initializes it does recursively search of such directories
 starting with your application root. It means you can publish and use
