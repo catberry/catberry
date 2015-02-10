@@ -508,7 +508,14 @@ DocumentRenderer.prototype._createBindingHandler =
 	function (componentRoot, selectorHandlers) {
 		var selectors = Object.keys(selectorHandlers);
 		return function (event) {
-			var element = event.target,
+			var dispatchedEvent = Object.create(event, {
+					currentTarget: {
+						get: function () {
+							return element;
+						}
+					}
+				}),
+				element = event.target,
 				targetMatches = getMatchesMethod(element),
 				isHandled = false;
 			selectors.every(function (selector) {
@@ -516,7 +523,7 @@ DocumentRenderer.prototype._createBindingHandler =
 					return true;
 				}
 				isHandled = true;
-				selectorHandlers[selector](event);
+				selectorHandlers[selector](dispatchedEvent);
 				return false;
 			});
 			if (isHandled) {
@@ -532,7 +539,7 @@ DocumentRenderer.prototype._createBindingHandler =
 						continue;
 					}
 					isHandled = true;
-					selectorHandlers[selectors[i]](event);
+					selectorHandlers[selectors[i]](dispatchedEvent);
 					break;
 				}
 

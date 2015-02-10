@@ -93,7 +93,8 @@ describe('browser/RequestRouter', function () {
 						window.location.replace('http://local/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('a')[0]
@@ -160,7 +161,8 @@ describe('browser/RequestRouter', function () {
 						window.location.replace('http://local/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('div')[0]
@@ -219,7 +221,8 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('https://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('a')[0]
@@ -281,7 +284,8 @@ describe('browser/RequestRouter', function () {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('a')[0]
@@ -347,7 +351,8 @@ describe('browser/RequestRouter', function () {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b/');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('a')[0]
@@ -394,7 +399,8 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local2.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('a')[0]
@@ -441,7 +447,8 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('a')[0]
@@ -490,7 +497,8 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('div')[0]
@@ -538,7 +546,8 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						event.button = 1;
 						window.document
@@ -582,7 +591,8 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document.createEvent();
+						var event = window.document
+							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						window.document
 							.getElementsByTagName('a')[0]
