@@ -614,7 +614,7 @@ describe('browser/DocumentRenderer', function () {
 				return {
 					click: {
 						'a.clickable': function (event) {
-							event.target.innerHTML = 'Component2';
+							event.currentTarget.innerHTML = 'Component2';
 						}
 					}
 				};
@@ -658,7 +658,8 @@ describe('browser/DocumentRenderer', function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
 							for(var i = 0; i < links.length; i++) {
-								event = window.document.createEvent();
+								event = window.document
+									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
 								links[i].dispatchEvent(event);
 							}
@@ -683,6 +684,8 @@ describe('browser/DocumentRenderer', function () {
 					click: {
 						'a.clickable': function (event) {
 							event.target.parentNode.innerHTML += 'Component1';
+							event.currentTarget
+								.parentNode.innerHTML += 'Component1';
 						}
 					}
 				};
@@ -702,7 +705,7 @@ describe('browser/DocumentRenderer', function () {
 
 			var expected = 'test1<br><div><a class="clickable">' +
 				'<span><div class="toclick"></div>Component1</span>' +
-				'</a></div>';
+				'</a>Component1</div>';
 			eventBus.on('error', done);
 			jsdom.env({
 				html: ' ',
@@ -716,7 +719,8 @@ describe('browser/DocumentRenderer', function () {
 							var event,
 								toClick = element.querySelectorAll('div.toclick');
 							for(var i = 0; i < toClick.length; i++) {
-								event = window.document.createEvent();
+								event = window.document
+									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
 								toClick[i].dispatchEvent(event);
 							}
@@ -771,7 +775,8 @@ describe('browser/DocumentRenderer', function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
 							for(var i = 0; i < links.length; i++) {
-								event = window.document.createEvent();
+								event = window.document
+									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
 								links[i].dispatchEvent(event);
 							}
@@ -824,7 +829,8 @@ describe('browser/DocumentRenderer', function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
 							for(var i = 0; i < links.length; i++) {
-								event = window.document.createEvent();
+								event = window.document
+									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
 								links[i].dispatchEvent(event);
 							}
@@ -930,7 +936,8 @@ describe('browser/DocumentRenderer', function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
 							for(var i = 0; i < links.length; i++) {
-								event = window.document.createEvent();
+								event = window.document
+									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
 								links[i].dispatchEvent(event);
 							}
