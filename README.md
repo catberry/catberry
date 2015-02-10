@@ -26,7 +26,7 @@ To get started with example please proceed to
 ##Advantages
 * [Flux](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#flux) architecture
 * [Cat-components](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#cat-components) (like [web-components by Google](http://webcomponents.org/) but isomorphic)
-* Super fast server-side rendering engine based on
+* Fast server-side [progressive rendering engine](http://www.phpied.com/progressive-rendering-via-multiple-flushes/) based on
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors)
 * You will get [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)
 automatically
