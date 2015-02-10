@@ -144,10 +144,13 @@ but all of them are optional.
 * $lifetime – this field sets how long Catberry should cache data loaded
 from this store (milliseconds). By default it is set to 60000ms.
 * `load()` – loads and returns data (or Promise for it) from remote resource
-* `handleSomeActionName(args)` – does action and returns
+* `handle<SomeActionNameHere>(args)` – does action and returns
 the result (or Promise for it). You can submit data to remote resource here or
 just change some internal parameters in the store and then
-call `this.$context.changed()`
+call `this.$context.changed()`. For example the method can be
+named `handleFormSubmit` and when action with name
+`form-submit` or `form_submit` or `FORM_SUBMIT` or `formSubmit`or `FormSubmit`
+will be sent by any component this method will be called
 
 ##Store Context
 Every store always has a context. Catberry sets the property `$context`
