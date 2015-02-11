@@ -21,7 +21,7 @@ Here you can find full
 [Catberry Documentation](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md).
 
 To get started with example please proceed to 
-[this link](https://github.com/catberry/catberry-cli).
+[this link](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#get-started).
 
 ##Advantages
 * [Flux](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#flux) architecture

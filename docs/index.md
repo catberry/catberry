@@ -20,7 +20,8 @@
 * [Template Engines](#template-engines)
 * [Browser Bundle](#browser-bundle)
 * [Event Bus and Diagnostics](#event-bus-and-diagnostics) 
-* [CLI](#cli) 
+* [CLI](#cli)
+* [Get Started](#get-started)
 * [Code Style Guide](code-style-guide.md)
 
 #Isomorphic Applications
@@ -1010,5 +1011,97 @@ catberry utility:
 ```
 сcatberry --help
 ```
+
+**[⬆ back to top](#table-of-contents)**
+
+#Get Started
+First of all you need to install [CLI](https://github.com/catberry/catberry-cli):
+
+```bash
+npm install -g catberry
+```
+
+After that you can create a project.
+So, create a directory for your new project and change to new directory.
+
+```bash
+mkdir ~/new-project
+cd ~/new-project
+```
+
+Now you can initialize one of Catberry project templates.
+
+Please choose one:
+
+* `example` - finished project that works with GitHub API and demonstrates
+how to implement such isomorphic application using Catberry Framework
+* `empty-handlebars` - empty project using [Handlebars](http://handlebarsjs.com/) template engine.
+* `empty-dust` - empty project using [Dust](https://github.com/catberry/catberry-dust) template engine.
+* `empty-jade` - empty project using [Jade](http://jade-lang.com/) template engine.
+
+After you have chosen a template, please do the following:
+
+```bash
+catberry init <template>
+```
+Where `<template>` is a chosen name.
+
+For example,
+
+```bash
+catberry init empty-handlebars
+```
+
+Now you have created the project structure.
+Also you can see some instructions in console that say how to install and start
+the application.
+
+You need to install dependencies:
+
+```bash
+npm install --production
+```
+
+Then you can start your application, but you can start it using two modes:
+
+ * Debug mode – no code minification, watching files for changing and rebuilding
+ * Release mode – code minification, no watching files, production-ready
+
+To start in release mode:
+```bash
+npm start
+```
+
+To start in debug mode:
+```bash
+npm run debug
+```
+Or
+```bash
+npm run debug-win
+```
+if you use Windows.
+
+The application will say to you which port it is listening to.
+The address will be [http://localhost:3000](http://localhost:3000) by default.
+
+Now you have your first Catberry application, create your own [Stores](#stores) and
+[Cat-components](#cat-components).
+
+The CLI can help you here as well.
+
+For adding stores:
+```bash
+catberry addstore <store-name>
+```
+where `<store-name>` is name like `some-group/Store`.
+
+For adding cat-components:
+```bash
+catberry addcomp <component-name>
+```
+where `<component-name>` is name like `hello-world`.
+
+Hope now you are an expert in Catberry Framework. Enjoy it!
 
 **[⬆ back to top](#table-of-contents)**
