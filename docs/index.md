@@ -174,6 +174,56 @@ Every time router computes new application state it re-creates and re-assigns
 context to each store therefore do not save references to `this.$context`
 objects.
 
+##Code example
+This is an example how your store can look like:
+
+```javascript
+'use strict';
+
+module.exports = Some;
+
+/**
+ * Creates new instance of the "some" store.
+ * @param {UHR} $uhr Universal HTTP request.
+ * @constructor
+ */
+function Some($uhr) {
+	this._uhr = $uhr;
+}
+
+/**
+ * Current universal HTTP request to do it in isomorphic way.
+ * @type {UHR}
+ * @private
+ */
+Some.prototype._uhr = null;
+
+/**
+ * Current lifetime of data (in milliseconds) that is returned by this store.
+ * @type {number} Lifetime in milliseconds.
+ */
+Some.prototype.$lifetime = 60000;
+
+/**
+ * Loads data from remote source.
+ * @returns {Promise<Object>|Object|null|undefined} Loaded data.
+ */
+Some.prototype.load = function () {
+	// Here you can do any HTTP requests using this._uhr.
+	// Please read details here https://github.com/catberry/catberry-uhr.
+};
+
+/**
+ * Handles action named "some-action" from any component.
+ * @returns {Promise<Object>|Object|null|undefined} Response to component.
+ */
+Some.prototype.handleSomeAction = function () {
+	// Here you can call this.$context.changed() if you know
+	// that remote data source has been changed.
+	// Also you can have many handle methods for other actions.
+};
+```
+
 **[⬆ back to top](#table-of-contents)**
 
 #Cat-components
@@ -316,6 +366,52 @@ promise for `Array` of results.
 Every time router computes new application state, it re-creates and re-assigns
 context to each component therefore do not save references to `this.$context`
 objects.
+
+##Code example
+This is an example how your cat-component can look like:
+
+```javascript
+'use strict';
+
+module.exports = Some;
+
+/**
+ * Creates new instance of the "some" component.
+ * @constructor
+ */
+function Some() {
+
+}
+
+/**
+ * Gets data context for template engine.
+ * This method is optional.
+ * @returns {Promise<Object>|Object|null|undefined} Data context
+ * for template engine.
+ */
+Some.prototype.render = function () {
+
+};
+
+/**
+ * Returns event binding settings for the component.
+ * This method is optional.
+ * @returns {Promise<Object>|Object|null|undefined} Binding settings.
+ */
+Some.prototype.bind = function () {
+
+};
+
+/**
+ * Does cleaning for everything that have NOT been set by .bind() method.
+ * This method is optional.
+ * @returns {Promise|undefined} Promise or nothing.
+ */
+Some.prototype.unbind = function () {
+
+};
+
+```
 
 **[⬆ back to top](#table-of-contents)**
 
