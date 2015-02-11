@@ -845,10 +845,11 @@ CookiesWrapper.prototype.set = function (cookieSetup) { }
 
 #Template engines
 Catberry supports any template engine that have the "precompiling to string" feature.
-Currently [Dust](https://github.com/catberry/catberry-dust)
-and [Handlebars](https://github.com/catberry/catberry-handlebars)
-are officially supported but you can create own adapter for any template
-engine, just take a look hot it is done for [Handlebars](https://github.com/catberry/catberry-handlebars).
+Currently [Dust](https://github.com/catberry/catberry-dust),
+[Handlebars](https://github.com/catberry/catberry-handlebars) and
+[Jade](https://github.com/catberry/catberry-jade) are officially supported
+but you can create own adapter for any template engine,
+just take a look hot it is done for [Handlebars](https://github.com/catberry/catberry-handlebars).
 
 To set template engine you just need to register template provider like this:
 ```javascript
