@@ -1094,13 +1094,13 @@ For adding stores:
 ```bash
 catberry addstore <store-name>
 ```
-where `<store-name>` is name like `some-group/Store`.
+where `<store-name>` is a name like `some-group/Store`.
 
 For adding cat-components:
 ```bash
 catberry addcomp <component-name>
 ```
-where `<component-name>` is name like `hello-world`.
+where `<component-name>` is a name like `hello-world`.
 
 Hope now you are an expert in Catberry Framework. Enjoy it!
 
