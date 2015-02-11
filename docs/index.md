@@ -849,7 +849,7 @@ Currently [Dust](https://github.com/catberry/catberry-dust),
 [Handlebars](https://github.com/catberry/catberry-handlebars) and
 [Jade](https://github.com/catberry/catberry-jade) are officially supported
 but you can create own adapter for any template engine,
-just take a look hot it is done for [Handlebars](https://github.com/catberry/catberry-handlebars).
+just take a look how it is done for [Handlebars](https://github.com/catberry/catberry-handlebars).
 
 To set template engine you just need to register template provider like this:
 ```javascript
