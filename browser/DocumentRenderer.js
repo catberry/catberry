@@ -527,7 +527,7 @@ DocumentRenderer.prototype._createBindingHandler =
 				return false;
 			});
 			if (isHandled) {
-				event.stopPropagation();
+				//event.stopPropagation();
 				return;
 			}
 
@@ -544,7 +544,7 @@ DocumentRenderer.prototype._createBindingHandler =
 				}
 
 				if (isHandled) {
-					event.stopPropagation();
+					//event.stopPropagation();
 					break;
 				}
 			}
