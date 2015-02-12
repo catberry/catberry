@@ -600,7 +600,7 @@ describe('browser/DocumentRenderer', function () {
 				return {
 					click: {
 						'a.clickable': function (event) {
-							event.target.innerHTML = 'Component1';
+							event.target.innerHTML += 'Component1';
 						}
 					}
 				};
@@ -642,7 +642,7 @@ describe('browser/DocumentRenderer', function () {
 				'<cat-test2 id="unique2">' +
 					'test2<br>' +
 					'<span><a class="clickable">' +
-					'Component2' +
+					'Component2Component1' +
 					'</a></span>' +
 				'</cat-test2>';
 			eventBus.on('error', done);
