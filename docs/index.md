@@ -153,6 +153,11 @@ named `handleFormSubmit` and when action with name
 `form-submit` or `form_submit` or `FORM_SUBMIT` or `formSubmit`or `FormSubmit`
 will be sent by any component this method will be called
 
+Please, keep in mind that stores are isomorphic and they are executing from
+both server and client-side environments. Therefore you can not
+use environment-specific global objects and functions like
+`window`, `process` or DOM methods.
+
 ##Store Context
 Every store always has a context. Catberry sets the property `$context`
 to every instance of each store. It has following properties and methods.
@@ -332,6 +337,11 @@ the component and then unbind it manually in `unbind` method.
 
 After component is removed from the DOM all event listeners will be removed
 correctly and then `unbind` method will be called (if it exists).
+
+Please, keep in mind that cat-component's constructor and `render` methods
+are isomorphic and they are executing from both server and client-side
+environments. Therefore you can not use environment-specific global objects
+and functions like `window`, `process` or DOM methods inside these methods.
 
 ##Cat-component Context
 Every component always has a context. Catberry sets the property `$context`
