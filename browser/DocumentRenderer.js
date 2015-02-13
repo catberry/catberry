@@ -54,6 +54,12 @@ var HEAD_ID = '$$head',
 		NOSCRIPT: 'NOSCRIPT',
 		META: 'META',
 		LINK: 'LINK'
+	},
+	NODE_TYPES = {
+		ELEMENT_NODE: 1,
+		TEXT_NODE: 3,
+		PROCESSING_INSTRUCTION_NODE: 7,
+		COMMENT_NODE: 8
 	};
 
 /**
@@ -653,19 +659,19 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 	for (i = 0; i < newHead.childNodes.length; i++) {
 		current = newHead.childNodes[i];
 
-		if (!map.hasOwnProperty(current.tagName)) {
-			map[current.tagName] = {};
+		if (!map.hasOwnProperty(current.nodeName)) {
+			map[current.nodeName] = {};
 		}
 
-		switch (current.tagName) {
+		switch (current.nodeName) {
 			// these elements can be only replaced
 			case TAG_NAMES.TITLE:
 			case TAG_NAMES.BASE:
 			case TAG_NAMES.NOSCRIPT:
-				key = this._getElementKey(current);
-				oldItem = head.getElementsByTagName(current.tagName)[0];
+				key = this._getNodeKey(current);
+				oldItem = head.getElementsByTagName(current.nodeName)[0];
 				if (oldItem) {
-					oldKey = this._getElementKey(oldItem);
+					oldKey = this._getNodeKey(oldItem);
 					head.replaceChild(current, oldItem);
 				} else {
 					head.appendChild(current);
@@ -675,25 +681,24 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 				i--;
 				break;
 
-			// meta elements can be deleted
-			// but we should not delete and append same elements
-			case TAG_NAMES.META:
-				key = self._getElementKey(current);
-				if (map[current.tagName].hasOwnProperty(key)) {
-					sameMetaElements[key] = true;
-				} else {
-					head.appendChild(current);
-					i--;
-				}
-				break;
-
 			// these elements can not be deleted from head
 			// therefore we just add new elements that differs from existed
 			case TAG_NAMES.STYLE:
 			case TAG_NAMES.LINK:
 			case TAG_NAMES.SCRIPT:
-				key = self._getElementKey(current);
-				if (!map[current.tagName].hasOwnProperty(key)) {
+				key = self._getNodeKey(current);
+				if (!map[current.nodeName].hasOwnProperty(key)) {
+					head.appendChild(current);
+					i--;
+				}
+				break;
+			// meta and other elements can be deleted
+			// but we should not delete and append same elements
+			default:
+				key = self._getNodeKey(current);
+				if (map[current.nodeName].hasOwnProperty(key)) {
+					sameMetaElements[key] = true;
+				} else {
 					head.appendChild(current);
 					i--;
 				}
@@ -729,34 +734,38 @@ DocumentRenderer.prototype._getHeadMap = function (headChildren) {
 
 	for (i = 0; i < headChildren.length; i++) {
 		current = headChildren[i];
-		if (!map.hasOwnProperty(current.tagName)) {
-			map[current.tagName] = {};
+		if (!map.hasOwnProperty(current.nodeName)) {
+			map[current.nodeName] = {};
 		}
-		map[current.tagName][self._getElementKey(current)] = current;
+		map[current.nodeName][self._getNodeKey(current)] = current;
 	}
 	return map;
 };
 
 /**
  * Gets unique element key using element's attributes and its content.
- * @param {Element} element HTML element.
+ * @param {Node} node HTML element.
  * @returns {string} Unique key for element.
  * @private
  */
-DocumentRenderer.prototype._getElementKey = function (element) {
+DocumentRenderer.prototype._getNodeKey = function (node) {
 	var current, i,
 		attributes = [];
 
-	if (element.hasAttributes()) {
-		for (i = 0; i < element.attributes.length; i++) {
-			current = element.attributes[i];
+	if (node.nodeType !== NODE_TYPES.ELEMENT_NODE) {
+		return node.nodeValue || '';
+	}
+
+	if (node.hasAttributes()) {
+		for (i = 0; i < node.attributes.length; i++) {
+			current = node.attributes[i];
 			attributes.push(current.name + '=' + current.value);
 		}
 	}
 
 	return attributes
 			.sort()
-			.join('|') + '>' + element.textContent;
+			.join('|') + '>' + node.textContent;
 };
 
 /**
@@ -857,6 +866,9 @@ DocumentRenderer.prototype._getComponentContext =
  */
 DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 	var self = this,
+		headStore = this._window.document.head.getAttribute(
+			moduleHelper.ATTRIBUTE_STORE
+		),
 		components = this._componentLoader.getComponentsByNames(),
 		componentsElements = {},
 		storeNamesSet = {},
@@ -880,6 +892,11 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 				);
 		});
 
+	if (components.hasOwnProperty(moduleHelper.HEAD_COMPONENT_NAME) &&
+		storeNamesSet.hasOwnProperty(headStore)) {
+		rootsSet[getId(this._window.document.head)] = true;
+		roots.push(this._window.document.head);
+	}
 	changedStoreNames
 		.forEach(function (storeName) {
 			var current, currentId,
