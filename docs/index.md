@@ -270,7 +270,7 @@ For example:
 }
 ```
 
-In this example above you wil get a custom tag `<cat-cool/>` in your
+In this example above you wil get a custom tag `<cat-cool></cat-cool>` in your
 application.
 
 Please, keep in mind that all store names are NOT case-sensitive. If you
@@ -280,7 +280,7 @@ startup.
 After you define a cat-component you can use it like this:
 
 ```html
-<cat-cool id="unique-value" cat-store="group/store1" some-additional="value" />
+<cat-cool id="unique-value" cat-store="group/store1" some-additional="value" ></cat-cool>
 ```
 
 There are some important moments here:
@@ -289,7 +289,8 @@ it is not rendered and throws error
 * You can set `cat-store` attribute that means if store is changed this
 component will be re-rendered automatically
 * You can set any additional attributes you want without any problems
-* You should always use self-closing tags
+* You should always use open and close tags (not self-closing tags). The most
+of browsers do not support self-closing custom tags.
 * You can use tags of other components in template of any component
 
 There are two reserved component names that are used in unusual way:
