@@ -528,7 +528,7 @@ describe('browser/DocumentRenderer', function () {
 					'<link rel="stylesheet" href="someStyleLink1">' +
 					'<link rel="stylesheet" href="someStyleLink2">' +
 					'<meta name="name1" content="value1">' +
-					'<noscript>noScript2</noscript>' +
+					'head<br><noscript>noScript2</noscript>' +
 					'<style type="text/css">' +
 					'some styles3' +
 					'</style>' +
