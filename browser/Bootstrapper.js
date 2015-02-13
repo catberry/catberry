@@ -51,7 +51,7 @@ var util = require('util'),
 	BootstrapperBase =
 		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 
-var INFO_DOCUMENT_UPDATED = 'Document updated (%d stores changed)',
+var INFO_DOCUMENT_UPDATED = 'Document updated (%d store(s) changed)',
 	INFO_COMPONENT_BOUND = 'Component "%s" is bound';
 
 util.inherits(Bootstrapper, BootstrapperBase);
