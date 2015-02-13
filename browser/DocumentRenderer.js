@@ -266,7 +266,6 @@ DocumentRenderer.prototype.renderComponent =
 				return component.template.render(dataContext);
 			})
 			.then(function (html) {
-				//TODO optimize append and prepend operations if possible
 				if (element.tagName === TAG_NAMES.HEAD) {
 					self._mergeHead(element, html);
 				} else {
