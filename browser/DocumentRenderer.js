@@ -513,12 +513,8 @@ DocumentRenderer.prototype._createBindingHandler =
 	function (componentRoot, selectorHandlers) {
 		var selectors = Object.keys(selectorHandlers);
 		return function (event) {
-			var dispatchedEvent = Object.create(event, {
-					currentTarget: {
-						get: function () {
-							return element;
-						}
-					}
+			var dispatchedEvent = createCustomEvent(event, function () {
+					return element;
 				}),
 				element = event.target,
 				targetMatches = getMatchesMethod(element),
@@ -1016,4 +1012,46 @@ function getMatchesMethod(element) {
 		element.msMatchesSelector);
 
 	return method.bind(element);
+}
+
+/**
+ * Creates imitation of original Event object but with specified currentTarget.
+ * @param {Event} event Original event object.
+ * @param {Function} currentTargetGetter Getter for currentTarget.
+ * @returns {Event} Wrapped event.
+ */
+function createCustomEvent(event, currentTargetGetter) {
+	var catEvent = Object.create(event),
+		keys = [],
+		properties = {};
+	for(var key in event) {
+		keys.push(key);
+	}
+	keys.forEach(function (key) {
+		if (typeof(event[key]) === 'function') {
+			properties[key] = {
+				get: function () {
+					return event[key].bind(event);
+				}
+			};
+			return;
+		}
+
+		properties[key] = {
+			get: function () {
+				return event[key];
+			},
+			set: function (value) {
+				event[key] = value;
+			}
+		};
+	});
+
+	properties.currentTarget = {
+		get: currentTargetGetter
+	};
+	Object.defineProperties(catEvent, properties);
+	Object.seal(catEvent);
+	Object.freeze(catEvent);
+	return catEvent;
 }
