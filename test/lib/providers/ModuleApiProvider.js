@@ -173,16 +173,16 @@ describe('lib/providers/ModuleApiProvider', function () {
 				api = locator.resolveInstance(ModuleApiProvider);
 			assert.strictEqual(api.redirect('/some1') instanceof Promise, true);
 			assert.strictEqual(api.redirect('/some2') instanceof Promise, true);
-			assert.strictEqual(api.redirectedTo, '/some2');
+			assert.strictEqual(api.actions.redirectedTo, '/some2');
 		});
 	});
 	describe('#clearFragment', function () {
 		it('should save flag that hash has been cleared', function () {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
-			assert.strictEqual(api.isFragmentCleared, false);
+			assert.strictEqual(api.actions.isFragmentCleared, false);
 			assert.strictEqual(api.clearFragment() instanceof Promise, true);
-			assert.strictEqual(api.isFragmentCleared, true);
+			assert.strictEqual(api.actions.isFragmentCleared, true);
 		});
 	});
 	describe('#getInlineScript', function () {
