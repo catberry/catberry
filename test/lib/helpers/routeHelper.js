@@ -203,13 +203,17 @@ describe('lib/helpers/routeHelper', function () {
 		it('should return correct mapper for parameters when list with spaces',
 			function (done) {
 				var uri = '/some/test?filter=date',
-					expression = '/some/:test[       ]?filter=:filter[  ]',
+					expression = '/some/:test[group/module1,    ' +
+						'group/module2       ]?filter=:filter[group/module2]',
 					mapper = routeHelper.getUriMapperByRoute(expression);
 
 				assert.strictEqual(mapper.expression.test(uri), true);
 				var state = mapper.map(uri);
-				assert.strictEqual(typeof(state), 'object');
-				assert.strictEqual(Object.keys(state).length, 0);
+				assert.strictEqual(typeof(state['group/module1']), 'object');
+				assert.strictEqual(typeof(state['group/module2']), 'object');
+				assert.strictEqual(state['group/module1'].test, 'test');
+				assert.strictEqual(state['group/module2'].test, 'test');
+				assert.strictEqual(state['group/module2'].filter, 'date');
 				done();
 			});
 	});
