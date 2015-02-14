@@ -21,25 +21,29 @@ Here you can find full
 [Catberry Documentation](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md).
 
 To get started with example please proceed to 
-[this link](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#get-started).
+[Get Started Guide](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#get-started).
 
 ##Advantages
 * [Flux](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#flux) architecture
 * [Cat-components](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#cat-components) (like [web-components by Google](http://webcomponents.org/) but isomorphic)
-* Fast server-side [progressive rendering engine](http://www.phpied.com/progressive-rendering-via-multiple-flushes/) based on
+* You do not need to write any code for registration or definition of
+[cat-components](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#cat-components) or
+[stores[(https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#stores),
+Catberry discovers them automatically on startup
+* Fast and efficient server-side [progressive rendering engine](http://www.phpied.com/progressive-rendering-via-multiple-flushes/) based on
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors)
-* No Virtual DOM – you can use any other library with Catberry without conflicts
-* Efficient DOM event listening using event delegation
 * [Dust](https://github.com/catberry/catberry-dust),
 [Handlebars](https://github.com/catberry/catberry-handlebars) and
 [Jade](https://github.com/catberry/catberry-jade) template engines
+* No Virtual DOM – you can use any other library with Catberry without conflicts
+* Efficient DOM event listening using [event delegation](http://davidwalsh.name/event-delegate)
 are officially supported (and you can implement own provider for others)
 * You will get [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)
 automatically
 * You will get back-end that renders exactly the same page for search engines
 and shared links
 * You will write code in server-side style
-(using [node modules system](http://nodejs.org/api/modules.html#modules_modules))
+(using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) and [npm](https://www.npmjs.org/)
 * Entire architecture of framework is built using
 [Service Locator](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#service-locator)
 pattern and 
