@@ -174,7 +174,8 @@ of current referrer
 from routing definition
 * `this.$context.locator` – Service Locator of the application
 * `this.$context.redirect('String')` - Redirects to specified location string
-* `this.$context.changed()` – Triggers `changed` event for current store
+* `this.$context.changed()` – Triggers `changed` event for current store.
+You can use this method whenever you want, Catberry handles it correctly.
 
 Every time router computes new application state it re-creates and re-assigns
 context to each store therefore do not save references to `this.$context`
