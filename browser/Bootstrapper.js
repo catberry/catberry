@@ -97,6 +97,10 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	stores.forEach(function (store) {
 		locator.registerInstance('store', store);
 	});
+
+	components.forEach(function (component) {
+		locator.registerInstance('component', component);
+	});
 };
 
 /**
