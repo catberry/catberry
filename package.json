@@ -63,15 +63,15 @@
 		"promise": "^6.1.0"
 	},
 	"devDependencies": {
-		"istanbul-harmony": "~0.3.0",
-		"coveralls": "^2.11.0",
-		"jsdom": "^3.1.0",
+		"istanbul-harmony": "~0.3.1",
+		"coveralls": "^2.11.2",
+		"jsdom": "^3.1.1",
 		"mocha": "^2.1.0",
 		"jscs": "~1.6.2",
-		"jshint": "^2.5.0"
+		"jshint": "^2.6.0"
 	},
 	"engines": {
-		"node": "0.10.x || 0.12.x"
+		"node": ">=0.10"
 	},
 	"scripts": {
 		"test": "make"
