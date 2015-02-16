@@ -26,10 +26,10 @@
 
 # Isomorphic Applications
 Make a long story short, isomorphic applications are built to make it possible 
-to write module once and use it for both page rendering on server 
+to write module once and use it for both pages rendering on server
 (for SEO and shared links) and in browser with no server side at all.
 It means on server your modules are executing the same code as 
-in browser. This [Single Page Application]
+in a browser. This [Single Page Application]
 (http://en.wikipedia.org/wiki/Single_Page_Application) 
 can render all parts of the page using the same isomorphic modules and not
 reloading the page at all.
@@ -37,28 +37,28 @@ reloading the page at all.
 There is an awesome [post in Airbnb technical blog]
 (http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) 
 about the idea of isomorphic JavaScript applications and what exactly it is.
-Also you can find the video [Spike Brehm: Building Isomorphic Apps]
+Also, you can find the video [Spike Brehm: Building Isomorphic Apps]
 (http://www.youtube.com/watch?v=CH6icJbLhlI)
 from JSConf 2014 talks.
 
-Isomorphic applications can work with set of independent RESTful services that
+Isomorphic applications can work with a set of independent RESTful services that
 implement some business logic (Facebook API, Twitter API, your API etc).
 In fact, each module in isomorphic application should receive all data from 
-API server which could be written in any platform you want using REST approach.
+API server which could be written using any platform you want using REST approach.
 
 There is a list of problems which are solved by isomorphic applications:
 
-* *Using single page applications causes SEO problems*. Your isomorphic
-modules will render exactly the same page on server as it is in browser
-* *Code duplication for rendering parts of the page at server
-and in the browser, sometimes it even written in different programming
+* *Using Single Page Applications causes SEO problems*. Your isomorphic
+modules will render exactly the same page on the server as it is in a browser
+* *Code duplication for rendering parts of the page at the server
+and in the browser, sometimes it is even written in different programming
 languages*. Since isomorphic modules are written only once and in JavaScript
 you do not have this problem.
-* *Maintenance is complicated, because you need to synchronize changes 
-in server-side and browser modules*. Obviously, you do not need this
+* *Maintenance is complicated because you need to synchronize changes
+in server-side and browser modules*. Obviously, you do not need it
 using isomorphic modules. It is always one module to change.
-* *Overhead connected with rendering all pages on server*. Since browsers 
-receive a page from server only once and then render all other pages in 
+* *Overhead connected with rendering all pages on the server*. Since browsers
+receive a page from the server only once and then render all other pages in
 their browsers, your server's load will be reduced dramatically.
  
 And maybe a lot of more problems, who knows.
@@ -92,7 +92,7 @@ complicated applications.
 
 One more thing about Catberry architecture: the main approach in Catberry
 for controlling asynchronous operations is [Promise](https://www.promisejs.org/).
-Catberry uses the native `Promise` in a browser or in node.js (V8)
+Catberry uses the native `Promise` in a browser or in Node.js (V8)
 if it is possible. If global type `Promise` is not found it will be defined using
 ["Bare bones Promises/A+ implementation"](https://www.npmjs.org/package/promise).
 It means you can use `Promise` type globally and do not worry about its support.
@@ -100,12 +100,12 @@ It means you can use `Promise` type globally and do not worry about its support.
 **[⬆ back to top](#table-of-contents)**
 
 # Stores
-The store is a module that loads data from remote resource using routing
+The store is a module that loads data from a remote resource using routing
 parameters. It also can handle action messages from anywhere and send requests
-to remote resource changing data. It can emit `changed` event at anytime when it
-decided that data at the remote resource is changed.
+to the remote resource changing data. It can emit `changed` event at any time
+when it decided that data on the remote resource is changed.
 
-By default all stores should be placed into `./catberry_stores` directory
+By default, all stores should be placed into `./catberry_stores` directory
 of your application. But you can change this directory by [config](#config)
 parameter. Every file should export constructor function for creation of store
 instance.
@@ -143,12 +143,12 @@ define such methods and properties into constructor prototype,
 but all of them are optional.
 
 * $lifetime – this field sets how long Catberry should cache data loaded
-from this store (milliseconds). By default it is set to 60000ms.
-* `load()` – loads and returns data (or Promise for it) from remote resource
+from this store (milliseconds). By default, it is set to 60000ms.
+* `load()` – loads and returns data (or Promise for it) from a remote resource
 * `handle<SomeActionNameHere>(args)` – does action and returns
-the result (or Promise for it). You can submit data to remote resource here or
+the result (or Promise for it). You can submit data to a remote resource here or
 just change some internal parameters in the store and then
-call `this.$context.changed()`. For example the method can be
+call `this.$context.changed()`. For example, the method can be
 named `handleFormSubmit` and when action with name
 `form-submit` or `form_submit` or `FORM_SUBMIT` or `formSubmit`or `FormSubmit`
 will be sent by any component this method will be called
@@ -170,7 +170,7 @@ to every instance of each store. It has following properties and methods.
 of current location
 * `this.$context.referrer` – current [URI](https://github.com/catberry/catberry-uri) object
 of current referrer
-* `this.$context.state` – current set of parameters for current store parsed
+* `this.$context.state` – the current set of parameters for current store parsed
 from routing definition
 * `this.$context.locator` – Service Locator of the application
 * `this.$context.redirect('String')` - Redirects to specified location string
@@ -178,7 +178,7 @@ from routing definition
 You can use this method whenever you want, Catberry handles it correctly.
 
 Every time router computes new application state it re-creates and re-assigns
-context to each store therefore do not save references to `this.$context`
+context to each store, therefore, do not save references to `this.$context`
 objects.
 
 ## Code example
@@ -190,7 +190,7 @@ This is an example how your store can look like:
 module.exports = Some;
 
 /**
- * Creates new instance of the "some" store.
+ * Creates a new instance of the "some" store.
  * @param {UHR} $uhr Universal HTTP request.
  * @constructor
  */
@@ -212,7 +212,7 @@ Some.prototype._uhr = null;
 Some.prototype.$lifetime = 60000;
 
 /**
- * Loads data from remote source.
+ * Loads data from a remote source.
  * @returns {Promise<Object>|Object|null|undefined} Loaded data.
  */
 Some.prototype.load = function () {
@@ -245,17 +245,17 @@ have own template (any template engine), own logic in JavaScript and own assets.
 
 Cat-component is declared as a directory with `cat-component.json`
 file by default. But you can change it in [config](#config).
-When Catberry initializes it does recursively search of such directories
+When Catberry initializes it does recursively search for such directories
 starting with your application root. It means you can publish and use
 cat-components from [npm](http://npmjs.org/).
 
 `cat-component.json` consists of following:
 
-* name – name of the component and postfix of custom tag
+* name – the name of the component and postfix of custom tag
 (optional, by default it is the name of the directory).
 * description – some additional information about cat-component (optional)
 * template – relative path to component template (required)
-* errorTemplate – relative path to component template for error state (optional)
+* errorTemplate – relative path to component template for an error state (optional)
 * logic – relative path to file that exports constructor for logic object
 (optional, index.js by default)
 
@@ -275,7 +275,7 @@ In this example above you wil get a custom tag `<cat-cool></cat-cool>` in your
 application.
 
 Please, keep in mind that all store names are NOT case-sensitive. If you
-declare component with the same name twice you wii receive a warning message on
+declare component with the same name twice you will receive a warning message on
 startup.
 
 After you define a cat-component you can use it like this:
@@ -292,29 +292,29 @@ component will be re-rendered automatically
 * You can set any additional attributes you want without any problems
 * You should always use open and close tags (not self-closing tags). The most
 of browsers do not support self-closing custom tags.
-* You can use tags of other components in template of any component
+* You can use tags of other components in the template of any component
 
 There are two reserved component names that are used in unusual way:
-* document – the root template of entire application (doctype, html, body etc.).
+* document – the root template of the entire application (doctype, html, body etc.).
 It can not depend on any store. `cat-store` attribute is just ignored.
 * head – the component for HEAD element on the page. It always is rendered in
 diff/merge mode otherwise all styles and scripts are re-processed every time. It
-can depend on store and works as usual cat-component except rendering approach.
+can depend on a store and works as usual cat-component except rendering approach.
 
 ## Cat-component interface
 As store component's logic file should export a constructor function for
-creating instances for every custom tag on page. Also you can
+creating instances for every custom tag on the page. Also you can
 define such methods and properties into constructor prototype,
 but all of them are optional.
 
 * `render()` – creates and returns data (or Promise for it) for component template
-* `bind()` – creates and returns object with event bindings (or Promise for it)
+* `bind()` – creates and returns an object with event bindings (or Promise for it)
 * `unbind()` – this method is like a destructor and if you want to manually remove
 some listeners or to do something else you can implement this method
 
 Some more details about `bind()` method:
-It is supported that `bind()` methods returns an object that describes all event
-bindings inside the template of current component. You can return binding object
+It is supported that `bind()` method returns an object that describes all event
+bindings inside the template of the current component. You can return binding object
 (or Promise for it) like this.
 
 ```
@@ -331,18 +331,18 @@ Cool.prototype.bind = function () {
 };
 ```
 
-As you may notice, every event handler is bound to current instance of
-component, you do not need to use
+As you may notice, every event handler is bound to the current instance of
+the component, you do not need to use
 [`.bind(this)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
-by yourself. Also you can use bind method to make additional bindings outside
+by yourself. Also, you can use bind method to make additional bindings outside
 the component and then unbind it manually in `unbind` method.
 
-After component is removed from the DOM all event listeners will be removed
+After a component is removed from the DOM all event listeners will be removed
 correctly and then `unbind` method will be called (if it exists).
 
 Please, keep in mind that cat-component's constructor and `render` methods
 are isomorphic and they are executing from both server and client-side
-environments. Therefore you can not use environment-specific global objects
+environments. Therefore, you can not use environment-specific global objects
 and functions like `window`, `process` or DOM methods inside these methods.
 
 ## Cat-component Context
@@ -358,9 +358,9 @@ of current location`
 * `this.$context.referrer` – current [URI](https://github.com/catberry/catberry-uri) object
 of current referrer`
 * `this.$context.locator` – Service Locator of the application
-* `this.$context.element` – current DOM element that is a root of current component
+* `this.$context.element` – current DOM element that is a root of the current component
 * `this.$context.attributes` – set of attributes are set when component was
-rendered last time
+rendered the last time
 * `this.$context.redirect('String')` - redirects to specified location string
 * `this.$context.getComponentById(‘id’)` – gets other component by ID
 * `this.$context.createComponent(‘tagName’, attributesObject)` – creates new
@@ -371,13 +371,13 @@ component and returns promise for its root DOM element
 depends on any store
 * `this.$context.sendAction(‘name’, object)` – sends action to store if component
 depends on any store and returns a promise of the action handling result. If
-store does not have handler for this action the result is always `null`.
+the store does not have a handler for this action the result is always `null`.
 * `this.$context.sendBroadcastAction(‘name’, object)` – the same as previous but
-the action wil be sent to all stores that have handler for this action. Returns
+the action will be sent to all stores that have handler for this action. Returns
 promise for `Array` of results.
 
 Every time router computes new application state, it re-creates and re-assigns
-context to each component therefore do not save references to `this.$context`
+context to each component, therefore, do not save references to `this.$context`
 objects.
 
 ## Code example
@@ -389,7 +389,7 @@ This is an example how your cat-component can look like:
 module.exports = Some;
 
 /**
- * Creates new instance of the "some" component.
+ * Creates a new instance of the "some" component.
  * @constructor
  */
 function Some() {
@@ -397,10 +397,10 @@ function Some() {
 }
 
 /**
- * Gets data context for template engine.
+ * Gets data context for the template engine.
  * This method is optional.
  * @returns {Promise<Object>|Object|null|undefined} Data context
- * for template engine.
+ * for the template engine.
  */
 Some.prototype.render = function () {
 
@@ -459,12 +459,12 @@ Typically directory structure of your application should look like this:
 		errorTemplate.hbs
 		cat-component.json
 
- # directory for your own external non-catberry modules/services
+ # directory for your own external not catberry modules/services
 ./lib/
- # this directory is default destination for browser bundle building
+ # this directory is the default destination for browser bundle building
  # and it will be re-created on every start of Catberry application.
 ./public/
-	# this directory is default destination for copying assets
+	# this directory is the default destination for copying assets
 	assets/
 		document
 			favicon.ico
@@ -482,7 +482,7 @@ Typically directory structure of your application should look like this:
 ./server.js
 ```
 
-If you want to see finished application as an example then please proceed to
+If you want to see finished application as an example then please proceed to the
 [example directory](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
 **[⬆ back to top](#table-of-contents)**
@@ -492,7 +492,7 @@ Catberry's routing system triggers the "changed" event in every
 [store](#stores) that depends on changed arguments in routed URI.
 Those arguments are set by route definitions in file './routes.js'.
 
-When you change the URI in a browser or send request to the server Catberry
+When you change the URI in a browser or send a request to the server Catberry
 computes the application state using those definitions and pass
 it to Store Dispatcher that controls everything related to stores.
 
@@ -511,7 +511,7 @@ Default definition syntax is following:
 ```
 
 All parameters should be marked with the colon at the beginning and
-optionally followed by the list of store names that will receive value
+optionally followed by the list of store names that will receive the value
 of this parameter. These stores are called stores-dependants.
 This list can also be empty.
 
@@ -524,10 +524,10 @@ regular expression `[^\[\],]+` and parameter **value** should satisfy
 regular expression `[^\/\\&\?=]*`.
 
 ## Colon-marked parameters with additional `map` function
-Also you can define mapper object, that allows you to modify application
+Also, you can define mapper object, that allows you to modify application
 state object before it will be processed by Catberry.
 
-If you want to use `map` function just define route like this:
+If you want to use a `map` function just define route like this:
 
 ```javascript
 {
@@ -540,15 +540,15 @@ If you want to use `map` function just define route like this:
 
 ```
 Map function receives the state prepared by route definition string.
-State is an object where keys are names of stores and values are state
+State is an object, where keys are store names and values are state
 objects for every store. You can change entire state object if you want
-and return it from map function.
+and return it from a map function.
 
-In this example store `news` will receive additional state parameter `pageType`
+In this example, store `news` will receive additional state parameter `pageType`
 with value `userNews`.
 
 ## Regular expression
-For some rare cases you may need to parse parameters
+For some rare cases, you may need to parse parameters
 by regular expressions. In these cases you can define mapper
 object as listed below:
 
@@ -567,10 +567,10 @@ object as listed below:
 ```
 
 In this example the store `order` will receive parameter `orderId` with value
-matched with number in URL.
+matched with a number in URL.
 
 ## File example
-Here is example of `./routes.js` file with all 3 cases of route definition:
+Here is an example of `./routes.js` file with all 3 cases of the route definition:
 
 ```javascript
 module.exports = [
@@ -598,7 +598,7 @@ module.exports = [
 
 # Catberry Services
 Let's talk about Catberry Framework for isomorphic applications.
-In Catberry every framework component such as Logger or
+In Catberry, every framework component such as Logger or
 Universal HTTP(S) Request module are called "Services".
 
 Entire Catberry architecture is built using [Service Locator]
@@ -607,10 +607,10 @@ Entire Catberry architecture is built using [Service Locator]
 Service Locator is a Catberry core component that stores information about
 every Catberry's component (service). It is similar with
 [IoC](http://en.wikipedia.org/wiki/Inversion_of_control) Container
-in other platforms. So, if any components depends on others it just says it to
+in other platforms. So, if any components depend on others it just says it to
 Service Locator and it creates instances of every required dependency.
 For example, every component and even userland
-Catberry module can ask for a "logger" service to log messages to console.
+Catberry module can ask for a "logger" service to log messages to the console.
 
 When Catberry initializes itself it fills Service Locator with own set of
 services, but framework users can also register own plugins (services)
@@ -679,7 +679,7 @@ cat.startWhenReady(); // returns promise
 // now Catberry already has initialized the whole infrastructure of services
 ```
 
-Also you can override some existing service registrations, for example Logger:
+Also, you can override some existing service registrations, for example, Logger:
  
 ```javascript
 cat.locator.register('logger', MyCoolLogger, config, true);
@@ -697,31 +697,31 @@ If you want to know how to use registered services, please read
 * [Interface of Service Locator](https://github.com/catberry/catberry-locator/blob/master/lib/ServiceLocator.js)
 
 ## Dependency Injection
-If you need to use some registered service you just inject it into constructor
+If you need to use some registered service you just inject it into a constructor
 of [Store](#stores) or [Cat-component](#cat-components).
 
 For example, you have the store called "AwesomeStore".
-In Catberry every store is a constructor with prototype,
+In Catberry, every store is a constructor with prototype,
 to inject "logger" service, your own "restApiClient" service and
-someConfigKey from config object you just can do that:
+someConfigKey from the config object you just can do that:
 
 ```javascript
 function AwesomeStore($logger, $restApiClient, someConfigKey) {
 	// here the $logger and the $restApiClient are instances
 	// of registered services.
-	// someConfigKey is a field from startup config object.
+	// someConfigKey is a field from startup-config object.
 	// Every injection without '$' at the beginning is a config field
 }
 ```
 
-When you start application in release mode this code
+When you start an application in release mode this code
 will be optimized (minified) for the browser,
 but all these injections will stay as is and will not be broken.
 
-Also you can inject just `$serviceLocator` and resolve everything you want
+Also, you can inject just `$serviceLocator` and resolve everything you want
 directly from locator.
 
-It is really important not to make loops in graph of dependencies. It causes
+It is really important not to make loops in the graph of dependencies. It causes
 infinite recursion and just kills your application.
 
 Please keep in mind that config fields can be injected only side by side
@@ -737,23 +737,23 @@ Userland Services
 * [Universal HTTP(S) Request](#uhr-universal-https-request)
 
 ## Logger
-Catberry has an universal logger service registered as "logger" in 
+Catberry has a universal logger service registered as "logger" in
 [Service Locator](#service-locator) and it is accessible via
 [dependency injection](#dependency-injection).
 
 Just inject `$logger` into your store or component.
-Also it can be resolved from Service Locator directly.
+Also, it can be resolved from Service Locator directly.
 
 This logger implementation has standard for almost every logger methods
 {trace, warn, info, error, fatal}. 
-Last two supports Error object to be passed as the only argument.
+Last two support Error object to be passed as the only argument.
 
 Actually when you use this service at the server it uses
 [log4js](https://www.npmjs.org/package/log4js) module inside. 
 It means you can configure it as described [here]
 (https://github.com/nomiddlename/log4js-node) in its README file.
 
-In a browser it is implemented as a very simple logger that can only write
+In a browser, it is implemented as a very simple logger that can only write
 to the browser's console.
 
 ### Configuration
@@ -806,7 +806,7 @@ Catberry uses following parameters from it:
 
 * componentsGlob – glob expression for searching cat-components
 ("**/cat-component.json" by default)
-* storesDirectory – relative path to directory with stores
+* storesDirectory – relative path to the directory with stores
 ("./catberry_stores" by default)
 * publicDirectoryPath – path to public directory
 ("./public" by default)
@@ -817,15 +817,15 @@ Catberry has Universal HTTP(S) Request service registered as "uhr" in
 [dependency injection](#dependency-injection).
 
 This is isomorphic implementation of HTTP request.
-All details you can find in UHR read me file [here]
+All details you can find in UHR readme file [here]
 (https://github.com/catberry/catberry-uhr/blob/master/README.md).
 
 **[⬆ back to top](#table-of-contents)**
 
 # Cookie
-As you may notice, store and cat-component context have property `cookie` that
+As you may notice, store and cat-component context have a property `cookie` that
 allows you to control cookie in isomorphic way.
-Actually, it is an universal wrapper that can `get` and `set` cookie
+Actually, it is a universal wrapper that can `get` and `set` cookie
 in environment-independent way.
 
 It has following interface:
@@ -859,7 +859,7 @@ CookiesWrapper.prototype.set = function (cookieSetup) { }
 # Template engines
 Catberry supports any template engine that have the "precompiling to string" feature.
 Currently [Dust](https://github.com/catberry/catberry-dust),
-[Handlebars](https://github.com/catberry/catberry-handlebars) and
+[Handlebars](https://github.com/catberry/catberry-handlebars), and
 [Jade](https://github.com/catberry/catberry-jade) are officially supported
 but you can create own adapter for any template engine,
 just take a look how it is done for [Handlebars](https://github.com/catberry/catberry-handlebars).
@@ -897,7 +897,7 @@ For example you can use `./build.js` script like this:
 node ./build.js release
 ```
 
-To build browser bundle Catberry uses [browserify](http://browserify.org) which 
+To build browser bundle, Catberry uses [browserify](http://browserify.org) which
 is awesome and can convert your server-side JavaScript to browser code.
 
 ## Including packages into the browser bundle
@@ -934,7 +934,7 @@ Catberry has a set of events that can be used for diagnostics or
 in components and stores. Catberry uses the same events for logging all trace,
 info and error messages.
 
-There are two ways for listening to Catberry event:
+There are two ways of listening to Catberry event:
 
 * Subscribe on it using Catberry application instance directly like this
 
@@ -947,13 +947,13 @@ cat.events.on('error', function (error) {
 });
 ```
 
-* Subscribe on it using context of [store](#stores) or
+* Subscribe on it using the context of [store](#stores) or
 [cat-component](#cat-components) using the same `on`, `once` methods.
 
 
-In a browser you can access Catberry application instance via `window` object
+In a browser, you can access Catberry application instance via `window` object
 ```javascript
-// catberry object is global because it is a property of window
+// catberry object is global because it is a property of the window
 catberry.events.on('error', function (error) {
 	// some action
 });
@@ -998,7 +998,7 @@ List of browser-only events:
 | componentBound	| each component is bound							|	`{element: Element, id: String}`	|
 
 
-This events can be used for browser extensions, extended logging
+These events can be used for browser extensions, extended logging
 or component/store logic, feel free to use them everywhere you want
 but remember if any event has too many subscribers it can cause
 performance degradation.
@@ -1033,15 +1033,15 @@ First of all you need to install [CLI](https://github.com/catberry/catberry-cli)
 npm install -g catberry
 ```
 
-After that you can create a project.
-So, create a directory for your new project and change to new directory.
+After that, you can create a project.
+So, create a directory for your new project and change to the new directory.
 
 ```bash
 mkdir ~/new-project
 cd ~/new-project
 ```
 
-Now you can initialize one of Catberry project templates.
+Now you can initialize one of the Catberry project templates.
 
 Please choose one:
 
@@ -1065,7 +1065,7 @@ catberry init empty-handlebars
 ```
 
 Now you have created the project structure.
-Also you can see some instructions in console that say how to install and start
+Also you can see some instructions in the console that say how to install and start
 the application.
 
 You need to install dependencies:
@@ -1094,7 +1094,7 @@ npm run debug-win
 ```
 if you use Windows.
 
-The application will say to you which port it is listening to.
+The application will say to you which port it is listening on.
 The address will be [http://localhost:3000](http://localhost:3000) by default.
 
 Now you have your first Catberry application, create your own [Stores](#stores) and
