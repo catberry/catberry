@@ -55,7 +55,7 @@
 		"glob": "^4.3.5",
 		"gaze": "~0.5.1",
 		"catberry-locator": "^1.1.2",
-		"catberry-uhr": "^3.1.0",
+		"catberry-uhr": "^4.0.0",
 		"catberry-uri": "^2.0.0",
 		"uglify-js": "^2.4.16",
 		"browserify": "^8.1.3",
