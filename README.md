@@ -20,7 +20,7 @@ And back-end that renders exactly the same page on the server.
 Here you can find full
 [Catberry Documentation](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md).
 
-To get started with example please proceed to 
+To get started with an example please proceed to
 [Get Started Guide](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#get-started).
 
 ## Advantages
@@ -44,23 +44,23 @@ automatically
 and shared links
 * You will write code in server-side style
 (using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) and [npm](https://www.npmjs.org/)
-* Entire architecture of framework is built using
+* Entire architecture of the framework is built using
 [Service Locator](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#service-locator)
 pattern and 
 [Dependency Injection](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#dependency-injection)
-* Framework itself is a 
+* Framework itself is an
 [express](https://github.com/visionmedia/express)/[connect](https://github.com/senchalabs/connect) 
 middleware, it means you can use it with any other middlewares
 
 For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md).
 
-Also you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
+Also, you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
 ## Browser Support
 Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 
 and some HTML5 features like [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history)
 therefore it does not support old browsers at all. Catberry can render pages
-for any browser at the server but Catberry's browser script does not work
+for any browser at the server, but Catberry's browser script does not work
 as [SPA](http://en.wikipedia.org/wiki/Single-page_application) in old browsers.
 
 The main goal of Catberry Framework is to use the full power of new technologies
@@ -97,6 +97,6 @@ code is awesome.
 
 All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/4.0.0/docs/code-style-guide.md).
 
-Also your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
+Also, your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
 
 Denis Rechkunov <denis.rechkunov@gmail.com>
