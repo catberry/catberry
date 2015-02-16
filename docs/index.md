@@ -1,8 +1,8 @@
-#Catberry Framework Documentation
+# Catberry Framework Documentation
 
 ![Catberry](images/logo.png) 
 
-#Table Of Contents
+# Table Of Contents
 * [Isomorphic Applications](#isomorphic-applications)
 * [Flux](#flux)
 * [Stores](#stores)
@@ -24,7 +24,7 @@
 * [Get Started](#get-started)
 * [Code Style Guide](code-style-guide.md)
 
-#Isomorphic Applications
+# Isomorphic Applications
 Make a long story short, isomorphic applications are built to make it possible 
 to write module once and use it for both page rendering on server 
 (for SEO and shared links) and in browser with no server side at all.
@@ -68,7 +68,7 @@ of applications possible and we should use this possibility.
 
 **[⬆ back to top](#table-of-contents)**
 
-#Flux
+# Flux
 Catberry uses [Flux](https://facebook.github.io/flux/docs/overview.html)
 architecture. It defines that you should use [store](#stores) as data source
 and some kind of view that gets data from the store. So, Catberry uses
@@ -99,7 +99,7 @@ It means you can use `Promise` type globally and do not worry about its support.
 
 **[⬆ back to top](#table-of-contents)**
 
-#Stores
+# Stores
 The store is a module that loads data from remote resource using routing
 parameters. It also can handle action messages from anywhere and send requests
 to remote resource changing data. It can emit `changed` event at anytime when it
@@ -137,7 +137,7 @@ store2
 
 Please, keep in mind that all store names are case-sensitive.
 
-##Store interface
+## Store interface
 As it is said every store should export a constructor function. Also you can
 define such methods and properties into constructor prototype,
 but all of them are optional.
@@ -158,7 +158,7 @@ both server and client-side environments. Therefore you can not
 use environment-specific global objects and functions like
 `window`, `process` or DOM methods.
 
-##Store Context
+## Store Context
 Every store always has a context. Catberry sets the property `$context`
 to every instance of each store. It has following properties and methods.
 
@@ -181,7 +181,7 @@ Every time router computes new application state it re-creates and re-assigns
 context to each store therefore do not save references to `this.$context`
 objects.
 
-##Code example
+## Code example
 This is an example how your store can look like:
 
 ```javascript
@@ -233,7 +233,7 @@ Some.prototype.handleSomeAction = function () {
 
 **[⬆ back to top](#table-of-contents)**
 
-#Cat-components
+# Cat-components
 You may think cat-components are mustaches, paws or tail but they are not.
 
 Cat-component is an isomorphic implementation of
@@ -301,7 +301,7 @@ It can not depend on any store. `cat-store` attribute is just ignored.
 diff/merge mode otherwise all styles and scripts are re-processed every time. It
 can depend on store and works as usual cat-component except rendering approach.
 
-##Cat-component interface
+## Cat-component interface
 As store component's logic file should export a constructor function for
 creating instances for every custom tag on page. Also you can
 define such methods and properties into constructor prototype,
@@ -345,7 +345,7 @@ are isomorphic and they are executing from both server and client-side
 environments. Therefore you can not use environment-specific global objects
 and functions like `window`, `process` or DOM methods inside these methods.
 
-##Cat-component Context
+## Cat-component Context
 Every component always has a context. Catberry sets the property `$context`
 to every instance of each store. It has following properties and methods.
 
@@ -380,7 +380,7 @@ Every time router computes new application state, it re-creates and re-assigns
 context to each component therefore do not save references to `this.$context`
 objects.
 
-##Code example
+## Code example
 This is an example how your cat-component can look like:
 
 ```javascript
@@ -428,7 +428,7 @@ Some.prototype.unbind = function () {
 
 **[⬆ back to top](#table-of-contents)**
 
-#Example of Application Structure
+# Example of Application Structure
 Typically directory structure of your application should look like this:
 
 ```
@@ -487,7 +487,7 @@ If you want to see finished application as an example then please proceed to
 
 **[⬆ back to top](#table-of-contents)**
 
-#Routing
+# Routing
 Catberry's routing system triggers the "changed" event in every
 [store](#stores) that depends on changed arguments in routed URI.
 Those arguments are set by route definitions in file './routes.js'.
@@ -503,7 +503,7 @@ Route definition is a rule that describes which URIs are handled by Catberry,
 what parameters Catberry can parse from these URIs and what stores will
 receive parsed parameters.
 
-##Colon-marked parameters in string
+## Colon-marked parameters in string
 Default definition syntax is following:
 
 ```
@@ -523,7 +523,7 @@ Please keep in mind that parameter **name** in route definition should satisfy
 regular expression `[^\[\],]+` and parameter **value** should satisfy
 regular expression `[^\/\\&\?=]*`.
 
-##Colon-marked parameters with additional `map` function
+## Colon-marked parameters with additional `map` function
 Also you can define mapper object, that allows you to modify application
 state object before it will be processed by Catberry.
 
@@ -547,7 +547,7 @@ and return it from map function.
 In this example store `news` will receive additional state parameter `pageType`
 with value `userNews`.
 
-##Regular expression
+## Regular expression
 For some rare cases you may need to parse parameters
 by regular expressions. In these cases you can define mapper
 object as listed below:
@@ -569,7 +569,7 @@ object as listed below:
 In this example the store `order` will receive parameter `orderId` with value
 matched with number in URL.
 
-##File example
+## File example
 Here is example of `./routes.js` file with all 3 cases of route definition:
 
 ```javascript
@@ -596,7 +596,7 @@ module.exports = [
 
 **[⬆ back to top](#table-of-contents)**
 
-#Catberry Services
+# Catberry Services
 Let's talk about Catberry Framework for isomorphic applications.
 In Catberry every framework component such as Logger or
 Universal HTTP(S) Request module are called "Services".
@@ -625,12 +625,12 @@ and the browser environment. But in some cases it does not matter.
 
 Learn more how to use Service Locator in next section.
 
-##Service Locator
+## Service Locator
 Entire architecture of Catberry framework is based on
 [Service Locator pattern](http://en.wikipedia.org/wiki/Service_locator_pattern) 
 and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection).
 
-##Registration of Own Services
+## Registration of Own Services
 There is only one service locator (singleton) in a Catberry application
 and all Catberry services are resolved from this locator.
 It happens when you use `getMiddleware` method on the server or `startWhenReady`
@@ -696,7 +696,7 @@ If you want to know how to use registered services, please read
 
 * [Interface of Service Locator](https://github.com/catberry/catberry-locator/blob/master/lib/ServiceLocator.js)
 
-##Dependency Injection
+## Dependency Injection
 If you need to use some registered service you just inject it into constructor
 of [Store](#stores) or [Cat-component](#cat-components).
 
@@ -736,7 +736,7 @@ Userland Services
 * [Config](#config)
 * [Universal HTTP(S) Request](#uhr-universal-https-request)
 
-##Logger
+## Logger
 Catberry has an universal logger service registered as "logger" in 
 [Service Locator](#service-locator) and it is accessible via
 [dependency injection](#dependency-injection).
@@ -756,7 +756,7 @@ It means you can configure it as described [here]
 In a browser it is implemented as a very simple logger that can only write
 to the browser's console.
 
-###Configuration
+### Configuration
 To configure the browser logger you can set a config field `logger` in the
 Catberry config object.
 
@@ -791,7 +791,7 @@ More details [here](https://github.com/nomiddlename/log4js-node#usage).
 * [Interface of Browser Logger](../../../browser/Logger.js)
 * [Interface of Server Logger (log4js)](https://www.npmjs.org/package/log4js)
 
-##Config
+## Config
 Catberry has a configuration object registered as "config" service in
 [Service Locator](#service-locator) and it is accessible via
 [dependency injection](#dependency-injection).
@@ -811,7 +811,7 @@ Catberry uses following parameters from it:
 * publicDirectoryPath – path to public directory
 ("./public" by default)
 
-##UHR (Universal HTTP(S) Request)
+## UHR (Universal HTTP(S) Request)
 Catberry has Universal HTTP(S) Request service registered as "uhr" in 
 [Service Locator](#service-locator) and it is accessible via
 [dependency injection](#dependency-injection).
@@ -822,7 +822,7 @@ All details you can find in UHR read me file [here]
 
 **[⬆ back to top](#table-of-contents)**
 
-#Cookie
+# Cookie
 As you may notice, store and cat-component context have property `cookie` that
 allows you to control cookie in isomorphic way.
 Actually, it is an universal wrapper that can `get` and `set` cookie
@@ -856,7 +856,7 @@ CookiesWrapper.prototype.set = function (cookieSetup) { }
 
 **[⬆ back to top](#table-of-contents)**
 
-#Template engines
+# Template engines
 Catberry supports any template engine that have the "precompiling to string" feature.
 Currently [Dust](https://github.com/catberry/catberry-dust),
 [Handlebars](https://github.com/catberry/catberry-handlebars) and
@@ -875,7 +875,7 @@ Actually, [Catberry CLI](#cli) does it for you, see its [readme]([Catberry CLI](
 
 **[⬆ back to top](#table-of-contents)**
 
-#Browser Bundle
+# Browser Bundle
 The Catberry application object has a method `build` that can be used like this:
 
 ```javascript
@@ -900,7 +900,7 @@ node ./build.js release
 To build browser bundle Catberry uses [browserify](http://browserify.org) which 
 is awesome and can convert your server-side JavaScript to browser code.
 
-##Including packages into the browser bundle
+## Including packages into the browser bundle
 There are some rules according browserify limitations:
 
 * If you want to include some module into browser bundle it should be required
@@ -910,7 +910,7 @@ browserify just skips it or throws an error.
 replace it with browser version just use browserify `browser` field
 in `package.json` as it has been described [here](http://github.com/substack/node-browserify#packagejson).
 
-##Code watching and reloading
+## Code watching and reloading
 By default, Catberry works in debug mode and it means that all changes in code
 of your stores or components will automatically reload everything.
 You can switch application to release mode passing `isRelease: true` parameter
@@ -929,7 +929,7 @@ is minified using [uglify-js](https://www.npmjs.org/package/uglify-js)
 
 **[⬆ back to top](#table-of-contents)**
 
-#Event Bus and Diagnostics
+# Event Bus and Diagnostics
 Catberry has a set of events that can be used for diagnostics or
 in components and stores. Catberry uses the same events for logging all trace,
 info and error messages.
@@ -961,7 +961,7 @@ catberry.events.on('error', function (error) {
 
 Actually `cat.events` has interface similar with [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter).
 
-##Event names and arguments
+## Event names and arguments
 Here is a list of common Catberry events:
 
 | Event					| When happens									| Arguments																									|
@@ -1005,7 +1005,7 @@ performance degradation.
 
 **[⬆ back to top](#table-of-contents)**
 
-#CLI
+# CLI
 
 Catberry has a Command Line Interface that helps to start a new project and add
 new stores and components to it.
@@ -1026,7 +1026,7 @@ catberry utility:
 
 **[⬆ back to top](#table-of-contents)**
 
-#Get Started
+# Get Started
 First of all you need to install [CLI](https://github.com/catberry/catberry-cli):
 
 ```bash

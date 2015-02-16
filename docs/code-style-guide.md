@@ -1,8 +1,8 @@
-#Catberry Code Style Guide
+# Catberry Code Style Guide
 
 There are some aspects of Catberry code style below:
 
-##Table Of Contents
+## Table Of Contents
 1. [Formatting](#formatting)
 1. [JavaScript](#javascript)
 1. [Naming](#naming)
@@ -16,7 +16,7 @@ There are some aspects of Catberry code style below:
 1. [Comments](#comments)
 1. [Code Quality Tools](#code-quality-tools)
 
-##Formatting
+## Formatting
 
 - Always use tabs (hard tabs)
 - Never leave trailing whitespaces
@@ -98,7 +98,7 @@ There are some aspects of Catberry code style below:
 
 **[⬆ back to top](#table-of-contents)**
 
-##JavaScript
+## JavaScript
 
 - Use ECMAScript 5.1 syntax ([ECMA-262](http://www.ecma-international.org/ecma-262/5.1/))
 - Always use [JavaScript Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) 
@@ -113,7 +113,7 @@ in the beginning of each .js file.
 
 **[⬆ back to top](#table-of-contents)**
 
-##Naming
+## Naming
 
 - Always use `camelCase` for variables, `PascalCase` for constructors 
 and `UPPER_CASE` with underscores for constants
@@ -185,7 +185,7 @@ constructor in PascalCase like `Constructor.js`
 
 **[⬆ back to top](#table-of-contents)**
 
-##Variables
+## Variables
 
 - Always use `var` to declare variables. Not doing so will result in global 
 variables. We want to avoid polluting the global namespace.
@@ -297,7 +297,7 @@ variable declaration and assignment hoisting related issues.
 
 **[⬆ back to top](#table-of-contents)**
 
-##Objects
+## Objects
 
 - Always use the literal syntax for object creation.
 
@@ -344,7 +344,7 @@ operator. In some cases it can cause [performance degradation](https://speakerde
 	
 **[⬆ back to top](#table-of-contents)**
 
-##Arrays
+## Arrays
 
 - Always use the literal syntax for array creation.
 
@@ -419,7 +419,7 @@ var hasGreaterThanThree = array.some(function (item) {
 
 **[⬆ back to top](#table-of-contents)**
 
-##Types
+## Types
 
 - Always use explicit type conversion with `Number`, `Boolean` and 
 `String` (`.toString()`) functions
@@ -443,7 +443,7 @@ var hasGreaterThanThree = array.some(function (item) {
 
 **[⬆ back to top](#table-of-contents)**
 
-##Functions
+## Functions
 
 - Function expressions:
 
@@ -600,7 +600,7 @@ or to specify `this` inside the method.
 
 **[⬆ back to top](#table-of-contents)**
 
-##Strings
+## Strings
 
 - Use only single quotes for strings
 
@@ -633,7 +633,7 @@ using string concatenation like this:
 
 **[⬆ back to top](#table-of-contents)**
 
-##Comments
+## Comments
 
 - Always use [jsDoc](http://usejsdoc.org/) for everything
 - Use one line comments `//` instead `/* ... */`
@@ -667,7 +667,7 @@ using string concatenation like this:
 
 **[⬆ back to top](#table-of-contents)**
 
-##Code Quality Tools
+## Code Quality Tools
 
 Code style should be checked by:
 
