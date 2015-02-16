@@ -42,7 +42,7 @@ are officially supported (and you can implement own provider for others)
 automatically
 * You will get back-end that renders exactly the same page for search engines
 and shared links
-* You will write code in server-side style
+* You will write code in the server-side style
 (using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) and [npm](https://www.npmjs.org/)
 * Entire architecture of the framework is built using
 [Service Locator](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#service-locator)
@@ -66,8 +66,8 @@ as [SPA](http://en.wikipedia.org/wiki/Single-page_application) in old browsers.
 The main goal of Catberry Framework is to use the full power of new technologies
 and provide user with the best experience.
 
-Actually user gets HTML page from server only once and all the rest of the time 
-the whole page is rendered in browser receiving only pure data from some
+Actually a user gets HTML page from the server only once and all the rest of the time
+the whole page is rendered in a browser receiving only pure data from some
 API service(s). Thanks to Catberry's very fast page rendering engine, 
 user receives refreshed page as fast as API server could provide data for it.
 
