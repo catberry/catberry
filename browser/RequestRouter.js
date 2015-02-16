@@ -169,7 +169,12 @@ RequestRouter.prototype.route = function () {
  * @returns {Promise} Promise for nothing.
  */
 RequestRouter.prototype.go = function (locationString) {
-	var location = new URI(locationString);
+	var location;
+	try {
+		location = new URI(locationString);
+	} catch (e) {
+		location = new URI();
+	}
 	location = location.resolveRelative(this._location);
 	locationString = location.toString();
 
