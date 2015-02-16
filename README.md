@@ -1,4 +1,4 @@
-#Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry) [![Coverage Status](https://coveralls.io/repos/catberry/catberry/badge.png?branch=develop)](https://coveralls.io/r/catberry/catberry?branch=develop)
+# Catberry [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry) [![Coverage Status](https://coveralls.io/repos/catberry/catberry/badge.png?branch=develop)](https://coveralls.io/r/catberry/catberry?branch=develop)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
@@ -23,7 +23,7 @@ Here you can find full
 To get started with example please proceed to 
 [Get Started Guide](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#get-started).
 
-##Advantages
+## Advantages
 * [Flux](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#flux) architecture
 * [Cat-components](https://github.com/catberry/catberry/blob/4.0.0/docs/index.md#cat-components) (like [web-components by Google](http://webcomponents.org/) but isomorphic)
 * You do not need to write any code for registration or definition of
@@ -56,7 +56,7 @@ For more details please proceed to [Catberry Documentation](https://github.com/c
 
 Also you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
-##Browser Support
+## Browser Support
 Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 
 and some HTML5 features like [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history)
 therefore it does not support old browsers at all. Catberry can render pages
@@ -88,7 +88,7 @@ All supported browsers are listed below:
 | Opera Mobile		| 11.1+			|
 | Blackberry Browser| 7+			|
 
-##Contribution
+## Contribution
 If you have found a bug, please create pull request with [mocha](https://www.npmjs.org/package/mocha) 
 unit-test which reproduces it or describe all details in an issue if you can not
 implement test. If you want to propose some improvements just create an issue or
