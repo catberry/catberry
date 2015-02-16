@@ -118,7 +118,8 @@ Bootstrapper.prototype._wrapEventsWithLogger = function (eventBus, logger) {
 		})
 		.on('componentBound', function (args) {
 			logger.info(util.format(
-				INFO_COMPONENT_BOUND, args.element.tagName + '#' + args.id
+				INFO_COMPONENT_BOUND,
+				args.element.tagName.toLowerCase() + '#' + args.id
 			));
 		});
 };
