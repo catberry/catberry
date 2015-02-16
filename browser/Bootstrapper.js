@@ -97,14 +97,6 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	stores.forEach(function (store) {
 		locator.registerInstance('store', store);
 	});
-
-	components.forEach(function (component) {
-		locator.registerInstance('component', component);
-		// we have to do this for old browsers, otherwise they will not be
-		// able to show content of custom tags
-		var tagName = moduleHelper.getTagNameForComponentName(component.name);
-		window.document.createElement(tagName);
-	});
 };
 
 /**
