@@ -58,8 +58,8 @@ you do not have this problem.
 in server-side and browser modules*. Obviously, you do not need it
 using isomorphic modules. It is always one module to change.
 * *Overhead connected with rendering all pages on the server*. Since browsers
-receive a page from the server only once and then render all other pages in
-their browsers, your server's load will be reduced dramatically.
+receive a page from the server only once and then render all other pages themselves,
+your server's load will be reduced dramatically.
  
 And maybe a lot of more problems, who knows.
 
@@ -285,8 +285,8 @@ After you define a cat-component you can use it like this:
 ```
 
 There are some important moments here:
-* Every component tag should have an `id` attribute with unique value, otherwise
-it is not rendered and throws error
+* Every component tag should have an `id` attribute with a unique value, otherwise
+it is not rendered and throws an error
 * You can set `cat-store` attribute that means if store is changed this
 component will be re-rendered automatically
 * You can set any additional attributes you want without any problems
@@ -619,7 +619,7 @@ For example, you can replace Logger service in Service Locator with
 your favorite logger, you just need to write an adapter that matches
 the interface of [Catberry "logger" service](#logger).
  
-To register your own services you should keep in mind that
+To register your own services, you should keep in mind that
 you probably need different implementations of your service for the server
 and the browser environment. But in some cases it does not matter.
 
@@ -1017,7 +1017,7 @@ npm -g install catberry-cli
 ```
 
 And then follow usage instructions you can find
-[here](https://github.com/catberry/catberry-cli) or just use help of
+[here](https://github.com/catberry/catberry-cli) or just use the help of
 catberry utility:
 
 ```
