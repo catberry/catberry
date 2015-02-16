@@ -74,7 +74,7 @@ architecture. It defines that you should use [store](#stores) as data source
 and some kind of view that gets data from the store. So, Catberry uses
 [cat-components](#cat-components) as these views.
 
-Everything you need to know that there are [store](#stores),
+Everything you need to know that there are [stores](#stores),
 [cat-components](#cat-components) and store dispatcher that controls the whole
 workflow.
 
@@ -967,7 +967,7 @@ Here is a list of common Catberry events:
 | Event					| When happens									| Arguments																									|
 |-----------------------|-----------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | ready					| Catberry has finished initialization			|	no																										|
-| error					| error is happened								|	`Error` object																							|
+| error					| error happened								|	`Error` object																							|
 | storeLoaded			| each store is loaded							|	`{name: String, path: String, constructor: Function}`													|
 | componentLoaded		| each component is loaded						|	`{name: String, properties: Object, constructor: Function, template: Object, errorTemplate: Object}`	|
 | allStoresLoaded		| all stores are loaded							|	Map of loaded stores by names																			|
