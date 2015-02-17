@@ -1,8 +1,8 @@
-#Catberry Code Style Guide
+# Catberry Code Style Guide
 
 There are some aspects of Catberry code style below:
 
-##Table Of Contents
+## Table Of Contents
 1. [Formatting](#formatting)
 1. [JavaScript](#javascript)
 1. [Naming](#naming)
@@ -16,14 +16,14 @@ There are some aspects of Catberry code style below:
 1. [Comments](#comments)
 1. [Code Quality Tools](#code-quality-tools)
 
-##Formatting
+## Formatting
 
 - Always use tabs (hard tabs)
 - Never leave trailing whitespaces
 - Never use multiple line breaks
 - Maximum length of line &mdash; 80
 - Always use semicolons
-- Always use space after keywords and before curly braces
+- Always use a space after keywords and before curly braces
 
 	```javascript
 	// bad
@@ -79,7 +79,7 @@ There are some aspects of Catberry code style below:
 		aTime;
 	```
 	
-- Always use curly braces where it's possible, first brace on same line and 
+- Always use curly braces where it's possible, the first brace on same line and
  space before it
 
 	```javascript
@@ -98,11 +98,11 @@ There are some aspects of Catberry code style below:
 
 **[⬆ back to top](#table-of-contents)**
 
-##JavaScript
+## JavaScript
 
 - Use ECMAScript 5.1 syntax ([ECMA-262](http://www.ecma-international.org/ecma-262/5.1/))
 - Always use [JavaScript Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) 
-in the beginning of each .js file. 
+at the beginning of each .js file.
 - Never use [with](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with), 
 [let](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let) or 
 [void](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/void) operator
@@ -113,7 +113,7 @@ in the beginning of each .js file.
 
 **[⬆ back to top](#table-of-contents)**
 
-##Naming
+## Naming
 
 - Always use `camelCase` for variables, `PascalCase` for constructors 
 and `UPPER_CASE` with underscores for constants
@@ -170,7 +170,7 @@ and `UPPER_CASE` with underscores for constants
 	}
 	```
 
-- If variable is boolean type then start its name with `is` or `has` prefix
+- If the variable is boolean type then start its name with `is` or `has` prefix
 
 	```javascript
 	// bad
@@ -180,12 +180,12 @@ and `UPPER_CASE` with underscores for constants
 	var isSuccess = true;
 	```
 
-- If JavaScript file has definition of constructor it should has name of this
+- If JavaScript file has definition of a constructor it should have a name of this
 constructor in PascalCase like `Constructor.js`
 
 **[⬆ back to top](#table-of-contents)**
 
-##Variables
+## Variables
 
 - Always use `var` to declare variables. Not doing so will result in global 
 variables. We want to avoid polluting the global namespace.
@@ -214,7 +214,7 @@ on a newline.
 	```
 
 - Declare unassigned variables last. This is helpful when later on you might 
-need to assign a variable depending on one of the previous assigned variables.
+need to assign a variable depending on one of the previously assigned variables.
 
 	```javascript
 	// bad
@@ -297,7 +297,7 @@ variable declaration and assignment hoisting related issues.
 
 **[⬆ back to top](#table-of-contents)**
 
-##Objects
+## Objects
 
 - Always use the literal syntax for object creation.
 
@@ -310,7 +310,7 @@ variable declaration and assignment hoisting related issues.
 	```
 
 - When possible do not use [delete](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete) 
-operator. In some cases it can cause [performance degradation](https://speakerdeck.com/addyosmani/javascript-memory-management-masterclass).
+operator. In some, cases it can cause [performance degradation](https://speakerdeck.com/addyosmani/javascript-memory-management-masterclass).
 
 - Use dot notation when accessing properties.
 
@@ -344,7 +344,7 @@ operator. In some cases it can cause [performance degradation](https://speakerde
 	
 **[⬆ back to top](#table-of-contents)**
 
-##Arrays
+## Arrays
 
 - Always use the literal syntax for array creation.
 
@@ -404,7 +404,7 @@ var hasGreaterThanThree = array.some(function (item) {
 });
 ```
 
-- To convert an array-like object to an array, use [slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) like this
+- To convert an array-like object to an array, use the [slice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) like this
 
 	```javascript
 	var args = Array.prototype.slice.call(arguments);
@@ -419,7 +419,7 @@ var hasGreaterThanThree = array.some(function (item) {
 
 **[⬆ back to top](#table-of-contents)**
 
-##Types
+## Types
 
 - Always use explicit type conversion with `Number`, `Boolean` and 
 `String` (`.toString()`) functions
@@ -443,7 +443,7 @@ var hasGreaterThanThree = array.some(function (item) {
 
 **[⬆ back to top](#table-of-contents)**
 
-##Functions
+## Functions
 
 - Function expressions:
 
@@ -529,7 +529,7 @@ the `arguments` object that is given to every function scope.
 		.forEach(handler);
 	```
 
-- Separate function arguments with space after coma
+- Separate function arguments with the space after a comma
 
 	```javascript
 	// bad
@@ -543,7 +543,7 @@ the `arguments` object that is given to every function scope.
 	}
 	```
 
-- Use constructor and prototype to define module when you need to store 
+- Use constructor and prototype to define a module when you need to store
 local state like this:
 
 	```javascript
@@ -553,7 +553,7 @@ local state like this:
 	var MILE_MULTIPLIER = 0.6214;
 	
 	/**
-	 * Creates new instance of distance descriptor.
+	 * Creates a new instance of distance descriptor.
 	 * @constructor
 	 */
 	function DistanceDescriptor() {
@@ -600,7 +600,7 @@ or to specify `this` inside the method.
 
 **[⬆ back to top](#table-of-contents)**
 
-##Strings
+## Strings
 
 - Use only single quotes for strings
 
@@ -633,7 +633,7 @@ using string concatenation like this:
 
 **[⬆ back to top](#table-of-contents)**
 
-##Comments
+## Comments
 
 - Always use [jsDoc](http://usejsdoc.org/) for everything
 - Use one line comments `//` instead `/* ... */`
@@ -667,7 +667,7 @@ using string concatenation like this:
 
 **[⬆ back to top](#table-of-contents)**
 
-##Code Quality Tools
+## Code Quality Tools
 
 Code style should be checked by:
 

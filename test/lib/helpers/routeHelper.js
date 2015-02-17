@@ -203,70 +203,18 @@ describe('lib/helpers/routeHelper', function () {
 		it('should return correct mapper for parameters when list with spaces',
 			function (done) {
 				var uri = '/some/test?filter=date',
-					expression = '/some/:test[       ]?filter=:filter[  ]',
+					expression = '/some/:test[group/module1,    ' +
+						'group/module2       ]?filter=:filter[group/module2]',
 					mapper = routeHelper.getUriMapperByRoute(expression);
 
 				assert.strictEqual(mapper.expression.test(uri), true);
 				var state = mapper.map(uri);
-				assert.strictEqual(typeof(state), 'object');
-				assert.strictEqual(Object.keys(state).length, 0);
+				assert.strictEqual(typeof(state['group/module1']), 'object');
+				assert.strictEqual(typeof(state['group/module2']), 'object');
+				assert.strictEqual(state['group/module1'].test, 'test');
+				assert.strictEqual(state['group/module2'].test, 'test');
+				assert.strictEqual(state['group/module2'].filter, 'date');
 				done();
 			});
-	});
-	describe('#getEventMapperByRule', function () {
-		it('should return correct mapper for parametrized string', function () {
-			var eventName = 'some:param1-:param2  -> ' +
-					'  eventName  [   module1, module2     ]',
-				mapper = routeHelper.getEventMapperByRule(eventName),
-				testEvent = 'some59-73';
-
-			assert.strictEqual(mapper.expression.test(testEvent), true);
-			assert.strictEqual(mapper.eventName, 'eventName');
-			assert.strictEqual(mapper.moduleNames.length, 2);
-			assert.strictEqual(mapper.moduleNames[0], 'module1');
-			assert.strictEqual(mapper.moduleNames[1], 'module2');
-
-			var parameters = mapper.map(testEvent);
-			assert.strictEqual(parameters.param1, '59');
-			assert.strictEqual(parameters.param2, '73');
-		});
-
-		it('should return correct mapper for non-parametrized string',
-			function () {
-				var eventName = 'some->eventName[module1, module2]',
-					mapper = routeHelper.getEventMapperByRule(eventName),
-					testEvent = 'some';
-
-				assert.strictEqual(mapper.expression.test(testEvent), true);
-				assert.strictEqual(mapper.eventName, 'eventName');
-				assert.strictEqual(mapper.moduleNames.length, 2);
-				assert.strictEqual(mapper.moduleNames[0], 'module1');
-				assert.strictEqual(mapper.moduleNames[1], 'module2');
-
-				var parameters = mapper.map(testEvent);
-				assert.strictEqual(Object.keys(parameters).length, 0);
-			});
-
-		it('should return null for incorrect event definition', function () {
-			var eventName = 'some:param1-:param2  - ' +
-					'  eventName  [   module1, module2     ]',
-				mapper = routeHelper.getEventMapperByRule(eventName);
-
-			assert.strictEqual(mapper, null);
-		});
-
-		it('should return null for empty event definition', function () {
-			var mapper = routeHelper.getEventMapperByRule('');
-			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getEventMapperByRule(null);
-			assert.strictEqual(mapper, null);
-			mapper = routeHelper.getEventMapperByRule(undefined);
-			assert.strictEqual(mapper, null);
-		});
-
-		it('should return null for event definition without module', function () {
-			var mapper = routeHelper.getEventMapperByRule('some->some');
-			assert.strictEqual(mapper, null);
-		});
 	});
 });
