@@ -1021,7 +1021,7 @@ And then follow usage instructions you can find
 catberry utility:
 
 ```
-сcatberry --help
+catberry --help
 ```
 
 **[⬆ back to top](#table-of-contents)**
@@ -1030,7 +1030,7 @@ catberry utility:
 First of all you need to install [CLI](https://github.com/catberry/catberry-cli):
 
 ```bash
-npm install -g catberry
+npm install -g catberry-cli
 ```
 
 After that, you can create a project.
