@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "3.2.1",
+	"version": "4.0.0",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -41,36 +41,37 @@
 	"browser": {
 		"./lib/Bootstrapper.js": "__BrowserBundle.js",
 		"./lib/Catberry.js": "./browser/Catberry.js",
-		"./lib/CookiesWrapper.js": "./browser/CookiesWrapper.js",
-		"./lib/ModuleApiProvider.js": "./browser/ModuleApiProvider.js",
-		"./lib/ModuleLoader.js": "./browser/ModuleLoader.js",
-		"./lib/PageRenderer.js": "./browser/PageRenderer.js",
-		"./lib/RequestRouter.js": "./browser/RequestRouter.js",
-		"./lib/TemplateProvider.js": "./browser/TemplateProvider.js"
+		"./lib/CookieWrapper.js": "./browser/CookieWrapper.js",
+		"./lib/providers/ModuleApiProvider.js": "./browser/providers/ModuleApiProvider.js",
+		"./lib/loaders/ComponentLoader.js": "./browser/loaders/ComponentLoader.js",
+		"./lib/loaders/StoreLoader.js": "./browser/loaders/StoreLoader.js",
+		"./lib/DocumentRenderer.js": "./browser/DocumentRenderer.js",
+		"./lib/RequestRouter.js": "./browser/RequestRouter.js"
 	},
 	"dependencies": {
-		"glob": "^4.0.0",
-		"gaze": "~0.5.0",
-		"catberry-locator": "^1.0.0",
-		"catberry-uhr": "^3.0.0",
-		"catberry-uri": "^1.1.0",
-		"catberry-dust": "^3.0.0",
-		"jquery": "^2.0.0",
-		"uglify-js": "^2.0.0",
-		"browserify": "^6.0.0",
-		"log4js": "~0.6.0",
-		"promise": "^6.0.0"
+		"ncp": "^1.0.1",
+		"mkdirp": "~0.5.0",
+		"htmlparser2": "^3.8.2",
+		"glob": "^4.3.5",
+		"gaze": "~0.5.1",
+		"catberry-locator": "^1.1.2",
+		"catberry-uhr": "^4.0.0",
+		"catberry-uri": "^2.0.0",
+		"uglify-js": "^2.4.16",
+		"browserify": "^8.1.3",
+		"log4js": "~0.6.22",
+		"promise": "^6.1.0"
 	},
 	"devDependencies": {
-		"istanbul-harmony": "~0.3.0",
-		"coveralls": "^2.11.0",
-		"jsdom": "~1.1.0",
-		"mocha": "^2.0.0",
-		"jscs": "~1.6.0",
-		"jshint": "^2.5.0"
+		"istanbul-harmony": "~0.3.1",
+		"coveralls": "^2.11.2",
+		"jsdom": "^3.1.1",
+		"mocha": "^2.1.0",
+		"jscs": "~1.6.2",
+		"jshint": "^2.6.0"
 	},
 	"engines": {
-		"node": "~0.10.26"
+		"node": ">=0.10"
 	},
 	"scripts": {
 		"test": "make"

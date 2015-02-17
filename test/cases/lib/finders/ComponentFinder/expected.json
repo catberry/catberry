@@ -1,0 +1,27 @@
+{
+	"test1": {
+		"name": "test1",
+		"properties": {
+			"logic": "./logic.js",
+			"additional" : "some"
+		},
+		"path": "test/cases/lib/finders/ComponentFinder/components/test1/test-cat-component.json"
+	},
+	"cool": {
+		"name": "cool",
+		"properties": {
+			"name": "Cool",
+			"logic": "./logic.js",
+			"additional" : "some2"
+		},
+		"path": "test/cases/lib/finders/ComponentFinder/components/test1/test2/test-cat-component.json"
+	},
+	"test3": {
+		"name": "test3",
+		"properties": {
+			"logic": "./logic.js",
+			"additional" : "some"
+		},
+		"path": "test/cases/lib/finders/ComponentFinder/components/test3/test-cat-component.json"
+	}
+}

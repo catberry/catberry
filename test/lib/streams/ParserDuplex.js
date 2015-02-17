@@ -31,30 +31,26 @@
 'use strict';
 
 var assert = require('assert'),
-	path = require('path'),
-	fs = require('fs'),
+	testCases = require('../../cases/lib/streams/ParserDuplex.json'),
 	ContentReadable = require('../../../lib/streams/ContentReadable'),
 	ParserDuplex = require('../../../lib/streams/ParserDuplex');
 
-var casePath = path.join(__dirname, '..', '..', 'cases',
-	'server', 'streams', 'ParserDuplex');
-
 describe('lib/streams/ParserDuplex', function () {
-	describe('#foundTagIdHandler', function () {
-		it('should find HTML tags with ids and replace its content',
-			function (done) {
+	describe('#foundComponentHandler', function () {
+		testCases.cases.forEach(function (testCase) {
+			it(testCase.name, function (done) {
 				var concat = '',
-					input = fs.createReadStream(
-						path.join(casePath, 'case1', 'input.html')),
-					expected = fs.readFileSync(
-						path.join(casePath, 'case1', 'expected.html'), {
-							encoding: 'utf8'
-						}),
+					inputStream = new ContentReadable(
+						testCase.input, testCase.inputStreamOptions
+					),
 					parser = new ParserDuplex(),
-					result = input.pipe(parser);
+					result = inputStream.pipe(parser);
 
-				parser.foundTagIdHandler = function (id) {
-					return new ContentReadable('test' + id);
+				parser.foundComponentHandler = function (tagDetails) {
+					var id = tagDetails.attributes.id || '';
+					return new ContentReadable(
+						'content-' + tagDetails.name + id
+					);
 				};
 
 				result
@@ -64,71 +60,24 @@ describe('lib/streams/ParserDuplex', function () {
 					.on('end', function () {
 						assert.strictEqual(
 							concat,
-							expected,
+							testCase.expected,
 							'Wrong HTML content');
 						done();
 					});
 			});
-
-		it('should properly skip HTML comments', function (done) {
-			var concat = '',
-				input = fs.createReadStream(
-					path.join(casePath, 'case2', 'input.html')),
-				expected = fs.readFileSync(
-					path.join(casePath, 'case2', 'expected.html'), {
-						encoding: 'utf8'
-					}),
-				parser = new ParserDuplex(),
-				result = input.pipe(parser);
-
-			parser.foundTagIdHandler = function (id) {
-				return new ContentReadable('test' + id);
-			};
-
-			result
-				.on('data', function (chunk) {
-					concat += chunk;
-				})
-				.on('end', function () {
-					assert.strictEqual(concat, expected, 'Wrong HTML content');
-					done();
-				});
-		});
-
-		it('should ignore incorrect HTML syntax', function (done) {
-			var concat = '',
-				input = fs.createReadStream(
-					path.join(casePath, 'case3', 'input.html')),
-				expected = fs.readFileSync(
-					path.join(casePath, 'case3', 'expected.html'), {
-						encoding: 'utf8'
-					}),
-				parser = new ParserDuplex(),
-				result = input.pipe(parser);
-
-			parser.foundTagIdHandler = function (id) {
-				return new ContentReadable('test' + id);
-			};
-
-			result
-				.on('data', function (chunk) {
-					concat += chunk;
-				})
-				.on('end', function () {
-					assert.strictEqual(concat, expected, 'Wrong HTML content');
-					done();
-				});
 		});
 
 		it('should re-emit found tag errors', function (done) {
 			var concat = '',
-				input = new ContentReadable('<some id="1"></some>'),
-				expected = '<some id="1">test1</some>',
+				input = new ContentReadable('<cat-some id="1"></cat-some>'),
+				expected = '<cat-some id="1">test1</cat-some>',
 				parser = new ParserDuplex(),
 				result = input.pipe(parser);
 
-			parser.foundTagIdHandler = function (id) {
-				var stream = new ContentReadable('test' + id);
+			parser.foundComponentHandler = function (tagDetails) {
+				var stream = new ContentReadable(
+					'test' + tagDetails.attributes.id
+				);
 				setTimeout(function () {
 					stream.emit('error', new Error('hello'));
 				});
@@ -145,40 +94,5 @@ describe('lib/streams/ParserDuplex', function () {
 					done();
 				});
 		});
-
-		it('should properly work when tags do not fit in buffer',
-			function (done) {
-				var concat = '',
-					input = fs.readFileSync(
-						path.join(casePath, 'case4', 'input.html'), {
-							encoding: 'utf8'
-						}),
-					expected = fs.readFileSync(
-						path.join(casePath, 'case4', 'expected.html'), {
-							encoding: 'utf8'
-						}),
-					parser = new ParserDuplex(),
-					contentReadable = new ContentReadable(input, {
-						highWaterMark: 2
-					});
-				parser.write('');
-				var result = contentReadable.pipe(parser);
-
-				parser.foundTagIdHandler = function (id) {
-					return new ContentReadable('test' + id);
-				};
-
-				result
-					.on('data', function (chunk) {
-						concat += chunk;
-					})
-					.on('end', function () {
-						assert.strictEqual(
-							concat,
-							expected,
-							'Wrong HTML content');
-						done();
-					});
-			});
 	});
 });

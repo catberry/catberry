@@ -71,6 +71,15 @@ describe('lib/helpers/moduleHelper', function () {
 				assert.strictEqual(camelCaseName, 'awesomeModuleName');
 			});
 
+		it('should handle separators at the end',
+			function () {
+				var camelCaseName = moduleHelper.getCamelCaseName(
+					null, 'awesome-module-name-'
+				);
+
+				assert.strictEqual(camelCaseName, 'awesomeModuleName');
+			});
+
 		it('should return empty string if input is empty', function () {
 			var camelCaseName1 = moduleHelper.getCamelCaseName(null, null),
 				camelCaseName2 = moduleHelper.getCamelCaseName('', '');
@@ -80,32 +89,17 @@ describe('lib/helpers/moduleHelper', function () {
 		});
 	});
 
-	describe('#splitModuleAndContext', function () {
-		it('should return object with only module if context not found',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext('some_');
-				assert.strictEqual(result.moduleName, 'some');
-				assert.strictEqual(result.context, '');
-			});
-		it('should return object with only module if separator is not found',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext('some');
-				assert.strictEqual(result.moduleName, 'some');
-				assert.strictEqual(result.context, '');
-			});
-		it('should return null if argument is not a string',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext(null);
-				assert.strictEqual(result, null);
-			});
-		it('should return object if argument is a right string',
-			function () {
-				var result = moduleHelper.splitModuleNameAndContext(
-					'module-cool_placeholder-nice'
-				);
-				assert.strictEqual(result.moduleName, 'module-cool');
-				assert.strictEqual(result.context, 'placeholder-nice');
-			});
+	describe('#getOriginalComponentName', function () {
+		it('should return name without prefix', function () {
+			var originalName = moduleHelper.getOriginalComponentName(
+				'cat-some'
+			);
+			assert.strictEqual(originalName, 'some');
+		});
+		it('should return empty string for null value', function () {
+			var originalName = moduleHelper.getOriginalComponentName(null);
+			assert.strictEqual(originalName, '');
+		});
 	});
 
 	describe('#getMethodToInvoke', function () {
