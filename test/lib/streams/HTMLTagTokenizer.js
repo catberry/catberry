@@ -31,8 +31,8 @@
 'use strict';
 
 var assert = require('assert'),
-	tests = require('../cases/lib/HTMLTagTokenizer.json'),
-	HTMLTagTokenizer = require('../../lib/HTMLTagTokenizer');
+	tests = require('../../cases/lib/streams/HTMLTagTokenizer.json'),
+	HTMLTagTokenizer = require('../../../lib/streams/HTMLTagTokenizer');
 
 describe('HTMLTagTokenizer', function () {
 	describe('#next', function () {
@@ -48,7 +48,7 @@ describe('HTMLTagTokenizer', function () {
 						value: testCase.html.substring(next.start, next.end)
 					});
 				} while (
-					next.state !== HTMLTagTokenizer.STATES.END &&
+					next.state !== HTMLTagTokenizer.STATES.TAG_CLOSE &&
 					next.state !== HTMLTagTokenizer.STATES.ILLEGAL
 				);
 				assert.deepEqual(tokens, testCase.expected);
