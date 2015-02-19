@@ -1,0 +1,1034 @@
+{
+	"cases": [
+		{
+			"description": "should return ILLEGAL on empty string",
+			"html": "",
+			"expected": [
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on wrong beginning",
+			"html": "f",
+			"expected": [
+				{
+					"name": "ILLEGAL",
+					"value": "f"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on wrong tag name",
+			"html": "<>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on null symbol after tag name",
+			"html": "<tag\u0000>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "\u0000"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if wrong symbol instead attribute name",
+			"html": "<tag <>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "<"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if end after attribute name",
+			"html": "<tag attr",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "attr"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on wrong attribute name",
+			"html": "<name a\"=123>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "\""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on wrong double-quoted attribute value",
+			"html": "<name a=\"123\u0000\">",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "=\""
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_DOUBLE_QUOTED",
+					"value": "123"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "\u0000"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on wrong single-quoted attribute value",
+			"html": "<name a='123\u0000'>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "='"
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_SINGLE_QUOTED",
+					"value": "123"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "\u0000"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if end after single-quoted attribute value",
+			"html": "<name a='123",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "='"
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_SINGLE_QUOTED",
+					"value": "123"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if end after unquoted attribute value",
+			"html": "<name a=123",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "="
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "123"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if wrong symbol after unquoted attribute value",
+			"html": "<name a=123\u0000",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "="
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "123"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "\u0000"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if tag ends after equals",
+			"html": "<name a=>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "="
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if tag end is absent after tag name",
+			"html": "<name",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL if wrong tag end",
+			"html": "<name /",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "SELF_CLOSING_START_TAG_STATE",
+					"value": "/"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on absent closing quote",
+			"html": "<name a=\"123 b>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "=\""
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_DOUBLE_QUOTED",
+					"value": "123 b>"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on absent tag end after closing quote",
+			"html": "<name a=\"123 b\"",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "=\""
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_DOUBLE_QUOTED",
+					"value": "123 b"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_VALUE_QUOTED",
+					"value": "\""
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on absent tag end after equal",
+			"html": "<name a=",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "name"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "a"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "="
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize tag without attributes",
+			"html": "<tag>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize self-closing tag without attributes",
+			"html": "<tag />",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "SELF_CLOSING_START_TAG_STATE",
+					"value": "/"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize self-closing tag with whitespaces and without attributes",
+			"html": "<tag\t\n />",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": "\t\n "
+				},
+				{
+					"name": "SELF_CLOSING_START_TAG_STATE",
+					"value": "/"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize tag with quoted attributes",
+			"html": "<tag some1=\"attribute value\" some2='attribute value2'>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "=\""
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_DOUBLE_QUOTED",
+					"value": "attribute value"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_VALUE_QUOTED",
+					"value": "\""
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some2"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "='"
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_SINGLE_QUOTED",
+					"value": "attribute value2"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_VALUE_QUOTED",
+					"value": "'"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize tag with unquoted attributes",
+			"html": "<tag some1=value some2 = 123 >",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "="
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "value"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some2"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "= "
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "123"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize self-closing tag with unquoted attributes and spaces",
+			"html": "<tag some1 = value some2 = 123 />",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "= "
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "value"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some2"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "= "
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "123"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "SELF_CLOSING_START_TAG_STATE",
+					"value": "/"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize tag with unquoted attributes without whitespace",
+			"html": "<tag some1=value some2=123>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "="
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "value"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some2"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "="
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_UNQUOTED",
+					"value": "123"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize tag with boolean attributes",
+			"html": "<tag some1 some2 >",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some2"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize self-closing tag with boolean attributes",
+			"html": "<tag some1 some2 />",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some2"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "SELF_CLOSING_START_TAG_STATE",
+					"value": "/"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize tag with boolean attributes and whitespaces",
+			"html": "<tag\t\n some1\t\n some2\t\n />",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": "\t\n "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": "\t\n "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some2"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_NAME",
+					"value": "\t\n "
+				},
+				{
+					"name": "SELF_CLOSING_START_TAG_STATE",
+					"value": "/"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize tag with end after boolean attribute",
+			"html": "<tag some1>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize self-closing tag with end after boolean attribute",
+			"html": "<tag some1/>",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "tag"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "some1"
+				},
+				{
+					"name": "SELF_CLOSING_START_TAG_STATE",
+					"value": "/"
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		},
+		{
+			"description": "should correctly tokenize real tag",
+			"html": "<div id=\"css-stamp\" style=\"position: absolute !important; visibility: hidden !important\" class=\"\">",
+			"expected": [
+				{
+					"name": "TAG_OPEN",
+					"value": "<"
+				},
+				{
+					"name": "TAG_NAME",
+					"value": "div"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "id"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "=\""
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_DOUBLE_QUOTED",
+					"value": "css-stamp"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_VALUE_QUOTED",
+					"value": "\""
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "style"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "=\""
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_DOUBLE_QUOTED",
+					"value": "position: absolute !important; visibility: hidden !important"
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_VALUE_QUOTED",
+					"value": "\""
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_NAME",
+					"value": " "
+				},
+				{
+					"name": "ATTRIBUTE_NAME",
+					"value": "class"
+				},
+				{
+					"name": "BEFORE_ATTRIBUTE_VALUE",
+					"value": "=\""
+				},
+				{
+					"name": "ATTRIBUTE_VALUE_DOUBLE_QUOTED",
+					"value": ""
+				},
+				{
+					"name": "AFTER_ATTRIBUTE_VALUE_QUOTED",
+					"value": "\""
+				},
+				{
+					"name": "TAG_CLOSE",
+					"value": ">"
+				}
+			]
+		}
+	]
+}
