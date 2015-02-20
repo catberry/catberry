@@ -31,7 +31,7 @@ To get started with an example please proceed to
 * [Cat-components](https://github.com/catberry/catberry/blob/4.3.1/docs/index.md#cat-components) (like [web-components by Google](http://webcomponents.org/) but isomorphic)
 * You do not need to write any code for registration or definition of
 [cat-components](https://github.com/catberry/catberry/blob/4.3.1/docs/index.md#cat-components) or
-[stores[(https://github.com/catberry/catberry/blob/4.3.1/docs/index.md#stores),
+[stores](https://github.com/catberry/catberry/blob/4.3.1/docs/index.md#stores),
 Catberry discovers them automatically on startup
 * Fast and efficient server-side [progressive rendering engine](http://www.phpied.com/progressive-rendering-via-multiple-flushes/) based on
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors)
