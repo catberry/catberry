@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "4.3.4",
+	"version": "4.3.5",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -8,8 +8,15 @@
 	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
 	"homepage": "https://github.com/catberry/catberry",
 	"keywords": [
-		"stream", "web", "isomorphic", "framework", "middleware", "connect",
-		"dust", "module", "express"
+		"progressive rendering",
+		"Web",
+		"isomorphic",
+		"framework",
+		"middleware",
+		"connect",
+		"express",
+		"component",
+		"Flux"
 	],
 	"bugs": {
 		"url": "https://github.com/catberry/catberry/issues",
