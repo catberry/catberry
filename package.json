@@ -8,8 +8,15 @@
 	"description": "Catberry is a framework for fast and modular isomorphic web-applications written in JavaScript using node.js",
 	"homepage": "https://github.com/catberry/catberry",
 	"keywords": [
-		"stream", "web", "isomorphic", "framework", "middleware", "connect",
-		"dust", "module", "express"
+		"progressive rendering",
+		"Web",
+		"isomorphic",
+		"framework",
+		"middleware",
+		"connect",
+		"express",
+		"component",
+		"Flux"
 	],
 	"bugs": {
 		"url": "https://github.com/catberry/catberry/issues",
