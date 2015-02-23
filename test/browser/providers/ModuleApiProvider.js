@@ -63,7 +63,8 @@ describe('lib/providers/ModuleApiProvider', function () {
 			jsdom.env({
 				html: ' ',
 				done: function (errors, window) {
-					window.location.replace('http://local#some');
+					window.location.replace('http://local');
+					window.location.hash = '#some';
 					locator.registerInstance('window', window);
 					assert.strictEqual(
 						window.location.toString(), 'http://local/#some'
