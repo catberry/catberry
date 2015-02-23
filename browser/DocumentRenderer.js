@@ -528,11 +528,10 @@ DocumentRenderer.prototype._createBindingHandler =
 				return false;
 			});
 			if (isHandled) {
-				//event.stopPropagation();
 				return;
 			}
 
-			while(element !== componentRoot) {
+			while(element.parentNode && element !== componentRoot) {
 				element = element.parentNode;
 				targetMatches = getMatchesMethod(element);
 				for (var i = 0; i < selectors.length; i++) {
@@ -545,7 +544,6 @@ DocumentRenderer.prototype._createBindingHandler =
 				}
 
 				if (isHandled) {
-					//event.stopPropagation();
 					break;
 				}
 			}
