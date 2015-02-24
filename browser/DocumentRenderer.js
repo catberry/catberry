@@ -481,6 +481,10 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 	return moduleHelper.getSafePromise(bindMethod)
 		.then(function (bindings) {
 			if (!bindings || typeof(bindings) !== 'object') {
+				self._eventBus.emit('componentBound', {
+					element: element,
+					id: id
+				});
 				return;
 			}
 			self._componentBindings[id] = {};
