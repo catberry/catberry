@@ -447,6 +447,12 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 	}
 	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
 	return moduleHelper.getSafePromise(unbindMethod)
+		.then(function () {
+			self._eventBus.emit('componentUnbound', {
+				element: element,
+				id: id
+			});
+		})
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
 		});
@@ -793,7 +799,7 @@ DocumentRenderer.prototype._initialWrap = function () {
 					constructor, self._config
 				);
 				instance.$context = constructor.prototype.$context;
-
+				self._componentElements[id] = current;
 				self._componentInstances[id] = instance;
 				self._eventBus.emit('componentRendered', {
 					name: componentName,
