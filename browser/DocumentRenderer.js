@@ -405,22 +405,27 @@ DocumentRenderer.prototype._collectRenderingGarbage =
  */
 DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 	var self = this,
-		rootPromise = this._unbindComponent(element);
+		id = getId(element),
+		promises = [];
 
-	if (!element.hasChildNodes()) {
-		return rootPromise;
+	if (element.hasChildNodes()) {
+		self._findComponents(element, renderingContext)
+			.forEach(function (innerElement) {
+				var id = getId(innerElement);
+				if (renderingContext.unboundIds.hasOwnProperty(id)) {
+					return;
+				}
+				renderingContext.unboundIds[id] = true;
+				promises.push(self._unbindComponent(innerElement));
+			});
 	}
 
-	return rootPromise
-		.then(function () {
-			var promises = self._findComponents(element, renderingContext)
-				.map(function (innerElement) {
-					var id = getId(innerElement);
-					renderingContext.unboundIds[id] = true;
-					return self._unbindComponent(innerElement);
-				});
-			return Promise.all(promises);
-		});
+	if (!renderingContext.unboundIds.hasOwnProperty(id)) {
+		promises.push(this._unbindComponent(element));
+		renderingContext.unboundIds[id] = true;
+	}
+
+	return Promise.all(promises);
 };
 
 /**
@@ -447,6 +452,12 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 	}
 	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
 	return moduleHelper.getSafePromise(unbindMethod)
+		.then(function () {
+			self._eventBus.emit('componentUnbound', {
+				element: element,
+				id: id
+			});
+		})
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
 		});
@@ -470,6 +481,10 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 	return moduleHelper.getSafePromise(bindMethod)
 		.then(function (bindings) {
 			if (!bindings || typeof(bindings) !== 'object') {
+				self._eventBus.emit('componentBound', {
+					element: element,
+					id: id
+				});
 				return;
 			}
 			self._componentBindings[id] = {};
@@ -793,7 +808,7 @@ DocumentRenderer.prototype._initialWrap = function () {
 					constructor, self._config
 				);
 				instance.$context = constructor.prototype.$context;
-
+				self._componentElements[id] = current;
 				self._componentInstances[id] = instance;
 				self._eventBus.emit('componentRendered', {
 					name: componentName,

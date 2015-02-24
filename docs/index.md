@@ -996,7 +996,7 @@ List of browser-only events:
 |-------------------|---------------------------------------------------|---------------------------------------|
 | documentUpdated	| stores are changed and components are re-rendered	|	`['store1', 'store2']`				|
 | componentBound	| each component is bound							|	`{element: Element, id: String}`	|
-
+| componentUnbound	| each component is unbound							|	`{element: Element, id: String}`	|
 
 These events can be used for browser extensions, extended logging
 or component/store logic, feel free to use them everywhere you want

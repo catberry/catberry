@@ -947,7 +947,7 @@ describe('browser/DocumentRenderer', function () {
 								assert.strictEqual(bindCounters.first, 2);
 								assert.strictEqual(bindCounters.second, 2);
 								assert.strictEqual(unbindCounters.first, 2);
-								assert.strictEqual(unbindCounters.second, 3);
+								assert.strictEqual(unbindCounters.second, 2);
 								done();
 							}, 10);
 						})
@@ -1212,8 +1212,8 @@ describe('browser/DocumentRenderer', function () {
 						})
 						.then(function () {
 							assert.strictEqual(renders.length, 4);
-							assert.strictEqual(renders[0], 'unique4');
-							assert.strictEqual(renders[1], 'unique1');
+							assert.strictEqual(renders[0], 'unique1');
+							assert.strictEqual(renders[1], 'unique4');
 							assert.strictEqual(renders[2], 'unique2');
 							assert.strictEqual(renders[3], 'unique3');
 							done();
@@ -1311,12 +1311,16 @@ describe('browser/DocumentRenderer', function () {
 					renderer.render({}, {})
 						.then(function () {
 							eventBus.on('documentUpdated', function () {
-								assert.strictEqual(renders.length, 4);
-								assert.strictEqual(renders[0], 'unique4');
-								assert.strictEqual(renders[1], 'unique1');
-								assert.strictEqual(renders[2], 'unique2');
-								assert.strictEqual(renders[3], 'unique3');
-								done();
+								try {
+									assert.strictEqual(renders.length, 4);
+									assert.strictEqual(renders[0], 'unique1');
+									assert.strictEqual(renders[1], 'unique4');
+									assert.strictEqual(renders[2], 'unique2');
+									assert.strictEqual(renders[3], 'unique3');
+									done();
+								} catch(e) {
+									done(e);
+								}
 							});
 						});
 				}
