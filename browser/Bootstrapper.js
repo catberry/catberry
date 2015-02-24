@@ -52,7 +52,8 @@ var util = require('util'),
 		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 
 var INFO_DOCUMENT_UPDATED = 'Document updated (%d store(s) changed)',
-	INFO_COMPONENT_BOUND = 'Component "%s" is bound';
+	INFO_COMPONENT_BOUND = 'Component "%s" is bound',
+	INFO_COMPONENT_UNBOUND = 'Component "%s" is unbound';
 
 util.inherits(Bootstrapper, BootstrapperBase);
 
@@ -119,7 +120,13 @@ Bootstrapper.prototype._wrapEventsWithLogger = function (eventBus, logger) {
 		.on('componentBound', function (args) {
 			logger.info(util.format(
 				INFO_COMPONENT_BOUND,
-				args.element.tagName.toLowerCase() + '#' + args.id
+				args.element.tagName + '#' + args.id
+			));
+		})
+		.on('componentUnbound', function (args) {
+			logger.info(util.format(
+				INFO_COMPONENT_UNBOUND,
+				args.element.tagName + '#' + args.id
 			));
 		});
 };
