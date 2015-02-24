@@ -405,22 +405,27 @@ DocumentRenderer.prototype._collectRenderingGarbage =
  */
 DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 	var self = this,
-		rootPromise = this._unbindComponent(element);
+		id = getId(element),
+		promises = [];
 
-	if (!element.hasChildNodes()) {
-		return rootPromise;
+	if (element.hasChildNodes()) {
+		self._findComponents(element, renderingContext)
+			.forEach(function (innerElement) {
+				var id = getId(innerElement);
+				if (renderingContext.unboundIds.hasOwnProperty(id)) {
+					return;
+				}
+				renderingContext.unboundIds[id] = true;
+				promises.push(self._unbindComponent(innerElement));
+			});
 	}
 
-	return rootPromise
-		.then(function () {
-			var promises = self._findComponents(element, renderingContext)
-				.map(function (innerElement) {
-					var id = getId(innerElement);
-					renderingContext.unboundIds[id] = true;
-					return self._unbindComponent(innerElement);
-				});
-			return Promise.all(promises);
-		});
+	if (!renderingContext.unboundIds.hasOwnProperty(id)) {
+		promises.push(this._unbindComponent(element));
+		renderingContext.unboundIds[id] = true;
+	}
+
+	return Promise.all(promises);
 };
 
 /**
