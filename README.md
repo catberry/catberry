@@ -23,8 +23,10 @@ And back-end that renders exactly the same page on the server.
 Here you can find full
 [Catberry Documentation](https://github.com/catberry/catberry/blob/4.4.0/docs/index.md).
 
-To get started with an example please proceed to
+To get started with an example, please proceed to
 [Get Started Guide](https://github.com/catberry/catberry/blob/4.4.0/docs/index.md#get-started).
+
+If you want to try TodoMVC application, proceed to [this link](https://github.com/catberry/catberry-todomvc).
 
 ## Advantages
 * [Flux](https://github.com/catberry/catberry/blob/4.4.0/docs/index.md#flux) architecture
