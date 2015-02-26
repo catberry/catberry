@@ -39,7 +39,10 @@ var util = require('util'),
 
 util.inherits(DocumentRenderer, DocumentRendererBase);
 
-var HEAD_ID = '$$head',
+var SPECIAL_IDS = {
+		$$head: '$$head',
+		$$document: '$$document'
+	},
 	ERROR_CREATE_WRONG_ARGUMENTS = 'Tag name should be a string ' +
 		'and attributes should be an object',
 	ERROR_CREATE_WRONG_NAME = 'Component for tag "%s" not found',
@@ -219,7 +222,7 @@ DocumentRenderer.prototype.renderComponent =
 			),
 			hadChildren = element.hasChildNodes(),
 			component = renderingContext.components[componentName],
-			id = getId(element),
+			id = this._getId(element),
 			instance = this._componentInstances[id];
 
 		if (!component) {
@@ -314,7 +317,7 @@ DocumentRenderer.prototype.collectGarbage = function () {
 		promises = [];
 	Object.keys(this._componentElements)
 		.forEach(function (id) {
-			if (id === HEAD_ID) {
+			if (SPECIAL_IDS.hasOwnProperty(id)) {
 				return;
 			}
 			var element = self._window.document.getElementById(id);
@@ -405,13 +408,13 @@ DocumentRenderer.prototype._collectRenderingGarbage =
  */
 DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 	var self = this,
-		id = getId(element),
+		id = this._getId(element),
 		promises = [];
 
 	if (element.hasChildNodes()) {
 		self._findComponents(element, renderingContext)
 			.forEach(function (innerElement) {
-				var id = getId(innerElement);
+				var id = self._getId(innerElement);
 				if (renderingContext.unboundIds.hasOwnProperty(id)) {
 					return;
 				}
@@ -435,7 +438,7 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
  * @private
  */
 DocumentRenderer.prototype._unbindComponent = function (element) {
-	var id = getId(element),
+	var id = this._getId(element),
 		self = this,
 		instance = this._componentInstances[id];
 	if (!instance) {
@@ -455,7 +458,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 		.then(function () {
 			self._eventBus.emit('componentUnbound', {
 				element: element,
-				id: id
+				id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
 			});
 		})
 		.catch(function (reason) {
@@ -470,7 +473,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
  * @private
  */
 DocumentRenderer.prototype._bindComponent = function (element) {
-	var id = getId(element),
+	var id = this._getId(element),
 		self = this,
 		instance = this._componentInstances[id];
 	if (!instance) {
@@ -483,7 +486,7 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 			if (!bindings || typeof(bindings) !== 'object') {
 				self._eventBus.emit('componentBound', {
 					element: element,
-					id: id
+					id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
 				});
 				return;
 			}
@@ -546,8 +549,8 @@ DocumentRenderer.prototype._createBindingHandler =
 				return;
 			}
 
-			while(element.parentNode && element !== componentRoot) {
-				element = element.parentNode;
+			while(element.parentElement && element !== componentRoot) {
+				element = element.parentElement;
 				targetMatches = getMatchesMethod(element);
 				for (var i = 0; i < selectors.length; i++) {
 					if (!targetMatches(selectors[i])) {
@@ -623,6 +626,18 @@ DocumentRenderer.prototype._handleError = function (element, component, error) {
  */
 DocumentRenderer.prototype._updateStoreComponents = function () {
 	if (this._isUpdating) {
+		return Promise.resolve();
+	}
+	var documentStore = this._window.document.documentElement.getAttribute(
+		moduleHelper.ATTRIBUTE_STORE
+	);
+	if (this._currentChangedStores.hasOwnProperty(documentStore)) {
+		var newLocation = this._currentRoutingContext.location.toString();
+		if (newLocation === this._window.location.toString()) {
+			this._window.location.reload();
+			return Promise.resolve();
+		}
+		this._window.location.assign(newLocation);
 		return Promise.resolve();
 	}
 	var changed = Object.keys(this._currentChangedStores);
@@ -790,13 +805,20 @@ DocumentRenderer.prototype._initialWrap = function () {
 		.forEach(function (componentName) {
 			var tagName = moduleHelper
 					.getTagNameForComponentName(componentName),
-				elements = self._window.document
-					.getElementsByTagName(tagName),
+				elements,
 				constructor = components[componentName].constructor;
+
+			if (moduleHelper.isDocumentComponent(componentName)) {
+				elements = [self._window.document.documentElement];
+			} else if (moduleHelper.isHeadComponent(componentName)) {
+				elements = [self._window.document.head];
+			} else {
+				elements = self._window.document.getElementsByTagName(tagName);
+			}
 
 			for (i = 0; i < elements.length; i++) {
 				current = elements[i];
-				id = current.getAttribute(moduleHelper.ATTRIBUTE_ID);
+				id = self._getId(current);
 				if (!id) {
 					continue;
 				}
@@ -902,9 +924,10 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 
 	if (components.hasOwnProperty(moduleHelper.HEAD_COMPONENT_NAME) &&
 		storeNamesSet.hasOwnProperty(headStore)) {
-		rootsSet[getId(this._window.document.head)] = true;
+		rootsSet[this._getId(this._window.document.head)] = true;
 		roots.push(this._window.document.head);
 	}
+
 	changedStoreNames
 		.forEach(function (storeName) {
 			var current, currentId,
@@ -921,9 +944,9 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 					current.tagName
 				);
 
-				while (current.tagName !== TAG_NAMES.HTML) {
-					current = current.parentNode;
-					currentId = getId(current);
+				while (current.parentElement) {
+					current = current.parentElement;
+					currentId = self._getId(current);
 					currentStore = current.getAttribute(
 						moduleHelper.ATTRIBUTE_STORE
 					);
@@ -989,6 +1012,21 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
 };
 
 /**
+ * Gets ID of the element.
+ * @param {Element} element HTML element of component.
+ * @returns {string} ID.
+ */
+DocumentRenderer.prototype._getId = function (element) {
+	if (element === this._window.document.documentElement) {
+		return SPECIAL_IDS.$$document;
+	}
+	if (element === this._window.document.head) {
+		return SPECIAL_IDS.$$head;
+	}
+	return element.getAttribute(moduleHelper.ATTRIBUTE_ID);
+};
+
+/**
  * Converts NamedNodeMap of Attr items to key-value object map.
  * @param {NamedNodeMap} attributes List of Element attributes.
  * @returns {Object} Map of attribute values by names.
@@ -999,17 +1037,6 @@ function attributesToObject(attributes) {
 		result[attributes[i].name] = attributes[i].value;
 	}
 	return result;
-}
-
-/**
- * Gets ID of the element.
- * @param {Element} element HTML element of component.
- * @returns {string} ID.
- */
-function getId(element) {
-	return element.tagName === TAG_NAMES.HEAD ?
-		HEAD_ID :
-		element.getAttribute(moduleHelper.ATTRIBUTE_ID);
 }
 
 /**

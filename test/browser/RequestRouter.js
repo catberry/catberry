@@ -72,8 +72,6 @@ describe('browser/RequestRouter', function () {
 						'http://local' + link
 					);
 					assert.strictEqual(
-						typeof(context.cookie), 'object');
-					assert.strictEqual(
 						documentRenderer.state.first.first, 'firstValue');
 					assert.strictEqual(
 						documentRenderer.state.second.second, 'secondValue');
@@ -139,8 +137,6 @@ describe('browser/RequestRouter', function () {
 						context.location.toString(),
 						'http://local' + link
 					);
-					assert.strictEqual(
-						typeof(context.cookie), 'object');
 					assert.strictEqual(
 						documentRenderer.state.first.first, 'firstValue');
 					assert.strictEqual(
@@ -636,8 +632,4 @@ function createLocator() {
 	locator.register('stateProvider', StateProvider);
 	locator.register('contextFactory', ContextFactory);
 	return locator;
-}
-
-function prepareWindow(window, locator) {
-	locator.registerInstance('window', window);
 }
