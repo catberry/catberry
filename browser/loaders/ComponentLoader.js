@@ -91,12 +91,6 @@ ComponentLoader.prototype.load = function () {
 
 	this._serviceLocator.resolveAll('component')
 		.forEach(function (component) {
-			var componentContext = Object.create(
-				self._contextFactory.createStub()
-			);
-			componentContext.name = component.name;
-			component.constructor.prototype.$context = componentContext;
-
 			components[component.name] = Object.create(component);
 			self._templateProvider.registerCompiled(
 				component.name, component.templateSource

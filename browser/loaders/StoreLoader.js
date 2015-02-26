@@ -80,9 +80,6 @@ StoreLoader.prototype.load = function () {
 		stores = {};
 	this._serviceLocator.resolveAll('store')
 		.forEach(function (store) {
-			var storeContext = Object.create(self._contextFactory.createStub());
-			storeContext.name = store.name;
-			store.constructor.prototype.$context = storeContext;
 			stores[store.name] = store;
 			self._eventBus.emit('storeLoaded', stores[store.name]);
 		});

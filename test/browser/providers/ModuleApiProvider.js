@@ -97,6 +97,10 @@ function createLocator() {
 	templateProvider.decorateMethod('render', function () {
 		return Promise.resolve();
 	});
+	locator.registerInstance('cookieWrapper', {
+		get: function () {},
+		set: function () {}
+	});
 	locator.registerInstance('templateProvider', templateProvider);
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('eventBus', new events.EventEmitter());
