@@ -120,13 +120,13 @@ Bootstrapper.prototype._wrapEventsWithLogger = function (eventBus, logger) {
 		.on('componentBound', function (args) {
 			logger.info(util.format(
 				INFO_COMPONENT_BOUND,
-				args.element.tagName + '#' + args.id
+				args.element.tagName + (args.id ? '#' + args.id : '')
 			));
 		})
 		.on('componentUnbound', function (args) {
 			logger.info(util.format(
 				INFO_COMPONENT_UNBOUND,
-				args.element.tagName + '#' + args.id
+				args.element.tagName + (args.id ? '#' + args.id : '')
 			));
 		});
 };
