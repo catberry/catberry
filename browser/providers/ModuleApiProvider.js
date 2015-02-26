@@ -58,7 +58,7 @@ function ModuleApiProvider($serviceLocator) {
  * @returns {Promise} Promise for nothing.
  */
 ModuleApiProvider.prototype.redirect = function (uriString) {
-	var requestRouter = this._serviceLocator.resolve('requestRouter');
+	var requestRouter = this.locator.resolve('requestRouter');
 	return requestRouter.go(uriString);
 };
 
@@ -67,7 +67,7 @@ ModuleApiProvider.prototype.redirect = function (uriString) {
  * @returns {Promise} Promise for nothing.
  */
 ModuleApiProvider.prototype.clearFragment = function () {
-	var window = this._serviceLocator.resolve('window'),
+	var window = this.locator.resolve('window'),
 		position = window.document.body.scrollTop;
 	window.location.hash = '';
 	window.document.body.scrollTop = position;
