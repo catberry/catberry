@@ -39,8 +39,10 @@ var util = require('util'),
 
 util.inherits(DocumentRenderer, DocumentRendererBase);
 
-var HEAD_ID = '$$head',
-	DOCUMENT_ID = '$$document',
+var SPECIAL_IDS = {
+		$$head: '$$head',
+		$$document: '$$document'
+	},
 	ERROR_CREATE_WRONG_ARGUMENTS = 'Tag name should be a string ' +
 		'and attributes should be an object',
 	ERROR_CREATE_WRONG_NAME = 'Component for tag "%s" not found',
@@ -315,7 +317,7 @@ DocumentRenderer.prototype.collectGarbage = function () {
 		promises = [];
 	Object.keys(this._componentElements)
 		.forEach(function (id) {
-			if (id === HEAD_ID) {
+			if (SPECIAL_IDS.hasOwnProperty(id)) {
 				return;
 			}
 			var element = self._window.document.getElementById(id);
@@ -456,7 +458,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 		.then(function () {
 			self._eventBus.emit('componentUnbound', {
 				element: element,
-				id: id !== DOCUMENT_ID && id !== HEAD_ID ? id : null
+				id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
 			});
 		})
 		.catch(function (reason) {
@@ -484,7 +486,7 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 			if (!bindings || typeof(bindings) !== 'object') {
 				self._eventBus.emit('componentBound', {
 					element: element,
-					id: id !== DOCUMENT_ID && id !== HEAD_ID ? id : null
+					id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
 				});
 				return;
 			}
@@ -1016,10 +1018,10 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
  */
 DocumentRenderer.prototype._getId = function (element) {
 	if (element === this._window.document.documentElement) {
-		return DOCUMENT_ID;
+		return SPECIAL_IDS.$$document;
 	}
 	if (element === this._window.document.head) {
-		return HEAD_ID;
+		return SPECIAL_IDS.$$head;
 	}
 	return element.getAttribute(moduleHelper.ATTRIBUTE_ID);
 };
