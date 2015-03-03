@@ -61,6 +61,61 @@ describe('lib/StoreDispatcher', function () {
 				})
 				.catch(done);
 		});
+		it('should properly get store data from $context', function (done) {
+			function Store1() {}
+			Store1.prototype.load = function () {
+				return this.$context.getStoreData('store2');
+			};
+			function Store2() {}
+			Store2.prototype.load = function () {
+				return 'hello';
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store1
+				},
+				store2: {
+					name: 'store2',
+					constructor: Store2
+				}
+			};
+			var locator = createLocator(stores),
+				context = {hello: 'world'},
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, context);
+			dispatcher.getStoreData(stores.store1.name)
+				.then(function (data) {
+					assert.strictEqual(data, 'hello');
+					done();
+				})
+				.catch(done);
+		});
+		it('should return null if store name equals ' +
+		'current in $context', function (done) {
+			function Store1() {}
+			Store1.prototype.load = function () {
+				return this.$context.getStoreData('store1');
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store1
+				}
+			};
+			var locator = createLocator(stores),
+				context = {hello: 'world'},
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, context);
+			dispatcher.getStoreData(stores.store1.name)
+				.then(function (data) {
+					assert.strictEqual(data, null);
+					done();
+				})
+				.catch(done);
+		});
 		it('should pass error from store', function (done) {
 			var stores = {
 				store1: {
@@ -552,6 +607,38 @@ describe('lib/StoreDispatcher', function () {
 				})
 				.catch(done);
 		});
+		it('should send action to store if it has handler', function (done) {
+			function Store1() {}
+			Store1.prototype.handleHello = function (name) {
+				return this.$context.sendAction('store2', 'world', name);
+			};
+			function Store2() {}
+			Store2.prototype.handleWorld = function (name) {
+				return 'hello, ' + name;
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store1
+				},
+				store2: {
+					name: 'store2',
+					constructor: Store2
+				}
+			};
+			var locator = createLocator(stores),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, {});
+			dispatcher.sendAction(
+				stores.store1.name, 'hello', 'catberry'
+			)
+				.then(function (result) {
+					assert.strictEqual(result, 'hello, catberry');
+					done();
+				})
+				.catch(done);
+		});
 		it('should response with undefined ' +
 		'if there is no such action handler', function (done) {
 			var stores = {
@@ -639,6 +726,51 @@ describe('lib/StoreDispatcher', function () {
 					assert.strictEqual(results[0].result, 'store1');
 					assert.strictEqual(results[1].args, actionParameters);
 					assert.strictEqual(results[1].result, 'store3');
+					done();
+				})
+				.catch(done);
+		});
+		it('should send action to all stores ' +
+		'with handlers from $context', function (done) {
+			function Store1() {}
+			Store1.prototype.handleSome = function (name) {
+				return this.$context.sendBroadcastAction('action', name);
+			};
+			function Store2() {}
+			Store2.prototype.handleAction = function (name) {
+				return 'hello from store2, ' + name;
+			};
+			function Store3() {}
+			Store3.prototype.handleAction = function (name) {
+				return 'hello from store3, ' + name;
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store1
+				},
+				store2: {
+					name: 'store2',
+					constructor: Store2
+				},
+				store3: {
+					name: 'store3',
+					constructor: Store3
+				}
+			};
+			var locator = createLocator(stores),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, {});
+			dispatcher.sendAction('store1', 'some', 'catberry')
+				.then(function (results) {
+					assert.strictEqual(results.length, 2);
+					assert.strictEqual(
+						results[0], 'hello from store2, catberry'
+					);
+					assert.strictEqual(
+						results[1], 'hello from store3, catberry'
+					);
 					done();
 				})
 				.catch(done);
