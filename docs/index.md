@@ -176,6 +176,14 @@ from routing definition
 * `this.$context.redirect('String')` - Redirects to specified location string
 * `this.$context.changed()` – Triggers `changed` event for current store.
 You can use this method whenever you want, Catberry handles it correctly.
+* `this.$context.getStoreData('storeName')` – gets promise for
+another store's data, if `storeName` is the same as current it will be `null`.
+* `this.$context.sendAction('storeName', ‘name’, object)` – sends action to
+store by name and returns a promise of the action handling result. If
+the store does not have a handler for this action the result is always `null`.
+* `this.$context.sendBroadcastAction(‘name’, object)` – the same as previous but
+the action will be sent to all stores that have handler for this action. Returns
+promise for `Array` of results.
 
 Every time router computes new application state it re-creates and re-assigns
 context to each store, therefore, do not save references to `this.$context`
