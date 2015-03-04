@@ -189,6 +189,15 @@ Every time router computes new application state it re-creates and re-assigns
 context to each store, therefore, do not save references to `this.$context`
 objects.
 
+Please keep in mind that if you use `getStoreData` method and data from
+another store in `load` method you should add current store to
+routing parameter-dependant list near the store which data you use, otherwise
+cache of current store will not be updated if parameter is changed.
+For example, you have two stores `City` and `List` and you do
+`this.$context.getStoreData('City')` in `List.prototype.load`. In this case if
+you have `/:city[City]` routing rule definition it will not work. You should
+define `/:city[City,List]` in this case.
+
 ## Code example
 This is an example how your store can look like:
 
