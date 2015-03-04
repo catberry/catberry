@@ -260,6 +260,9 @@ DocumentRenderer.prototype.renderComponent =
 				self._eventBus.emit('error', reason);
 			})
 			.then(function () {
+				instance.$context.attributes = attributesToObject(
+					element.attributes
+				);
 				var renderMethod = moduleHelper.getMethodToInvoke(
 					instance, 'render'
 				);
