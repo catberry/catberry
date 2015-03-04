@@ -43,7 +43,8 @@ var REPOSITORY_LINK_REGEXP =
 	PACKAGE_REGEXP = /(Catberry@)([0-9\-a-z\.]+)/gi,
 	PATHS = [
 		'README.md',
-		'lib/helpers/errorHelper.js'
+		'lib/helpers/errorHelper.js',
+		'lib/base/CatberryBase.js'
 	];
 
 PATHS.forEach(function (currentPath) {
