@@ -41,6 +41,8 @@ var packageInfo = require('./package.json'),
 var REPOSITORY_LINK_REGEXP =
 	/(https:\/\/github.com\/catberry\/catberry\/blob\/)([0-9\-a-z\.]+)(\/)/gi,
 	PACKAGE_REGEXP = /(Catberry@)([0-9\-a-z\.]+)/gi,
+	CATBERRY_PROPERTY_REGEXP =
+		/(CatberryBase\.prototype\.version\s*=\s*')([0-9\-a-z\.]+)/i,
 	PATHS = [
 		'README.md',
 		'lib/helpers/errorHelper.js',
@@ -61,7 +63,8 @@ PATHS.forEach(function (currentPath) {
 			console.log('Replacing...');
 			buffer = buffer
 				.replace(REPOSITORY_LINK_REGEXP, '$1' + version + '$3')
-				.replace(PACKAGE_REGEXP, '$1' + version);
+				.replace(PACKAGE_REGEXP, '$1' + version)
+				.replace(CATBERRY_PROPERTY_REGEXP, '$1' + version);
 			console.log('Writing...');
 			fs.createWriteStream(absolutePath, options)
 				.write(buffer);
