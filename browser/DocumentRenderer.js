@@ -363,12 +363,14 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 		);
 	}
 
+	var safeTagName = moduleHelper.getTagNameForComponentName(componentName);
+
 	var id = attributes[moduleHelper.ATTRIBUTE_ID];
 	if (!id || this._componentInstances.hasOwnProperty(id)) {
 		return Promise.reject(new Error(ERROR_CREATE_WRONG_ID));
 	}
 
-	var element = this._window.document.createElement(tagName);
+	var element = this._window.document.createElement(safeTagName);
 	Object.keys(attributes)
 		.forEach(function (attributeName) {
 			element.setAttribute(attributeName, attributes[attributeName]);
