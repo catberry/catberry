@@ -240,6 +240,9 @@ RequestRouter.prototype._wrapDocument = function () {
 	});
 
 	this._window.document.body.addEventListener('click', function (event) {
+		if (event.defaultPrevented) {
+			return;
+		}
 		if (event.target.tagName === A_TAG_NAME) {
 			self._linkClickHandler(event, event.target)
 				.catch(self._handleError.bind(self));

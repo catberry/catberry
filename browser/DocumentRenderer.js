@@ -541,15 +541,13 @@ DocumentRenderer.prototype._createBindingHandler =
 				}),
 				element = event.target,
 				targetMatches = getMatchesMethod(element),
-				isHandled = false;
-			selectors.every(function (selector) {
-				if (!targetMatches(selector)) {
-					return true;
-				}
-				isHandled = true;
-				selectorHandlers[selector](dispatchedEvent);
-				return false;
-			});
+				isHandled = selectors.some(function (selector) {
+					if (targetMatches(selector)) {
+						selectorHandlers[selector](dispatchedEvent);
+						return true;
+					}
+					return false;
+				});
 			if (isHandled) {
 				return;
 			}
