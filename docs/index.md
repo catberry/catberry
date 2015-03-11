@@ -184,19 +184,25 @@ the store does not have a handler for this action the result is always `null`.
 * `this.$context.sendBroadcastAction(‘name’, object)` – the same as previous but
 the action will be sent to all stores that have handler for this action. Returns
 promise for `Array` of results.
+* `this.$context.setDependency(‘storeName’)` – sets a dependency store
+for current store. Every time the dependency store changes, current store
+also will trigger `changed` event.
+* `this.$context.unsetDependency(‘storeName’)` – removes dependency store
+described in the previous method.
 
 Every time router computes new application state it re-creates and re-assigns
 context to each store, therefore, do not save references to `this.$context`
 objects.
 
 Please keep in mind that if you use `getStoreData` method and data from
-another store in `load` method you should add current store to
-routing parameter-dependant list near the store which data you use, otherwise
-cache of current store will not be updated if parameter is changed.
+another store in `load` method you should set that store as a dependency for
+current store (`this.$context.setDependency(‘storeName’)`), otherwise
+cache of current store will not be updated if store-dependency is changed.
 For example, you have two stores `Country` and `CityList` and you do
 `this.$context.getStoreData('Country')` in `CityList.prototype.load`.
-In this case if you have `/:country[Country]` routing rule definition it
-will not work. You should define `/:country[Country, CityList]` in this case.
+In this case, if `Country` store is changed `CityList` will not changed.
+To avoid this just add `this.$context.setDependency(‘Country’)` to
+the `CityList` constructor.
 
 ## Code example
 This is an example how your store can look like:
