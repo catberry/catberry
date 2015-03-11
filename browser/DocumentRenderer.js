@@ -266,6 +266,10 @@ DocumentRenderer.prototype.renderComponent =
 				var renderMethod = moduleHelper.getMethodToInvoke(
 					instance, 'render'
 				);
+				// initialize the store of the component
+				self._storeDispatcher.getStore(
+					element.getAttribute(moduleHelper.ATTRIBUTE_STORE)
+				);
 				return moduleHelper.getSafePromise(renderMethod);
 			})
 			.then(function (dataContext) {
@@ -835,6 +839,10 @@ DocumentRenderer.prototype._initialWrap = function () {
 				instance.$context = constructor.prototype.$context;
 				self._componentElements[id] = current;
 				self._componentInstances[id] = instance;
+				// initialize the store of the component
+				self._storeDispatcher.getStore(
+					current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
+				);
 				self._eventBus.emit('componentRendered', {
 					name: componentName,
 					attributes: instance.$context.attributes,
