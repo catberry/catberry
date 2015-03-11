@@ -290,8 +290,8 @@ describe('lib/StoreDispatcher', function () {
 				counter++;
 				var self = this;
 				return new Promise(function (fulfill) {
+					fulfill('hello');
 					setTimeout(function () {
-						fulfill('hello');
 						if (counter === 1) {
 							self.$context.changed();
 						}
@@ -367,6 +367,83 @@ describe('lib/StoreDispatcher', function () {
 					dispatcher.setState({store1: {}}, context);
 				});
 		});
+		it('should emit store\'s changed ' +
+		'for dependant store ', function (done) {
+			var loads = [];
+			function Store1() {}
+			Store1.prototype.load = function () {
+				loads.push(this.$context.name);
+				var self = this;
+				if (loads.length === 1) {
+					setTimeout(function () {
+						self.$context.changed();
+					}, 10);
+				}
+				return new Promise(function (fulfill) {
+					fulfill('hello');
+				});
+			};
+			function Store2() {
+				this.$context.setDependency('store1');
+			}
+			Store2.prototype.load = function () {
+				loads.push(this.$context.name);
+			};
+			function Store3() {
+				this.$context.setDependency('store2');
+			}
+			Store3.prototype.load = function () {
+				loads.push(this.$context.name);
+			};
+			var stores = {
+				store1: {
+					name: 'store1',
+					constructor: Store1
+				},
+				store2: {
+					name: 'store2',
+					constructor: Store2
+				},
+				store3: {
+					name: 'store3',
+					constructor: Store3
+				}
+			};
+			var locator = createLocator(stores),
+				context = {hello: 'world'},
+				eventBus = locator.resolve('eventBus'),
+				dispatcher = locator.resolve('storeDispatcher');
+
+			dispatcher.setState({}, context);
+			Promise.all([
+				dispatcher.getStoreData(stores.store1.name),
+				dispatcher.getStoreData(stores.store2.name),
+				dispatcher.getStoreData(stores.store3.name)
+			])
+				.catch(done);
+
+			eventBus.on('storeChanged', function (storeName) {
+				if (storeName !== 'store3') {
+					return;
+				}
+				return Promise.all([
+					dispatcher.getStoreData(stores.store1.name),
+					dispatcher.getStoreData(stores.store2.name),
+					dispatcher.getStoreData(stores.store3.name)
+				])
+					.then(function () {
+						assert.strictEqual(loads[0], 'store1');
+						assert.strictEqual(loads[1], 'store2');
+						assert.strictEqual(loads[2], 'store3');
+						assert.strictEqual(loads[3], 'store1');
+						assert.strictEqual(loads[4], 'store2');
+						assert.strictEqual(loads[5], 'store3');
+						done();
+					})
+					.catch(done);
+			});
+		});
+
 		it('should not cache store\'s data ' +
 		'if there was an error loading data', function (done) {
 			var counter = 0;
@@ -450,7 +527,7 @@ describe('lib/StoreDispatcher', function () {
 				.catch(done);
 		});
 		it('should reject promise when initial state ' +
-		'is not state', function (done) {
+		'is not set', function (done) {
 			var stores = {
 				store1: {
 					name: 'store1',
