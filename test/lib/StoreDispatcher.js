@@ -290,8 +290,8 @@ describe('lib/StoreDispatcher', function () {
 				counter++;
 				var self = this;
 				return new Promise(function (fulfill) {
+					fulfill('hello');
 					setTimeout(function () {
-						fulfill('hello');
 						if (counter === 1) {
 							self.$context.changed();
 						}
@@ -450,7 +450,7 @@ describe('lib/StoreDispatcher', function () {
 				.catch(done);
 		});
 		it('should reject promise when initial state ' +
-		'is not state', function (done) {
+		'is not set', function (done) {
 			var stores = {
 				store1: {
 					name: 'store1',
