@@ -279,6 +279,9 @@ RequestRouter.prototype._linkClickHandler = function (event, element) {
 	if (!locationString) {
 		return Promise.resolve();
 	}
+	if (locationString[0] === '#') {
+		return Promise.resolve();
+	}
 
 	event.preventDefault();
 	return this.go(locationString);
