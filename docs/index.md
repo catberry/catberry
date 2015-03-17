@@ -811,7 +811,7 @@ logger.setLevel('ERROR');
 
 More details [here](https://github.com/nomiddlename/log4js-node#usage).
 
-* [Interface of Browser Logger](../../../browser/Logger.js)
+* [Interface of Browser Logger](../browser/Logger.js)
 * [Interface of Server Logger (log4js)](https://www.npmjs.org/package/log4js)
 
 ## Config
