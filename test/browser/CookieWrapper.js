@@ -133,6 +133,30 @@ describe('browser/CookieWrapper', function () {
 				}, Error);
 			});
 	});
+	describe('#getCookieString', function () {
+		it('should return right cookie string', function () {
+			var locator = createLocator('some=value; some2=value2'),
+				cookieWrapper = locator.resolveInstance(CookieWrapper);
+
+			assert.strictEqual(
+				cookieWrapper.getCookieString(),
+				'some=value; some2=value2'
+			);
+		});
+	});
+	describe('#getAll', function () {
+		it('should return right cookie string', function () {
+			var locator = createLocator('some=value; some2=value2'),
+				cookieWrapper = locator.resolveInstance(CookieWrapper);
+
+			assert.deepEqual(
+				cookieWrapper.getAll(), {
+					some: 'value',
+					some2: 'value2'
+				}
+			);
+		});
+	});
 });
 
 function createLocator(cookieString) {
