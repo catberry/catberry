@@ -340,7 +340,7 @@ It is supported that `bind()` method returns an object that describes all event
 bindings inside the template of the current component. You can return binding object
 (or Promise for it) like this.
 
-```
+```javascript
 Cool.prototype.bind = function () {
 	return {
 		click: {
