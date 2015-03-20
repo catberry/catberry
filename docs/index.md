@@ -875,6 +875,18 @@ CookiesWrapper.prototype.get = function (name) { }
  * @returns {string} Cookie setup string.
  */
 CookiesWrapper.prototype.set = function (cookieSetup) { }
+
+/**
+ * Gets current cookie string.
+ * @returns {string} Cookie string.
+ */
+CookieWrapper.prototype.getCookieString = function () { }
+
+/**
+ * Gets map of cookie values by name.
+ * @returns {Object} Cookies map by names.
+ */
+CookieWrapperBase.prototype.getAll = function () { }
 ```
 
 **[⬆ back to top](#table-of-contents)**

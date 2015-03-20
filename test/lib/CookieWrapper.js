@@ -148,4 +148,58 @@ describe('lib/CookieWrapper', function () {
 				}, Error);
 			});
 	});
+	describe('#getCookieString', function () {
+		it('should return right cookie string with init', function () {
+			var cookieWrapper = new CookieWrapper();
+			cookieWrapper.initWithString('some=value; some2=value2');
+			assert.strictEqual(
+				cookieWrapper.getCookieString(),
+				'some=value; some2=value2'
+			);
+		});
+		it('should return right cookie string ' +
+		'without init but with set', function () {
+			var cookieWrapper = new CookieWrapper();
+			cookieWrapper.set({
+				key: 'some3',
+				value: 'value3'
+			});
+			cookieWrapper.set({
+				key: 'some4',
+				value: 'value4'
+			});
+			assert.strictEqual(
+				cookieWrapper.getCookieString(),
+				'some3=value3; some4=value4'
+			);
+		});
+		it('should return right cookie string after init and set', function () {
+			var cookieWrapper = new CookieWrapper();
+			cookieWrapper.initWithString('some=value; some2=value2');
+			cookieWrapper.set({
+				key: 'some3',
+				value: 'value3'
+			});
+			cookieWrapper.set({
+				key: 'some4',
+				value: 'value4'
+			});
+			assert.strictEqual(
+				cookieWrapper.getCookieString(),
+				'some=value; some2=value2; some3=value3; some4=value4'
+			);
+		});
+	});
+	describe('#getAll', function () {
+		it('should return right cookie string', function () {
+			var cookieWrapper = new CookieWrapper();
+			cookieWrapper.initWithString('some=value; some2=value2');
+			assert.deepEqual(
+				cookieWrapper.getAll(), {
+					some: 'value',
+					some2: 'value2'
+				}
+			);
+		});
+	});
 });
