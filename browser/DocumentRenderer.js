@@ -260,6 +260,11 @@ DocumentRenderer.prototype.renderComponent =
 				self._eventBus.emit('error', reason);
 			})
 			.then(function () {
+				if (instance.$context.element !== element) {
+					instance.$context = self._getComponentContext(
+						component, element
+					);
+				}
 				var renderMethod = moduleHelper.getMethodToInvoke(
 					instance, 'render'
 				);
