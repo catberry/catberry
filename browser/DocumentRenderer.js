@@ -107,7 +107,7 @@ DocumentRenderer.prototype._config = null;
 /**
  * Current store dispatcher.
  * @type {StoreDispatcher}
- * @private
+ * @protected
  */
 DocumentRenderer.prototype._storeDispatcher = null;
 
@@ -260,15 +260,13 @@ DocumentRenderer.prototype.renderComponent =
 				self._eventBus.emit('error', reason);
 			})
 			.then(function () {
-				instance.$context.attributes = attributesToObject(
-					element.attributes
-				);
+				if (instance.$context.element !== element) {
+					instance.$context = self._getComponentContext(
+						component, element
+					);
+				}
 				var renderMethod = moduleHelper.getMethodToInvoke(
 					instance, 'render'
-				);
-				// initialize the store of the component
-				self._storeDispatcher.getStore(
-					element.getAttribute(moduleHelper.ATTRIBUTE_STORE)
 				);
 				return moduleHelper.getSafePromise(renderMethod);
 			})
@@ -871,30 +869,64 @@ DocumentRenderer.prototype._getComponentContext =
 			storeName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE),
 			componentContext = Object.create(this._currentRoutingContext);
 
-		componentContext.element = element;
-		componentContext.name = component.name;
-		componentContext.attributes = attributesToObject(element.attributes);
-		componentContext.getComponentById = function (id) {
-			return self.getComponentById(id);
-		};
-		componentContext.createComponent = function (tagName, attributes) {
-			return self.createComponent(tagName, attributes);
-		};
-		componentContext.collectGarbage = function () {
-			return self.collectGarbage();
-		};
-		componentContext.getStoreData = function () {
-			return self._storeDispatcher
-				.getStoreData(storeName);
-		};
-		componentContext.sendAction = function (name, args) {
-			return self._storeDispatcher
-				.sendAction(storeName, name, args);
-		};
-		componentContext.sendBroadcastAction = function (name, args) {
-			return self._storeDispatcher
-				.sendBroadcastAction(name, args);
-		};
+		// initialize the store of the component
+		this._storeDispatcher.getStore(storeName);
+
+		Object.defineProperties(componentContext, {
+			element: {
+				value: element,
+				enumerable: true
+			},
+			name: {
+				get: function () {
+					return component.name;
+				},
+				enumerable: true
+			},
+			attributes: {
+				get: function () {
+					return attributesToObject(element.attributes);
+				},
+				enumerable: true
+			},
+			getComponentById: {
+				value: function (id) {
+					return self.getComponentById(id);
+				}
+			},
+			createComponent: {
+				value: function (tagName, attributes) {
+					return self.createComponent(tagName, attributes);
+				}
+			},
+			collectGarbage: {
+				value: function () {
+					return self.collectGarbage();
+				}
+			},
+			getStoreData: {
+				value: function () {
+					var currentStoreName = componentContext.element
+						.getAttribute(moduleHelper.ATTRIBUTE_STORE);
+					return self._storeDispatcher
+						.getStoreData(currentStoreName);
+				}
+			},
+			sendAction: {
+				value: function (name, args) {
+					var currentStoreName = componentContext.element
+						.getAttribute(moduleHelper.ATTRIBUTE_STORE);
+					return self._storeDispatcher
+						.sendAction(currentStoreName, name, args);
+				}
+			},
+			sendBroadcastAction: {
+				value: function (name, args) {
+					return self._storeDispatcher
+						.sendBroadcastAction(name, args);
+				}
+			}
+		});
 
 		return componentContext;
 	};

@@ -340,7 +340,7 @@ It is supported that `bind()` method returns an object that describes all event
 bindings inside the template of the current component. You can return binding object
 (or Promise for it) like this.
 
-```
+```javascript
 Cool.prototype.bind = function () {
 	return {
 		click: {
@@ -875,6 +875,18 @@ CookiesWrapper.prototype.get = function (name) { }
  * @returns {string} Cookie setup string.
  */
 CookiesWrapper.prototype.set = function (cookieSetup) { }
+
+/**
+ * Gets current cookie string.
+ * @returns {string} Cookie string.
+ */
+CookieWrapper.prototype.getCookieString = function () { }
+
+/**
+ * Gets map of cookie values by name.
+ * @returns {Object} Cookies map by names.
+ */
+CookieWrapperBase.prototype.getAll = function () { }
 ```
 
 **[⬆ back to top](#table-of-contents)**
