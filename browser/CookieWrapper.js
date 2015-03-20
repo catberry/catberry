@@ -53,20 +53,13 @@ function CookieWrapper($window) {
 CookieWrapper.prototype._window = null;
 
 /**
- * Gets cookie value by name.
- * @param {string} name Cookie name.
- * @returns {string} Cookie value.
+ * Gets current cookie string.
+ * @returns {string} Cookie string.
  */
-CookieWrapper.prototype.get = function (name) {
-	if (typeof(name) !== 'string') {
-		return '';
-	}
-	if (!this._window.document.cookie) {
-		return '';
-	}
-	var cookie = this._parseCookieString(
-		this._window.document.cookie.toString());
-	return cookie[name] || '';
+CookieWrapper.prototype.getCookieString = function () {
+	return this._window.document.cookie ?
+		this._window.document.cookie.toString() :
+		'';
 };
 
 /**
