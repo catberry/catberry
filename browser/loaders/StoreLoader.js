@@ -40,15 +40,7 @@ module.exports = StoreLoader;
 function StoreLoader($serviceLocator) {
 	this._serviceLocator = $serviceLocator;
 	this._eventBus = $serviceLocator.resolve('eventBus');
-	this._contextFactory = $serviceLocator.resolve('contextFactory');
 }
-
-/**
- * Current context factory.
- * @type {ContextFactory}
- * @private
- */
-StoreLoader.prototype._contextFactory = null;
 
 /**
  * Current event bus.
