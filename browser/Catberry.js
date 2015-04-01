@@ -33,8 +33,7 @@
 module.exports = Catberry;
 
 var util = require('util'),
-	CatberryBase = require('../lib/base/CatberryBase'),
-	ServiceLocator = require('catberry-locator');
+	CatberryBase = require('../lib/base/CatberryBase');
 
 util.inherits(Catberry, CatberryBase);
 

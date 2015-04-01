@@ -63,6 +63,18 @@ var SPECIAL_IDS = {
 		TEXT_NODE: 3,
 		PROCESSING_INSTRUCTION_NODE: 7,
 		COMMENT_NODE: 8
+	},
+	// http://www.w3.org/TR/2015/WD-uievents-20150319/#event-types-list
+	NON_BUBBLING_EVENTS = {
+		abort: true,
+		blur: true,
+		error: true,
+		focus: true,
+		load: true,
+		mouseenter: true,
+		mouseleave: true,
+		resize: true,
+		unload: true
 	};
 
 /**
@@ -455,7 +467,9 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 		Object.keys(this._componentBindings[id])
 			.forEach(function (eventName) {
 				element.removeEventListener(
-					eventName, self._componentBindings[id][eventName].handler
+					eventName,
+					self._componentBindings[id][eventName].handler,
+					NON_BUBBLING_EVENTS.hasOwnProperty(eventName)
 				);
 			});
 		delete this._componentBindings[id];
@@ -500,6 +514,10 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 			self._componentBindings[id] = {};
 			Object.keys(bindings)
 				.forEach(function (eventName) {
+					eventName = eventName.toLowerCase();
+					if (self._componentBindings[id].hasOwnProperty(eventName)) {
+						return;
+					}
 					var selectorHandlers = {};
 					Object.keys(bindings[eventName])
 						.forEach(function (selector) {
@@ -517,7 +535,8 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 					};
 					element.addEventListener(
 						eventName,
-						self._componentBindings[id][eventName].handler
+						self._componentBindings[id][eventName].handler,
+						NON_BUBBLING_EVENTS.hasOwnProperty(eventName)
 					);
 				});
 			self._eventBus.emit('componentBound', {
@@ -550,7 +569,7 @@ DocumentRenderer.prototype._createBindingHandler =
 					}
 					return false;
 				});
-			if (isHandled) {
+			if (isHandled || !event.bubbles) {
 				return;
 			}
 
