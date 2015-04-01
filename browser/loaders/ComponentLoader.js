@@ -41,17 +41,9 @@ var moduleHelper = require('../../lib/helpers/moduleHelper');
  */
 function ComponentLoader($serviceLocator) {
 	this._serviceLocator = $serviceLocator;
-	this._contextFactory = $serviceLocator.resolve('contextFactory');
 	this._eventBus = $serviceLocator.resolve('eventBus');
 	this._templateProvider = $serviceLocator.resolve('templateProvider');
 }
-
-/**
- * Current context factory.
- * @type {ContextFactory}
- * @private
- */
-ComponentLoader.prototype._contextFactory = null;
 
 /**
  * Current event bus.
