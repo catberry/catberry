@@ -285,6 +285,9 @@ DocumentRenderer.prototype.renderComponent =
 			.then(function (dataContext) {
 				return component.template.render(dataContext);
 			})
+			.catch(function (reason) {
+				return self._handleRenderError(element, component, reason);
+			})
 			.then(function (html) {
 				if (element.tagName === TAG_NAMES.HEAD) {
 					self._mergeHead(element, html);
@@ -304,14 +307,14 @@ DocumentRenderer.prototype.renderComponent =
 				self._eventBus.emit('componentRendered', eventArgs);
 				return self._bindComponent(element);
 			})
-			.catch(function (reason) {
-				return self._handleError(element, component, reason);
-			})
 			.then(function () {
 				if (!hadChildren) {
 					return;
 				}
 				self._collectRenderingGarbage(renderingContext);
+			})
+			.catch(function (reason) {
+				self._eventBus.emit('error', reason);
 			});
 	};
 
@@ -616,32 +619,28 @@ DocumentRenderer.prototype._findComponents =
  * @param {Element} element Component HTML element.
  * @param {Object} component Component instance.
  * @param {Error} error Error to handle.
- * @returns {Promise|null} Promise for nothing or null.
+ * @returns {Promise<String>} Promise for HTML string.
  * @private
  */
-DocumentRenderer.prototype._handleError = function (element, component, error) {
-	this._eventBus.emit('error', error);
+DocumentRenderer.prototype._handleRenderError =
+	function (element, component, error) {
+		this._eventBus.emit('error', error);
 
-	// do not corrupt existed HEAD when error occurs
-	if (element.tagName === TAG_NAMES.HEAD) {
-		return null;
-	}
+		// do not corrupt existed HEAD when error occurs
+		if (element.tagName === TAG_NAMES.HEAD) {
+			return Promise.resolve('');
+		}
 
-	if (!this._config.isRelease && error instanceof Error) {
-		element.innerHTML = errorHelper.prettyPrint(
-			error, this._window.navigator.userAgent
-		);
-	} else if (component.errorTemplate) {
-		return component.errorTemplate.render(error)
-			.then(function (html) {
-				element.innerHTML = html;
-			});
-	} else {
-		element.innerHTML = '';
-	}
+		if (!this._config.isRelease && error instanceof Error) {
+			return Promise.resolve(errorHelper.prettyPrint(
+				error, this._window.navigator.userAgent
+			));
+		} else if (component.errorTemplate) {
+			return component.errorTemplate.render(error);
+		}
 
-	return null;
-};
+		return Promise.resolve('');
+	};
 
 /**
  * Updates all components that depend on current set of changed stores.
@@ -695,6 +694,9 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
  */
 /*jshint maxcomplexity:false */
 DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
+	if (!htmlText) {
+		return;
+	}
 	var self = this,
 		newHead = this._window.document.createElement('head');
 	newHead.innerHTML = htmlText;
