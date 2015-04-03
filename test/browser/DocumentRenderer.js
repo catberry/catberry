@@ -227,16 +227,34 @@ describe('browser/DocumentRenderer', function () {
 					name: 'test-async',
 					constructor: ComponentErrorAsync,
 					templateSource: '<div>Hello, World!</div>',
-					errorTemplateSource: '<div>Hello, Error!</div>'
+					errorTemplateSource: '<div>Hello, Error!</div>' +
+						'<cat-error id="cat-error" test="error-text">' +
+						'</cat-error>'
+				},
+				{
+					name: 'error',
+					constructor: ComponentAsync,
+					templateSource: '<div>Hello, Error Component!</div>' +
+					'<cat-error2 id="cat-error2"></cat-error2>'
+				},
+				{
+					name: 'error2',
+					constructor: ComponentErrorAsync,
+					templateSource: 'none'
 				}
 			];
 			var locator = createLocator(components, {isRelease: true}),
 				eventBus = locator.resolve('eventBus');
 
-			var expected = 'Error<br><div>Hello, Error!</div>';
+			var expected = 'Error<br><div>Hello, Error!</div>' +
+				'<cat-error id="cat-error" test="error-text">' +
+				'error<br>' +
+				'<div>Hello, Error Component!</div>' +
+				'<cat-error2 id="cat-error2"></cat-error2>' +
+				'</cat-error>';
 
 			eventBus.on('error', function (error) {
-				assert.strictEqual(error.message, 'test-async');
+				// nothing to do
 			});
 			jsdom.env({
 				html: ' ',
