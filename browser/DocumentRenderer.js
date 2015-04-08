@@ -173,39 +173,31 @@ DocumentRenderer.prototype._renderedPromise = null;
 DocumentRenderer.prototype._isUpdating = false;
 
 /**
+ * Current awaiting routing.
+ * @type {{state: Object, routingContext: Object}}
+ * @private
+ */
+DocumentRenderer.prototype._awaitingRouting = null;
+
+/**
  * Renders new state of application.
  * @param {Object} state New state of application.
  * @param {Object} routingContext Routing context.
  * @returns {Promise} Promise for nothing.
  */
 DocumentRenderer.prototype.render = function (state, routingContext) {
-	var self = this,
-		components = this._componentLoader.getComponentsByNames();
-	// we have to update all contexts of all components
-	this._currentRoutingContext = routingContext;
-	Object.keys(this._componentInstances)
-		.forEach(function (id) {
-			var instance = self._componentInstances[id];
-			instance.$context = self._getComponentContext(
-				components[instance.$context.name],
-				instance.$context.element
-			);
-		});
-
+	var self = this;
+	this._awaitingRouting = {
+		state: state,
+		routingContext: routingContext
+	};
 	if (this._isStateChanging) {
-		var changedAgain = this._storeDispatcher.setState(
-			state, routingContext
-		);
-		changedAgain.forEach(function (name) {
-			self._currentChangedStores[name] = true;
-		});
 		return this._renderedPromise;
 	}
 
 	// we should set this flag to avoid "storeChanged"
 	// event handling for now
 	this._isStateChanging = true;
-	this._storeDispatcher.setState(state, routingContext);
 
 	// and then we update all components of these stores in a batch.
 	this._renderedPromise = self._updateStoreComponents()
@@ -651,6 +643,10 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 	if (this._isUpdating) {
 		return Promise.resolve();
 	}
+
+	var self = this;
+
+	// if document component is changed we should reload the page
 	var documentStore = this._window.document.documentElement.getAttribute(
 		moduleHelper.ATTRIBUTE_STORE
 	);
@@ -663,13 +659,39 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 		this._window.location.assign(newLocation);
 		return Promise.resolve();
 	}
-	var changed = Object.keys(this._currentChangedStores);
-	if (changed.length === 0) {
+
+	// if we have awaiting routing we should apply state to the stores
+	if (this._awaitingRouting) {
+		var components = this._componentLoader.getComponentsByNames(),
+			changedByState = this._storeDispatcher.setState(
+				this._awaitingRouting.state,
+				this._awaitingRouting.routingContext
+			);
+
+		changedByState.forEach(function (name) {
+			self._currentChangedStores[name] = true;
+		});
+
+		// we should update contexts of the stores with the new routing context
+		this._currentRoutingContext = this._awaitingRouting.routingContext;
+		Object.keys(this._componentInstances)
+			.forEach(function (id) {
+				var instance = self._componentInstances[id];
+				instance.$context = self._getComponentContext(
+					components[instance.$context.name],
+					instance.$context.element
+				);
+			});
+		this._awaitingRouting = null;
+	}
+
+	var changedStores = Object.keys(this._currentChangedStores);
+	if (changedStores.length === 0) {
 		return Promise.resolve();
 	}
 	this._currentChangedStores = {};
-	var self = this,
-		renderingContext = this._createRenderingContext(changed),
+
+	var renderingContext = this._createRenderingContext(changedStores),
 		promises = renderingContext.roots.map(function (root) {
 			return self.renderComponent(root, renderingContext);
 		});
@@ -681,7 +703,7 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 		})
 		.then(function () {
 			self._isUpdating = false;
-			self._eventBus.emit('documentUpdated', changed);
+			self._eventBus.emit('documentUpdated', changedStores);
 			return self._updateStoreComponents();
 		});
 };
