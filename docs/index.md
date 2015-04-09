@@ -592,9 +592,10 @@ object as listed below:
 In this example the store `order` will receive parameter `orderId` with value
 matched with a number in URL.
 
-## URL with any query
-If URL includes query parameters which are not defined in `routes.js`, Catberry will
-use route definition for URI without query parameters if such definition exists.
+## URL with any query parameters
+If URL includes query parameters which are not described by route definition in `routes.js`,
+Catberry will use route definition for URI without query string at all. If it also does not exist,
+then Catberry will not handle the request.
 
 ## File example
 Here is an example of `./routes.js` file with all 3 cases of the route definition:
