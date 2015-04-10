@@ -33,6 +33,7 @@
 var assert = require('assert'),
 	events = require('events'),
 	URI = require('catberry-uri').URI,
+	testCases = require('../../cases/lib/providers/StateProvider.json'),
 	ServiceLocator = require('catberry-locator'),
 	StateProvider = require('../../../lib/providers/StateProvider');
 
@@ -40,39 +41,14 @@ global.Promise = require('promise');
 
 describe('lib/providers/StateProvider', function () {
 	describe('#getStateByUri', function () {
-		it('should return the correct state', function () {
-			var routes = [
-					'/state/:arg1[Store1, Store2]/:arg2[Store2]' +
-					'?arg3=:arg3[Store1]&arg4=:arg4[Store3]'
-				],
-				locator = createLocator(routes),
-				provider = locator.resolveInstance(StateProvider),
-				uri = new URI('/state/val1/val2?arg3=val3&arg4=val4');
-
-			var state = provider.getStateByUri(uri);
-			assert.strictEqual(state.Store1.arg1, 'val1');
-			assert.strictEqual(state.Store2.arg1, 'val1');
-			assert.strictEqual(state.Store2.arg2, 'val2');
-			assert.strictEqual(state.Store1.arg3, 'val3');
-			assert.strictEqual(state.Store3.arg4, 'val4');
-		});
-		it('should return the alternative state without query', function () {
-			var routes = [
-					'/state/:arg1[Store1, Store2]/:arg2[Store2]',
-					'/state/:arg1[Store1, Store2]/:arg2[Store2]' +
-					'?arg3=:arg3[Store1]&arg4=:arg4[Store3]'
-				],
-				locator = createLocator(routes),
-				provider = locator.resolveInstance(StateProvider),
-				uri = new URI('/state/val1/val2?none=val3&arg4=val4');
-
-			var state = provider.getStateByUri(uri);
-			assert.strictEqual(Object.keys(state).length, 2);
-			assert.strictEqual(Object.keys(state.Store1).length, 1);
-			assert.strictEqual(state.Store1.arg1, 'val1');
-			assert.strictEqual(Object.keys(state.Store2).length, 2);
-			assert.strictEqual(state.Store2.arg1, 'val1');
-			assert.strictEqual(state.Store2.arg2, 'val2');
+		testCases.getStateByUri.forEach(function (testCase) {
+			it(testCase.name, function () {
+				var locator = createLocator(testCase.routes),
+					provider = locator.resolveInstance(StateProvider),
+					uri = new URI(testCase.uri);
+				var state = provider.getStateByUri(uri);
+				assert.deepEqual(state, testCase.expectedState);
+			});
 		});
 	});
 });

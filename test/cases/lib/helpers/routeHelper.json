@@ -1,0 +1,44 @@
+{
+	"removeEndSlash": [
+		{
+			"name": "should remove slash at the end of absolute URI",
+			"uri": "http:///some/ggg/dsd/",
+			"expected": "http:///some/ggg/dsd"
+		},
+		{
+			"name": "should remove slash at the end of relative URI",
+			"uri": "ggg/dsd/",
+			"expected": "ggg/dsd"
+		},
+		{
+			"name": "should remove slash at the end of URI with hash",
+			"uri": "http:///some/ggg/dsd/#some",
+			"expected": "http:///some/ggg/dsd#some"
+		},
+		{
+			"name": "should remove slash at the end of URI with search",
+			"uri": "http:///some/ggg/dsd/?arg=some",
+			"expected": "http:///some/ggg/dsd?arg=some"
+		},
+		{
+			"name": "should return empty string if URI is not a string",
+			"uri": null,
+			"expected": ""
+		},
+		{
+			"name": "should return URI as is if URI is a root",
+			"uri": "/",
+			"expected": "/"
+		},
+		{
+			"name": "should return URI as is if URI is a root with hash",
+			"uri": "/#hash",
+			"expected": "/#hash"
+		},
+		{
+			"name": "should return URI as is if URI is a root with search",
+			"uri": "/?arg=some",
+			"expected": "/?arg=some"
+		}
+	]
+}

@@ -544,7 +544,7 @@ of store `store1`.
 
 Please keep in mind that parameter **name** in route definition should satisfy
 regular expression `[^\[\],]+` and parameter **value** should satisfy
-regular expression `[^\/\\&\?=]*`.
+regular expression `[^\\\/&?=]*`.
 
 ## Colon-marked parameters with additional `map` function
 Also, you can define mapper object, that allows you to modify application
@@ -593,9 +593,43 @@ In this example the store `order` will receive parameter `orderId` with value
 matched with a number in URL.
 
 ## URL with any query parameters
-If URL includes query parameters which are not described by route definition in `routes.js`,
-Catberry will use route definition for URI without query string at all. If it also does not exist,
-then Catberry will not handle the request.
+If the route definition includes any query parameters they are always optional.
+For example if you have such route definition:
+```
+/some/:id[store1,store2]/actions?a=:p1[store1]&b=:p2[store1]&c=:p3[store1]
+```
+Now if you try to route such URL:
+```
+/some/1/actions?b=123
+```
+you will receive the state:
+```javascript
+{
+	store1: {
+		id: "1",
+		p2: "123"
+	},
+	store2: {
+		id: "1"
+	}
+}
+```
+The parameters `p1` and `p3` will be skipped.
+You can even route the URL without any query parameters at all.
+```
+/some/1/actions
+```
+and receive such state
+```javascript
+{
+	store1: {
+		id: "1"
+	},
+	store2: {
+		id: "1"
+	}
+}
+```
 
 ## File example
 Here is an example of `./routes.js` file with all 3 cases of the route definition:
