@@ -1,0 +1,345 @@
+{
+	"getStateByUri": [
+		{
+			"name": "should return null if URI is not routed",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/none/val1/val2?a=val3&b=val4",
+			"expectedState": null
+		},
+		{
+			"name": "should return null if URI is not a string",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": null,
+			"expectedState": null
+		},
+		{
+			"name": "should return null if URI is an empty string",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "",
+			"expectedState": null
+		},
+		{
+			"name": "should return null if there are not routes",
+			"routes": [],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": null
+		},
+		{
+			"name": "should return null if route is empty",
+			"routes": [
+				"",
+				""
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": null
+		},
+		{
+			"name": "should return the correct state for correct URI",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": "val3"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should return the state if one query string parameter is not specified",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should return the state if query string parameters are not specified",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				}
+			}
+		},
+		{
+			"name": "should return the state if query string has wrong parameters",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?c=val3&d=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				}
+			}
+		},
+		{
+			"name": "should return the state if it has routes with the same paths but the second has no query",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]",
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				}
+			}
+		},
+		{
+			"name": "should return the state if it has routes with the same paths but the second has query",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]",
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": "val3"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should return the state if it query parameter is an array",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4&a=val5&a=val6",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": ["val3","val5","val6"]
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should return the state if route has wrong query parameters",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=b&b=c"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				}
+			}
+		},
+		{
+			"name": "should return the state if route has array query parameters",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]&a=:arg5[Store1]&a=:arg6[Store1]"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should support another order of query parameters",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?b=val4&a=val3",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": "val3"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should support when query parameters are empty",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				}
+			}
+		},
+		{
+			"name": "should support when query parameter is empty",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?a=&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": ""
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should support when static path without parameters",
+			"routes": [
+				"/state?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state?a=val3&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg3": "val3"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should support overriding path parameters by query string parameters",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg3[Store1]?a=:arg3[Store1]&b=:arg4[Store3]"
+			],
+			"uri": "/state/val1/val2?a=valX&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": "valX"
+				},
+				"Store2": {
+					"arg1": "val1"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should support partial parameters",
+			"routes": [
+				"/state/w:arg1[Store1, Store2]q/q:arg2[Store2]s?a=a:arg3[Store1]z&b=x:arg4[Store3]y"
+			],
+			"uri": "/state/wval1q/qval2s?a=aval3z&b=xval4y",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": "val3"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should support partial parameters and set them empty if they are absent in query",
+			"routes": [
+				"/state/w:arg1[Store1, Store2]q/q:arg2[Store2]s?a=a:arg3[Store1]z&b=x:arg4[Store3]y"
+			],
+			"uri": "/state/wval1q/qval2s?a=val3&b=val4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": ""
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": ""
+				}
+			}
+		},
+		{
+			"name": "should return null if partial parameters are absent in path",
+			"routes": [
+				"/state/w:arg1[Store1, Store2]q/q:arg2[Store2]s?a=a:arg3[Store1]z&b=x:arg4[Store3]y"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": null
+		}
+	]
+}
