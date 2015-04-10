@@ -30,33 +30,35 @@
 
 'use strict';
 
-module.exports = CatberryBase;
+var assert = require('assert'),
+	events = require('events'),
+	URI = require('catberry-uri').URI,
+	testCases = require('../../cases/lib/providers/StateProvider.json'),
+	ServiceLocator = require('catberry-locator'),
+	StateProvider = require('../../../lib/providers/StateProvider');
 
-var ServiceLocator = require('catberry-locator');
+global.Promise = require('promise');
 
-/**
- * Creates new instance of the basic Catberry application module.
- * @constructor
- */
-function CatberryBase() {
-	this.locator = new ServiceLocator();
-	this.locator.registerInstance('serviceLocator', this.locator);
-	this.locator.registerInstance('catberry', this);
+describe('lib/providers/StateProvider', function () {
+	describe('#getStateByUri', function () {
+		testCases.getStateByUri.forEach(function (testCase) {
+			it(testCase.name, function () {
+				var locator = createLocator(testCase.routes),
+					provider = locator.resolveInstance(StateProvider),
+					uri = new URI(testCase.uri);
+				var state = provider.getStateByUri(uri);
+				assert.deepEqual(state, testCase.expectedState);
+			});
+		});
+	});
+});
+
+function createLocator(routeDefinitions) {
+	var locator = new ServiceLocator();
+	locator.registerInstance('serviceLocator', locator);
+	routeDefinitions.forEach(function (routeDefinition) {
+		locator.registerInstance('routeDefinition', routeDefinition);
+	});
+
+	return locator;
 }
-
-/**
- * Current version of catberry.
- */
-CatberryBase.prototype.version = '4.8.0';
-
-/**
- * Current object with events.
- * @type {ModuleApiProvider}
- */
-CatberryBase.prototype.events = null;
-
-/**
- * Current service locator.
- * @type {ServiceLocator}
- */
-CatberryBase.prototype.locator = null;
