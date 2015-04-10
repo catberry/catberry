@@ -31,16 +31,34 @@
 'use strict';
 
 var assert = require('assert'),
-	testCases = require('../../cases/lib/helpers/routeHelper.json'),
-	routeHelper = require('../../../lib/helpers/routeHelper');
+	events = require('events'),
+	URI = require('catberry-uri').URI,
+	testCases = require('../../cases/lib/providers/StateProvider.json'),
+	ServiceLocator = require('catberry-locator'),
+	StateProvider = require('../../../lib/providers/StateProvider');
 
-describe('lib/helpers/routeHelper', function () {
-	describe('#removeEndSlash', function () {
-		testCases.removeEndSlash.forEach(function (testCase) {
+global.Promise = require('promise');
+
+describe('lib/providers/StateProvider', function () {
+	describe('#getStateByUri', function () {
+		testCases.getStateByUri.forEach(function (testCase) {
 			it(testCase.name, function () {
-				var result = routeHelper.removeEndSlash(testCase.uri);
-				assert.strictEqual(result, testCase.expected);
+				var locator = createLocator(testCase.routes),
+					provider = locator.resolveInstance(StateProvider),
+					uri = new URI(testCase.uri);
+				var state = provider.getStateByUri(uri);
+				assert.deepEqual(state, testCase.expectedState);
 			});
 		});
 	});
 });
+
+function createLocator(routeDefinitions) {
+	var locator = new ServiceLocator();
+	locator.registerInstance('serviceLocator', locator);
+	routeDefinitions.forEach(function (routeDefinition) {
+		locator.registerInstance('routeDefinition', routeDefinition);
+	});
+
+	return locator;
+}
