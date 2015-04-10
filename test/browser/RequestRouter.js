@@ -60,7 +60,9 @@ describe('browser/RequestRouter', function () {
 					'&first=:first[first]' +
 					'&second=:second[second]',
 					map: function (state) {
-						state.second.hello = 'world';
+						if (state.second) {
+							state.second.hello = 'world';
+						}
 						return state;
 					}
 				});
@@ -126,7 +128,9 @@ describe('browser/RequestRouter', function () {
 					'&first=:first[first]' +
 					'&second=:second[second]',
 					map: function (state) {
-						state.second.hello = 'world';
+						if (state.second) {
+							state.second.hello = 'world';
+						}
 						return state;
 					}
 				});
@@ -314,7 +318,7 @@ describe('browser/RequestRouter', function () {
 						'&second=secondValue';
 
 				locator.registerInstance('routeDefinition', {
-					expression: /\/some.+/,
+					expression: /\/some$/,
 					map: function () {
 						return {
 							first: {
