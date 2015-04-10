@@ -578,8 +578,8 @@ object as listed below:
 ```javascript
 {
 	expression: /^\/orders\/\d+/i,
-	map: function(urlPath) {
-		var matches = urlPath.match(/^\/orders\/(\d+)/i);
+	map: function(uri) {
+		var matches = uri.path.match(/^\/orders\/(\d+)/i);
 		return {
 			order:{
 				orderId: Number(matches[1])
