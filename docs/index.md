@@ -14,8 +14,8 @@
 	* [Dependency Injection](#dependency-injection)
 	* Userland Catberry Services
 		* [Logger](#logger)
-        * [Config](#config)
-        * [Universal HTTP(S) Request](#uhr-universal-https-request)
+		* [Config](#config)
+		* [Universal HTTP(S) Request](#uhr-universal-https-request)
 * [Cookie](#cookie)
 * [Template Engines](#template-engines)
 * [Browser Bundle](#browser-bundle)
@@ -582,7 +582,7 @@ object as listed below:
 		var matches = uri.path.match(/^\/orders\/(\d+)/i);
 		return {
 			order:{
-				orderId: Number(matches[1])
+				orderId: Number(#matches[1])
 			}
 		};
 	}
@@ -831,23 +831,30 @@ Like this for browser logger:
 }
 ```
 
-To configure the server logger you have to do more actions:
-```javascript
-var log4js = require('log4js'); 
-
-//console log is loaded by default, so you won't normally need to do this
-//log4js.loadAppender('console');
-//log4js.addAppender(log4js.appenders.console());
-
-log4js.loadAppender('file');
-log4js.addAppender(log4js.appenders.file('logs/cheese.log'), 'cheese');
-// this code above sets appenders collection for global log4js configuration
-
-// but if you want to change settings of exactly Catberry's logger instance
-var logger = cat.locator.resolve('logger');
-logger.setLevel('ERROR');
+To configure the server logger you have to set the configuration like this:
+```json
+{
+	"logger": {
+			"appenders": [
+				{
+					"type": "console",
+					"category": "catberry"
+				},
+				{
+					"type": "gelf",
+					"host": "logserver.example",
+					"hostname":"my.app",
+					"port": "12201",
+					"facility": "MyApp",
+					"category": "catberry"
+				}
+			],
+			"levels": {
+				"catberry": "TRACE"
+			}
+		},
+}
 ```
-
 More details [here](https://github.com/nomiddlename/log4js-node#usage).
 
 * [Interface of Browser Logger](../browser/Logger.js)
