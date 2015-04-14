@@ -46,7 +46,56 @@ var CASE_PATH = path.join(
 describe('lib/finders/ComponentFinder', function () {
 	describe('#find', function () {
 		it('should find all valid components', function (done) {
-			var locator = createLocator({}),
+			var locator = createLocator({
+					componentsGlob: '**/test-cat-component.json'
+				}),
+				finder = locator.resolve('componentFinder');
+
+			var expectedPath = path.join(
+					process.cwd(), CASE_PATH, 'expected.json'
+				),
+				expected = require(expectedPath);
+
+			finder
+				.find()
+				.then(function (found) {
+					assert.strictEqual(
+						Object.keys(found).length,
+						Object.keys(expected).length,
+						'Wrong store count'
+					);
+
+					Object.keys(expected)
+						.forEach(function (name) {
+							assert.strictEqual(
+								(name in found), true,
+								name + ' not found'
+							);
+							assert.strictEqual(
+								found[name].name, expected[name].name
+							);
+							assert.strictEqual(
+								found[name].path, expected[name].path
+							);
+							assert.deepEqual(
+								found[name].properties,
+								expected[name].properties
+							);
+						});
+					done();
+				})
+				.catch(done);
+		});
+		it('should find all valid components by globs array', function (done) {
+			var caseRoot = 'test/cases/lib/finders/ComponentFinder/components',
+				locator = createLocator({
+					componentsGlob: [
+						caseRoot + '/test1/**/test-cat-component.json',
+						caseRoot + '/test1/test-cat-component.json',
+						caseRoot + '/test3/**/test-cat-component.json',
+						caseRoot + '/test3/test-cat-component.json'
+					]
+				}),
 				finder = locator.resolve('componentFinder');
 
 			var expectedPath = path.join(
@@ -85,7 +134,9 @@ describe('lib/finders/ComponentFinder', function () {
 				.catch(done);
 		});
 		it('should watch components for changes', function (done) {
-			var locator = createLocator({}),
+			var locator = createLocator({
+					componentsGlob: '**/test-cat-component.json'
+				}),
 				finder = locator.resolve('componentFinder');
 
 			finder
@@ -114,7 +165,6 @@ describe('lib/finders/ComponentFinder', function () {
 
 function createLocator(config) {
 	var locator = new ServiceLocator();
-	config.componentsGlob = '**/test-cat-component.json';
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	locator.registerInstance('eventBus', new events.EventEmitter());
