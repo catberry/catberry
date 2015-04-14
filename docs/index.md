@@ -873,8 +873,9 @@ method.
 
 Catberry uses following parameters from it:
 
-* componentsGlob – glob expression for searching cat-components
-("**/cat-component.json" by default)
+* componentsGlob – glob expression for searching cat-components,
+can be an string array or just a string
+(`['catberry_components/**/cat-component.json','node_modules/*/cat-component.json']` by default)
 * storesDirectory – relative path to the directory with stores
 ("./catberry_stores" by default)
 * publicDirectoryPath – path to public directory
