@@ -92,7 +92,8 @@ describe('lib/finders/StoreFinder', function () {
 			finder
 				.find()
 				.then(function (found) {
-					finder.watch(function () {
+					finder.watch();
+					finder.on('change', function () {
 						done();
 					});
 					var key = Object.keys(found)[0],
