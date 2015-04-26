@@ -32,7 +32,13 @@
 
 module.exports = ComponentFinder;
 
+var util = require('util'),
+	events = require('events');
+
+util.inherits(ComponentFinder, events.EventEmitter);
+
 function ComponentFinder(components) {
+	events.EventEmitter.call(this);
 	this._toFind = components;
 }
 
