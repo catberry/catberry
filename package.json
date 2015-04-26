@@ -60,11 +60,9 @@
 		"./lib/RequestRouter.js": "./browser/RequestRouter.js"
 	},
 	"dependencies": {
-		"ncp": "^2.0.0",
 		"mkdirp": "~0.5.0",
-		"rimraf": "^2.3.2",
 		"glob": "^5.0.3",
-		"gaze": "~0.5.1",
+		"chokidar": "^1.0.1",
 		"catberry-locator": "^1.1.4",
 		"catberry-uhr": "^4.0.1",
 		"catberry-uri": "^2.1.0",
