@@ -81,35 +81,6 @@ describe('lib/finders/StoreFinder', function () {
 				})
 				.catch(done);
 		});
-
-		it('should watch stores for changes', function (done) {
-			var locator = createLocator({
-					storesDirectory: path.join(CASE_PATH, 'catberry_stores')
-				}),
-				finder = locator.resolve('storeFinder');
-
-			finder
-				.find()
-				.then(function (found) {
-					finder.watch();
-					finder.on('change', function () {
-						done();
-					});
-					var key = Object.keys(found)[0],
-						storePath = path.join(
-							process.cwd(),
-							found[key].path
-						);
-					fs.readFile(storePath,
-						function (error, data) {
-							if (error) {
-								done(error);
-							}
-							fs.writeFile(storePath, data);
-						});
-				})
-				.catch(done);
-		});
 	});
 });
 

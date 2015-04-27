@@ -132,43 +132,6 @@ describe('lib/finders/ComponentFinder', function () {
 				})
 				.catch(done);
 		});
-		it('should watch components for changes', function (done) {
-			var locator = createLocator({
-					componentsGlob: 'test/**/test-cat-component.json'
-				}),
-				finder = locator.resolve('componentFinder');
-
-			finder
-				.find()
-				.then(function (found) {
-					finder.watch();
-					var isUnlinked = false;
-					finder
-						.on('unlink', function () {
-							isUnlinked = true;
-						})
-						.on('add', function () {
-							if (!isUnlinked) {
-								done(new Error('Should be unlinked first'));
-							} else {
-								done();
-							}
-						});
-					var key = Object.keys(found)[0],
-						componentPath = path.join(
-							process.cwd(),
-							found[key].path
-						);
-					fs.readFile(componentPath,
-						function (error, data) {
-							if (error) {
-								done(error);
-							}
-							fs.writeFile(componentPath, data);
-						});
-				})
-				.catch(done);
-		});
 	});
 });
 
