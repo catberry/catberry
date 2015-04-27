@@ -47,7 +47,7 @@ describe('lib/finders/ComponentFinder', function () {
 	describe('#find', function () {
 		it('should find all valid components', function (done) {
 			var locator = createLocator({
-					componentsGlob: '**/test-cat-component.json'
+					componentsGlob: 'test/**/test-cat-component.json'
 				}),
 				finder = locator.resolve('componentFinder');
 
@@ -135,7 +135,7 @@ describe('lib/finders/ComponentFinder', function () {
 		});
 		it('should watch components for changes', function (done) {
 			var locator = createLocator({
-					componentsGlob: '**/test-cat-component.json'
+					componentsGlob: 'test/**/test-cat-component.json'
 				}),
 				finder = locator.resolve('componentFinder');
 
@@ -143,9 +143,18 @@ describe('lib/finders/ComponentFinder', function () {
 				.find()
 				.then(function (found) {
 					finder.watch();
-					finder.on('change', function () {
-						done();
-					});
+					var isUnlinked = false;
+					finder
+						.on('unlink', function () {
+							isUnlinked = true;
+						})
+						.on('add', function () {
+							if (!isUnlinked) {
+								done(new Error('Should be unlinked first'));
+							} else {
+								done();
+							}
+						});
 					var key = Object.keys(found)[0],
 						componentPath = path.join(
 							process.cwd(),

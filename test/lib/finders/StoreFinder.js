@@ -97,16 +97,16 @@ describe('lib/finders/StoreFinder', function () {
 						done();
 					});
 					var key = Object.keys(found)[0],
-						componentPath = path.join(
+						storePath = path.join(
 							process.cwd(),
 							found[key].path
 						);
-					fs.readFile(componentPath,
+					fs.readFile(storePath,
 						function (error, data) {
 							if (error) {
 								done(error);
 							}
-							fs.writeFile(componentPath, data);
+							fs.writeFile(storePath, data);
 						});
 				})
 				.catch(done);
