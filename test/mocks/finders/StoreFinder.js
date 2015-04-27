@@ -32,7 +32,13 @@
 
 module.exports = StoreFinder;
 
+var util = require('util'),
+	events = require('events');
+
+util.inherits(StoreFinder, events.EventEmitter);
+
 function StoreFinder(stores) {
+	events.EventEmitter.call(this);
 	this._toFind = stores;
 }
 

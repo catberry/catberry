@@ -297,7 +297,7 @@ For example:
 In this example above you wil get a custom tag `<cat-cool></cat-cool>` in your
 application.
 
-Please, keep in mind that all store names are NOT case-sensitive. If you
+Please, keep in mind that all component names are NOT case-sensitive. If you
 declare component with the same name twice you will receive a warning message on
 startup.
 
@@ -466,17 +466,10 @@ Typically directory structure of your application should look like this:
 	store2.js
 ./catberry_components/
 	document/
-		assets/
-			favicon.ico
-			logo.jpg
-			style.css
 		index.js
 		template.hbs
 		cat-component.json
 	component1/
-		assets/
-			some.png
-			some.css
 		index.js
 		template.hbs
 		errorTemplate.hbs
@@ -485,17 +478,7 @@ Typically directory structure of your application should look like this:
  # directory for your own external not catberry modules/services
 ./lib/
  # this directory is the default destination for browser bundle building
- # and it will be re-created on every start of Catberry application.
 ./public/
-	# this directory is the default destination for copying assets
-	assets/
-		document
-			favicon.ico
-			logo.jpg
-			style.css
-		component1
-			some.png
-			some.css
 	bundle.js
  # entry script for the browser code
 ./browser.js

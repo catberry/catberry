@@ -36,7 +36,6 @@ var assert = require('assert'),
 	events = require('events'),
 	ServiceLocator = require('catberry-locator'),
 	Logger = require('../../mocks/Logger'),
-	FileWatcher = require('../../../lib/FileWatcher'),
 	StoreFinder = require('../../../lib/finders/StoreFinder');
 
 var CASE_PATH = path.join(
@@ -92,20 +91,21 @@ describe('lib/finders/StoreFinder', function () {
 			finder
 				.find()
 				.then(function (found) {
-					finder.watch(function () {
+					finder.watch();
+					finder.on('change', function () {
 						done();
 					});
 					var key = Object.keys(found)[0],
-						componentPath = path.join(
+						storePath = path.join(
 							process.cwd(),
 							found[key].path
 						);
-					fs.readFile(componentPath,
+					fs.readFile(storePath,
 						function (error, data) {
 							if (error) {
 								done(error);
 							}
-							fs.writeFile(componentPath, data);
+							fs.writeFile(storePath, data);
 						});
 				})
 				.catch(done);
@@ -119,7 +119,6 @@ function createLocator(config) {
 	locator.registerInstance('config', config);
 	locator.registerInstance('eventBus', new events.EventEmitter());
 	locator.register('storeFinder', StoreFinder, config);
-	locator.register('fileWatcher', FileWatcher, config);
 	locator.register('logger', Logger, config);
 	return locator;
 }
