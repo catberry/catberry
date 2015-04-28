@@ -58,6 +58,7 @@ describe('lib/loaders/ComponentLoader', function () {
 					path: 'test/cases/lib/loaders/ComponentLoader' +
 					'/Second/second.json',
 					properties: {
+						logic: './index.js',
 						template: './template.html'
 					}
 				}
@@ -111,32 +112,9 @@ describe('lib/loaders/ComponentLoader', function () {
 					path: 'test/cases/lib/loaders/ComponentLoader' +
 					'/Error1/error1.json',
 					properties: {
+						logic: './index.js',
 						template: './template.html'
 					}
-				}
-			},
-			locator = createLocator({isRelease: true}, components),
-			loader = locator.resolve('componentLoader');
-
-		loader
-			.load()
-			.then(function (components) {
-				assert.strictEqual(components, loader.getComponentsByNames());
-				var componentNames = Object.keys(components);
-				assert.strictEqual(componentNames.length, 0);
-				done();
-			})
-			.catch(done);
-	});
-
-	it('should not load ' +
-	'if component does not have "template" field', function (done) {
-		var components = {
-				error2: {
-					name: 'error2',
-					path: 'test/cases/lib/loaders/ComponentLoader' +
-					'/Error2/error2.json',
-					properties: {}
 				}
 			},
 			locator = createLocator({isRelease: true}, components),
@@ -161,6 +139,7 @@ describe('lib/loaders/ComponentLoader', function () {
 					path: 'test/cases/lib/loaders/ComponentLoader' +
 					'/Error3/error3.json',
 					properties: {
+						logic: './index.js',
 						template: './template.html'
 					}
 				}
@@ -187,6 +166,7 @@ describe('lib/loaders/ComponentLoader', function () {
 					path: 'test/cases/lib/loaders/ComponentLoader' +
 					'/Error4/error4.json',
 					properties: {
+						logic: './index.js',
 						template: './template.html'
 					}
 				}
