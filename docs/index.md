@@ -863,6 +863,8 @@ can be an string array or just a string
 ("./catberry_stores" by default)
 * publicDirectoryPath – path to public directory
 ("./public" by default)
+* bundleFilename – name of the browser bundle file
+("bundle.js" by default)
 
 ## UHR (Universal HTTP(S) Request)
 Catberry has Universal HTTP(S) Request service registered as "uhr" in 
