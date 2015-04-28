@@ -36,7 +36,6 @@ var assert = require('assert'),
 	events = require('events'),
 	ServiceLocator = require('catberry-locator'),
 	Logger = require('../../mocks/Logger'),
-	FileWatcher = require('../../../lib/FileWatcher'),
 	ComponentFinder = require('../../../lib/finders/ComponentFinder');
 
 var CASE_PATH = path.join(
@@ -47,7 +46,7 @@ describe('lib/finders/ComponentFinder', function () {
 	describe('#find', function () {
 		it('should find all valid components', function (done) {
 			var locator = createLocator({
-					componentsGlob: '**/test-cat-component.json'
+					componentsGlob: 'test/**/test-cat-component.json'
 				}),
 				finder = locator.resolve('componentFinder');
 
@@ -133,33 +132,6 @@ describe('lib/finders/ComponentFinder', function () {
 				})
 				.catch(done);
 		});
-		it('should watch components for changes', function (done) {
-			var locator = createLocator({
-					componentsGlob: '**/test-cat-component.json'
-				}),
-				finder = locator.resolve('componentFinder');
-
-			finder
-				.find()
-				.then(function (found) {
-					finder.watch(function () {
-						done();
-					});
-					var key = Object.keys(found)[0],
-						componentPath = path.join(
-							process.cwd(),
-							found[key].path
-						);
-					fs.readFile(componentPath,
-						function (error, data) {
-							if (error) {
-								done(error);
-							}
-							fs.writeFile(componentPath, data);
-						});
-				})
-				.catch(done);
-		});
 	});
 });
 
@@ -169,7 +141,6 @@ function createLocator(config) {
 	locator.registerInstance('config', config);
 	locator.registerInstance('eventBus', new events.EventEmitter());
 	locator.register('componentFinder', ComponentFinder, config);
-	locator.register('fileWatcher', FileWatcher, config);
 	locator.register('logger', Logger, config);
 	return locator;
 }

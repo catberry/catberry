@@ -1,4 +1,5 @@
 {
 	"logic": "./logic.js",
+	"template": "test3.html",
 	"additional" : "some"
 }
