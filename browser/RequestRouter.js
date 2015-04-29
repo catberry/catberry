@@ -68,6 +68,13 @@ function RequestRouter($serviceLocator) {
 }
 
 /**
+ * Current initialization flag.
+ * @type {boolean}
+ * @private
+ */
+RequestRouter.prototype._isStateInitialized = false;
+
+/**
  * Current referrer.
  * @type {URI}
  * @private
@@ -217,6 +224,11 @@ RequestRouter.prototype._changeState = function (newLocation) {
 		});
 
 	var self = this;
+	if (!this._isStateInitialized) {
+		this._isStateInitialized = true;
+		return this._documentRenderer.initWithState(state, routingContext);
+	}
+
 	return this._documentRenderer
 		.render(state, routingContext)
 		.then(function () {
