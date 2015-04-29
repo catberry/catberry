@@ -32,17 +32,23 @@
 
 module.exports = ComponentLoader;
 
-var moduleHelper = require('../../lib/helpers/moduleHelper');
+var moduleHelper = require('../../lib/helpers/moduleHelper'),
+	util = require('util'),
+	LoaderBase = require('../../lib/base/LoaderBase');
+
+util.inherits(ComponentLoader, LoaderBase);
 
 /**
  * Creates new instance of the component loader.
  * @param {ServiceLocator} $serviceLocator Locator to resolve dependencies.
  * @constructor
+ * @extends LoaderBase
  */
 function ComponentLoader($serviceLocator) {
 	this._serviceLocator = $serviceLocator;
 	this._eventBus = $serviceLocator.resolve('eventBus');
 	this._templateProvider = $serviceLocator.resolve('templateProvider');
+	LoaderBase.call(this, $serviceLocator.resolveAll('componentTransform'));
 }
 
 /**
@@ -78,16 +84,51 @@ ComponentLoader.prototype._loadedComponents = null;
  * @returns {Promise} Promise for nothing.
  */
 ComponentLoader.prototype.load = function () {
-	var self = this,
-		components = {};
+	if (this._loadedComponents) {
+		return Promise.resolve(this._loadedComponents);
+	}
 
-	this._serviceLocator.resolveAll('component')
-		.forEach(function (component) {
-			components[component.name] = Object.create(component);
+	this._loadedComponents = {};
+
+	var self = this;
+	return Promise.resolve()
+		.then(function () {
+			var componentPromises = self._serviceLocator.resolveAll('component')
+				.map(function (componentDetails) {
+					return self._processComponent(componentDetails);
+				});
+
+			return Promise.all(componentPromises);
+		})
+		.then(function (components) {
+			components.forEach(function (component) {
+				if (!component || typeof(component) !== 'object') {
+					return;
+				}
+				self._loadedComponents[component.name] = component;
+			});
+			self._eventBus.emit('allComponentsLoaded', components);
+			return self._loadedComponents;
+		});
+};
+
+/**
+ * Processes component and apply required operations.
+ * @param {Object} componentDetails Loaded component details.
+ * @returns {Object} Component object.
+ * @private
+ */
+ComponentLoader.prototype._processComponent = function (componentDetails) {
+	var self = this,
+		component = Object.create(componentDetails);
+
+	return this._applyTransforms(component)
+		.then(function (transformed) {
+			component = transformed;
 			self._templateProvider.registerCompiled(
 				component.name, component.templateSource
 			);
-			components[component.name].template = {
+			component.template = {
 				render: function (dataContext) {
 					return self._templateProvider.render(
 						component.name, dataContext
@@ -101,7 +142,7 @@ ComponentLoader.prototype.load = function () {
 				self._templateProvider.registerCompiled(
 					errorTemplateName, component.errorTemplateSource
 				);
-				components[component.name].errorTemplate = {
+				component.errorTemplate = {
 					render: function (dataContext) {
 						return self._templateProvider.render(
 							errorTemplateName, dataContext
@@ -109,11 +150,13 @@ ComponentLoader.prototype.load = function () {
 					}
 				};
 			}
-			self._eventBus.emit('componentLoaded', components[component.name]);
+			self._eventBus.emit('componentLoaded', component);
+			return component;
+		})
+		.catch(function (reason) {
+			self._eventBus.emit('error', reason);
+			return null;
 		});
-	this._loadedComponents = components;
-	this._eventBus.emit('allComponentsLoaded', components);
-	return Promise.resolve(components);
 };
 
 /**
