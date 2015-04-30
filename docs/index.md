@@ -1275,7 +1275,7 @@ locator.registerInstance(‘postBuildAction’, {
 `find()` method returns a promise for a map object of 
 stores or promises by their names.
 
-Every `store` in this case will be an object like this:
+Every `store`, in this case, will be an object like this:
 ```javascript
 {
 	name: 'some store name',
@@ -1283,7 +1283,7 @@ Every `store` in this case will be an object like this:
 }
 ```
 
-Every `component` in this case will be an object like this:
+Every `component`, in this case, will be an object like this:
 ```javascript
 {
 	name: 'nameOfTheComponent', 
@@ -1309,18 +1309,18 @@ Store Finder
 * add – a new store has been added to the application
 * change – the store source has been changed
 * unlink – the store has been removed from the application
-* error – watch error is occurred
+* error – watch error occurs
 
 Every event handler receives a store descriptor as the first parameter.
 
 Component Finder
 
-* add – a new component has beed added to the application
+* add – a new component has been added to the application
 * change – the component folder has been changed (any inner files)
 * changeLogic – the component's logic file has been changed
 * changeTemplates – the component's template or error template has been changed
 * unlink – the component has been removed from the application
-* error – watch error occurred
+* error – watch error occurs
 
 Every event handler except the `change` event receives a component descriptor 
 as the first parameter, but `change` event handler receives 
