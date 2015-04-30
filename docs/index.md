@@ -22,6 +22,7 @@
 * [Event Bus and Diagnostics](#event-bus-and-diagnostics) 
 * [CLI](#cli)
 * [Get Started](#get-started)
+* [Plugin API](#plugin-api)
 * [Code Style Guide](code-style-guide.md)
 
 # Isomorphic Applications
@@ -1182,5 +1183,178 @@ catberry addcomp <component-name>
 where `<component-name>` is a name like `hello-world`.
 
 Hope now you are an expert in Catberry Framework. Enjoy it!
+
+**[⬆ back to top](#table-of-contents)**
+
+# Plugin API
+The entire Catberry's plugin API is based on the Service Locator 
+and every plugin is just a [service](#catberry-services) 
+registered in the locator.
+
+So, there are several ways how to register plugins.
+
+## Store Transformation API
+You can register a plugin that does some transformations on loaded
+stores. A Promise is supported as a returned value. A plugin can be registered 
+as an instance (`locator.registerInstance`) 
+or as a constructor (`locator.register`) like this:
+
+```javascript
+locator.registerInstance(‘storeTransform’, {
+	transform: function (store) {
+		// store is loaded 
+		// you can replace values, wrap constructor, or even build a new object
+		return newStore;
+	}
+);
+```
+
+The `store` parameter will be an object like this:
+```javascript
+{
+	name: 'some store name',
+	constructor: function StoreConstructor() { }
+}
+```
+
+## Component Transformation API
+You can register a plugin that does some transformations on loaded
+components. A Promise is supported as a returned value. 
+A plugin can be registered as an instance (`locator.registerInstance`) 
+or as a constructor (`locator.register`) like this:
+
+```javascript
+function ComponentTransform($config, $serviceLocator) {
+	// …
+}
+ComponentTransform.prototype.transform = function (component) {
+	// component is loaded
+	// you can replace values, wrap constructor, or even build a new object
+	return Promise.resolve(newComponent);
+};
+locator.registerInstance(‘componentTransform’, ComponentTransform);
+```
+
+The `component` parameter will be an object like this:
+```javascript
+{
+	name: 'nameOfTheComponent', 
+	constructor: function ComponentConstructor() {},
+	// the object from cat-component.json
+	// you can store in these files whatever you want and use it in
+	// transformations
+	properties: {
+		name: 'nameOfTheComponent',
+		template: './template.hbs',
+		logic: 'index.js'
+	}, 
+	templateSource: 'template compiled sources here', 
+	errorTemplateSource: 'error template compiled sources here or null'
+}
+```
+
+## Post-build Action API
+You can register any plugin that does any actions after the browser bundle is
+built. It can be assets building or some post-processing of files.
+A Promise is supported as a returned value. A plugin can be registered 
+as an instance (`locator.registerInstance`) or 
+as a constructor (`locator.register`) like this:
+
+```javascript
+locator.registerInstance(‘postBuildAction’, {
+	action: function (storeFinder, componentFinder) {
+		// you can get a list of found stores or a list of found components
+		// using storeFinder.find() and componentFinder.find() respectively
+		// every component object has "properties" field 
+		// that contains cat-component.json values
+		return Promise.resolve();
+	}
+);
+```
+
+`find()` method returns a promise for a map object of 
+stores or promises by their names.
+
+Every `store` in this case will be an object like this:
+```javascript
+{
+	name: 'some store name',
+	path: 'relative path to a store module'
+}
+```
+
+Every `component` in this case will be an object like this:
+```javascript
+{
+	name: 'nameOfTheComponent', 
+	path: 'path to a cat-component.json file',
+	// the object from cat-component.json
+	// you can store in these files whatever you want and use it in
+	// transformations
+	properties: {
+		name: 'nameOfTheComponent',
+		template: './template.hbs',
+		logic: 'index.js'
+	} 
+}
+```
+
+These type of objects above are called descriptors.
+
+Every finder is an [EventEmitter](https://nodejs.org/api/events.html#events_class_events_eventemitter)
+and has following events:
+
+Store Finder
+
+* add – a new store has been added to the application
+* change – the store source has been changed
+* unlink – the store has been removed from the application
+* error – watch error is occurred
+
+Every event handler receives a store descriptor as the first parameter.
+
+Component Finder
+
+* add – a new component has beed added to the application
+* change – the component folder has been changed (any inner files)
+* changeLogic – the component's logic file has been changed
+* changeTemplates – the component's template or error template has been changed
+* unlink – the component has been removed from the application
+* error – watch error occurred
+
+Every event handler except the `change` event receives a component descriptor 
+as the first parameter, but `change` event handler receives 
+an object with additional data like this:
+
+```javascript
+{
+	filename: 'filename of changed file,
+	// component descriptor
+	component: {
+		name: 'nameOfTheComponent', 
+		path: 'path to a cat-component.json file',
+		properties: {
+			name: 'nameOfTheComponent',
+			template: './template.hbs',
+			logic: 'index.js'
+		} 
+	}
+}
+```
+
+## Browserify Transformation API
+You can register a 
+[browserfiy transformation](https://github.com/substack/node-browserify/wiki/list-of-transforms).
+A plugin can be registered as an instance (`locator.registerInstance`) or 
+as a constructor (`locator.register`):
+
+```javascript
+locator.registerInstance(‘browserifyTransformation’, {
+  transform: function (fileStream) {
+    return transformStream;
+  },
+  options: { /* transform options will be passed to the browserify */ }
+);
+```
 
 **[⬆ back to top](#table-of-contents)**
