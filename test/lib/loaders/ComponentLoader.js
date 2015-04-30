@@ -132,15 +132,14 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		locator.registerInstance('componentTransform', {
 			transform: function (component) {
-				component.name = component.name += '?';
-				return Promise.resolve(component);
-			}
-		});
-
-		locator.registerInstance('componentTransform', {
-			transform: function (component) {
 				component.name = component.name += '!';
 				return component;
+			}
+		});
+		locator.registerInstance('componentTransform', {
+			transform: function (component) {
+				component.name = component.name += '?';
+				return Promise.resolve(component);
 			}
 		});
 

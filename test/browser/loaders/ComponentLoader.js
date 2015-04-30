@@ -40,16 +40,7 @@ var assert = require('assert'),
 describe('browser/loaders/ComponentLoader', function () {
 	it('should properly load components', function (done) {
 		var locator = createLocator({isRelease: true});
-		locator.registerInstance('component', {
-			constructor: function ctr1() {},
-			name: 'second',
-			properties: {
-				logic: './index.js',
-				template: './template.html'
-			},
-			templateSource: 'Hello from second!',
-			errorTemplateSource: null
-		});
+
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
 			name: 'first-cool',
@@ -62,8 +53,18 @@ describe('browser/loaders/ComponentLoader', function () {
 			templateSource: 'Hello, world!',
 			errorTemplateSource: 'Error occurs :('
 		});
+		locator.registerInstance('component', {
+			constructor: function ctr2() {},
+			name: 'second',
+			properties: {
+				logic: './index.js',
+				template: './template.html'
+			},
+			templateSource: 'Hello from second!',
+			errorTemplateSource: null
+		});
 
-		var components = locator.resolveAll('component'),
+		var components = locator.resolveAll('component').reverse(),
 			loader = locator.resolve('componentLoader');
 
 		loader
@@ -112,16 +113,7 @@ describe('browser/loaders/ComponentLoader', function () {
 
 	it('should not load components twice', function (done) {
 		var locator = createLocator({isRelease: true});
-		locator.registerInstance('component', {
-			constructor: function ctr1() {},
-			name: 'second',
-			properties: {
-				logic: './index.js',
-				template: './template.html'
-			},
-			templateSource: 'Hello from second!',
-			errorTemplateSource: null
-		});
+
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
 			name: 'first-cool',
@@ -134,8 +126,18 @@ describe('browser/loaders/ComponentLoader', function () {
 			templateSource: 'Hello, world!',
 			errorTemplateSource: 'Error occurs :('
 		});
+		locator.registerInstance('component', {
+			constructor: function ctr2() {},
+			name: 'second',
+			properties: {
+				logic: './index.js',
+				template: './template.html'
+			},
+			templateSource: 'Hello from second!',
+			errorTemplateSource: null
+		});
 
-		var components = locator.resolveAll('component'),
+		var components = locator.resolveAll('component').reverse(),
 			loader = locator.resolve('componentLoader');
 
 		loader
@@ -167,16 +169,7 @@ describe('browser/loaders/ComponentLoader', function () {
 
 	it('should properly transform components', function (done) {
 		var locator = createLocator({isRelease: true});
-		locator.registerInstance('component', {
-			constructor: function ctr1() {},
-			name: 'second',
-			properties: {
-				logic: './index.js',
-				template: './template.html'
-			},
-			templateSource: 'Hello from second!',
-			errorTemplateSource: null
-		});
+
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
 			name: 'first-cool',
@@ -189,21 +182,31 @@ describe('browser/loaders/ComponentLoader', function () {
 			templateSource: 'Hello, world!',
 			errorTemplateSource: 'Error occurs :('
 		});
-
-		locator.registerInstance('componentTransform', {
-			transform: function (component) {
-				component.name += '?';
-				return component;
-			}
+		locator.registerInstance('component', {
+			constructor: function ctr2() {},
+			name: 'second',
+			properties: {
+				logic: './index.js',
+				template: './template.html'
+			},
+			templateSource: 'Hello from second!',
+			errorTemplateSource: null
 		});
+
 		locator.registerInstance('componentTransform', {
 			transform: function (component) {
 				component.name += '!';
 				return Promise.resolve(component);
 			}
 		});
+		locator.registerInstance('componentTransform', {
+			transform: function (component) {
+				component.name += '?';
+				return component;
+			}
+		});
 
-		var components = locator.resolveAll('component'),
+		var components = locator.resolveAll('component').reverse(),
 			loader = locator.resolve('componentLoader');
 
 		loader
@@ -254,16 +257,7 @@ describe('browser/loaders/ComponentLoader', function () {
 
 	it('should skip transform errors', function (done) {
 		var locator = createLocator({isRelease: true});
-		locator.registerInstance('component', {
-			constructor: function ctr1() {},
-			name: 'second',
-			properties: {
-				logic: './index.js',
-				template: './template.html'
-			},
-			templateSource: 'Hello from second!',
-			errorTemplateSource: null
-		});
+
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
 			name: 'first-cool',
@@ -276,7 +270,23 @@ describe('browser/loaders/ComponentLoader', function () {
 			templateSource: 'Hello, world!',
 			errorTemplateSource: 'Error occurs :('
 		});
+		locator.registerInstance('component', {
+			constructor: function ctr2() {},
+			name: 'second',
+			properties: {
+				logic: './index.js',
+				template: './template.html'
+			},
+			templateSource: 'Hello from second!',
+			errorTemplateSource: null
+		});
 
+		locator.registerInstance('componentTransform', {
+			transform: function (component) {
+				component.name += '!';
+				return Promise.resolve(component);
+			}
+		});
 		locator.registerInstance('componentTransform', {
 			transform: function (component) {
 				if (component.name === 'second!') {
@@ -286,14 +296,8 @@ describe('browser/loaders/ComponentLoader', function () {
 				return component;
 			}
 		});
-		locator.registerInstance('componentTransform', {
-			transform: function (component) {
-				component.name += '!';
-				return Promise.resolve(component);
-			}
-		});
 
-		var components = locator.resolveAll('component'),
+		var components = locator.resolveAll('component').reverse(),
 			loader = locator.resolve('componentLoader');
 
 		loader

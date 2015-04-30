@@ -85,18 +85,15 @@ StoreLoader.prototype.load = function () {
 
 	return Promise.resolve()
 		.then(function () {
-			var storePromises = self._serviceLocator.resolveAll('store')
-				.map(function (store) {
-					return self._applyTransforms(store)
-						.then(function (transformed) {
-							self._eventBus.emit('storeLoaded', transformed);
-							return transformed;
-						})
-						.catch(function (reason) {
-							self._eventBus.emit('error', reason);
-							return null;
-						});
-				});
+			var stores = self._serviceLocator.resolveAll('store'),
+				storePromises = [];
+
+			// the list is a stack, we should reverse it
+			stores.forEach(function (store) {
+				storePromises.unshift(
+					self._getStore(store)
+				);
+			});
 
 			return Promise.all(storePromises);
 		})
@@ -109,6 +106,25 @@ StoreLoader.prototype.load = function () {
 			});
 			self._eventBus.emit('allStoresLoaded', self._loadedStores);
 			return Promise.resolve(self._loadedStores);
+		});
+};
+
+/**
+ * Gets the store from store details.
+ * @param {Object} storeDetails Store details.
+ * @returns {Promise<Object>} Promise for store.
+ * @private
+ */
+StoreLoader.prototype._getStore = function (storeDetails) {
+	var self = this;
+	return this._applyTransforms(storeDetails)
+		.then(function (transformed) {
+			self._eventBus.emit('storeLoaded', transformed);
+			return transformed;
+		})
+		.catch(function (reason) {
+			self._eventBus.emit('error', reason);
+			return null;
 		});
 };
 

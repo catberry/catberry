@@ -40,15 +40,15 @@ describe('lib/loaders/StoreLoader', function () {
 		var locator = createLocator({isRelease: true});
 
 		locator.registerInstance('store', {
-			name: 'Test2',
-			constructor: function ctr2() {}
-		});
-		locator.registerInstance('store', {
 			name: 'Test1',
 			constructor: function ctr1() {}
 		});
+		locator.registerInstance('store', {
+			name: 'Test2',
+			constructor: function ctr2() {}
+		});
 
-		var stores = locator.resolveAll('store'),
+		var stores = locator.resolveAll('store').reverse(),
 			loader = locator.resolve('storeLoader');
 
 		loader
@@ -72,15 +72,15 @@ describe('lib/loaders/StoreLoader', function () {
 		var locator = createLocator({isRelease: true});
 
 		locator.registerInstance('store', {
-			name: 'Test2',
-			constructor: function ctr2() {}
-		});
-		locator.registerInstance('store', {
 			name: 'Test1',
 			constructor: function ctr1() {}
 		});
+		locator.registerInstance('store', {
+			name: 'Test2',
+			constructor: function ctr2() {}
+		});
 
-		var stores = locator.resolveAll('store'),
+		var stores = locator.resolveAll('store').reverse(),
 			loader = locator.resolve('storeLoader');
 
 		loader
@@ -111,28 +111,28 @@ describe('lib/loaders/StoreLoader', function () {
 		var locator = createLocator({isRelease: true});
 
 		locator.registerInstance('store', {
-			name: 'Test2',
-			constructor: function ctr2() {}
-		});
-		locator.registerInstance('store', {
 			name: 'Test1',
 			constructor: function ctr1() {}
 		});
-
-		locator.registerInstance('storeTransform', {
-			transform: function (store) {
-				store.name = store.name += '?';
-				return Promise.resolve(store);
-			}
+		locator.registerInstance('store', {
+			name: 'Test2',
+			constructor: function ctr2() {}
 		});
+
 		locator.registerInstance('storeTransform', {
 			transform: function (store) {
 				store.name = store.name += '!';
 				return store;
 			}
 		});
+		locator.registerInstance('storeTransform', {
+			transform: function (store) {
+				store.name = store.name += '?';
+				return Promise.resolve(store);
+			}
+		});
 
-		var stores = locator.resolveAll('store'),
+		var stores = locator.resolveAll('store').reverse(),
 			loader = locator.resolve('storeLoader');
 
 		loader
@@ -156,14 +156,20 @@ describe('lib/loaders/StoreLoader', function () {
 		var locator = createLocator({isRelease: true});
 
 		locator.registerInstance('store', {
-			name: 'Test2',
-			constructor: function ctr2() {}
-		});
-		locator.registerInstance('store', {
 			name: 'Test1',
 			constructor: function ctr1() {}
 		});
+		locator.registerInstance('store', {
+			name: 'Test2',
+			constructor: function ctr2() {}
+		});
 
+		locator.registerInstance('storeTransform', {
+			transform: function (store) {
+				store.name = store.name += '!';
+				return store;
+			}
+		});
 		locator.registerInstance('storeTransform', {
 			transform: function (store) {
 				if (store.name === 'Test1!') {
@@ -173,14 +179,8 @@ describe('lib/loaders/StoreLoader', function () {
 				return Promise.resolve(store);
 			}
 		});
-		locator.registerInstance('storeTransform', {
-			transform: function (store) {
-				store.name = store.name += '!';
-				return store;
-			}
-		});
 
-		var stores = locator.resolveAll('store'),
+		var stores = locator.resolveAll('store').reverse(),
 			loader = locator.resolve('storeLoader');
 
 		loader
