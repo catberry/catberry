@@ -1328,7 +1328,7 @@ an object with additional data like this:
 
 ```javascript
 {
-	filename: 'filename of changed file,
+	filename: 'filename of changed file',
 	// component descriptor
 	component: {
 		name: 'nameOfTheComponent', 
