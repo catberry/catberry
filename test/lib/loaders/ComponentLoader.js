@@ -68,19 +68,100 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (components) {
-				assert.strictEqual(components, loader.getComponentsByNames());
-				var componentNames = Object.keys(components);
+			.then(function (loadedComponents) {
+				assert.strictEqual(
+					loadedComponents, loader.getComponentsByNames()
+				);
+				var componentNames = Object.keys(loadedComponents);
 				assert.strictEqual(componentNames.length, 2);
 
-				var component1 = components[componentNames[0]],
-					component2 = components[componentNames[1]];
+				var component1 = loadedComponents[componentNames[0]],
+					component2 = loadedComponents[componentNames[1]];
 				assert.strictEqual(
 					component1.name, components['first-cool'].name
 				);
 				assert.strictEqual(typeof(component1.constructor), 'function');
 
 				assert.strictEqual(component2.name, components.second.name);
+				assert.strictEqual(typeof(component2.constructor), 'function');
+				assert.strictEqual(component2.errorTemplate, undefined);
+
+				var expected = [
+					'Hello, world!',
+					'Error occurs :(',
+					'Hello from second!'
+				];
+				Promise.all([
+					component1.template.render(),
+					component1.errorTemplate.render(),
+					component2.template.render()
+				])
+					.then(function (rendered) {
+						assert.deepEqual(rendered, expected);
+						done();
+					})
+					.catch(done);
+
+			})
+			.catch(done);
+	});
+
+	it('should properly transform components', function (done) {
+		var components = {
+				'first-cool': {
+					name: 'first-cool',
+					path: 'test/cases/lib/loaders/ComponentLoader' +
+					'/first/first.json',
+					properties: {
+						logic: './logic.js',
+						errorTemplate: './templates/error.html',
+						template: './templates/template.html'
+					}
+				},
+				second: {
+					name: 'second',
+					path: 'test/cases/lib/loaders/ComponentLoader' +
+					'/Second/second.json',
+					properties: {
+						logic: './index.js',
+						template: './template.html'
+					}
+				}
+			},
+			locator = createLocator({isRelease: true}, components);
+
+		locator.registerInstance('componentTransform', {
+			transform: function (component) {
+				component.name = component.name += '!';
+				return component;
+			}
+		});
+		locator.registerInstance('componentTransform', {
+			transform: function (component) {
+				component.name = component.name += '?';
+				return Promise.resolve(component);
+			}
+		});
+
+		var loader = locator.resolve('componentLoader');
+
+		loader
+			.load()
+			.then(function (loadedComponents) {
+				assert.strictEqual(
+					loadedComponents, loader.getComponentsByNames()
+				);
+				var componentNames = Object.keys(loadedComponents);
+				assert.strictEqual(componentNames.length, 2);
+
+				var component1 = loadedComponents[componentNames[0]],
+					component2 = loadedComponents[componentNames[1]];
+				assert.strictEqual(
+					component1.name, 'first-cool!?'
+				);
+				assert.strictEqual(typeof(component1.constructor), 'function');
+
+				assert.strictEqual(component2.name, 'second!?');
 				assert.strictEqual(typeof(component2.constructor), 'function');
 				assert.strictEqual(component2.errorTemplate, undefined);
 
@@ -122,9 +203,11 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (components) {
-				assert.strictEqual(components, loader.getComponentsByNames());
-				var componentNames = Object.keys(components);
+			.then(function (loadedComponents) {
+				assert.strictEqual(
+					loadedComponents, loader.getComponentsByNames()
+				);
+				var componentNames = Object.keys(loadedComponents);
 				assert.strictEqual(componentNames.length, 0);
 				done();
 			})
@@ -149,9 +232,11 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (components) {
-				assert.strictEqual(components, loader.getComponentsByNames());
-				var componentNames = Object.keys(components);
+			.then(function (loadedComponents) {
+				assert.strictEqual(
+					loadedComponents, loader.getComponentsByNames()
+				);
+				var componentNames = Object.keys(loadedComponents);
 				assert.strictEqual(componentNames.length, 0);
 				done();
 			})
@@ -176,9 +261,11 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (components) {
-				assert.strictEqual(components, loader.getComponentsByNames());
-				var componentNames = Object.keys(components);
+			.then(function (loadedComponents) {
+				assert.strictEqual(
+					loadedComponents, loader.getComponentsByNames()
+				);
+				var componentNames = Object.keys(loadedComponents);
 				assert.strictEqual(componentNames.length, 0);
 				done();
 			})

@@ -620,6 +620,9 @@ function createLocator() {
 	locator.register('logger', Logger);
 	locator.register('cookieWrapper', CookieWrapper);
 	var documentRenderer = {
+		initWithState: function (state, context) {
+			return documentRenderer.render(state, context);
+		},
 		render: function (state, context) {
 			var last = documentRenderer.context;
 			documentRenderer.state = state;

@@ -53,12 +53,49 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (stores) {
-				assert.strictEqual(stores, loader.getStoresByNames());
-				var storeNames = Object.keys(stores);
+			.then(function (loadedStores) {
+				assert.strictEqual(loadedStores, loader.getStoresByNames());
+				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 1);
-				var store = stores[storeNames[0]];
+				var store = loadedStores[storeNames[0]];
 				assert.strictEqual(store.name, stores.Test1.name);
+				assert.strictEqual(typeof(store.constructor), 'function');
+				done();
+			})
+			.catch(done);
+	});
+	it('should properly transform stores', function (done) {
+		var stores = {
+				Test1: {
+					name: 'Test1',
+					path: 'test/cases/lib/loaders/StoreLoader/Test1.js'
+				}
+			},
+			locator = createLocator({isRelease: true}, stores);
+
+		locator.registerInstance('storeTransform', {
+			transform: function (store) {
+				store.name = store.name += '!';
+				return store;
+			}
+		});
+		locator.registerInstance('storeTransform', {
+			transform: function (store) {
+				store.name = store.name += '?';
+				return Promise.resolve(store);
+			}
+		});
+
+		var loader = locator.resolve('storeLoader');
+
+		loader
+			.load()
+			.then(function (loadedStores) {
+				assert.strictEqual(loadedStores, loader.getStoresByNames());
+				var storeNames = Object.keys(loadedStores);
+				assert.strictEqual(storeNames.length, 1);
+				var store = loadedStores[storeNames[0]];
+				assert.strictEqual(store.name, stores.Test1.name + '!?');
 				assert.strictEqual(typeof(store.constructor), 'function');
 				done();
 			})
@@ -86,9 +123,9 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (stores) {
-				assert.strictEqual(stores, loader.getStoresByNames());
-				var storeNames = Object.keys(stores);
+			.then(function (loadedStores) {
+				assert.strictEqual(loadedStores, loader.getStoresByNames());
+				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 0);
 			})
 			.catch(done);
@@ -110,9 +147,9 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (stores) {
-				assert.strictEqual(stores, loader.getStoresByNames());
-				var storeNames = Object.keys(stores);
+			.then(function (loadedStores) {
+				assert.strictEqual(loadedStores, loader.getStoresByNames());
+				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 0);
 			})
 			.catch(done);
