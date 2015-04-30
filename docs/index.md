@@ -1299,7 +1299,7 @@ Every `component`, in this case, will be an object like this:
 }
 ```
 
-These type of objects above are called descriptors.
+This type of objects above are called descriptors.
 
 Every finder is an [EventEmitter](https://nodejs.org/api/events.html#events_class_events_eventemitter)
 and has following events:
