@@ -1221,13 +1221,8 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-
-					renderer.render({}, {})
-						.then(function () {
-							return renderer.render(
-								{store1: {}, store2: {}, store3: {}}, {}
-							);
-						})
+					renderer.initWithState({}, {});
+					renderer.render({store1: {}, store2: {}, store3: {}}, {})
 						.then(function () {
 							assert.strictEqual(renders.length, 4);
 							assert.strictEqual(renders[0], 'unique1');
@@ -1326,21 +1321,19 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.render({}, {})
-						.then(function () {
-							eventBus.on('documentUpdated', function () {
-								try {
-									assert.strictEqual(renders.length, 4);
-									assert.strictEqual(renders[0], 'unique1');
-									assert.strictEqual(renders[1], 'unique4');
-									assert.strictEqual(renders[2], 'unique2');
-									assert.strictEqual(renders[3], 'unique3');
-									done();
-								} catch(e) {
-									done(e);
-								}
-							});
-						});
+					renderer.initWithState({}, {});
+					eventBus.on('documentUpdated', function () {
+						try {
+							assert.strictEqual(renders.length, 4);
+							assert.strictEqual(renders[0], 'unique1');
+							assert.strictEqual(renders[1], 'unique4');
+							assert.strictEqual(renders[2], 'unique2');
+							assert.strictEqual(renders[3], 'unique3');
+							done();
+						} catch(e) {
+							done(e);
+						}
+					});
 				}
 			});
 		});
@@ -1430,7 +1423,7 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.render({}, {});
+					renderer.initWithState({}, {});
 					setTimeout(function () {
 						assert.strictEqual(renders.length, 4);
 						assert.strictEqual(renders[0], 'unique4');
@@ -1516,11 +1509,8 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-
+					renderer.initWithState(state, {});
 					renderer.render(state, {})
-						.then(function () {
-							return renderer.render(state, {});
-						})
 						.then(function () {
 							assert.strictEqual(renders.length, 0);
 							done();
@@ -1618,21 +1608,20 @@ describe('browser/DocumentRenderer', function () {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
 
-					renderer.render({}, {})
+					renderer.initWithState({}, {});
+					Promise.all([
+						renderer.render({store1: {}}, {}),
+						renderer.render({store1: {}, store2: {}}, {}),
+						renderer.render(
+							{store1: {}, store2: {}, store3: {}}, {}
+						)
+					])
 						.then(function () {
-							renderer.render({store1: {}}, {});
-							renderer.render({store1: {}, store2: {}}, {});
-							return renderer.render(
-								{store1: {}, store2: {}, store3: {}}, {}
-							);
-						})
-						.then(function () {
-							assert.strictEqual(renders.length, 5);
-							assert.strictEqual(renders[0], 'unique3');
+							assert.strictEqual(renders.length, 4);
+							assert.strictEqual(renders[0], 'unique1');
 							assert.strictEqual(renders[1], 'unique4');
-							assert.strictEqual(renders[2], 'unique1');
-							assert.strictEqual(renders[3], 'unique2');
-							assert.strictEqual(renders[4], 'unique3');
+							assert.strictEqual(renders[2], 'unique2');
+							assert.strictEqual(renders[3], 'unique3');
 							done();
 						})
 						.catch(done);
@@ -1888,9 +1877,11 @@ function createLocator(components, config, stores) {
 	});
 
 	if (stores) {
-		stores.forEach(function (store) {
-			locator.registerInstance('store', store);
-		});
+		stores
+			.reverse()
+			.forEach(function (store) {
+				locator.registerInstance('store', store);
+			});
 	}
 
 	locator.register('componentLoader', ComponentLoader, config, true);
