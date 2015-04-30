@@ -1877,9 +1877,11 @@ function createLocator(components, config, stores) {
 	});
 
 	if (stores) {
-		stores.forEach(function (store) {
-			locator.registerInstance('store', store);
-		});
+		stores
+			.reverse()
+			.forEach(function (store) {
+				locator.registerInstance('store', store);
+			});
 	}
 
 	locator.register('componentLoader', ComponentLoader, config, true);

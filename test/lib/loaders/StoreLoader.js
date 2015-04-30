@@ -75,14 +75,14 @@ describe('lib/loaders/StoreLoader', function () {
 
 		locator.registerInstance('storeTransform', {
 			transform: function (store) {
-				store.name = store.name += '?';
-				return Promise.resolve(store);
+				store.name = store.name += '!';
+				return store;
 			}
 		});
 		locator.registerInstance('storeTransform', {
 			transform: function (store) {
-				store.name = store.name += '!';
-				return store;
+				store.name = store.name += '?';
+				return Promise.resolve(store);
 			}
 		});
 

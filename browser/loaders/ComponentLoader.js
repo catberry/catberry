@@ -93,11 +93,15 @@ ComponentLoader.prototype.load = function () {
 	var self = this;
 	return Promise.resolve()
 		.then(function () {
-			var componentPromises = self._serviceLocator.resolveAll('component')
-				.map(function (componentDetails) {
-					return self._processComponent(componentDetails);
-				});
+			var components = self._serviceLocator.resolveAll('component'),
+				componentPromises = [];
 
+			// the list is a stack, we should reverse it
+			components.forEach(function (component) {
+				componentPromises.unshift(
+					self._processComponent(component)
+				);
+			});
 			return Promise.all(componentPromises);
 		})
 		.then(function (components) {
