@@ -102,13 +102,6 @@ function DocumentRenderer($serviceLocator) {
 		}
 		self._updateStoreComponents();
 	});
-	// need to run all bind methods and events for components
-	// have been rendered at server after all modules will be resolved from
-	// Service Locator
-	this._getPromiseForReadyState()
-		.then(function () {
-			self._initialWrap();
-		});
 }
 
 /**
@@ -188,10 +181,15 @@ DocumentRenderer.prototype._awaitingRouting = null;
  * @returns {Promise} Promise for nothing.
  */
 DocumentRenderer.prototype.initWithState = function (state, routingContext) {
-	this._currentRoutingContext = routingContext;
-	return Promise.resolve(
-		this._storeDispatcher.setState(state, routingContext)
-	);
+	var self = this;
+	return self._getPromiseForReadyState()
+		.then(function () {
+			self._currentRoutingContext = routingContext;
+			return self._storeDispatcher.setState(state, routingContext);
+		})
+		.then(function () {
+			return self._initialWrap();
+		});
 };
 
 /**
@@ -296,7 +294,9 @@ DocumentRenderer.prototype.renderComponent =
 						return component.template.render(dataContext);
 					})
 					.catch(function (reason) {
-						return self._handleRenderError(element, component, reason);
+						return self._handleRenderError(
+							element, component, reason
+						);
 					})
 					.then(function (html) {
 						if (element.tagName === TAG_NAMES.HEAD) {
@@ -304,7 +304,9 @@ DocumentRenderer.prototype.renderComponent =
 						} else {
 							element.innerHTML = html;
 						}
-						var promises = self._findComponents(element, renderingContext)
+						var promises = self._findComponents(
+							element, renderingContext
+						)
 							.map(function (innerComponent) {
 								return self.renderComponent(
 									innerComponent, renderingContext

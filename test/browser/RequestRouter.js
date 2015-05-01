@@ -398,6 +398,10 @@ describe('browser/RequestRouter', function () {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local2.com/some');
+						window.location.assign = function (linkToGo) {
+							assert.strictEqual(linkToGo, link);
+							done();
+						};
 						locator.resolveInstance(RequestRouter);
 						var event = window.document
 							.createEvent('MouseEvents');
@@ -405,13 +409,6 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local2.com/some'
-							);
-							done();
-						}, 10);
 					}
 				});
 			}
