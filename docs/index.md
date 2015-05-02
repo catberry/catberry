@@ -6,11 +6,21 @@
 * [Isomorphic Applications](#isomorphic-applications)
 * [Flux](#flux)
 * [Stores](#stores)
+	* [Store Interface](#store-interface)
+	* [Store Context](#store-context)
+	* [Code Example](#code-example)
 * [Cat-components](#cat-components)
+	* [Cat-component Interface](#cat-component-interface)
+	* [Cat-component Context](#cat-component-context)
+	* [Code Example](#code-example-1)
 * [Example of Application Structure](#example-of-application-structure)
 * [Routing](#routing)
+	* [Colon-marked Parameters in a String](#colon-marked-parameters-in-a-string)
+	* [Colon-marked Parameters with Additional 'map' Function](#colon-marked-parameters-with-additional-map-function)
+	* [Regular Expression](#regular-expression)
 * [Catberry Services](#catberry-services)
 	* [Service Locator](#service-locator)
+	* [Registration of Own Services](#registration-of-own-services)
 	* [Dependency Injection](#dependency-injection)
 	* Userland Catberry Services
 		* [Logger](#logger)
@@ -19,10 +29,18 @@
 * [Cookie](#cookie)
 * [Template Engines](#template-engines)
 * [Browser Bundle](#browser-bundle)
-* [Event Bus and Diagnostics](#event-bus-and-diagnostics) 
+	* [Including Packages into the Browser Bundle](#including-packages-into-the-browser-bundle)
+	* [Code watching and reloading](#code-watching-and-reloading)
+* [Event Bus and Diagnostics](#event-bus-and-diagnostics)
+	* [Event Names and Arguments](#event-names-and-arguments)
 * [CLI](#cli)
 * [Get Started](#get-started)
 * [Plugin API](#plugin-api)
+	* [Store Transformation API](#store-transformation-api)
+	* [Component Transformation API](#component-transformation-api)
+	* [Post-build Action API](#post-build-action-api)
+	* [Browserify Transformation API](#browserify-transformation-api)
+	* [List of Officially Supported Plugins](#list-of-officially-supported-plugins)
 * [Code Style Guide](code-style-guide.md)
 
 # Isomorphic Applications
@@ -138,7 +156,7 @@ store2
 
 Please, keep in mind that all store names are case-sensitive.
 
-## Store interface
+## Store Interface
 As it is said every store should export a constructor function. Also you can
 define such methods and properties into constructor prototype,
 but all of them are optional.
@@ -205,7 +223,7 @@ In this case, if `Country` store is changed `CityList` will not changed.
 To avoid this just add `this.$context.setDependency(‘Country’)` to
 the `CityList` constructor.
 
-## Code example
+## Code Example
 This is an example how your store can look like:
 
 ```javascript
@@ -325,7 +343,7 @@ It can not depend on any store. `cat-store` attribute is just ignored.
 diff/merge mode otherwise all styles and scripts are re-processed every time. It
 can depend on a store and works as usual cat-component except rendering approach.
 
-## Cat-component interface
+## Cat-component Interface
 As store component's logic file should export a constructor function for
 creating instances for every custom tag on the page. Also you can
 define such methods and properties into constructor prototype,
@@ -404,7 +422,7 @@ Every time router computes new application state, it re-creates and re-assigns
 context to each component, therefore, do not save references to `this.$context`
 objects.
 
-## Code example
+## Code Example
 This is an example how your cat-component can look like:
 
 ```javascript
@@ -510,7 +528,7 @@ Route definition is a rule that describes which URIs are handled by Catberry,
 what parameters Catberry can parse from these URIs and what stores will
 receive parsed parameters.
 
-## Colon-marked parameters in string
+## Colon-marked Parameters in a String
 Default definition syntax is following:
 
 ```
@@ -530,7 +548,7 @@ Please keep in mind that parameter **name** in route definition should satisfy
 regular expression `[^\[\],]+` and parameter **value** should satisfy
 regular expression `[^\\\/&?=]*`.
 
-## Colon-marked parameters with additional `map` function
+## Colon-marked Parameters with Additional `map` Function
 Also, you can define mapper object, that allows you to modify application
 state object before it will be processed by Catberry.
 
@@ -554,7 +572,7 @@ and return it from a map function.
 In this example, store `news` will receive additional state parameter `pageType`
 with value `userNews`.
 
-## Regular expression
+## Regular Expression
 For some rare cases, you may need to parse parameters
 by regular expressions. In these cases you can define mapper
 object as listed below:
@@ -576,7 +594,7 @@ object as listed below:
 In this example the store `order` will receive parameter `orderId` with value
 matched with a number in URL.
 
-## URL with any query parameters
+## URL with any Query Parameters
 If the route definition includes any query parameters they are always optional.
 For example if you have such route definition:
 ```
@@ -615,7 +633,7 @@ and receive such state
 }
 ```
 
-## File example
+## File Example
 Here is an example of `./routes.js` file with all 3 cases of the route definition:
 
 ```javascript
@@ -924,7 +942,7 @@ CookieWrapperBase.prototype.getAll = function () { }
 
 **[⬆ back to top](#table-of-contents)**
 
-# Template engines
+# Template Engines
 Catberry supports any template engine that have the "precompiling to string" feature.
 Currently [Dust](https://github.com/catberry/catberry-dust),
 [Handlebars](https://github.com/catberry/catberry-handlebars), and
@@ -968,7 +986,7 @@ node ./build.js release
 To build browser bundle, Catberry uses [browserify](http://browserify.org) which
 is awesome and can convert your server-side JavaScript to browser code.
 
-## Including packages into the browser bundle
+## Including Packages into the Browser Bundle
 There are some rules according browserify limitations:
 
 * If you want to include some module into browser bundle it should be required
@@ -978,7 +996,7 @@ browserify just skips it or throws an error.
 replace it with browser version just use browserify `browser` field
 in `package.json` as it has been described [here](http://github.com/substack/node-browserify#packagejson).
 
-## Code watching and reloading
+## Code Watching and Reloading
 By default, Catberry works in debug mode and it means that all changes in code
 of your stores or components will automatically reload everything.
 You can switch application to release mode passing `isRelease: true` parameter
@@ -1029,7 +1047,7 @@ catberry.events.on('error', function (error) {
 
 Actually `cat.events` has interface similar with [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter).
 
-## Event names and arguments
+## Event Names and Arguments
 Here is a list of common Catberry events:
 
 | Event					| When happens									| Arguments																									|
