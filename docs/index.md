@@ -1356,5 +1356,10 @@ locator.registerInstance(‘browserifyTransformation’, {
   options: { /* transform options will be passed to the browserify */ }
 );
 ```
+## List of Officially Supported Plugins
+
+* [catberry-assets](https://github.com/catberry/catberry-assets) – The plugin that builds assets for every component using Gulp
+* [catberry-l10n](https://github.com/catberry/catberry-l10n) – The localization plugin
+* [catberry-oauth2-client](https://github.com/catberry/catberry-oauth2-client) – The OAuth 2.0 client plugin that allows your stores to work with RESTful API using OAuth 2.0
 
 **[⬆ back to top](#table-of-contents)**
