@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "4.10.0",
+	"version": "5.0.0",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -60,25 +60,24 @@
 		"./lib/RequestRouter.js": "./browser/RequestRouter.js"
 	},
 	"dependencies": {
-		"ncp": "^2.0.0",
 		"mkdirp": "~0.5.0",
-		"rimraf": "^2.3.2",
-		"glob": "^5.0.3",
-		"gaze": "~0.5.1",
+		"glob": "^5.0.5",
+		"chokidar": "^1.0.1",
 		"catberry-locator": "^1.1.4",
 		"catberry-uhr": "^4.0.1",
 		"catberry-uri": "^2.1.0",
 		"entities": "^1.1.1",
-		"uglify-js": "^2.4.17",
-		"browserify": "^9.0.3",
-		"log4js": "~0.6.22",
-		"promise": "^6.1.0"
+		"watchify": "^3.2.1",
+		"uglify-js": "^2.4.20",
+		"browserify": "^10.0.0",
+		"log4js": "~0.6.24",
+		"promise": "^7.0.1"
 	},
 	"devDependencies": {
-		"istanbul-harmony": "~0.3.1",
+		"istanbul-harmony": "~0.3.12",
 		"coveralls": "^2.11.2",
 		"jsdom": "^3.1.2",
-		"mocha": "^2.1.0",
+		"mocha": "^2.2.4",
 		"jscs": "~1.6.2",
 		"jshint": "^2.6.0"
 	},

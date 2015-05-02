@@ -32,14 +32,22 @@
 
 module.exports = StoreLoader;
 
+var moduleHelper = require('../../lib/helpers/moduleHelper'),
+	util = require('util'),
+	LoaderBase = require('../../lib/base/LoaderBase');
+
+util.inherits(StoreLoader, LoaderBase);
+
 /**
  * Creates instance of the store loader.
  * @param {ServiceLocator} $serviceLocator Locator to resolve stores.
  * @constructor
+ * @extends LoaderBase
  */
 function StoreLoader($serviceLocator) {
 	this._serviceLocator = $serviceLocator;
 	this._eventBus = $serviceLocator.resolve('eventBus');
+	LoaderBase.call(this, $serviceLocator.resolveAll('storeTransform'));
 }
 
 /**
@@ -68,16 +76,56 @@ StoreLoader.prototype._loadedStores = null;
  * @returns {Promise} Promise for nothing.
  */
 StoreLoader.prototype.load = function () {
-	var self = this,
-		stores = {};
-	this._serviceLocator.resolveAll('store')
-		.forEach(function (store) {
-			stores[store.name] = store;
-			self._eventBus.emit('storeLoaded', stores[store.name]);
+	if (this._loadedStores) {
+		return Promise.resolve(this._loadedStores);
+	}
+
+	this._loadedStores = {};
+	var self = this;
+
+	return Promise.resolve()
+		.then(function () {
+			var stores = self._serviceLocator.resolveAll('store'),
+				storePromises = [];
+
+			// the list is a stack, we should reverse it
+			stores.forEach(function (store) {
+				storePromises.unshift(
+					self._getStore(store)
+				);
+			});
+
+			return Promise.all(storePromises);
+		})
+		.then(function (stores) {
+			stores.forEach(function (store) {
+				if (!store || typeof(store) !== 'object') {
+					return;
+				}
+				self._loadedStores[store.name] = store;
+			});
+			self._eventBus.emit('allStoresLoaded', self._loadedStores);
+			return Promise.resolve(self._loadedStores);
 		});
-	this._loadedStores = stores;
-	this._eventBus.emit('allStoresLoaded', stores);
-	return Promise.resolve(stores);
+};
+
+/**
+ * Gets the store from store details.
+ * @param {Object} storeDetails Store details.
+ * @returns {Promise<Object>} Promise for store.
+ * @private
+ */
+StoreLoader.prototype._getStore = function (storeDetails) {
+	var self = this;
+	return this._applyTransforms(storeDetails)
+		.then(function (transformed) {
+			self._eventBus.emit('storeLoaded', transformed);
+			return transformed;
+		})
+		.catch(function (reason) {
+			self._eventBus.emit('error', reason);
+			return null;
+		});
 };
 
 /**

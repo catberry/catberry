@@ -94,6 +94,7 @@ function DocumentRenderer($serviceLocator) {
 	this._storeDispatcher = $serviceLocator.resolve('storeDispatcher');
 
 	var self = this;
+
 	this._eventBus.on('storeChanged', function (storeName) {
 		self._currentChangedStores[storeName] = true;
 		if (self._isStateChanging) {
@@ -101,12 +102,6 @@ function DocumentRenderer($serviceLocator) {
 		}
 		self._updateStoreComponents();
 	});
-	// need to run all bind methods and events for components
-	// have been rendered at server after all modules will be resolved from
-	// Service Locator
-	setTimeout(function () {
-		self._initialWrap();
-	}, 0);
 }
 
 /**
@@ -180,13 +175,30 @@ DocumentRenderer.prototype._isUpdating = false;
 DocumentRenderer.prototype._awaitingRouting = null;
 
 /**
+ * Sets the initial state of the application.
+ * @param {Object} state New state of application.
+ * @param {Object} routingContext Routing context.
+ * @returns {Promise} Promise for nothing.
+ */
+DocumentRenderer.prototype.initWithState = function (state, routingContext) {
+	var self = this;
+	return self._getPromiseForReadyState()
+		.then(function () {
+			self._currentRoutingContext = routingContext;
+			return self._storeDispatcher.setState(state, routingContext);
+		})
+		.then(function () {
+			return self._initialWrap();
+		});
+};
+
+/**
  * Renders new state of application.
  * @param {Object} state New state of application.
  * @param {Object} routingContext Routing context.
  * @returns {Promise} Promise for nothing.
  */
 DocumentRenderer.prototype.render = function (state, routingContext) {
-	var self = this;
 	this._awaitingRouting = {
 		state: state,
 		routingContext: routingContext
@@ -199,8 +211,12 @@ DocumentRenderer.prototype.render = function (state, routingContext) {
 	// event handling for now
 	this._isStateChanging = true;
 
-	// and then we update all components of these stores in a batch.
-	this._renderedPromise = self._updateStoreComponents()
+	var self = this;
+	self._renderedPromise = this._getPromiseForReadyState()
+		.then(function () {
+			// and then we update all components of these stores in a batch.
+			return self._updateStoreComponents();
+		})
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
 		})
@@ -218,95 +234,100 @@ DocumentRenderer.prototype.render = function (state, routingContext) {
  */
 DocumentRenderer.prototype.renderComponent =
 	function (element, renderingContext) {
-		renderingContext = renderingContext || this._createRenderingContext([]);
-
-		var self = this,
-			componentName = moduleHelper.getOriginalComponentName(
-					element.tagName
-			),
-			hadChildren = element.hasChildNodes(),
-			component = renderingContext.components[componentName],
-			id = this._getId(element),
-			instance = this._componentInstances[id];
-
-		if (!component) {
-			return Promise.resolve();
-		}
-
-		if (!id || renderingContext.renderedIds.hasOwnProperty(id)) {
-			return Promise.resolve();
-		}
-
-		renderingContext.renderedIds[id] = true;
-
-		if (!instance) {
-			component.constructor.prototype.$context =
-				this._getComponentContext(component, element);
-			instance = this._serviceLocator.resolveInstance(
-				component.constructor, renderingContext.config
-			);
-			instance.$context = component.constructor.prototype.$context;
-			this._componentInstances[id] = instance;
-		}
-
-		var eventArgs = {
-			name: componentName,
-			context: instance.$context
-		};
-
-		this._componentElements[id] = element;
-
-		var startTime = Date.now();
-		this._eventBus.emit('componentRender', eventArgs);
-
-		return this._unbindAll(element, renderingContext)
-			.catch(function (reason) {
-				self._eventBus.emit('error', reason);
-			})
+		var self = this;
+		return this._getPromiseForReadyState()
 			.then(function () {
-				if (instance.$context.element !== element) {
-					instance.$context = self._getComponentContext(
-						component, element
-					);
-				}
-				var renderMethod = moduleHelper.getMethodToInvoke(
-					instance, 'render'
-				);
-				return moduleHelper.getSafePromise(renderMethod);
-			})
-			.then(function (dataContext) {
-				return component.template.render(dataContext);
-			})
-			.catch(function (reason) {
-				return self._handleRenderError(element, component, reason);
-			})
-			.then(function (html) {
-				if (element.tagName === TAG_NAMES.HEAD) {
-					self._mergeHead(element, html);
-				} else {
-					element.innerHTML = html;
-				}
-				var promises = self._findComponents(element, renderingContext)
-					.map(function (innerComponent) {
-						return self.renderComponent(
-							innerComponent, renderingContext
-						);
-					});
-				return Promise.all(promises);
-			})
-			.then(function () {
-				eventArgs.time = Date.now() - startTime;
-				self._eventBus.emit('componentRendered', eventArgs);
-				return self._bindComponent(element);
-			})
-			.then(function () {
-				if (!hadChildren) {
+				renderingContext = renderingContext ||
+					self._createRenderingContext([]);
+
+				var componentName = moduleHelper.getOriginalComponentName(
+						element.tagName
+					),
+					hadChildren = element.hasChildNodes(),
+					component = renderingContext.components[componentName],
+					id = self._getId(element),
+					instance = self._componentInstances[id];
+
+				if (!component || !id ||
+					renderingContext.renderedIds.hasOwnProperty(id)) {
 					return;
 				}
-				self._collectRenderingGarbage(renderingContext);
-			})
-			.catch(function (reason) {
-				self._eventBus.emit('error', reason);
+
+				renderingContext.renderedIds[id] = true;
+
+				if (!instance) {
+					component.constructor.prototype.$context =
+						self._getComponentContext(component, element);
+					instance = self._serviceLocator.resolveInstance(
+						component.constructor, renderingContext.config
+					);
+					instance.$context = component.constructor.prototype.$context;
+					self._componentInstances[id] = instance;
+				}
+
+				var eventArgs = {
+					name: componentName,
+					context: instance.$context
+				};
+
+				self._componentElements[id] = element;
+
+				var startTime = Date.now();
+				self._eventBus.emit('componentRender', eventArgs);
+
+				return self._unbindAll(element, renderingContext)
+					.catch(function (reason) {
+						self._eventBus.emit('error', reason);
+					})
+					.then(function () {
+						if (instance.$context.element !== element) {
+							instance.$context = self._getComponentContext(
+								component, element
+							);
+						}
+						var renderMethod = moduleHelper.getMethodToInvoke(
+							instance, 'render'
+						);
+						return moduleHelper.getSafePromise(renderMethod);
+					})
+					.then(function (dataContext) {
+						return component.template.render(dataContext);
+					})
+					.catch(function (reason) {
+						return self._handleRenderError(
+							element, component, reason
+						);
+					})
+					.then(function (html) {
+						if (element.tagName === TAG_NAMES.HEAD) {
+							self._mergeHead(element, html);
+						} else {
+							element.innerHTML = html;
+						}
+						var promises = self._findComponents(
+							element, renderingContext
+						)
+							.map(function (innerComponent) {
+								return self.renderComponent(
+									innerComponent, renderingContext
+								);
+							});
+						return Promise.all(promises);
+					})
+					.then(function () {
+						eventArgs.time = Date.now() - startTime;
+						self._eventBus.emit('componentRendered', eventArgs);
+						return self._bindComponent(element);
+					})
+					.then(function () {
+						if (!hadChildren) {
+							return;
+						}
+						self._collectRenderingGarbage(renderingContext);
+					})
+					.catch(function (reason) {
+						self._eventBus.emit('error', reason);
+					});
 			});
 	};
 
@@ -325,27 +346,30 @@ DocumentRenderer.prototype.getComponentById = function (id) {
  * @returns {Promise} Promise for nothing.
  */
 DocumentRenderer.prototype.collectGarbage = function () {
-	var self = this,
-		promises = [];
-	Object.keys(this._componentElements)
-		.forEach(function (id) {
-			if (SPECIAL_IDS.hasOwnProperty(id)) {
-				return;
-			}
-			var element = self._window.document.getElementById(id);
-			if (element) {
-				return;
-			}
+	var self = this;
+	return this._getPromiseForReadyState().
+		then(function () {
+			var promises = [];
+			Object.keys(self._componentElements)
+				.forEach(function (id) {
+					if (SPECIAL_IDS.hasOwnProperty(id)) {
+						return;
+					}
+					var element = self._window.document.getElementById(id);
+					if (element) {
+						return;
+					}
 
-			var promise = self._unbindComponent(self._componentElements[id])
-				.then(function () {
-					delete self._componentElements[id];
-					delete self._componentInstances[id];
-					delete self._componentBindings[id];
+					var promise = self._unbindComponent(self._componentElements[id])
+						.then(function () {
+							delete self._componentElements[id];
+							delete self._componentInstances[id];
+							delete self._componentBindings[id];
+						});
+					promises.push(promise);
 				});
-			promises.push(promise);
+			return Promise.all(promises);
 		});
-	return Promise.all(promises);
 };
 
 /**
@@ -362,32 +386,37 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 		);
 	}
 
-	var components = this._componentLoader.getComponentsByNames(),
-		componentName = moduleHelper.getOriginalComponentName(tagName);
-	if (moduleHelper.isHeadComponent(componentName) ||
-		moduleHelper.isDocumentComponent(componentName) ||
-		!components.hasOwnProperty(componentName)) {
-		return Promise.reject(
-			new Error(util.format(ERROR_CREATE_WRONG_NAME, tagName))
-		);
-	}
-
-	var safeTagName = moduleHelper.getTagNameForComponentName(componentName);
-
-	var id = attributes[moduleHelper.ATTRIBUTE_ID];
-	if (!id || this._componentInstances.hasOwnProperty(id)) {
-		return Promise.reject(new Error(ERROR_CREATE_WRONG_ID));
-	}
-
-	var element = this._window.document.createElement(safeTagName);
-	Object.keys(attributes)
-		.forEach(function (attributeName) {
-			element.setAttribute(attributeName, attributes[attributeName]);
-		});
-
-	return this.renderComponent(element)
+	var self = this;
+	return this._getPromiseForReadyState()
 		.then(function () {
-			return element;
+			var components = self._componentLoader.getComponentsByNames(),
+				componentName = moduleHelper.getOriginalComponentName(tagName);
+
+			if (moduleHelper.isHeadComponent(componentName) ||
+				moduleHelper.isDocumentComponent(componentName) ||
+				!components.hasOwnProperty(componentName)) {
+				return Promise.reject(
+					new Error(util.format(ERROR_CREATE_WRONG_NAME, tagName))
+				);
+			}
+
+			var safeTagName = moduleHelper.getTagNameForComponentName(componentName);
+
+			var id = attributes[moduleHelper.ATTRIBUTE_ID];
+			if (!id || self._componentInstances.hasOwnProperty(id)) {
+				return Promise.reject(new Error(ERROR_CREATE_WRONG_ID));
+			}
+
+			var element = self._window.document.createElement(safeTagName);
+			Object.keys(attributes)
+				.forEach(function (attributeName) {
+					element.setAttribute(attributeName, attributes[attributeName]);
+				});
+
+			return self.renderComponent(element)
+				.then(function () {
+					return element;
+				});
 		});
 };
 

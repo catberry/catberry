@@ -49,7 +49,11 @@ var util = require('util'),
 	Catberry = require('./node_modules/catberry/browser/Catberry.js'),
 	Logger = require('./node_modules/catberry/browser/Logger.js'),
 	BootstrapperBase =
-		require('./node_modules/catberry/lib/base/BootstrapperBase.js');
+		require('./node_modules/catberry/lib/base/BootstrapperBase.js'),
+	StoreDispatcher = require('./node_modules/catberry/lib/StoreDispatcher'),
+	ModuleApiProvider =
+		require('./node_modules/catberry/browser/providers/ModuleApiProvider'),
+	CookieWrapper = require('./node_modules/catberry/browser/CookieWrapper');
 
 var INFO_DOCUMENT_UPDATED = 'Document updated (%d store(s) changed)',
 	INFO_COMPONENT_BOUND = 'Component "%s" is bound',
@@ -78,6 +82,12 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	if (!('Promise' in window)) {
 		window.Promise = locator.resolve('promise');
 	}
+
+	locator.register('storeDispatcher', StoreDispatcher, configObject, true);
+	locator.register(
+		'moduleApiProvider', ModuleApiProvider, configObject, true
+	);
+	locator.register('cookieWrapper', CookieWrapper, configObject, true);
 
 	locator.registerInstance('window', window);
 
