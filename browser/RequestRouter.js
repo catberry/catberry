@@ -59,13 +59,24 @@ function RequestRouter($serviceLocator) {
 
 	this._isHistorySupported = this._window.history &&
 		this._window.history.pushState instanceof Function;
-	this._wrapDocument();
 	var self = this;
+
+	// add event handlers
+	self._wrapDocument();
+
+	// set initial state from current URI
 	this._changeState(new URI(this._window.location.toString()))
-		.then(function () {
-			self._eventBus.emit('ready');
+		.catch(function (reason) {
+			self._handleError(reason);
 		});
 }
+
+/**
+ * Current initialization flag.
+ * @type {boolean}
+ * @private
+ */
+RequestRouter.prototype._isStateInitialized = false;
 
 /**
  * Current referrer.
@@ -132,35 +143,31 @@ RequestRouter.prototype.route = function () {
 	// because now location was not change yet and
 	// different browsers handle `popstate` differently
 	// we need to do route in next iteration of event loop
-	return new Promise(function (fulfill, reject) {
-		var newLocation = new URI(self._window.location.toString()),
-			newAuthority = newLocation.authority ?
-				newLocation.authority.toString() : null,
-			currentAuthority = self._location.authority ?
-				self._location.authority.toString() : null;
+	return Promise.resolve()
+		.then(function () {
+			var newLocation = new URI(self._window.location.toString()),
+				newAuthority = newLocation.authority ?
+					newLocation.authority.toString() : null,
+				currentAuthority = self._location.authority ?
+					self._location.authority.toString() : null;
 
-		if (newLocation.scheme !== self._location.scheme ||
-			newAuthority !== currentAuthority) {
-			fulfill();
-			return;
-		}
+			if (newLocation.scheme !== self._location.scheme ||
+				newAuthority !== currentAuthority) {
+				return;
+			}
 
-		// if only URI fragment is changed
-		var newQuery = newLocation.query ?
-			newLocation.query.toString() : null,
-			currentQuery = self._location.query ?
-				self._location.query.toString() : null;
-		if (newLocation.path === self._location.path &&
-			newQuery === currentQuery) {
-			self._location = newLocation;
-			fulfill();
-			return;
-		}
-
-		self._changeState(newLocation)
-			.then(fulfill)
-			.catch(reject);
-	});
+			// if only URI fragment is changed
+			var newQuery = newLocation.query ?
+					newLocation.query.toString() : null,
+				currentQuery = self._location.query ?
+					self._location.query.toString() : null;
+			if (newLocation.path === self._location.path &&
+				newQuery === currentQuery) {
+				self._location = newLocation;
+				return;
+			}
+			return self._changeState(newLocation);
+		});
 };
 
 /**
@@ -169,36 +176,36 @@ RequestRouter.prototype.route = function () {
  * @returns {Promise} Promise for nothing.
  */
 RequestRouter.prototype.go = function (locationString) {
-	var location;
-	try {
-		location = new URI(locationString);
-	} catch (e) {
-		location = new URI();
-	}
-	location = location.resolveRelative(this._location);
-	locationString = location.toString();
+	var self = this;
+	return Promise.resolve()
+		.then(function () {
+			var location = new URI(locationString);
+			location = location.resolveRelative(self._location);
+			locationString = location.toString();
 
-	var currentAuthority = this._location.authority ?
-			this._location.authority.toString() : null,
-		newAuthority = location.authority ?
-			location.authority.toString() : null;
-	// we must check if this is an external link before map URI
-	// to internal application state
-	if (!this._isHistorySupported ||
-		location.scheme !== this._location.scheme ||
-		newAuthority !== currentAuthority) {
-		this._window.location.assign(locationString);
-		return Promise.resolve();
-	}
+			var currentAuthority = self._location.authority ?
+					self._location.authority.toString() : null,
+				newAuthority = location.authority ?
+					location.authority.toString() : null;
 
-	var state = this._stateProvider.getStateByUri(location);
-	if (!state) {
-		this._window.location.assign(locationString);
-		return Promise.resolve();
-	}
+			// we must check if this is an external link before map URI
+			// to internal application state
+			if (!self._isHistorySupported ||
+				location.scheme !== self._location.scheme ||
+				newAuthority !== currentAuthority) {
+				self._window.location.assign(locationString);
+				return;
+			}
 
-	this._window.history.pushState(state, '', locationString);
-	return this.route();
+			var state = self._stateProvider.getStateByUri(location);
+			if (!state) {
+				self._window.location.assign(locationString);
+				return;
+			}
+
+			self._window.history.pushState(state, '', locationString);
+			return self.route();
+		});
 };
 
 /**
@@ -208,17 +215,27 @@ RequestRouter.prototype.go = function (locationString) {
  * @private
  */
 RequestRouter.prototype._changeState = function (newLocation) {
-	this._location = newLocation;
-	var state = this._stateProvider.getStateByUri(newLocation),
-		routingContext = this._contextFactory.create({
-			referrer: this._referrer || this._window.document.referrer,
-			location: this._location,
-			userAgent: this._window.navigator.userAgent
-		});
-
 	var self = this;
-	return this._documentRenderer
-		.render(state, routingContext)
+	return Promise.resolve()
+		.then(function () {
+			self._location = newLocation;
+			var state = self._stateProvider.getStateByUri(newLocation),
+				routingContext = self._contextFactory.create({
+					referrer: self._referrer || self._window.document.referrer,
+					location: self._location,
+					userAgent: self._window.navigator.userAgent
+				});
+
+			if (!self._isStateInitialized) {
+				self._isStateInitialized = true;
+				return self._documentRenderer.initWithState(
+					state, routingContext
+				);
+			}
+
+			return self._documentRenderer
+				.render(state, routingContext);
+		})
 		.then(function () {
 			self._referrer = self._location;
 		});
@@ -251,8 +268,7 @@ RequestRouter.prototype._wrapDocument = function () {
 			if (!link) {
 				return;
 			}
-			self._linkClickHandler(event, link)
-				.catch(self._handleError.bind(self));
+			self._linkClickHandler(event, link);
 		}
 	});
 };
@@ -265,26 +281,33 @@ RequestRouter.prototype._wrapDocument = function () {
  * @private
  */
 RequestRouter.prototype._linkClickHandler = function (event, element) {
-	var targetAttribute = element.getAttribute(TARGET_ATTRIBUTE_NAME);
-	if (targetAttribute) {
-		return Promise.resolve();
-	}
+	var self = this;
+	return Promise.resolve()
+		.then(function () {
+			var targetAttribute = element.getAttribute(TARGET_ATTRIBUTE_NAME);
+			if (targetAttribute) {
+				return;
+			}
 
-	// if middle mouse button was clicked
-	if (event.button === MOUSE_KEYS.MIDDLE) {
-		return Promise.resolve();
-	}
+			// if middle mouse button was clicked
+			if (event.button === MOUSE_KEYS.MIDDLE) {
+				return;
+			}
 
-	var locationString = element.getAttribute(HREF_ATTRIBUTE_NAME);
-	if (!locationString) {
-		return Promise.resolve();
-	}
-	if (locationString[0] === '#') {
-		return Promise.resolve();
-	}
+			var locationString = element.getAttribute(HREF_ATTRIBUTE_NAME);
+			if (!locationString) {
+				return;
+			}
+			if (locationString[0] === '#') {
+				return;
+			}
 
-	event.preventDefault();
-	return this.go(locationString);
+			event.preventDefault();
+			return self.go(locationString);
+		})
+		.catch(function (reason) {
+			self._handleError(reason);
+		});
 };
 
 /**
