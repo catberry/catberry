@@ -233,6 +233,11 @@ RequestRouter.prototype._changeState = function (newLocation) {
 				);
 			}
 
+			if (state === null) {
+				window.location.reload();
+				return;
+			}
+
 			return self._documentRenderer
 				.render(state, routingContext);
 		})
