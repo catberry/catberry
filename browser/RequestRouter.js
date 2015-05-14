@@ -266,8 +266,7 @@ RequestRouter.prototype._wrapDocument = function () {
 			return;
 		}
 		if (event.target.tagName === A_TAG_NAME) {
-			self._linkClickHandler(event, event.target)
-				.catch(self._handleError.bind(self));
+			self._linkClickHandler(event, event.target);
 		} else {
 			var link = closestLink(event.target);
 			if (!link) {
@@ -282,37 +281,30 @@ RequestRouter.prototype._wrapDocument = function () {
  * Handles link click on the page.
  * @param {Event} event Event-related object.
  * @param {Element} element Link element.
- * @returns {Promise} Promise for nothing.
  * @private
  */
 RequestRouter.prototype._linkClickHandler = function (event, element) {
-	var self = this;
-	return Promise.resolve()
-		.then(function () {
-			var targetAttribute = element.getAttribute(TARGET_ATTRIBUTE_NAME);
-			if (targetAttribute) {
-				return;
-			}
+	var targetAttribute = element.getAttribute(TARGET_ATTRIBUTE_NAME);
+	if (targetAttribute) {
+		return;
+	}
 
-			// if middle mouse button was clicked
-			if (event.button === MOUSE_KEYS.MIDDLE) {
-				return;
-			}
+	// if middle mouse button was clicked
+	if (event.button === MOUSE_KEYS.MIDDLE) {
+		return;
+	}
 
-			var locationString = element.getAttribute(HREF_ATTRIBUTE_NAME);
-			if (!locationString) {
-				return;
-			}
-			if (locationString[0] === '#') {
-				return;
-			}
+	var locationString = element.getAttribute(HREF_ATTRIBUTE_NAME);
+	if (!locationString) {
+		return;
+	}
+	if (locationString[0] === '#') {
+		return;
+	}
 
-			event.preventDefault();
-			return self.go(locationString);
-		})
-		.catch(function (reason) {
-			self._handleError(reason);
-		});
+	event.preventDefault();
+	this.go(locationString)
+		.catch(this._handleError.bind(this));
 };
 
 /**
