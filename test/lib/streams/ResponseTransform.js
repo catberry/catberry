@@ -39,18 +39,16 @@ var assert = require('assert'),
 	ContextFactory = require('../../../lib/ContextFactory'),
 	ModuleApiProvider = require('../../../lib/providers/ModuleApiProvider'),
 	ContentReadable = require('../../../lib/streams/ContentReadable'),
-	ResponseProxyWritable =
-		require('../../../lib/streams/ResponseProxyWritable');
+	ResponseTransform =
+		require('../../../lib/streams/ResponseTransform');
 
-// TODO redirect, not found, cookie
-
-describe('lib/streams/ResponseProxyWritable', function () {
-	describe('#write', function () {
+describe('lib/streams/ResponseTransform', function () {
+	describe('#transform', function () {
 		it('should properly write all chunks of default size', function (done) {
 			var content = '1234567890',
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content),
-				responseStream = new ResponseProxyWritable(renderingContext);
+				responseStream = new ResponseTransform(renderingContext);
 
 			renderingContext.isAnyComponentRendered = true;
 
@@ -83,7 +81,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 				},
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content, options),
-				responseStream = new ResponseProxyWritable(
+				responseStream = new ResponseTransform(
 					renderingContext, options
 				);
 
@@ -115,7 +113,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 			var content = '1234567890',
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content),
-				responseStream = new ResponseProxyWritable(renderingContext);
+				responseStream = new ResponseTransform(renderingContext);
 
 			contentStream
 				.pipe(responseStream)
@@ -146,7 +144,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 				},
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content, options),
-				responseStream = new ResponseProxyWritable(
+				responseStream = new ResponseTransform(
 					renderingContext, options
 				);
 
@@ -180,7 +178,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 				countTransform = new stream.Transform(options),
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content, options),
-				responseStream = new ResponseProxyWritable(
+				responseStream = new ResponseTransform(
 					renderingContext, options
 				);
 
@@ -202,7 +200,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 					done();
 				});
 
-			response.write = function (chunk) {
+			response._write = function (chunk, encoding, callback) {
 				assert.strictEqual(
 					renderingContext.isAnyComponentRendered, true
 				);
@@ -211,6 +209,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 					isFirstPartConsumed = true;
 				}
 				response.result += chunk;
+				callback();
 			};
 		});
 
@@ -218,7 +217,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 			var content = '1234567890',
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content),
-				responseStream = new ResponseProxyWritable(renderingContext);
+				responseStream = new ResponseTransform(renderingContext);
 
 			renderingContext.routingContext.redirect('/some');
 			contentStream
@@ -244,7 +243,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 			var content = '1234567890',
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content),
-				responseStream = new ResponseProxyWritable(renderingContext);
+				responseStream = new ResponseTransform(renderingContext);
 
 			renderingContext.routingContext.cookie.set({
 				key: 'first', value: 'value1'
@@ -285,7 +284,7 @@ describe('lib/streams/ResponseProxyWritable', function () {
 			var content = '1234567890',
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content),
-				responseStream = new ResponseProxyWritable(renderingContext);
+				responseStream = new ResponseTransform(renderingContext);
 
 			renderingContext.routingContext.notFound();
 
@@ -309,24 +308,28 @@ describe('lib/streams/ResponseProxyWritable', function () {
 			var content = '1234567890',
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content),
-				responseStream = new ResponseProxyWritable(renderingContext);
+				responseStream = new ResponseTransform(renderingContext);
 
 			renderingContext.isCanceled = true;
 
 			contentStream
 				.pipe(responseStream)
 				.on('finish', function () {
-					var response = renderingContext
-						.routingContext.middleware.response;
-					assert.strictEqual(renderingContext.isCanceled, true);
-					assert.strictEqual(response.result, '');
-					assert.strictEqual(response.status, 200);
-					assert.strictEqual(response.isEnded, false);
-					assert.strictEqual(
-						Object.keys(response.setHeaders).length, 0
-					);
-					done();
+					assert.fail('Should not finish');
 				});
+
+			setTimeout(function () {
+				var response = renderingContext
+					.routingContext.middleware.response;
+				assert.strictEqual(renderingContext.isCanceled, true);
+				assert.strictEqual(response.result, '');
+				assert.strictEqual(response.status, 200);
+				assert.strictEqual(response.isEnded, false);
+				assert.strictEqual(
+					Object.keys(response.setHeaders).length, 0
+				);
+				done();
+			}, 10);
 		});
 	});
 });
