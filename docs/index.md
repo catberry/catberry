@@ -193,6 +193,7 @@ of current referrer
 from routing definition
 * `this.$context.locator` – Service Locator of the application
 * `this.$context.redirect('String')` - Redirects to specified location string
+* `this.$context.notFound()` - Passes request handling to the next middleware
 * `this.$context.changed()` – Triggers `changed` event for current store.
 You can use this method whenever you want, Catberry handles it correctly.
 * `this.$context.getStoreData('storeName')` – gets promise for
@@ -222,6 +223,14 @@ For example, you have two stores `Country` and `CityList` and you do
 In this case, if `Country` store is changed `CityList` will not changed.
 To avoid this just add `this.$context.setDependency(‘Country’)` to
 the `CityList` constructor.
+
+Also, there is one thing about setting a cookie, `redirect` 
+and `notFound` methods.
+If you use these methods while rendering `document` or `head` component it will
+be done using HTTP headers and status codes on the server, otherwise it will be
+rendered as inline `<script>` tags.
+`notFound` method should be used only during rendering 
+of `document` or `head` components.
 
 ## Code Example
 This is an example how your store can look like:
@@ -404,6 +413,7 @@ of current referrer`
 * `this.$context.attributes` – set of attributes are set when component was
 rendered the last time
 * `this.$context.redirect('String')` - redirects to specified location string
+* `this.$context.notFound()` - Passes request handling to the next middleware
 * `this.$context.getComponentById(‘id’)` – gets other component by ID
 * `this.$context.createComponent(‘tagName’, attributesObject)` – creates new
 component and returns promise for its root DOM element
@@ -421,6 +431,14 @@ promise for `Array` of results.
 Every time router computes new application state, it re-creates and re-assigns
 context to each component, therefore, do not save references to `this.$context`
 objects.
+
+Also, there is one thing about setting a cookie, `redirect` 
+and `notFound` methods.
+If you use these methods while rendering `document` or `head` component it will
+be done using HTTP headers and status codes on the server, otherwise it will be
+rendered as inline `<script>` tags.
+`notFound` method should be used only during rendering 
+of `document` or `head` components.
 
 ## Code Example
 This is an example how your cat-component can look like:
