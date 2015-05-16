@@ -46,6 +46,36 @@ var assert = require('assert'),
 
 describe('lib/streams/ResponseProxyWritable', function () {
 	describe('#write', function () {
+		it('should properly write all chunks of default size', function (done) {
+			var content = '1234567890',
+				renderingContext = createRenderingContext(),
+				contentStream = new ContentReadable(content),
+				responseStream = new ResponseProxyWritable(renderingContext);
+
+			renderingContext.isAnyComponentRendered = true;
+
+			contentStream
+				.pipe(responseStream)
+				.on('finish', function () {
+					var response = renderingContext
+						.routingContext.middleware.response;
+					assert.strictEqual(renderingContext.isCanceled, false);
+					assert.strictEqual(response.result, content);
+					assert.strictEqual(response.status, 200);
+					assert.strictEqual(response.isEnded, true);
+					assert.strictEqual(
+						Object.keys(response.setHeaders).length, 2
+					);
+					assert.strictEqual(
+						typeof(response.setHeaders['Content-Type']), 'string'
+					);
+					assert.strictEqual(
+						typeof(response.setHeaders['X-Powered-By']), 'string'
+					);
+					done();
+				});
+		});
+
 		it('should properly write all chunks of 1 byte size', function (done) {
 			var content = '1234567890',
 				options = {
@@ -81,13 +111,44 @@ describe('lib/streams/ResponseProxyWritable', function () {
 				});
 		});
 
-		it('should properly write all chunks of 1 byte size', function (done) {
+		it('should properly delay chunks of default size', function (done) {
 			var content = '1234567890',
 				renderingContext = createRenderingContext(),
 				contentStream = new ContentReadable(content),
 				responseStream = new ResponseProxyWritable(renderingContext);
 
-			renderingContext.isAnyComponentRendered = false;
+			contentStream
+				.pipe(responseStream)
+				.on('finish', function () {
+					var response = renderingContext
+						.routingContext.middleware.response;
+					assert.strictEqual(renderingContext.isCanceled, false);
+					assert.strictEqual(response.result, content);
+					assert.strictEqual(response.status, 200);
+					assert.strictEqual(response.isEnded, true);
+					assert.strictEqual(
+						Object.keys(response.setHeaders).length, 2
+					);
+					assert.strictEqual(
+						typeof(response.setHeaders['Content-Type']), 'string'
+					);
+					assert.strictEqual(
+						typeof(response.setHeaders['X-Powered-By']), 'string'
+					);
+					done();
+				});
+		});
+
+		it('should properly delay chunks of 1 byte size', function (done) {
+			var content = '1234567890',
+				options = {
+					highWaterMark: 1
+				},
+				renderingContext = createRenderingContext(),
+				contentStream = new ContentReadable(content, options),
+				responseStream = new ResponseProxyWritable(
+					renderingContext, options
+				);
 
 			contentStream
 				.pipe(responseStream)
@@ -151,6 +212,121 @@ describe('lib/streams/ResponseProxyWritable', function () {
 				}
 				response.result += chunk;
 			};
+		});
+
+		it('should properly set redirect status and headers', function (done) {
+			var content = '1234567890',
+				renderingContext = createRenderingContext(),
+				contentStream = new ContentReadable(content),
+				responseStream = new ResponseProxyWritable(renderingContext);
+
+			renderingContext.routingContext.redirect('/some');
+			contentStream
+				.pipe(responseStream)
+				.on('finish', function () {
+					var response = renderingContext
+						.routingContext.middleware.response;
+					assert.strictEqual(renderingContext.isCanceled, true);
+					assert.strictEqual(response.result, '');
+					assert.strictEqual(response.status, 302);
+					assert.strictEqual(response.isEnded, true);
+					assert.strictEqual(
+						Object.keys(response.setHeaders).length, 1
+					);
+					assert.strictEqual(
+						response.setHeaders.Location, '/some'
+					);
+					done();
+				});
+		});
+
+		it('should properly set cookie headers', function (done) {
+			var content = '1234567890',
+				renderingContext = createRenderingContext(),
+				contentStream = new ContentReadable(content),
+				responseStream = new ResponseProxyWritable(renderingContext);
+
+			renderingContext.routingContext.cookie.set({
+				key: 'first', value: 'value1'
+			});
+			renderingContext.routingContext.cookie.set({
+				key: 'second', value: 'value2'
+			});
+
+			contentStream
+				.pipe(responseStream)
+				.on('finish', function () {
+					var response = renderingContext
+						.routingContext.middleware.response;
+					assert.strictEqual(renderingContext.isCanceled, false);
+					assert.strictEqual(response.result, content);
+					assert.strictEqual(response.status, 200);
+					assert.strictEqual(response.isEnded, true);
+					assert.strictEqual(
+						Object.keys(response.setHeaders).length, 3
+					);
+					assert.strictEqual(
+						typeof(response.setHeaders['Content-Type']), 'string'
+					);
+					assert.strictEqual(
+						typeof(response.setHeaders['X-Powered-By']), 'string'
+					);
+					assert.deepEqual(
+						response.setHeaders['Set-Cookie'], [
+							'first=value1',
+							'second=value2'
+						]
+					);
+					done();
+				});
+		});
+
+		it('should call next middleware if not found', function (done) {
+			var content = '1234567890',
+				renderingContext = createRenderingContext(),
+				contentStream = new ContentReadable(content),
+				responseStream = new ResponseProxyWritable(renderingContext);
+
+			renderingContext.routingContext.notFound();
+
+			renderingContext.routingContext.middleware.next = function () {
+				var response = renderingContext
+					.routingContext.middleware.response;
+				assert.strictEqual(renderingContext.isCanceled, true);
+				assert.strictEqual(response.result, '');
+				assert.strictEqual(response.status, 200);
+				assert.strictEqual(response.isEnded, false);
+				assert.strictEqual(
+					Object.keys(response.setHeaders).length, 0
+				);
+				done();
+			};
+			contentStream
+				.pipe(responseStream);
+		});
+
+		it('should not write if it\'s canceled', function (done) {
+			var content = '1234567890',
+				renderingContext = createRenderingContext(),
+				contentStream = new ContentReadable(content),
+				responseStream = new ResponseProxyWritable(renderingContext);
+
+			renderingContext.isCanceled = true;
+
+			contentStream
+				.pipe(responseStream)
+				.on('finish', function () {
+					var response = renderingContext
+						.routingContext.middleware.response;
+					assert.strictEqual(renderingContext.isCanceled, true);
+					assert.strictEqual(response.result, '');
+					assert.strictEqual(response.status, 200);
+					assert.strictEqual(response.isEnded, false);
+					assert.strictEqual(
+						Object.keys(response.setHeaders).length, 0
+					);
+					done();
+				});
 		});
 	});
 });
