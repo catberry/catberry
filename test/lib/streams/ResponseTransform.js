@@ -60,7 +60,6 @@ describe('lib/streams/ResponseTransform', function () {
 					assert.strictEqual(renderingContext.isCanceled, false);
 					assert.strictEqual(response.result, content);
 					assert.strictEqual(response.status, 200);
-					assert.strictEqual(response.isEnded, true);
 					assert.strictEqual(
 						Object.keys(response.setHeaders).length, 2
 					);
@@ -95,7 +94,6 @@ describe('lib/streams/ResponseTransform', function () {
 					assert.strictEqual(renderingContext.isCanceled, false);
 					assert.strictEqual(response.result, content);
 					assert.strictEqual(response.status, 200);
-					assert.strictEqual(response.isEnded, true);
 					assert.strictEqual(
 						Object.keys(response.setHeaders).length, 2
 					);
@@ -123,7 +121,6 @@ describe('lib/streams/ResponseTransform', function () {
 					assert.strictEqual(renderingContext.isCanceled, false);
 					assert.strictEqual(response.result, content);
 					assert.strictEqual(response.status, 200);
-					assert.strictEqual(response.isEnded, true);
 					assert.strictEqual(
 						Object.keys(response.setHeaders).length, 2
 					);
@@ -156,7 +153,6 @@ describe('lib/streams/ResponseTransform', function () {
 					assert.strictEqual(renderingContext.isCanceled, false);
 					assert.strictEqual(response.result, content);
 					assert.strictEqual(response.status, 200);
-					assert.strictEqual(response.isEnded, true);
 					assert.strictEqual(
 						Object.keys(response.setHeaders).length, 2
 					);
@@ -228,7 +224,6 @@ describe('lib/streams/ResponseTransform', function () {
 					assert.strictEqual(renderingContext.isCanceled, true);
 					assert.strictEqual(response.result, '');
 					assert.strictEqual(response.status, 302);
-					assert.strictEqual(response.isEnded, true);
 					assert.strictEqual(
 						Object.keys(response.setHeaders).length, 1
 					);
@@ -260,7 +255,6 @@ describe('lib/streams/ResponseTransform', function () {
 					assert.strictEqual(renderingContext.isCanceled, false);
 					assert.strictEqual(response.result, content);
 					assert.strictEqual(response.status, 200);
-					assert.strictEqual(response.isEnded, true);
 					assert.strictEqual(
 						Object.keys(response.setHeaders).length, 3
 					);
@@ -294,14 +288,16 @@ describe('lib/streams/ResponseTransform', function () {
 				assert.strictEqual(renderingContext.isCanceled, true);
 				assert.strictEqual(response.result, '');
 				assert.strictEqual(response.status, 200);
-				assert.strictEqual(response.isEnded, false);
 				assert.strictEqual(
 					Object.keys(response.setHeaders).length, 0
 				);
 				done();
 			};
 			contentStream
-				.pipe(responseStream);
+				.pipe(responseStream)
+				.on('finish', function () {
+					assert.fail('Should not finish');
+				});
 		});
 
 		it('should not write if it\'s canceled', function (done) {
@@ -324,7 +320,6 @@ describe('lib/streams/ResponseTransform', function () {
 				assert.strictEqual(renderingContext.isCanceled, true);
 				assert.strictEqual(response.result, '');
 				assert.strictEqual(response.status, 200);
-				assert.strictEqual(response.isEnded, false);
 				assert.strictEqual(
 					Object.keys(response.setHeaders).length, 0
 				);
