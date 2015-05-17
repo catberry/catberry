@@ -32,9 +32,8 @@
 
 var assert = require('assert'),
 	events = require('events'),
-	stream = require('stream'),
-	errorHelper = require('../../lib/helpers/errorHelper'),
 	URI = require('catberry-uri').URI,
+	ServerResponse = require('../mocks/ServerResponse'),
 	Component = require('../mocks/components/Component'),
 	ComponentError = require('../mocks/components/ComponentError'),
 	ComponentAsync = require('../mocks/components/ComponentAsync'),
@@ -74,8 +73,6 @@ describe('lib/DocumentRenderer', function () {
 				}
 			};
 			var routingContext = createRoutingContext({}, {}, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head><title>Hello</title></head>' +
@@ -88,17 +85,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -137,8 +131,6 @@ describe('lib/DocumentRenderer', function () {
 				}
 			};
 			var routingContext = createRoutingContext({}, {}, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head><title>head – head</title></head>' +
@@ -151,17 +143,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -224,8 +213,6 @@ describe('lib/DocumentRenderer', function () {
 				}
 			};
 			var routingContext = createRoutingContext({}, {}, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head><title>head – head</title></head>' +
@@ -240,17 +227,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -339,8 +323,6 @@ describe('lib/DocumentRenderer', function () {
 				}
 			};
 			var routingContext = createRoutingContext({}, stores, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head cat-store="folder/store2">' +
@@ -358,17 +340,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -455,8 +434,6 @@ describe('lib/DocumentRenderer', function () {
 			var routingContext = createRoutingContext({
 					isRelease: true
 				}, {}, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head cat-store="folder/store2">' +
@@ -473,17 +450,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -571,8 +545,6 @@ describe('lib/DocumentRenderer', function () {
 				}
 			};
 			var routingContext = createRoutingContext({}, stores, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head cat-store="folder/store2">' +
@@ -592,17 +564,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -676,8 +645,6 @@ describe('lib/DocumentRenderer', function () {
 			var routingContext = createRoutingContext({
 					isRelease: true
 				}, {}, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head>Error: head</head>' +
@@ -692,17 +659,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -802,8 +766,6 @@ describe('lib/DocumentRenderer', function () {
 			var routingContext = createRoutingContext({
 					isRelease: true
 				}, stores, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head cat-store="folder/store2">' +
@@ -821,17 +783,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -906,8 +865,6 @@ describe('lib/DocumentRenderer', function () {
 			var routingContext = createRoutingContext({
 					isRelease: true
 				}, {}, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				expected = '<!DOCTYPE html>' +
 					'<html>' +
 					'<head></head>' +
@@ -921,17 +878,14 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output, expected, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -994,22 +948,17 @@ describe('lib/DocumentRenderer', function () {
 					}
 				};
 			var routingContext = createRoutingContext({}, {}, components),
-				outputStream = new stream.PassThrough(),
-				output = '',
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			// stub for HTTP response method
-			outputStream.writeHead = function () {};
-
-			documentRenderer.render({}, routingContext, outputStream);
-			outputStream
-				.on('data', function (chunk) {
-					output += chunk;
-				})
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
 				.on('error', done)
-				.on('end', function () {
-					assert.strictEqual(output.length > 0, true, 'Wrong HTML');
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result.length > 0,
+						true, 'Wrong HTML'
+					);
 					done();
 				});
 		});
@@ -1049,6 +998,10 @@ function createRoutingContext(config, stores, components) {
 	return contextFactory.create({
 		referrer: new URI(),
 		location: new URI(),
-		userAgent: 'test'
+		userAgent: 'test',
+		middleware: {
+			response: new ServerResponse(),
+			next: function () {}
+		}
 	});
 }

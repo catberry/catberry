@@ -53,6 +53,16 @@ function ModuleApiProvider($serviceLocator) {
 }
 
 /**
+ * Reloads the page for handling "not found" error.
+ * @returns {Promise} Promise for nothing.
+ */
+ModuleApiProvider.prototype.notFound = function () {
+	var window = this.locator.resolve('window');
+	window.location.reload();
+	return Promise.resolve();
+};
+
+/**
  * Redirects current page to specified URI.
  * @param {string} uriString URI to redirect.
  * @returns {Promise} Promise for nothing.
