@@ -44,7 +44,6 @@ function ServerResponse() {
 
 ServerResponse.prototype.result = '';
 ServerResponse.prototype.status = 200;
-ServerResponse.prototype.isEnded = false;
 ServerResponse.prototype.setHeaders = null;
 ServerResponse.prototype.headersSent = false;
 
@@ -66,6 +65,5 @@ ServerResponse.prototype._write = function (chunk, encoding, callback) {
 };
 
 ServerResponse.prototype.end = function () {
-	this.isEnded = true;
 	stream.Writable.prototype.end.apply(this, arguments);
 };
