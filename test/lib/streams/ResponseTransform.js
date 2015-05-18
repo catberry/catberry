@@ -50,7 +50,7 @@ describe('lib/streams/ResponseTransform', function () {
 				contentStream = new ContentReadable(content),
 				responseStream = new ResponseTransform(renderingContext);
 
-			renderingContext.isAnyComponentRendered = true;
+			renderingContext.isReadyToFlush = true;
 
 			contentStream
 				.pipe(responseStream)
@@ -84,7 +84,7 @@ describe('lib/streams/ResponseTransform', function () {
 					renderingContext, options
 				);
 
-			renderingContext.isAnyComponentRendered = true;
+			renderingContext.isReadyToFlush = true;
 
 			contentStream
 				.pipe(responseStream)
@@ -180,7 +180,7 @@ describe('lib/streams/ResponseTransform', function () {
 
 			countTransform._transform = function (chunk, encoding, callback) {
 				if (chunk.toString() === '5') {
-					renderingContext.isAnyComponentRendered = true;
+					renderingContext.isReadyToFlush = true;
 				}
 				callback(null, chunk);
 			};
@@ -198,7 +198,7 @@ describe('lib/streams/ResponseTransform', function () {
 
 			response._write = function (chunk, encoding, callback) {
 				assert.strictEqual(
-					renderingContext.isAnyComponentRendered, true
+					renderingContext.isReadyToFlush, true
 				);
 				if (!isFirstPartConsumed) {
 					assert.strictEqual(chunk.toString(), '1234');
@@ -353,7 +353,7 @@ function createRenderingContext() {
 		isNextCalled: false,
 		isDocumentRendered: false,
 		isHeadRendered: false,
-		isAnyComponentRendered: false,
+		isReadyToFlush: false,
 		isCanceled: false,
 		renderedIds: {},
 		routingContext: routingContext,
