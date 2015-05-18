@@ -1,7 +1,7 @@
 /*
  * catberry
  *
- * Copyright (c) 2014 Denis Rechkunov and project contributors.
+ * Copyright (c) 2015 Denis Rechkunov and project contributors.
  *
  * catberry's license follows:
  *
@@ -30,33 +30,40 @@
 
 'use strict';
 
-module.exports = CatberryBase;
+module.exports = ServerResponse;
 
-var ServiceLocator = require('catberry-locator');
+var stream = require('stream'),
+	util = require('util');
 
-/**
- * Creates new instance of the basic Catberry application module.
- * @constructor
- */
-function CatberryBase() {
-	this.locator = new ServiceLocator();
-	this.locator.registerInstance('serviceLocator', this.locator);
-	this.locator.registerInstance('catberry', this);
+util.inherits(ServerResponse, stream.Writable);
+
+function ServerResponse() {
+	stream.Writable.call(this);
+	this.setHeaders = {};
 }
 
-/**
- * Current version of catberry.
- */
-CatberryBase.prototype.version = '5.1.0';
+ServerResponse.prototype.result = '';
+ServerResponse.prototype.status = 200;
+ServerResponse.prototype.setHeaders = null;
+ServerResponse.prototype.headersSent = false;
 
-/**
- * Current object with events.
- * @type {ModuleApiProvider}
- */
-CatberryBase.prototype.events = null;
+ServerResponse.prototype.writeHead = function (code, headers) {
+	if (this.headersSent) {
+		throw new Error('Headers were sent');
+	}
+	this.status = code;
+	this.setHeaders = headers;
+};
 
-/**
- * Current service locator.
- * @type {ServiceLocator}
- */
-CatberryBase.prototype.locator = null;
+ServerResponse.prototype._write = function (chunk, encoding, callback) {
+	if (this.isEnded) {
+		throw new Error('Write after EOF');
+	}
+	this.headersSent = true;
+	this.result += chunk;
+	callback();
+};
+
+ServerResponse.prototype.end = function () {
+	stream.Writable.prototype.end.apply(this, arguments);
+};
