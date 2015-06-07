@@ -86,10 +86,10 @@ var SPECIAL_IDS = {
  */
 function DocumentRenderer($serviceLocator) {
 	DocumentRendererBase.call(this, $serviceLocator);
-	this._componentInstances = {};
-	this._componentElements = {};
-	this._componentBindings = {};
-	this._currentChangedStores = {};
+	this._componentInstances = Object.create(null);
+	this._componentElements = Object.create(null);
+	this._componentBindings = Object.create(null);
+	this._currentChangedStores = Object.create(null);
 	this._window = $serviceLocator.resolve('window');
 	this._config = $serviceLocator.resolve('config');
 	this._storeDispatcher = $serviceLocator.resolve('storeDispatcher');
@@ -250,7 +250,7 @@ DocumentRenderer.prototype.renderComponent =
 					instance = self._componentInstances[id];
 
 				if (!component || !id ||
-					renderingContext.renderedIds.hasOwnProperty(id)) {
+					id in renderingContext.renderedIds) {
 					return;
 				}
 
@@ -396,7 +396,7 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 
 			if (moduleHelper.isHeadComponent(componentName) ||
 				moduleHelper.isDocumentComponent(componentName) ||
-				!components.hasOwnProperty(componentName)) {
+				!(componentName in components)) {
 				return Promise.reject(
 					new Error(util.format(ERROR_CREATE_WRONG_NAME, tagName))
 				);
@@ -405,7 +405,7 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 			var safeTagName = moduleHelper.getTagNameForComponentName(componentName);
 
 			var id = attributes[moduleHelper.ATTRIBUTE_ID];
-			if (!id || self._componentInstances.hasOwnProperty(id)) {
+			if (!id || id in self._componentInstances) {
 				return Promise.reject(new Error(ERROR_CREATE_WRONG_ID));
 			}
 
@@ -434,7 +434,7 @@ DocumentRenderer.prototype._collectRenderingGarbage =
 			.forEach(function (id) {
 				// this component has been rendered again and we do not need to
 				// remove it.
-				if (renderingContext.renderedIds.hasOwnProperty(id)) {
+				if (id in renderingContext.renderedIds) {
 					return;
 				}
 
@@ -460,7 +460,7 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 		self._findComponents(element, renderingContext)
 			.forEach(function (innerElement) {
 				var id = self._getId(innerElement);
-				if (renderingContext.unboundIds.hasOwnProperty(id)) {
+				if (id in renderingContext.unboundIds) {
 					return;
 				}
 				renderingContext.unboundIds[id] = true;
@@ -468,7 +468,7 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 			});
 	}
 
-	if (!renderingContext.unboundIds.hasOwnProperty(id)) {
+	if (!(id in renderingContext.unboundIds)) {
 		promises.push(this._unbindComponent(element));
 		renderingContext.unboundIds[id] = true;
 	}
@@ -489,7 +489,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 	if (!instance) {
 		return Promise.resolve();
 	}
-	if (this._componentBindings.hasOwnProperty(id)) {
+	if (id in this._componentBindings) {
 		Object.keys(this._componentBindings[id])
 			.forEach(function (eventName) {
 				element.removeEventListener(
@@ -537,14 +537,14 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 				});
 				return;
 			}
-			self._componentBindings[id] = {};
+			self._componentBindings[id] = Object.create(null);
 			Object.keys(bindings)
 				.forEach(function (eventName) {
 					eventName = eventName.toLowerCase();
-					if (self._componentBindings[id].hasOwnProperty(eventName)) {
+					if (eventName in self._componentBindings[id]) {
 						return;
 					}
-					var selectorHandlers = {};
+					var selectorHandlers = Object.create(null);
 					Object.keys(bindings[eventName])
 						.forEach(function (selector) {
 							var handler = bindings[eventName][selector];
@@ -681,7 +681,7 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 	var documentStore = this._window.document.documentElement.getAttribute(
 		moduleHelper.ATTRIBUTE_STORE
 	);
-	if (this._currentChangedStores.hasOwnProperty(documentStore)) {
+	if (documentStore in this._currentChangedStores) {
 		var newLocation = this._currentRoutingContext.location.toString();
 		if (newLocation === this._window.location.toString()) {
 			this._window.location.reload();
@@ -720,7 +720,7 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 	if (changedStores.length === 0) {
 		return Promise.resolve();
 	}
-	this._currentChangedStores = {};
+	this._currentChangedStores = Object.create(null);
 
 	var renderingContext = this._createRenderingContext(changedStores),
 		promises = renderingContext.roots.map(function (root) {
@@ -756,13 +756,13 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 
 	var map = this._getHeadMap(head.childNodes),
 		current, i, key, oldKey, oldItem,
-		sameMetaElements = {};
+		sameMetaElements = Object.create(null);
 
 	for (i = 0; i < newHead.childNodes.length; i++) {
 		current = newHead.childNodes[i];
 
-		if (!map.hasOwnProperty(current.nodeName)) {
-			map[current.nodeName] = {};
+		if (!(current.nodeName in map)) {
+			map[current.nodeName] = Object.create(null);
 		}
 
 		switch (current.nodeName) {
@@ -789,7 +789,7 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 			case TAG_NAMES.LINK:
 			case TAG_NAMES.SCRIPT:
 				key = self._getNodeKey(current);
-				if (!map[current.nodeName].hasOwnProperty(key)) {
+				if (!(key in map[current.nodeName])) {
 					head.appendChild(current);
 					i--;
 				}
@@ -798,7 +798,7 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 			// but we should not delete and append same elements
 			default:
 				key = self._getNodeKey(current);
-				if (map[current.nodeName].hasOwnProperty(key)) {
+				if (key in map[current.nodeName]) {
 					sameMetaElements[key] = true;
 				} else {
 					head.appendChild(current);
@@ -808,11 +808,11 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 		}
 	}
 
-	if (map.hasOwnProperty(TAG_NAMES.META)) {
+	if (TAG_NAMES.META in map) {
 		// remove meta tags which a not in a new head state
 		Object.keys(map[TAG_NAMES.META])
 			.forEach(function (metaKey) {
-				if (sameMetaElements.hasOwnProperty(metaKey)) {
+				if (metaKey in sameMetaElements) {
 					return;
 				}
 
@@ -830,14 +830,14 @@ DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
 DocumentRenderer.prototype._getHeadMap = function (headChildren) {
 	// Create map of <meta>, <link>, <style> and <script> tags
 	// by unique keys that contain attributes and content
-	var map = {},
+	var map = Object.create(null),
 		i, current,
 		self = this;
 
 	for (i = 0; i < headChildren.length; i++) {
 		current = headChildren[i];
-		if (!map.hasOwnProperty(current.nodeName)) {
-			map[current.nodeName] = {};
+		if (!(current.nodeName in map)) {
+			map[current.nodeName] = Object.create(null);
 		}
 		map[current.nodeName][self._getNodeKey(current)] = current;
 	}
@@ -1017,9 +1017,9 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 			moduleHelper.ATTRIBUTE_STORE
 		),
 		components = this._componentLoader.getComponentsByNames(),
-		componentsElements = {},
-		storeNamesSet = {},
-		rootsSet = {},
+		componentsElements = Object.create(null),
+		storeNamesSet = Object.create(null),
+		rootsSet = Object.create(null),
 		roots = [];
 
 	// we should find all components and then looking for roots
@@ -1039,8 +1039,8 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 				);
 		});
 
-	if (components.hasOwnProperty(moduleHelper.HEAD_COMPONENT_NAME) &&
-		storeNamesSet.hasOwnProperty(headStore)) {
+	if (moduleHelper.HEAD_COMPONENT_NAME in components &&
+		headStore in storeNamesSet) {
 		rootsSet[this._getId(this._window.document.head)] = true;
 		roots.push(this._window.document.head);
 	}
@@ -1069,20 +1069,19 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 					);
 
 					// store did not change state
-					if (!currentStore ||
-						!storeNamesSet.hasOwnProperty(currentStore)) {
+					if (!currentStore || !(currentStore in storeNamesSet)) {
 						continue;
 					}
 
 					//// is not an active component
-					if (!components.hasOwnProperty(currentComponentName)) {
+					if (!(currentComponentName in components)) {
 						continue;
 					}
 
 					lastRoot = current;
 					lastRootId = currentId;
 				}
-				if (rootsSet.hasOwnProperty(lastRootId)) {
+				if (lastRootId in rootsSet) {
 					continue;
 				}
 				rootsSet[lastRootId] = true;
@@ -1117,8 +1116,8 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
 			});
 	return {
 		config: this._config,
-		renderedIds: {},
-		unboundIds: {},
+		renderedIds: Object.create(null),
+		unboundIds: Object.create(null),
 		isHeadRendered: false,
 		bindMethods: [],
 		routingContext: this._currentRoutingContext,
@@ -1149,7 +1148,7 @@ DocumentRenderer.prototype._getId = function (element) {
  * @returns {Object} Map of attribute values by names.
  */
 function attributesToObject(attributes) {
-	var result = {};
+	var result = Object.create(null);
 	for (var i = 0; i < attributes.length; i++) {
 		result[attributes[i].name] = attributes[i].value;
 	}

@@ -80,7 +80,7 @@ StoreLoader.prototype.load = function () {
 		return Promise.resolve(this._loadedStores);
 	}
 
-	this._loadedStores = {};
+	this._loadedStores = Object.create(null);
 	var self = this;
 
 	return Promise.resolve()
@@ -133,5 +133,5 @@ StoreLoader.prototype._getStore = function (storeDetails) {
  * @returns {Object} Map of stores by names.
  */
 StoreLoader.prototype.getStoresByNames = function () {
-	return this._loadedStores || {};
+	return this._loadedStores || Object.create(null);
 };
