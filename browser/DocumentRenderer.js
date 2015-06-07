@@ -35,6 +35,7 @@ module.exports = DocumentRenderer;
 var util = require('util'),
 	errorHelper = require('../lib/helpers/errorHelper'),
 	moduleHelper = require('../lib/helpers/moduleHelper'),
+	hrTimeHelper = require('../lib/helpers/hrTimeHelper'),
 	DocumentRendererBase = require('../lib/base/DocumentRendererBase');
 
 util.inherits(DocumentRenderer, DocumentRendererBase);
@@ -272,7 +273,7 @@ DocumentRenderer.prototype.renderComponent =
 
 				self._componentElements[id] = element;
 
-				var startTime = Date.now();
+				var startTime = hrTimeHelper.get();
 				self._eventBus.emit('componentRender', eventArgs);
 
 				return self._unbindAll(element, renderingContext)
@@ -315,7 +316,8 @@ DocumentRenderer.prototype.renderComponent =
 						return Promise.all(promises);
 					})
 					.then(function () {
-						eventArgs.time = Date.now() - startTime;
+						eventArgs.hrTime = hrTimeHelper.get(startTime);
+						eventArgs.time = eventArgs.hrTime[0];
 						self._eventBus.emit('componentRendered', eventArgs);
 						return self._bindComponent(element);
 					})
