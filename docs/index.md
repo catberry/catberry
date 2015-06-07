@@ -1077,7 +1077,7 @@ Here is a list of common Catberry events:
 | allStoresLoaded		| all stores are loaded							|	Map of loaded stores by names																			|
 | allComponentsLoaded	| all components are loaded						|	Map of loaded components by names																		|
 | componentRender		| Catberry starts rendering component			|	`{name: String, context: Object}`																		|
-| componentRendered		| Catberry finishes rendering component			|	`{name: String, context: Object, time: Number}`															|
+| componentRendered		| Catberry finishes rendering component			|	`{name: String, context: Object, hrTime: [number, number], time: Number}`								|
 | storeDataLoad			| Catberry starts loading data from store		|	`{name: String}`																						|
 | storeDataLoaded		| Catberry finishes loading data from store		|	`{name: String, data: Object, lifetime: Number}`														|
 | actionSend			| Catberry sends action to store				|	`{storeName: String, actionName: String, args: Object}`													|
@@ -1088,11 +1088,11 @@ Here is a list of common Catberry events:
 
 List of server-only events:
 
-| Event				| When happens					| Arguments												|
-|-------------------|-------------------------------|-------------------------------------------------------|
-| storeFound		| each store is found			|	`{name: String, path: String}`						|
-| componentFound	| each component is found		|	`{name: String, path: String, properties: Object}`	|
-| bundleBuilt 		| browser bundle is built		|	`{time: Number, path: String}`						|
+| Event				| When happens					| Arguments														|
+|-------------------|-------------------------------|---------------------------------------------------------------|
+| storeFound		| each store is found			|	`{name: String, path: String}`								|
+| componentFound	| each component is found		|	`{name: String, path: String, properties: Object}`			|
+| bundleBuilt 		| browser bundle is built		|	`{hrTime: [number, number], time: Number, path: String}`	|
 
 List of browser-only events:
 
