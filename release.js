@@ -45,6 +45,7 @@ var REPOSITORY_LINK_REGEXP =
 		/(CatberryBase\.prototype\.version\s*=\s*')([0-9\-a-z\.]+)/i,
 	PATHS = [
 		'README.md',
+		'CONTRIBUTING.md',
 		'lib/helpers/errorHelper.js',
 		'lib/base/CatberryBase.js'
 	];

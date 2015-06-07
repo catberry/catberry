@@ -93,15 +93,14 @@ All supported browsers are listed below:
 | Opera Mobile		| 11.1+			|
 | Blackberry Browser| 7+			|
 
-## Contribution
-If you have found a bug, please create pull request with [mocha](https://www.npmjs.org/package/mocha) 
-unit-test which reproduces it or describe all details in an issue if you can not
-implement test. If you want to propose some improvements just create an issue or
-a pull request but please do not forget to use `npm test` to be sure that your
-code is awesome.
+## Contributing
 
-All changes should satisfy this [Code Style Guide](https://github.com/catberry/catberry/blob/5.1.1/docs/code-style-guide.md).
+There are a lot of ways to contribute into Catberry:
 
-Also, your changes should be covered by unit tests using [mocha](https://www.npmjs.org/package/mocha).
+* Give it a star
+* Join the [Gitter](https://gitter.im/catberry/catberry) room and leave a feedback or help with answering users' questions
+* [Submit a bug or a feature request](https://github.com/catberry/catberry/issues)
+* [Submit a PR](https://github.com/catberry/catberry/blob/5.1.1/CONTRIBUTING.md)
+* If you like the logo, you might want to buy a Catberry [T-Shirt](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=t-shirt) or a [sticker](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=sticker)
 
 Denis Rechkunov <denis.rechkunov@gmail.com>
