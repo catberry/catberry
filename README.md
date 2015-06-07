@@ -5,7 +5,9 @@
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
-![Catberry](https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png" />
+</p>
 
 Catberry was developed to help in creating ["isomorphic" Web applications](https://github.com/catberry/catberry/blob/5.1.1/docs/index.md#isomorphic-applications).
 Isomorphic applications are apps that use the same codebase to run from both
