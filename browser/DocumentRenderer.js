@@ -691,6 +691,8 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 		return Promise.resolve();
 	}
 
+	this._isUpdating = true;
+
 	// if we have awaiting routing we should apply state to the stores
 	if (this._awaitingRouting) {
 		var components = this._componentLoader.getComponentsByNames(),
@@ -718,8 +720,10 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 
 	var changedStores = Object.keys(this._currentChangedStores);
 	if (changedStores.length === 0) {
+		this._isUpdating = false;
 		return Promise.resolve();
 	}
+
 	this._currentChangedStores = Object.create(null);
 
 	var renderingContext = this._createRenderingContext(changedStores),
@@ -727,7 +731,6 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 			return self.renderComponent(root, renderingContext);
 		});
 
-	this._isUpdating = true;
 	return Promise.all(promises)
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
