@@ -88,7 +88,7 @@ ComponentLoader.prototype.load = function () {
 		return Promise.resolve(this._loadedComponents);
 	}
 
-	this._loadedComponents = {};
+	this._loadedComponents = Object.create(null);
 
 	var self = this;
 	return Promise.resolve()
@@ -168,5 +168,5 @@ ComponentLoader.prototype._processComponent = function (componentDetails) {
  * @returns {Object} Map of components by names.
  */
 ComponentLoader.prototype.getComponentsByNames = function () {
-	return this._loadedComponents || {};
+	return this._loadedComponents || Object.create(null);
 };
