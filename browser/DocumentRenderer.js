@@ -189,7 +189,14 @@ DocumentRenderer.prototype.initWithState = function (state, routingContext) {
 			return self._storeDispatcher.setState(state, routingContext);
 		})
 		.then(function () {
-			return self._initialWrap();
+			var components = self._componentLoader.getComponentsByNames(),
+				elements = self._findComponents(
+					self._window.document.body, components
+				);
+			elements.unshift(self._window.document.head);
+			elements.unshift(self._window.document.documentElement);
+			return self._initialWrap(components, elements);
+
 		});
 };
 
@@ -306,7 +313,7 @@ DocumentRenderer.prototype.renderComponent =
 							element.innerHTML = html;
 						}
 						var promises = self._findComponents(
-							element, renderingContext
+							element, renderingContext.components
 						)
 							.map(function (innerComponent) {
 								return self.renderComponent(
@@ -457,7 +464,7 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 		promises = [];
 
 	if (element.hasChildNodes()) {
-		self._findComponents(element, renderingContext)
+		self._findComponents(element, renderingContext.components)
 			.forEach(function (innerElement) {
 				var id = self._getId(innerElement);
 				if (id in renderingContext.unboundIds) {
@@ -621,41 +628,38 @@ DocumentRenderer.prototype._createBindingHandler =
 /**
  * Finds all descendant components of specified component element.
  * @param {Element} element Root component HTML element to begin search with.
- * @param {Object} renderingContext Context of rendering.
+ * @param {Object} components Map of components by names.
  * @private
  */
-DocumentRenderer.prototype._findComponents =
-	function (element, renderingContext) {
-		var components = [],
-			queue = [element],
-			currentNodeName, currentChildren, i;
+DocumentRenderer.prototype._findComponents = function (element, components) {
+	var elements = [],
+		queue = [element],
+		currentNodeName, currentChildren, i;
 
-		while (queue.length > 0) {
-			currentChildren = queue.shift().childNodes;
-			for (i = 0; i < currentChildren.length; i++) {
-				// we need only Element nodes
-				if (currentChildren[i].nodeType !== 1) {
-					continue;
-				}
+	while (queue.length > 0) {
+		currentChildren = queue.shift().childNodes;
+		for (i = 0; i < currentChildren.length; i++) {
+			// we need only Element nodes
+			if (currentChildren[i].nodeType !== 1) {
+				continue;
+			}
 
-				queue.push(currentChildren[i]);
+			queue.push(currentChildren[i]);
 
-				currentNodeName = currentChildren[i].nodeName;
-				// and they should be components
-				if (!moduleHelper.COMPONENT_PREFIX_REGEXP.test(
-						currentNodeName
-					)) {
-					continue;
-				}
-				if (moduleHelper.getOriginalComponentName(currentNodeName) in
-						renderingContext.components) {
-					components.push(currentChildren[i]);
-				}
+			currentNodeName = currentChildren[i].nodeName;
+			// and they should be components
+			if (!moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName)) {
+				continue;
+			}
+			if (moduleHelper.getOriginalComponentName(currentNodeName) in
+					components) {
+				elements.push(currentChildren[i]);
 			}
 		}
+	}
 
-		return components;
-	};
+	return elements;
+};
 
 /**
  * Handles error while rendering.
@@ -897,59 +901,50 @@ DocumentRenderer.prototype._getNodeKey = function (node) {
  * Does initial wrapping for every component on the page.
  * @private
  */
-DocumentRenderer.prototype._initialWrap = function () {
+DocumentRenderer.prototype._initialWrap = function (components, elements) {
 	var self = this,
-		current, i, id, instance,
-		components = this._componentLoader.getComponentsByNames(),
-		bindPromises = [];
+		current = elements.pop();
 
-	Object.keys(components)
-		.forEach(function (componentName) {
-			var tagName = moduleHelper
-					.getTagNameForComponentName(componentName),
-				elements,
-				constructor = components[componentName].constructor;
-
-			if (moduleHelper.isDocumentComponent(componentName)) {
-				elements = [self._window.document.documentElement];
-			} else if (moduleHelper.isHeadComponent(componentName)) {
-				elements = [self._window.document.head];
-			} else {
-				elements = self._window.document.getElementsByTagName(tagName);
-			}
-
-			for (i = 0; i < elements.length; i++) {
-				current = elements[i];
-				id = self._getId(current);
-				if (!id) {
-					continue;
-				}
-
-				constructor.prototype.$context = self._getComponentContext(
-					components[componentName], current
-				);
-				instance = self._serviceLocator.resolveInstance(
-					constructor, self._config
-				);
-				instance.$context = constructor.prototype.$context;
-				self._componentElements[id] = current;
-				self._componentInstances[id] = instance;
-				// initialize the store of the component
-				self._storeDispatcher.getStore(
-					current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
-				);
-				self._eventBus.emit('componentRendered', {
-					name: componentName,
-					attributes: instance.$context.attributes,
-					context: instance.$context
-				});
-				bindPromises.push(self._bindComponent(current));
-			}
-		});
-
-	return Promise.all(bindPromises)
+	return Promise.resolve()
 		.then(function () {
-			self._eventBus.emit('documentRendered', self._currentRoutingContext);
+			var id = self._getId(current);
+			if (!id) {
+				return;
+			}
+
+			var componentName = moduleHelper.getOriginalComponentName(
+					current.nodeName
+				),
+				constructor = components[componentName].constructor;
+			constructor.prototype.$context = self._getComponentContext(
+				components[componentName], current
+			);
+
+			var instance = self._serviceLocator.resolveInstance(
+				constructor, self._config
+			);
+			instance.$context = constructor.prototype.$context;
+			self._componentElements[id] = current;
+			self._componentInstances[id] = instance;
+			// initialize the store of the component
+			self._storeDispatcher.getStore(
+				current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
+			);
+			self._eventBus.emit('componentRendered', {
+				name: componentName,
+				attributes: instance.$context.attributes,
+				context: instance.$context
+			});
+			return self._bindComponent(current);
+		})
+		.then(function () {
+			if (elements.length > 0) {
+				return self._initialWrap(components, elements);
+			}
+
+			self._eventBus.emit(
+				'documentRendered', self._currentRoutingContext
+			);
 		});
 };
 
