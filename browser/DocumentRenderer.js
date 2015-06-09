@@ -626,14 +626,34 @@ DocumentRenderer.prototype._createBindingHandler =
  */
 DocumentRenderer.prototype._findComponents =
 	function (element, renderingContext) {
-		var components = [];
-		renderingContext.componentTags
-			.forEach(function (tag) {
-				var nodes = element.getElementsByTagName(tag);
-				for(var i = 0; i < nodes.length; i++) {
-					components.push(nodes[i]);
+		var components = [],
+			queue = [element],
+			currentNodeName, currentChildren, i;
+
+		while (queue.length > 0) {
+			currentChildren = queue.shift().childNodes;
+			for (i = 0; i < currentChildren.length; i++) {
+				// we need only Element nodes
+				if (currentChildren[i].nodeType !== 1) {
+					continue;
 				}
-			});
+
+				queue.push(currentChildren[i]);
+
+				currentNodeName = currentChildren[i].nodeName;
+				// and they should be components
+				if (!moduleHelper.COMPONENT_PREFIX_REGEXP.test(
+						currentNodeName
+					)) {
+					continue;
+				}
+				if (moduleHelper.getOriginalComponentName(currentNodeName) in
+						renderingContext.components) {
+					components.push(currentChildren[i]);
+				}
+			}
+		}
+
 		return components;
 	};
 
@@ -1106,17 +1126,13 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
  *   bindMethods: Array,
  *   routingContext: Object,
  *   components: Object,
- *   componentTags: Array,
  *   roots: Array.<Element>
  * }}
  * @private
  */
 DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
-	var components = this._componentLoader.getComponentsByNames(),
-		componentTags = Object.keys(components)
-			.map(function (name) {
-				return moduleHelper.getTagNameForComponentName(name);
-			});
+	var components = this._componentLoader.getComponentsByNames();
+
 	return {
 		config: this._config,
 		renderedIds: Object.create(null),
@@ -1125,7 +1141,6 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
 		bindMethods: [],
 		routingContext: this._currentRoutingContext,
 		components: components,
-		componentTags: componentTags,
 		roots: changedStores ? this._findRenderingRoots(changedStores) : []
 	};
 };
