@@ -30,7 +30,8 @@
 
 'use strict';
 
-var assert = require('assert'),
+var fs = require('fs'),
+	assert = require('assert'),
 	events = require('events'),
 	jsdom = require('jsdom'),
 	StoreDispatcher = require('../../lib/StoreDispatcher'),
@@ -48,6 +49,83 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator');
 
 describe('browser/DocumentRenderer', function () {
+	describe('#initWithState', function () {
+		it('should init and bind all components in right order',
+			function (done) {
+				var html = fs.readFileSync(
+					__dirname + '/../cases/browser' +
+					'/DocumentRenderer/initWithState.html'
+				);
+
+				var bindCalls = [];
+				function NestComponent () {}
+				NestComponent.prototype.bind = function () {
+					var id = this.$context.attributes.id ?
+						'-' + this.$context.attributes.id : '';
+					bindCalls.push(this.$context.name + id);
+				};
+
+				var components = [
+					{
+						name: 'comp',
+						constructor: NestComponent,
+						templateSource: ''
+					},
+					{
+						name: 'head',
+						constructor: NestComponent,
+						templateSource: ''
+					},
+					{
+						name: 'document',
+						constructor: NestComponent,
+						templateSource: ''
+					}
+				];
+
+				var locator = createLocator(components, {}),
+					eventBus = locator.resolve('eventBus');
+
+				var expected = [
+					'comp-1',
+					'comp-2',
+					'comp-3',
+					'comp-4',
+					'comp-5',
+					'comp-6',
+					'comp-7',
+					'comp-8',
+					'comp-9',
+					'comp-10',
+					'comp-11',
+					'comp-12',
+					'comp-13',
+					'comp-14',
+					'comp-15',
+					'comp-16',
+					'comp-17',
+					'comp-18',
+					'head',
+					'document'
+				];
+				eventBus.on('error', done);
+				jsdom.env({
+					html: html,
+					done: function (errors, window) {
+						locator.registerInstance('window', window);
+						var renderer = locator.resolveInstance(
+								DocumentRenderer
+							);
+						renderer.initWithState({}, {})
+							.then(function () {
+								assert.deepEqual(bindCalls, expected);
+								done();
+							})
+							.catch(done);
+					}
+				});
+			});
+	});
 	describe('#renderComponent', function () {
 		it('should render component into HTML element', function (done) {
 			var components = [
