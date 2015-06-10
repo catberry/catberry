@@ -914,8 +914,11 @@ DocumentRenderer.prototype._initialWrap = function (components, elements) {
 
 			var componentName = moduleHelper.getOriginalComponentName(
 					current.nodeName
-				),
-				constructor = components[componentName].constructor;
+				);
+			if (!(componentName in components)) {
+				return;
+			}
+			var constructor = components[componentName].constructor;
 			constructor.prototype.$context = self._getComponentContext(
 				components[componentName], current
 			);
