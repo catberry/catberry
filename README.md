@@ -1,6 +1,6 @@
 # Catberry
 
-[![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry) [![Coverage Status](https://coveralls.io/repos/catberry/catberry/badge.png?branch=develop)](https://coveralls.io/r/catberry/catberry?branch=develop)
+[![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry) [![codecov.io](http://codecov.io/github/catberry/catberry/coverage.svg?branch=master)](http://codecov.io/github/catberry/catberry?branch=master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/catberry/catberry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
@@ -9,7 +9,7 @@
   <img src="https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png" />
 </p>
 
-Catberry was developed to help in creating ["isomorphic" Web applications](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#isomorphic-applications).
+Catberry was developed to help in creating ["isomorphic" Web applications](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#isomorphic-applications).
 Isomorphic applications are apps that use the same codebase to run from both
 server and client-side environments.
 
@@ -23,19 +23,19 @@ using browser's
 And back-end that renders exactly the same page on the server.
 
 Here you can find full
-[Catberry Documentation](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md).
+[Catberry Documentation](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md).
 
 To get started with an example, please proceed to
-[Get Started Guide](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#get-started).
+[Get Started Guide](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#get-started).
 
 If you want to try TodoMVC application, proceed to [this link](https://github.com/catberry/catberry-todomvc).
 
 ## Advantages
-* [Flux](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#flux) architecture
-* [Cat-components](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#cat-components) (like [web-components by Google](http://webcomponents.org/) but isomorphic)
+* [Flux](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#flux) architecture
+* [Cat-components](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#cat-components) (like [web-components by Google](http://webcomponents.org/) but isomorphic)
 * You do not need to write any code for registration or definition of
-[cat-components](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#cat-components) or
-[stores](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#stores),
+[cat-components](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#cat-components) or
+[stores](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#stores),
 Catberry discovers them automatically on startup
 * Fast and efficient server-side [progressive rendering engine](http://www.phpied.com/progressive-rendering-via-multiple-flushes/) based on
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors)
@@ -52,14 +52,14 @@ and shared links
 * You will write code in the server-side style
 (using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) and [npm](https://www.npmjs.org/)
 * Entire architecture of the framework is built using
-[Service Locator](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#service-locator)
+[Service Locator](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#service-locator)
 pattern and 
-[Dependency Injection](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md#dependency-injection)
+[Dependency Injection](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md#dependency-injection)
 * Framework itself is an
 [express](https://github.com/visionmedia/express)/[connect](https://github.com/senchalabs/connect) 
 middleware, it means you can use it with any other middlewares
 
-For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/5.2.1/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/5.2.2/docs/index.md).
 
 Also, you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
@@ -102,7 +102,7 @@ There are a lot of ways to contribute into Catberry:
 * Give it a star
 * Join the [Gitter](https://gitter.im/catberry/catberry) room and leave a feedback or help with answering users' questions
 * [Submit a bug or a feature request](https://github.com/catberry/catberry/issues)
-* [Submit a PR](https://github.com/catberry/catberry/blob/5.2.1/CONTRIBUTING.md)
+* [Submit a PR](https://github.com/catberry/catberry/blob/5.2.2/CONTRIBUTING.md)
 * If you like the logo, you might want to buy a Catberry [T-Shirt](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=t-shirt) or a [sticker](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=sticker)
 
 Denis Rechkunov <denis.rechkunov@gmail.com>
