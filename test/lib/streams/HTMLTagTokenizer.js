@@ -38,9 +38,10 @@ describe('HTMLTagTokenizer', function () {
 	describe('#next', function () {
 		tests.cases.forEach(function (testCase) {
 			it(testCase.description, function (done) {
-				var tokenizer = new HTMLTagTokenizer(testCase.html),
+				var tokenizer = new HTMLTagTokenizer(),
 					tokens = [],
 					next;
+				tokenizer.setTagString(testCase.html);
 				do {
 					next = tokenizer.next();
 					tokens.push({
