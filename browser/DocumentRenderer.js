@@ -263,6 +263,10 @@ DocumentRenderer.prototype.renderComponent =
 
 				renderingContext.renderedIds[id] = true;
 
+				if (!renderingContext.startElementId) {
+					renderingContext.startElementId = id;
+				}
+
 				if (!instance) {
 					component.constructor.prototype.$context =
 						self._getComponentContext(component, element);
@@ -329,7 +333,10 @@ DocumentRenderer.prototype.renderComponent =
 						return self._bindComponent(element);
 					})
 					.then(function () {
-						if (!hadChildren) {
+						// collecting garbage only when
+						// the entire rendering is finished
+						if (renderingContext.startElementId !== id ||
+							!hadChildren) {
 							return;
 						}
 						self._collectRenderingGarbage(renderingContext);
