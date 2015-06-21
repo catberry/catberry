@@ -1,6 +1,6 @@
 # Catberry Framework Documentation
 
-![Catberry](images/logo.png) 
+![Catberry](images/logo.png)
 
 # Table Of Contents
 * [Isomorphic Applications](#isomorphic-applications)
@@ -44,17 +44,17 @@
 * [Code Style Guide](code-style-guide.md)
 
 # Isomorphic Applications
-Make a long story short, isomorphic applications are built to make it possible 
+Make a long story short, isomorphic applications are built to make it possible
 to write module once and use it for both pages rendering on server
 (for SEO and shared links) and in browser with no server side at all.
-It means on server your modules are executing the same code as 
+It means on server your modules are executing the same code as
 in a browser. This [Single Page Application]
-(http://en.wikipedia.org/wiki/Single_Page_Application) 
+(http://en.wikipedia.org/wiki/Single_Page_Application)
 can render all parts of the page using the same isomorphic modules and not
 reloading the page at all.
 
 There is an awesome [post in Airbnb technical blog]
-(http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) 
+(http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/)
 about the idea of isomorphic JavaScript applications and what exactly it is.
 Also, you can find the video [Spike Brehm: Building Isomorphic Apps]
 (http://www.youtube.com/watch?v=CH6icJbLhlI)
@@ -62,7 +62,7 @@ from JSConf 2014 talks.
 
 Isomorphic applications can work with a set of independent RESTful services that
 implement some business logic (Facebook API, Twitter API, your API etc).
-In fact, each module in isomorphic application should receive all data from 
+In fact, each module in isomorphic application should receive all data from
 API server which could be written using any platform you want using REST approach.
 
 There is a list of problems which are solved by isomorphic applications:
@@ -79,10 +79,10 @@ using isomorphic modules. It is always one module to change.
 * *Overhead connected with rendering all pages on the server*. Since browsers
 receive a page from the server only once and then render all other pages themselves,
 your server's load will be reduced dramatically.
- 
+
 And maybe a lot of more problems, who knows.
 
-Technologies like History API and node.js make this type 
+Technologies like History API and node.js make this type
 of applications possible and we should use this possibility.
 
 **[⬆ back to top](#table-of-contents)**
@@ -224,12 +224,12 @@ In this case, if `Country` store is changed `CityList` will not changed.
 To avoid this just add `this.$context.setDependency(‘Country’)` to
 the `CityList` constructor.
 
-Also, there is one thing about setting a cookie, `redirect` 
+Also, there is one thing about setting a cookie, `redirect`
 and `notFound` methods.
 If you use these methods while rendering `document` or `head` component it will
 be done using HTTP headers and status codes on the server, otherwise it will be
 rendered as inline `<script>` tags.
-`notFound` method should be used only during rendering 
+`notFound` method should be used only during rendering
 of `document` or `head` components.
 
 ## Code Example
@@ -415,6 +415,7 @@ rendered the last time
 * `this.$context.redirect('String')` - redirects to specified location string
 * `this.$context.notFound()` - Passes request handling to the next middleware
 * `this.$context.getComponentById(‘id’)` – gets other component by ID
+* `this.$context.getComponentByElement(domElement)` – gets other component by DOM element
 * `this.$context.createComponent(‘tagName’, attributesObject)` – creates new
 component and returns promise for its root DOM element
 * `this.$context.collectGarbage()` – collects all components created with
@@ -432,12 +433,12 @@ Every time router computes new application state, it re-creates and re-assigns
 context to each component, therefore, do not save references to `this.$context`
 objects.
 
-Also, there is one thing about setting a cookie, `redirect` 
+Also, there is one thing about setting a cookie, `redirect`
 and `notFound` methods.
 If you use these methods while rendering `document` or `head` component it will
 be done using HTTP headers and status codes on the server, otherwise it will be
 rendered as inline `<script>` tags.
-`notFound` method should be used only during rendering 
+`notFound` method should be used only during rendering
 of `document` or `head` components.
 
 ## Code Example
@@ -684,7 +685,7 @@ In Catberry, every framework component such as Logger or
 Universal HTTP(S) Request module are called "Services".
 
 Entire Catberry architecture is built using [Service Locator]
-(http://en.wikipedia.org/wiki/Service_locator_pattern) pattern and 
+(http://en.wikipedia.org/wiki/Service_locator_pattern) pattern and
 [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection).
 Service Locator is a Catberry core component that stores information about
 every Catberry's component (service). It is similar with
@@ -700,7 +701,7 @@ and even overwrite implementation of some Catberry services.
 For example, you can replace Logger service in Service Locator with
 your favorite logger, you just need to write an adapter that matches
 the interface of [Catberry "logger" service](#logger).
- 
+
 To register your own services, you should keep in mind that
 you probably need different implementations of your service for the server
 and the browser environment. But in some cases it does not matter.
@@ -709,7 +710,7 @@ Learn more how to use Service Locator in next section.
 
 ## Service Locator
 Entire architecture of Catberry framework is based on
-[Service Locator pattern](http://en.wikipedia.org/wiki/Service_locator_pattern) 
+[Service Locator pattern](http://en.wikipedia.org/wiki/Service_locator_pattern)
 and [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection).
 
 ## Registration of Own Services
@@ -762,7 +763,7 @@ cat.startWhenReady(); // returns promise
 ```
 
 Also, you can override some existing service registrations, for example, Logger:
- 
+
 ```javascript
 cat.locator.register('logger', MyCoolLogger, config, true);
 ```
@@ -827,11 +828,11 @@ Just inject `$logger` into your store or component.
 Also, it can be resolved from Service Locator directly.
 
 This logger implementation has standard for almost every logger methods
-{trace, warn, info, error, fatal}. 
+{trace, warn, info, error, fatal}.
 Last two support Error object to be passed as the only argument.
 
 Actually when you use this service at the server it uses
-[log4js](https://www.npmjs.org/package/log4js) module inside. 
+[log4js](https://www.npmjs.org/package/log4js) module inside.
 It means you can configure it as described [here]
 (https://github.com/nomiddlename/log4js-node) in its README file.
 
@@ -885,7 +886,7 @@ Catberry has a configuration object registered as "config" service in
 [Service Locator](#service-locator) and it is accessible via
 [dependency injection](#dependency-injection).
 
-Just inject `$config` into your module or resolve it from 
+Just inject `$config` into your module or resolve it from
 Service Locator directly.
 
 This service is just a full config object which was passed to `catberry.create()`
@@ -904,7 +905,7 @@ can be an string array or just a string
 ("bundle.js" by default)
 
 ## UHR (Universal HTTP(S) Request)
-Catberry has Universal HTTP(S) Request service registered as "uhr" in 
+Catberry has Universal HTTP(S) Request service registered as "uhr" in
 [Service Locator](#service-locator) and it is accessible via
 [dependency injection](#dependency-injection).
 
@@ -991,8 +992,8 @@ cat.build(); // returns a promise
 This method can be called in `./server.js` script or separately in
 different script and process.
 
-It is highly recommended to use `build` method in separated process 
-(not in server process) because JavaScript minification requires a lot of memory 
+It is highly recommended to use `build` method in separated process
+(not in server process) because JavaScript minification requires a lot of memory
 and it looks like your `./server.js` script uses 1GB of RAM, which is not so of
 course.
 
@@ -1010,7 +1011,7 @@ There are some rules according browserify limitations:
 * If you want to include some module into browser bundle it should be required
 directly via `require('some/path/to/module')`. If module path is a variable
 browserify just skips it or throws an error.
-* If you want to exclude some server-side package from browser bundle or 
+* If you want to exclude some server-side package from browser bundle or
 replace it with browser version just use browserify `browser` field
 in `package.json` as it has been described [here](http://github.com/substack/node-browserify#packagejson).
 
@@ -1223,22 +1224,22 @@ Hope now you are an expert in Catberry Framework. Enjoy it!
 **[⬆ back to top](#table-of-contents)**
 
 # Plugin API
-The entire Catberry's plugin API is based on the Service Locator 
-and every plugin is just a [service](#catberry-services) 
+The entire Catberry's plugin API is based on the Service Locator
+and every plugin is just a [service](#catberry-services)
 registered in the locator.
 
 So, there are several ways how to register plugins.
 
 ## Store Transformation API
 You can register a plugin that does some transformations on loaded
-stores. A Promise is supported as a returned value. A plugin can be registered 
-as an instance (`locator.registerInstance`) 
+stores. A Promise is supported as a returned value. A plugin can be registered
+as an instance (`locator.registerInstance`)
 or as a constructor (`locator.register`) like this:
 
 ```javascript
 locator.registerInstance(‘storeTransform’, {
 	transform: function (store) {
-		// store is loaded 
+		// store is loaded
 		// you can replace values, wrap constructor, or even build a new object
 		return newStore;
 	}
@@ -1255,8 +1256,8 @@ The `store` parameter will be an object like this:
 
 ## Component Transformation API
 You can register a plugin that does some transformations on loaded
-components. A Promise is supported as a returned value. 
-A plugin can be registered as an instance (`locator.registerInstance`) 
+components. A Promise is supported as a returned value.
+A plugin can be registered as an instance (`locator.registerInstance`)
 or as a constructor (`locator.register`) like this:
 
 ```javascript
@@ -1274,7 +1275,7 @@ locator.registerInstance(‘componentTransform’, ComponentTransform);
 The `component` parameter will be an object like this:
 ```javascript
 {
-	name: 'nameOfTheComponent', 
+	name: 'nameOfTheComponent',
 	constructor: function ComponentConstructor() {},
 	// the object from cat-component.json
 	// you can store in these files whatever you want and use it in
@@ -1283,8 +1284,8 @@ The `component` parameter will be an object like this:
 		name: 'nameOfTheComponent',
 		template: './template.hbs',
 		logic: 'index.js'
-	}, 
-	templateSource: 'template compiled sources here', 
+	},
+	templateSource: 'template compiled sources here',
 	errorTemplateSource: 'error template compiled sources here or null'
 }
 ```
@@ -1292,8 +1293,8 @@ The `component` parameter will be an object like this:
 ## Post-build Action API
 You can register any plugin that does any actions after the browser bundle is
 built. It can be assets building or some post-processing of files.
-A Promise is supported as a returned value. A plugin can be registered 
-as an instance (`locator.registerInstance`) or 
+A Promise is supported as a returned value. A plugin can be registered
+as an instance (`locator.registerInstance`) or
 as a constructor (`locator.register`) like this:
 
 ```javascript
@@ -1301,14 +1302,14 @@ locator.registerInstance(‘postBuildAction’, {
 	action: function (storeFinder, componentFinder) {
 		// you can get a list of found stores or a list of found components
 		// using storeFinder.find() and componentFinder.find() respectively
-		// every component object has "properties" field 
+		// every component object has "properties" field
 		// that contains cat-component.json values
 		return Promise.resolve();
 	}
 );
 ```
 
-`find()` method returns a promise for a map object of 
+`find()` method returns a promise for a map object of
 stores or promises by their names.
 
 Every `store`, in this case, will be an object like this:
@@ -1322,7 +1323,7 @@ Every `store`, in this case, will be an object like this:
 Every `component`, in this case, will be an object like this:
 ```javascript
 {
-	name: 'nameOfTheComponent', 
+	name: 'nameOfTheComponent',
 	path: 'path to a cat-component.json file',
 	// the object from cat-component.json
 	// you can store in these files whatever you want and use it in
@@ -1331,7 +1332,7 @@ Every `component`, in this case, will be an object like this:
 		name: 'nameOfTheComponent',
 		template: './template.hbs',
 		logic: 'index.js'
-	} 
+	}
 }
 ```
 
@@ -1358,8 +1359,8 @@ Component Finder
 * unlink – the component has been removed from the application
 * error – watch error occurs
 
-Every event handler except the `change` event receives a component descriptor 
-as the first parameter, but `change` event handler receives 
+Every event handler except the `change` event receives a component descriptor
+as the first parameter, but `change` event handler receives
 an object with additional data like this:
 
 ```javascript
@@ -1367,21 +1368,21 @@ an object with additional data like this:
 	filename: 'filename of changed file',
 	// component descriptor
 	component: {
-		name: 'nameOfTheComponent', 
+		name: 'nameOfTheComponent',
 		path: 'path to a cat-component.json file',
 		properties: {
 			name: 'nameOfTheComponent',
 			template: './template.hbs',
 			logic: 'index.js'
-		} 
+		}
 	}
 }
 ```
 
 ## Browserify Transformation API
-You can register a 
+You can register a
 [browserfiy transformation](https://github.com/substack/node-browserify/wiki/list-of-transforms).
-A plugin can be registered as an instance (`locator.registerInstance`) or 
+A plugin can be registered as an instance (`locator.registerInstance`) or
 as a constructor (`locator.register`):
 
 ```javascript
