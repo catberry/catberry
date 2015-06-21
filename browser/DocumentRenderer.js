@@ -961,13 +961,12 @@ DocumentRenderer.prototype._initialWrap = function (components, elements) {
 DocumentRenderer.prototype._getComponentContext =
 	function (component, element) {
 		var self = this,
-			storeName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE),
-			componentContext = Object.create(this._currentRoutingContext);
+			storeName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE);
 
 		// initialize the store of the component
 		this._storeDispatcher.getStore(storeName);
 
-		Object.defineProperties(componentContext, {
+		return Object.create(this._currentRoutingContext, {
 			element: {
 				value: element,
 				enumerable: true
@@ -1001,7 +1000,7 @@ DocumentRenderer.prototype._getComponentContext =
 			},
 			getStoreData: {
 				value: function () {
-					var currentStoreName = componentContext.element
+					var currentStoreName = element
 						.getAttribute(moduleHelper.ATTRIBUTE_STORE);
 					return self._storeDispatcher
 						.getStoreData(currentStoreName);
@@ -1009,7 +1008,7 @@ DocumentRenderer.prototype._getComponentContext =
 			},
 			sendAction: {
 				value: function (name, args) {
-					var currentStoreName = componentContext.element
+					var currentStoreName = element
 						.getAttribute(moduleHelper.ATTRIBUTE_STORE);
 					return self._storeDispatcher
 						.sendAction(currentStoreName, name, args);
@@ -1022,8 +1021,6 @@ DocumentRenderer.prototype._getComponentContext =
 				}
 			}
 		});
-
-		return componentContext;
 	};
 
 /**
