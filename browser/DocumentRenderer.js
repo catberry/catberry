@@ -378,9 +378,7 @@ DocumentRenderer.prototype.collectGarbage = function () {
 
 					var promise = self._unbindComponent(self._componentElements[id])
 						.then(function () {
-							delete self._componentElements[id];
-							delete self._componentInstances[id];
-							delete self._componentBindings[id];
+							self._removeComponent(id);
 						});
 					promises.push(promise);
 				});
@@ -452,9 +450,13 @@ DocumentRenderer.prototype._collectRenderingGarbage =
 					return;
 				}
 
-				delete self._componentElements[id];
-				delete self._componentInstances[id];
-				delete self._componentBindings[id];
+				// if someone added an element with the same ID during the
+				// rendering process
+				if (self._window.document.getElementById(id) !== null) {
+					return;
+				}
+
+				self._removeComponent(id);
 			});
 	};
 
@@ -525,6 +527,17 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
 		});
+};
+
+/**
+ * Removes component from the list.
+ * @param {string} id Component's ID
+ * @private
+ */
+DocumentRenderer.prototype._removeComponent = function (id) {
+	delete this._componentElements[id];
+	delete this._componentInstances[id];
+	delete this._componentBindings[id];
 };
 
 /**
