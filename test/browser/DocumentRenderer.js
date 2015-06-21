@@ -1737,6 +1737,98 @@ describe('browser/DocumentRenderer', function () {
 			});
 		});
 
+		it('should properly bind nested components', function (done) {
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component,
+					templateSource: '<div>Hello from test1!</div>' +
+					'<cat-test2 id="test2"></cat-test2>' +
+					'<cat-test3 id="test3"></cat-test3>'
+				},
+				{
+					name: 'test2',
+					constructor: Component,
+					templateSource: '<div>Hello from test2!</div>'
+				},
+				{
+					name: 'test3',
+					constructor: Component,
+					templateSource: '<div>Hello from test3!</div>'
+				},
+				{
+					name: 'test4',
+					constructor: Component,
+					templateSource: '<div>Hello from test4!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			var expected1 = 'test1<br><div>Hello from test1!</div>' +
+				'<cat-test2 id="test2">' +
+				'test2<br><div>Hello from test2!</div>' +
+				'</cat-test2>' +
+				'<cat-test3 id="test3">' +
+				'test3<br><div>Hello from test3!</div>' +
+				'</cat-test3>';
+
+			var expected2 = 'test4<br><div>Hello from test4!</div>';
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent('cat-test1', {id: 'test1'})
+						.then(function (element) {
+							assert.strictEqual(element.innerHTML, expected1);
+							return renderer.createComponent(
+								'cat-test4', {id: 'test4'}
+							);
+						})
+						.then(function (element) {
+							assert.strictEqual(element.innerHTML, expected2);
+							assert.strictEqual(
+								renderer.getComponentById('test1') instanceof
+								Component, true
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test2') instanceof
+								Component, true
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test3') instanceof
+								Component, true
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test4') instanceof
+								Component, true
+							);
+
+							return renderer.collectGarbage();
+						})
+						.then(function () {
+							assert.strictEqual(
+								renderer.getComponentById('test1'), null
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test2'), null
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test3'), null
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test4'), null
+							);
+
+							done();
+						})
+						.catch(done);
+				}
+			});
+		});
+
 		it('should reject promise if wrong component', function (done) {
 			var components = [
 				{
@@ -1769,7 +1861,7 @@ describe('browser/DocumentRenderer', function () {
 			});
 		});
 
-		it('should reject promise if ID is not specefied', function (done) {
+		it('should reject promise if ID is not specified', function (done) {
 			var components = [
 				{
 					name: 'test',
