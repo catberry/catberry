@@ -350,10 +350,23 @@ DocumentRenderer.prototype.renderComponent =
 /**
  * Gets component instance by ID.
  * @param {String} id Component ID.
- * @returns {Object} Component instance.
+ * @returns {Object|null} Component instance.
  */
 DocumentRenderer.prototype.getComponentById = function (id) {
 	return this._componentInstances[id] || null;
+};
+
+/**
+ * Gets component instance by a DOM element.
+ * @param {Element} element Component's Element.
+ * @returns {Object|null} Component instance.
+ */
+DocumentRenderer.prototype.getComponentByElement = function (element) {
+	if (!element) {
+		return null;
+	}
+	var id = element.getAttribute(moduleHelper.ATTRIBUTE_ID);
+	return this.getComponentById(id);
 };
 
 /**
@@ -1007,6 +1020,11 @@ DocumentRenderer.prototype._getComponentContext =
 			getComponentById: {
 				value: function (id) {
 					return self.getComponentById(id);
+				}
+			},
+			getComponentByElement: {
+				value: function (element) {
+					return self.getComponentByElement(element);
 				}
 			},
 			createComponent: {

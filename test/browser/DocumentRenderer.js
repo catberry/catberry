@@ -1730,6 +1730,11 @@ describe('browser/DocumentRenderer', function () {
 					renderer.createComponent('cat-test', {id: 'unique'})
 						.then(function (element) {
 							assert.strictEqual(element.innerHTML, expected);
+							assert.strictEqual(
+								renderer
+									.getComponentByElement(element) instanceof
+								Component, true
+							);
 							done();
 						})
 						.catch(done);
