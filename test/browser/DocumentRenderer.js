@@ -1730,6 +1730,103 @@ describe('browser/DocumentRenderer', function () {
 					renderer.createComponent('cat-test', {id: 'unique'})
 						.then(function (element) {
 							assert.strictEqual(element.innerHTML, expected);
+							assert.strictEqual(
+								renderer
+									.getComponentByElement(element) instanceof
+								Component, true
+							);
+							done();
+						})
+						.catch(done);
+				}
+			});
+		});
+
+		it('should properly bind nested components', function (done) {
+			var components = [
+				{
+					name: 'test1',
+					constructor: Component,
+					templateSource: '<div>Hello from test1!</div>' +
+					'<cat-test2 id="test2"></cat-test2>' +
+					'<cat-test3 id="test3"></cat-test3>'
+				},
+				{
+					name: 'test2',
+					constructor: Component,
+					templateSource: '<div>Hello from test2!</div>'
+				},
+				{
+					name: 'test3',
+					constructor: Component,
+					templateSource: '<div>Hello from test3!</div>'
+				},
+				{
+					name: 'test4',
+					constructor: Component,
+					templateSource: '<div>Hello from test4!</div>'
+				}
+			];
+			var locator = createLocator(components, {}),
+				eventBus = locator.resolve('eventBus');
+
+			var expected1 = 'test1<br><div>Hello from test1!</div>' +
+				'<cat-test2 id="test2">' +
+				'test2<br><div>Hello from test2!</div>' +
+				'</cat-test2>' +
+				'<cat-test3 id="test3">' +
+				'test3<br><div>Hello from test3!</div>' +
+				'</cat-test3>';
+
+			var expected2 = 'test4<br><div>Hello from test4!</div>';
+			eventBus.on('error', done);
+			jsdom.env({
+				html: ' ',
+				done: function (errors, window) {
+					locator.registerInstance('window', window);
+					var renderer = locator.resolveInstance(DocumentRenderer);
+					renderer.createComponent('cat-test1', {id: 'test1'})
+						.then(function (element) {
+							assert.strictEqual(element.innerHTML, expected1);
+							return renderer.createComponent(
+								'cat-test4', {id: 'test4'}
+							);
+						})
+						.then(function (element) {
+							assert.strictEqual(element.innerHTML, expected2);
+							assert.strictEqual(
+								renderer.getComponentById('test1') instanceof
+								Component, true
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test2') instanceof
+								Component, true
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test3') instanceof
+								Component, true
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test4') instanceof
+								Component, true
+							);
+
+							return renderer.collectGarbage();
+						})
+						.then(function () {
+							assert.strictEqual(
+								renderer.getComponentById('test1'), null
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test2'), null
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test3'), null
+							);
+							assert.strictEqual(
+								renderer.getComponentById('test4'), null
+							);
+
 							done();
 						})
 						.catch(done);
@@ -1769,7 +1866,7 @@ describe('browser/DocumentRenderer', function () {
 			});
 		});
 
-		it('should reject promise if ID is not specefied', function (done) {
+		it('should reject promise if ID is not specified', function (done) {
 			var components = [
 				{
 					name: 'test',
@@ -1914,12 +2011,16 @@ describe('browser/DocumentRenderer', function () {
 					name: 'test',
 					constructor: Component,
 					templateSource: '<div>Hello, World!</div>'
+				},
+				{
+					name: 'head',
+					constructor: Component,
+					templateSource: '<div>Hello, World!</div>'
 				}
 			];
 			var locator = createLocator(components, {}),
 				eventBus = locator.resolve('eventBus');
 
-			var expected = 'test<br><div>Hello, World!</div>';
 			eventBus.on('error', done);
 			jsdom.env({
 				html: ' ',
@@ -1928,17 +2029,37 @@ describe('browser/DocumentRenderer', function () {
 					var renderer = locator.resolveInstance(DocumentRenderer),
 						element = window.document.createElement('cat-test');
 					element.setAttribute('id', 'unique');
-					renderer.renderComponent(element)
-						.then(function () {
-							var instance = renderer.getComponentById('unique');
+					Promise.all([
+						renderer.createComponent('cat-test', {id: 'unique1'}),
+						renderer.createComponent('cat-test', {id: 'unique2'})
+					])
+						.then(function (elements) {
+							window.document.body.appendChild(elements[0]);
+							var instance1 = renderer.getComponentById(
+									'unique1'
+								),
+								instance2 = renderer.getComponentById(
+									'unique2'
+								);
 							assert.strictEqual(
-								instance instanceof Component, true
+								instance1 instanceof Component, true
+							);
+							assert.strictEqual(
+								instance2 instanceof Component, true
 							);
 							return renderer.collectGarbage();
 						})
 						.then(function () {
-							var instance = renderer.getComponentById('unique');
-							assert.strictEqual(instance, null);
+							var instance1 = renderer.getComponentById(
+									'unique1'
+								),
+								instance2 = renderer.getComponentById(
+									'unique2'
+								);
+							assert.strictEqual(
+								instance1 instanceof Component, true
+							);
+							assert.strictEqual(instance2, null);
 							done();
 						})
 						.catch(done);
