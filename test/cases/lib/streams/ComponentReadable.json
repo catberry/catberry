@@ -13,7 +13,7 @@
 		{
 			"name": "should ignore incorrect HTML syntax",
 			"input": "<!DOCTYPE html>\n<html>\n<head>\n\t<titleSome title\n\t</title\n</head>\nbody><\n<div></div>\n<cat-test1 id=\"1\"></cat-test1>\n<div></div>\n<!-\n<cat-test2 data-bind=\"test\" id=\"2\" class=\"test\"></cat-test2>\n-->\n<cat-test3 id=\"3\">content</cat-test3>\n\n</html>",
-			"expected": "<!DOCTYPE html>\n<html>\n<head>content-head\n\t<titleSome title\n\t</title\n</head>\nbody><\n<div></div>\n<cat-test1 id=\"1\">content-cat-test11</cat-test1>\n<div></div>\n<!-\n<cat-test2 data-bind=\"test\" id=\"2\" class=\"test\"></cat-test2>\n-->\n<cat-test3 id=\"3\">content-cat-test33content</cat-test3>\n\n</html>"
+			"expected": "<!DOCTYPE html>\n<html>\n<head>content-head\n\t<titleSome title\n\t</title\n</head>\nbody><\n<div></div>\n<cat-test1 id=\"1\">content-cat-test11</cat-test1>\n<div></div>\n<!-\n<cat-test2 data-bind=\"test\" id=\"2\" class=\"test\">content-cat-test22</cat-test2>\n-->\n<cat-test3 id=\"3\">content-cat-test33content</cat-test3>\n\n</html>"
 		},
 		{
 			"name": "should properly work when tags do not fit in buffer",
