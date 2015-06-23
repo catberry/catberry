@@ -33,6 +33,7 @@
 module.exports = Logger;
 
 var LEVELS = {
+	DEBUG: 'debug',
 	TRACE: 'trace',
 	INFO: 'info',
 	WARN: 'warn',
@@ -60,6 +61,7 @@ function Logger(levels) {
 			}, this);
 	}
 
+	this.debug = this.debug.bind(this);
 	this.trace = this.trace.bind(this);
 	this.info = this.info.bind(this);
 	this.warn = this.warn.bind(this);
@@ -73,6 +75,7 @@ function Logger(levels) {
  * @private
  */
 Logger.prototype._levels = {
+	debug: true,
 	trace: true,
 	info: true,
 	warn: true,
@@ -86,6 +89,20 @@ Logger.prototype._levels = {
  */
 Logger.prototype.trace = function (message) {
 	if (!this._levels.trace) {
+		return;
+	}
+
+	if (console.log) {
+		console.log(message);
+	}
+};
+
+/**
+ * Logs trace message.
+ * @param {string} message Trace message.
+ */
+Logger.prototype.debug = function (message) {
+	if (!this._levels.debug) {
 		return;
 	}
 
