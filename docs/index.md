@@ -1381,7 +1381,7 @@ an object with additional data like this:
 
 ## Browserify Transformation API
 You can register a
-[browserfiy transformation](https://github.com/substack/node-browserify/wiki/list-of-transforms).
+[browserify transformation](https://github.com/substack/node-browserify/wiki/list-of-transforms).
 A plugin can be registered as an instance (`locator.registerInstance`) or
 as a constructor (`locator.register`):
 
