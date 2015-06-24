@@ -263,6 +263,10 @@ DocumentRenderer.prototype.renderComponent =
 
 				renderingContext.renderedIds[id] = true;
 
+				if (!renderingContext.startElementId) {
+					renderingContext.startElementId = id;
+				}
+
 				if (!instance) {
 					component.constructor.prototype.$context =
 						self._getComponentContext(component, element);
@@ -329,7 +333,10 @@ DocumentRenderer.prototype.renderComponent =
 						return self._bindComponent(element);
 					})
 					.then(function () {
-						if (!hadChildren) {
+						// collecting garbage only when
+						// the entire rendering is finished
+						if (renderingContext.startElementId !== id ||
+							!hadChildren) {
 							return;
 						}
 						self._collectRenderingGarbage(renderingContext);
@@ -343,10 +350,23 @@ DocumentRenderer.prototype.renderComponent =
 /**
  * Gets component instance by ID.
  * @param {String} id Component ID.
- * @returns {Object} Component instance.
+ * @returns {Object|null} Component instance.
  */
 DocumentRenderer.prototype.getComponentById = function (id) {
 	return this._componentInstances[id] || null;
+};
+
+/**
+ * Gets component instance by a DOM element.
+ * @param {Element} element Component's Element.
+ * @returns {Object|null} Component instance.
+ */
+DocumentRenderer.prototype.getComponentByElement = function (element) {
+	if (!element) {
+		return null;
+	}
+	var id = element.getAttribute(moduleHelper.ATTRIBUTE_ID);
+	return this.getComponentById(id);
 };
 
 /**
@@ -371,9 +391,7 @@ DocumentRenderer.prototype.collectGarbage = function () {
 
 					var promise = self._unbindComponent(self._componentElements[id])
 						.then(function () {
-							delete self._componentElements[id];
-							delete self._componentInstances[id];
-							delete self._componentBindings[id];
+							self._removeComponent(id);
 						});
 					promises.push(promise);
 				});
@@ -445,9 +463,13 @@ DocumentRenderer.prototype._collectRenderingGarbage =
 					return;
 				}
 
-				delete self._componentElements[id];
-				delete self._componentInstances[id];
-				delete self._componentBindings[id];
+				// if someone added an element with the same ID during the
+				// rendering process
+				if (self._window.document.getElementById(id) !== null) {
+					return;
+				}
+
+				self._removeComponent(id);
 			});
 	};
 
@@ -518,6 +540,17 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 		.catch(function (reason) {
 			self._eventBus.emit('error', reason);
 		});
+};
+
+/**
+ * Removes component from the list.
+ * @param {string} id Component's ID
+ * @private
+ */
+DocumentRenderer.prototype._removeComponent = function (id) {
+	delete this._componentElements[id];
+	delete this._componentInstances[id];
+	delete this._componentBindings[id];
 };
 
 /**
@@ -986,6 +1019,11 @@ DocumentRenderer.prototype._getComponentContext =
 			getComponentById: {
 				value: function (id) {
 					return self.getComponentById(id);
+				}
+			},
+			getComponentByElement: {
+				value: function (element) {
+					return self.getComponentByElement(element);
 				}
 			},
 			createComponent: {
