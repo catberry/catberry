@@ -12,7 +12,7 @@ build: src-all
 lint:
 	./node_modules/.bin/jshint ./ && ./node_modules/.bin/jscs ./
 
-test:
+test: build
 ifeq ($(TRAVIS),true)
 	@echo "Running tests for Travis..."
 	$(MAKE) travis
