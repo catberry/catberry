@@ -7,8 +7,7 @@ TESTS = test/lib/* \
 
 all: lint test
 
-build:
-	$(MAKE) -C src
+build: src-all
 
 lint:
 	./node_modules/.bin/jshint ./ && ./node_modules/.bin/jscs ./
@@ -53,5 +52,17 @@ send-cov: test-cov
 travis: send-cov
 clean:
 	rm -rf coverage
+	rm -rf build
 
-.PHONY: test
+# src build rules
+
+src-all: src-configure src-build src-install
+
+src-configure: 
+	node-gyp configure
+src-build:
+	node-gyp build
+src-install:
+	cp ./build/Release/HTMLTokenizer.node ./lib/streams/
+
+.PHONY: test build

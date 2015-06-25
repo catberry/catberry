@@ -10,3 +10,4 @@ coverage
 ehthumbs.db
 Thumbs.db
 *.node
+build
