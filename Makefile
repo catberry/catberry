@@ -7,6 +7,9 @@ TESTS = test/lib/* \
 
 all: lint test
 
+build:
+	$(MAKE) -C src
+
 lint:
 	./node_modules/.bin/jshint ./ && ./node_modules/.bin/jscs ./
 

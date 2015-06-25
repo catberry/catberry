@@ -1,99 +1,100 @@
 {
-	"name": "catberry",
-	"version": "5.2.2",
-	"author": {
-		"name": "Denis Rechkunov",
-		"email": "denis.rechkunov@gmail.com"
-	},
-	"description": "Catberry is a framework with Flux architecture, isomorphic web-components and progressive rendering.",
-	"homepage": "https://github.com/catberry/catberry",
-	"keywords": [
-		"progressive rendering",
-		"Web",
-		"isomorphic",
-		"framework",
-		"middleware",
-		"connect",
-		"express",
-		"component",
-		"Flux"
-	],
-	"bugs": {
-		"url": "https://github.com/catberry/catberry/issues",
-		"email": "denis.rechkunov@gmail.com"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/catberry/catberry.git"
-	},
-	"directories":{
-		"doc": "docs"
-	},
-	"contributors": [
-		{
-			"name": "Denis Rechkunov",
-			"email": "denis.rechkunov@gmail.com"
-		},
-		{
-			"name": "Julia Rechkunova",
-			"email": "julia.rechkunova@gmail.com"
-		},
-		{
-			"name": "Julia Kostyukova",
-			"email": "kostyukova.julia@gmail.com"
-		},
-		{
-			"name": "Mansur Gabidullin",
-			"email": "mansur.gabidullin@gmail.com"
-		}
-	],
-
-	"main": "./index",
-	"browser": {
-		"./lib/Bootstrapper.js": "__BrowserBundle.js",
-		"./lib/Catberry.js": "./browser/Catberry.js",
-		"./lib/CookieWrapper.js": "./browser/CookieWrapper.js",
-		"./lib/providers/ModuleApiProvider.js": "./browser/providers/ModuleApiProvider.js",
-		"./lib/loaders/ComponentLoader.js": "./browser/loaders/ComponentLoader.js",
-		"./lib/loaders/StoreLoader.js": "./browser/loaders/StoreLoader.js",
-		"./lib/DocumentRenderer.js": "./browser/DocumentRenderer.js",
-		"./lib/RequestRouter.js": "./browser/RequestRouter.js",
-		"./lib/helpers/hrTimeHelper.js": "./browser/helpers/hrTimeHelper.js"
-	},
-	"dependencies": {
-		"mkdirp": "~0.5.0",
-		"glob": "^5.0.5",
-		"chokidar": "^1.0.1",
-		"catberry-locator": "^1.1.4",
-		"catberry-uhr": "^4.0.1",
-		"catberry-uri": "^2.1.0",
-		"entities": "^1.1.1",
-		"watchify": "^3.2.1",
-		"uglify-js": "^2.4.20",
-		"browserify": "^10.0.0",
-		"log4js": "~0.6.24",
-		"promise": "^7.0.1",
-		"pretty-hrtime": "^1.0.0",
-		"browser-process-hrtime": "~0.1.1"
-	},
-	"devDependencies": {
-		"istanbul-harmony": "~0.3.12",
-		"codecov.io": "^0.1.2",
-		"jsdom": "^3.1.2",
-		"mocha": "^2.2.4",
-		"jscs": "~1.6.2",
-		"jshint": "^2.6.0"
-	},
-	"engines": {
-		"node": ">=0.10"
-	},
-	"scripts": {
-		"test": "make"
-	},
-	"licenses": [
-		{
-			"type": "MIT",
-			"url": "https://github.com/catberry/catberry/blob/master/LICENSE"
-		}
-	]
+  "name": "catberry",
+  "version": "5.2.2",
+  "author": {
+    "name": "Denis Rechkunov",
+    "email": "denis.rechkunov@gmail.com"
+  },
+  "description": "Catberry is a framework with Flux architecture, isomorphic web-components and progressive rendering.",
+  "homepage": "https://github.com/catberry/catberry",
+  "keywords": [
+    "progressive rendering",
+    "Web",
+    "isomorphic",
+    "framework",
+    "middleware",
+    "connect",
+    "express",
+    "component",
+    "Flux"
+  ],
+  "bugs": {
+    "url": "https://github.com/catberry/catberry/issues",
+    "email": "denis.rechkunov@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/catberry/catberry.git"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "contributors": [
+    {
+      "name": "Denis Rechkunov",
+      "email": "denis.rechkunov@gmail.com"
+    },
+    {
+      "name": "Julia Rechkunova",
+      "email": "julia.rechkunova@gmail.com"
+    },
+    {
+      "name": "Julia Kostyukova",
+      "email": "kostyukova.julia@gmail.com"
+    },
+    {
+      "name": "Mansur Gabidullin",
+      "email": "mansur.gabidullin@gmail.com"
+    }
+  ],
+  "main": "./index",
+  "browser": {
+    "./lib/Bootstrapper.js": "__BrowserBundle.js",
+    "./lib/Catberry.js": "./browser/Catberry.js",
+    "./lib/CookieWrapper.js": "./browser/CookieWrapper.js",
+    "./lib/providers/ModuleApiProvider.js": "./browser/providers/ModuleApiProvider.js",
+    "./lib/loaders/ComponentLoader.js": "./browser/loaders/ComponentLoader.js",
+    "./lib/loaders/StoreLoader.js": "./browser/loaders/StoreLoader.js",
+    "./lib/DocumentRenderer.js": "./browser/DocumentRenderer.js",
+    "./lib/RequestRouter.js": "./browser/RequestRouter.js",
+    "./lib/helpers/hrTimeHelper.js": "./browser/helpers/hrTimeHelper.js"
+  },
+  "dependencies": {
+    "mkdirp": "~0.5.0",
+    "glob": "^5.0.5",
+    "chokidar": "^1.0.1",
+    "catberry-locator": "^1.1.4",
+    "catberry-uhr": "^4.0.1",
+    "catberry-uri": "^2.1.0",
+    "entities": "^1.1.1",
+    "watchify": "^3.2.1",
+    "uglify-js": "^2.4.20",
+    "browserify": "^10.0.0",
+    "log4js": "~0.6.24",
+    "promise": "^7.0.1",
+    "pretty-hrtime": "^1.0.0",
+    "browser-process-hrtime": "~0.1.1"
+  },
+  "devDependencies": {
+    "codecov.io": "^0.1.2",
+    "istanbul-harmony": "~0.3.12",
+    "jscs": "~1.6.2",
+    "jsdom": "^3.1.2",
+    "jshint": "^2.6.0",
+    "mocha": "^2.2.4",
+    "nan": "^1.8.4"
+  },
+  "engines": {
+    "node": ">=0.12"
+  },
+  "scripts": {
+    "test": "make",
+    "build": "make build"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/catberry/catberry/blob/master/LICENSE"
+    }
+  ]
 }
