@@ -32,6 +32,7 @@
 
 var assert = require('assert'),
 	testCases = require('../../cases/lib/streams/ComponentReadable.json'),
+	ServerResponse = require('../../mocks/ServerResponse'),
 	ComponentReadable = require('../../../lib/streams/ComponentReadable');
 
 describe('lib/streams/ComponentReadable', function () {
@@ -39,8 +40,12 @@ describe('lib/streams/ComponentReadable', function () {
 		testCases.cases.forEach(function (testCase) {
 			it(testCase.name, function (done) {
 				var concat = '',
-					parser = new ComponentReadable(testCase.inputStreamOptions);
+					parser = new ComponentReadable(
+						createContext(),
+						testCase.inputStreamOptions
+					);
 
+				parser._isFlushed = true;
 				parser._foundComponentHandler = function (tagDetails) {
 					var id = tagDetails.attributes.id || '';
 					return Promise.resolve(
@@ -62,37 +67,16 @@ describe('lib/streams/ComponentReadable', function () {
 					});
 			});
 		});
-
-		it('should re-emit found tag errors', function (done) {
-			done();
-			//var concat = '',
-			//	input = '<cat-some id="1"></cat-some>',
-			//	expected = '<cat-some id="1">test1</cat-some>',
-			//	parser = new ComponentReadable();
-			//
-			//parser.foundComponentHandler = function (tagDetails) {
-			//	return Promise.resolve()
-			//		.then(function () {
-			//			throw new Error('hello');
-			//		});
-			//};
-			//parser.parse(input);
-			//
-			//parser
-			//	.on('data', function (chunk) {
-			//		concat += chunk;
-			//	})
-			//	.on('error', function (error) {
-			//		try {
-			//			assert.strictEqual(error.message, 'hello');
-			//			assert.strictEqual(
-			//				concat, expected, 'Wrong HTML content'
-			//			);
-			//			done();
-			//		} catch (e) {
-			//			done(e);
-			//		}
-			//	});
-		});
 	});
 });
+
+function createContext() {
+	return {
+		routingContext: {
+			middleware: {
+				response: new ServerResponse(),
+				next: function () {}
+			}
+		}
+	};
+}
