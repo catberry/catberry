@@ -55,9 +55,9 @@ var util = require('util'),
 		require('./node_modules/catberry/browser/providers/ModuleApiProvider'),
 	CookieWrapper = require('./node_modules/catberry/browser/CookieWrapper');
 
-var INFO_DOCUMENT_UPDATED = 'Document updated (%d store(s) changed)',
-	INFO_COMPONENT_BOUND = 'Component "%s" is bound',
-	INFO_COMPONENT_UNBOUND = 'Component "%s" is unbound';
+var DEBUG_DOCUMENT_UPDATED = 'Document updated (%d store(s) changed)',
+	DEBUG_COMPONENT_BOUND = 'Component "%s" is bound',
+	DEBUG_COMPONENT_UNBOUND = 'Component "%s" is unbound';
 
 util.inherits(Bootstrapper, BootstrapperBase);
 
@@ -99,7 +99,7 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 		return true;
 	};
 	var eventBus = locator.resolve('eventBus');
-	this._wrapEventsWithLogger(eventBus, logger);
+	this._wrapEventsWithLogger(configObject, eventBus, logger);
 
 	routeDefinitions.forEach(function (routeDefinition) {
 		locator.registerInstance('routeDefinition', routeDefinition);
@@ -116,29 +116,36 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 
 /**
  * Wraps event bus with log messages.
+ * @param {Object} config Application config.
  * @param {EventEmitter} eventBus Event emitter that implements event bus.
  * @param {Logger} logger Logger to write messages.
  * @protected
  */
-Bootstrapper.prototype._wrapEventsWithLogger = function (eventBus, logger) {
-	BootstrapperBase.prototype._wrapEventsWithLogger
-		.call(this, eventBus, logger);
-	eventBus
-		.on('documentUpdated', function (args) {
-			logger.info(util.format(INFO_DOCUMENT_UPDATED, args.length));
-		})
-		.on('componentBound', function (args) {
-			logger.info(util.format(
-				INFO_COMPONENT_BOUND,
-				args.element.tagName + (args.id ? '#' + args.id : '')
-			));
-		})
-		.on('componentUnbound', function (args) {
-			logger.info(util.format(
-				INFO_COMPONENT_UNBOUND,
-				args.element.tagName + (args.id ? '#' + args.id : '')
-			));
-		});
-};
+Bootstrapper.prototype._wrapEventsWithLogger =
+	function (config, eventBus, logger) {
+		BootstrapperBase.prototype._wrapEventsWithLogger
+			.call(this, config, eventBus, logger);
+
+		var isRelease = Boolean(config.isRelease);
+		if (isRelease) {
+			return;
+		}
+		eventBus
+			.on('documentUpdated', function (args) {
+				logger.debug(util.format(DEBUG_DOCUMENT_UPDATED, args.length));
+			})
+			.on('componentBound', function (args) {
+				logger.debug(util.format(
+					DEBUG_COMPONENT_BOUND,
+					args.element.tagName + (args.id ? '#' + args.id : '')
+				));
+			})
+			.on('componentUnbound', function (args) {
+				logger.debug(util.format(
+					DEBUG_COMPONENT_UNBOUND,
+					args.element.tagName + (args.id ? '#' + args.id : '')
+				));
+			});
+	};
 
 module.exports = new Bootstrapper();
