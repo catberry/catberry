@@ -36,6 +36,22 @@ var assert = require('assert'),
 global.Promise = require('promise');
 
 describe('lib/helpers/moduleHelper', function () {
+	describe('#getNameForErrorTemplate', function () {
+		it('should return name with postfix', function () {
+			var templateName = moduleHelper.getNameForErrorTemplate(
+				'some'
+			);
+			assert.strictEqual(
+				templateName,
+				'some' + moduleHelper.COMPONENT_ERROR_TEMPLATE_POSTFIX
+			);
+		});
+		it('should return empty string for null value', function () {
+			var templateName = moduleHelper.getNameForErrorTemplate(null);
+			assert.strictEqual(templateName, '');
+		});
+	});
+
 	describe('#getCamelCaseName', function () {
 		it('should convert name to camel case with prefix', function () {
 			var badName = 'awesome-module_name',
@@ -92,13 +108,42 @@ describe('lib/helpers/moduleHelper', function () {
 	describe('#getOriginalComponentName', function () {
 		it('should return name without prefix', function () {
 			var originalName = moduleHelper.getOriginalComponentName(
-				'cat-some'
+				moduleHelper.COMPONENT_PREFIX + 'some'
 			);
 			assert.strictEqual(originalName, 'some');
 		});
 		it('should return empty string for null value', function () {
 			var originalName = moduleHelper.getOriginalComponentName(null);
 			assert.strictEqual(originalName, '');
+		});
+	});
+
+	describe('#getTagNameForComponentName', function () {
+		it('should return name with prefix', function () {
+			var tagName = moduleHelper.getTagNameForComponentName(
+				'some'
+			);
+			assert.strictEqual(
+				tagName, moduleHelper.COMPONENT_PREFIX.toUpperCase() + 'SOME'
+			);
+		});
+		it('should return name without prefix for HEAD', function () {
+			var tagName = moduleHelper.getTagNameForComponentName(
+				'head'
+			);
+			assert.strictEqual(tagName, 'HEAD');
+		});
+		it('should return name HTML without prefix for document', function () {
+			var tagName = moduleHelper.getTagNameForComponentName(
+				'document'
+			);
+			assert.strictEqual(
+				tagName, moduleHelper.DOCUMENT_ELEMENT_NAME.toUpperCase()
+			);
+		});
+		it('should return empty string for null value', function () {
+			var tagName = moduleHelper.getTagNameForComponentName(null);
+			assert.strictEqual(tagName, '');
 		});
 	});
 

@@ -32,9 +32,9 @@
 
 var assert = require('assert'),
 	tests = require('../../cases/lib/streams/HTMLTagTokenizer.json'),
-	HTMLTagTokenizer = require('../../../lib/streams/HTMLTagTokenizer');
+	HTMLTagTokenizer = require('../../../lib/tokenizers/HTMLTagTokenizer');
 
-describe('HTMLTagTokenizer', function () {
+describe('lib/tokenizers/HTMLTagTokenizer', function () {
 	describe('#next', function () {
 		tests.cases.forEach(function (testCase) {
 			it(testCase.description, function (done) {
