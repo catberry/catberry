@@ -1291,6 +1291,83 @@ describe('lib/DocumentRenderer', function () {
 					assert.fail('Should not finish the response');
 				});
 		});
+
+		it('should render inline script if clearFragment()', function (done) {
+			function Head() {}
+			Head.prototype.render = function () {
+				this.$context.clearFragment();
+				return this.$context;
+			};
+
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head></head>' +
+								'<body>' +
+								'document – ' + context.name +
+								'<cat-async-comp id="2"></cat-async-comp>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: Head,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				'async-comp': {
+					name: 'async-comp',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'test – ' + context.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({}, {}, components),
+				response = routingContext.middleware.response,
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer'),
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head><title>head – head</title></head>' +
+					'<body>' +
+					'<script>window.location.hash = \'\';</script>' +
+					'document – document' +
+					'<cat-async-comp id=\"2\">' +
+					'<div>test – async-comp</div>' +
+					'</cat-async-comp>' +
+					'</body>' +
+					'</html>';
+
+			documentRenderer.render({}, routingContext);
+			response
+				.on('error', done)
+				.on('finish', function () {
+					assert.strictEqual(
+						response.result, expected, 'Wrong HTML'
+					);
+					done();
+				});
+		});
 	});
 });
 
