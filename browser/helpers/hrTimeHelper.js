@@ -43,5 +43,12 @@ module.exports = {
 	 * @param {[number, number]}
 	 * @returns {string} Time message.
 	 */
-	toMessage: require('pretty-hrtime')
+	toMessage: require('pretty-hrtime'),
+	/**
+	 * Converts high resolution time to milliseconds number.
+	 * @param {Array} hrTime High resolution time tuple.
+	 */
+	toMilliseconds: function (hrTime) {
+		return hrTime[0] * 1e3 + Math.round(hrTime[1] / 1e6);
+	}
 };

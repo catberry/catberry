@@ -328,7 +328,9 @@ DocumentRenderer.prototype.renderComponent =
 					})
 					.then(function () {
 						eventArgs.hrTime = hrTimeHelper.get(startTime);
-						eventArgs.time = eventArgs.hrTime[0];
+						eventArgs.time = hrTimeHelper.toMilliseconds(
+							eventArgs.hrTime
+						);
 						self._eventBus.emit('componentRendered', eventArgs);
 						return self._bindComponent(element);
 					})
