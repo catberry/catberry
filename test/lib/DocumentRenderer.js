@@ -1292,7 +1292,7 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should render inline script if clearFragment()', function (done) {
+		it('should render inline script if clearFragment() in HEAD', function (done) {
 			function Head() {}
 			Head.prototype.render = function () {
 				this.$context.clearFragment();
@@ -1368,6 +1368,241 @@ describe('lib/DocumentRenderer', function () {
 					done();
 				});
 		});
+
+		it('should render inline script if clearFragment()', function (done) {
+			function ClearFragmentComponent() {}
+			ClearFragmentComponent.prototype.render = function () {
+				this.$context.clearFragment();
+				return this.$context;
+			};
+
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head></head>' +
+								'<body>' +
+								'document – ' + context.name +
+								'<cat-comp id="2"></cat-comp>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				comp: {
+					name: 'comp',
+					constructor: ClearFragmentComponent,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'test – ' + context.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({}, {}, components),
+				response = routingContext.middleware.response,
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer'),
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head><title>head – head</title></head>' +
+					'<body>' +
+					'document – document' +
+					'<cat-comp id=\"2\">' +
+					'<script>window.location.hash = \'\';</script>' +
+					'<div>test – comp</div>' +
+					'</cat-comp>' +
+					'</body>' +
+					'</html>';
+
+			documentRenderer.render({}, routingContext);
+			response
+				.on('error', done)
+				.on('finish', function () {
+					assert.strictEqual(
+						response.result, expected, 'Wrong HTML'
+					);
+					done();
+				});
+		});
+
+		it('should render inline script if redirect()', function (done) {
+			function RedirectComponent() {}
+			RedirectComponent.prototype.render = function () {
+				this.$context.redirect('/to/garden');
+				return this.$context;
+			};
+
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head></head>' +
+								'<body>' +
+								'document – ' + context.name +
+								'<cat-comp id="2"></cat-comp>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				comp: {
+					name: 'comp',
+					constructor: RedirectComponent,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'test – ' + context.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({}, {}, components),
+				response = routingContext.middleware.response,
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer'),
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head><title>head – head</title></head>' +
+					'<body>' +
+					'document – document' +
+					'<cat-comp id=\"2\">' +
+					'<script>window.location.assign(\'/to/garden\');</script>' +
+					'<div>test – comp</div>' +
+					'</cat-comp>' +
+					'</body>' +
+					'</html>';
+
+			documentRenderer.render({}, routingContext);
+			response
+				.on('error', done)
+				.on('finish', function () {
+					assert.strictEqual(
+						response.result, expected, 'Wrong HTML'
+					);
+					done();
+				});
+		});
+
+		it('should render inline script if cookie.set()', function (done) {
+			function CookieComponent() {}
+			CookieComponent.prototype.render = function () {
+				this.$context.cookie.set({
+					key: 'key',
+					value: 'value'
+				});
+				return this.$context;
+			};
+
+			var components = {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<!DOCTYPE html>' +
+								'<html>' +
+								'<head></head>' +
+								'<body>' +
+								'document – ' + context.name +
+								'<cat-comp id="2"></cat-comp>' +
+								'</body>' +
+								'</html>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentAsync,
+					template: {
+						render: function (context) {
+							var template = '<title>' +
+								'head – ' + context.name +
+								'</title>';
+							return Promise.resolve(template);
+						}
+					}
+				},
+				comp: {
+					name: 'comp',
+					constructor: CookieComponent,
+					template: {
+						render: function (context) {
+							var template = '<div>' +
+								'test – ' + context.name +
+								'</div>';
+							return Promise.resolve(template);
+						}
+					}
+				}
+			};
+			var routingContext = createRoutingContext({}, {}, components),
+				response = routingContext.middleware.response,
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer'),
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head><title>head – head</title></head>' +
+					'<body>' +
+					'document – document' +
+					'<cat-comp id=\"2\">' +
+					'<script>window.document.cookie = \'key=value\';</script>' +
+					'<div>test – comp</div>' +
+					'</cat-comp>' +
+					'</body>' +
+					'</html>';
+
+			documentRenderer.render({}, routingContext);
+			response
+				.on('error', done)
+				.on('finish', function () {
+					assert.strictEqual(
+						response.result, expected, 'Wrong HTML'
+					);
+					done();
+				});
+		});
+
 	});
 });
 
