@@ -671,6 +671,87 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
+		it('should properly render errors in component constructor', function (done) {
+			function ErrorConstructor() {
+				throw new Error('test');
+			}
+			var errorTemplate = {
+					render: function (context) {
+						return Promise.resolve('Error: ' + context.message);
+					}
+				},
+				components = {
+					document: {
+						name: 'document',
+						constructor: ComponentAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<!DOCTYPE html>' +
+									'<html>' +
+									'<head></head>' +
+									'<body>' +
+									'document – ' + context.name +
+									'<cat-comp id="1"></cat-comp>' +
+									'</body>' +
+									'</html>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					head: {
+						name: 'head',
+						constructor: ComponentErrorAsync,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<title>' +
+									'head – ' + context.name +
+									'</title>';
+								return Promise.resolve(template);
+							}
+						}
+					},
+					comp: {
+						name: 'comp',
+						constructor: ErrorConstructor,
+						errorTemplate: errorTemplate,
+						template: {
+							render: function (context) {
+								var template = '<div>' +
+									'content – ' + context.name +
+									'</div>';
+								return Promise.resolve(template);
+							}
+						}
+					}
+				};
+			var routingContext = createRoutingContext({
+					isRelease: true
+				}, {}, components),
+				expected = '<!DOCTYPE html>' +
+					'<html>' +
+					'<head>Error: head</head>' +
+					'<body>' +
+					'document – document' +
+					'<cat-comp id=\"1\">Error: test</cat-comp>' +
+					'</body>' +
+					'</html>',
+				documentRenderer = routingContext.locator
+					.resolve('documentRenderer');
+
+			documentRenderer.render({}, routingContext);
+			routingContext.middleware.response
+				.on('error', done)
+				.on('finish', function () {
+					assert.strictEqual(
+						routingContext.middleware.response.result,
+						expected, 'Wrong HTML'
+					);
+					done();
+				});
+		});
+
 		it('should properly render errors in stores', function (done) {
 			var errorTemplate = {
 					render: function (context) {
