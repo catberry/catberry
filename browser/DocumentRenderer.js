@@ -40,6 +40,10 @@ var util = require('util'),
 
 util.inherits(DocumentRenderer, DocumentRendererBase);
 
+var WARN_ID_NOT_SPECIFIED = 'Component "%s" does not have an ID, skipping...',
+	WARN_SAME_ID =
+		'The duplicated ID "%s" has been found, skipping component "%s"...';
+
 var SPECIAL_IDS = {
 		$$head: '$$head',
 		$$document: '$$document'
@@ -91,6 +95,7 @@ function DocumentRenderer($serviceLocator) {
 	this._componentBindings = Object.create(null);
 	this._currentChangedStores = Object.create(null);
 	this._window = $serviceLocator.resolve('window');
+	this._logger = $serviceLocator.resolve('logger');
 	this._config = $serviceLocator.resolve('config');
 	this._storeDispatcher = $serviceLocator.resolve('storeDispatcher');
 
@@ -111,6 +116,13 @@ function DocumentRenderer($serviceLocator) {
  * @private
  */
 DocumentRenderer.prototype._config = null;
+
+/**
+ * Current logger.
+ * @type {Logger}
+ * @private
+ */
+DocumentRenderer.prototype._logger = null;
 
 /**
  * Current store dispatcher.
@@ -256,8 +268,21 @@ DocumentRenderer.prototype.renderComponent =
 					id = self._getId(element),
 					instance = self._componentInstances[id];
 
-				if (!component || !id ||
-					id in renderingContext.renderedIds) {
+				if (!component) {
+					return;
+				}
+
+				if (!id) {
+					self._logger.warn(
+						util.format(WARN_ID_NOT_SPECIFIED, componentName)
+					);
+					return;
+				}
+
+				if (id in renderingContext.renderedIds) {
+					self._logger.warn(
+						util.format(WARN_SAME_ID, id, componentName)
+					);
 					return;
 				}
 
