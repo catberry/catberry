@@ -35,6 +35,7 @@ var fs = require('fs'),
 	events = require('events'),
 	jsdom = require('jsdom'),
 	StoreDispatcher = require('../../lib/StoreDispatcher'),
+	Logger = require('../mocks/Logger'),
 	Component = require('../mocks/components/Component'),
 	DataStore = require('../mocks/stores/DataStore'),
 	ComponentAsync = require('../mocks/components/ComponentAsync'),
@@ -2089,6 +2090,7 @@ function createLocator(components, config, stores) {
 	locator.register('moduleApiProvider', ModuleApiProvider, config);
 	locator.register('cookieWrapper', CookieWrapper, config);
 	locator.register('storeDispatcher', StoreDispatcher);
+	locator.register('logger', Logger);
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	locator.registerInstance('eventBus', new events.EventEmitter());

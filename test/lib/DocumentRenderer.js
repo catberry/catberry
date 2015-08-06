@@ -33,6 +33,7 @@
 var assert = require('assert'),
 	events = require('events'),
 	URI = require('catberry-uri').URI,
+	Logger = require('../mocks/Logger'),
 	ServerResponse = require('../mocks/ServerResponse'),
 	Component = require('../mocks/components/Component'),
 	ComponentError = require('../mocks/components/ComponentError'),
@@ -1690,6 +1691,7 @@ describe('lib/DocumentRenderer', function () {
 function createRoutingContext(config, stores, components) {
 	var locator = new ServiceLocator();
 	locator.register('cookieWrapper', CookieWrapper, config);
+	locator.register('logger', Logger, config);
 	locator.register('contextFactory', ContextFactory, config, true);
 	locator.register('documentRenderer', DocumentRenderer, config, true);
 	locator.register('moduleApiProvider', ModuleApiProvider, config, true);
