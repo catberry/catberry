@@ -35,11 +35,7 @@ module.exports = RequestRouter;
 var util = require('util'),
 	URI = require('catberry-uri').URI;
 
-var MOUSE_KEYS = {
-		LEFT: 0,
-		MIDDLE: 1
-	},
-
+var MOUSE_PRIMARY_KEY = 0,
 	HREF_ATTRIBUTE_NAME = 'href',
 	TARGET_ATTRIBUTE_NAME = 'target',
 	A_TAG_NAME = 'A',
@@ -290,7 +286,8 @@ RequestRouter.prototype._linkClickHandler = function (event, element) {
 	}
 
 	// if middle mouse button was clicked
-	if (event.button === MOUSE_KEYS.MIDDLE) {
+	if (event.button !== MOUSE_PRIMARY_KEY ||
+		event.ctrlKey || event.altKey || event.shiftKey) {
 		return;
 	}
 
