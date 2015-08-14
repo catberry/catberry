@@ -96,6 +96,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
@@ -164,6 +166,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('div')[0]
 							.dispatchEvent(event);
@@ -224,6 +228,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
@@ -287,6 +293,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
@@ -354,6 +362,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
@@ -406,6 +416,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
@@ -447,6 +459,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
@@ -497,6 +511,8 @@ describe('browser/RequestRouter', function () {
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('div')[0]
 							.dispatchEvent(event);
@@ -543,10 +559,171 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
+
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
 						event.button = 1;
+
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						setTimeout(function () {
+							assert.strictEqual(
+								window.location.toString(),
+								'http://local1.com/some'
+							);
+							done();
+						}, 10);
+					}
+				});
+			}
+		);
+
+		it('should not change state if link has been clicked ' +
+			'with Control',
+			function (done) {
+				var locator = createLocator(),
+					eventBus = locator.resolve('eventBus'),
+					documentRenderer = locator.resolve('documentRenderer'),
+					link = 'http://local1.com/some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
+
+				locator.registerInstance('routeDefinition',
+					'/some/' +
+					'?global=:global[first,second]' +
+					'&first=:first[first]' +
+					'&second=:second[second]'
+				);
+
+				eventBus.on('error', done);
+				eventBus.once('documentRendered', function () {
+					assert.fail('If link changes page this event ' +
+						'should not be triggered');
+				});
+
+				jsdom.env({
+					html: '<a href="' + link + '"></a>',
+					done: function (errors, window) {
+						locator.registerInstance('window', window);
+						window.location
+							.replace('http://local1.com/some');
+						locator.resolveInstance(RequestRouter);
+
+						var event = window.document
+							.createEvent('MouseEvents');
+						event.initEvent('click', true, true);
+						event.button = 0;
+						event.ctrlKey = true;
+
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						setTimeout(function () {
+							assert.strictEqual(
+								window.location.toString(),
+								'http://local1.com/some'
+							);
+							done();
+						}, 10);
+					}
+				});
+			}
+		);
+
+		it('should not change state if link has been clicked ' +
+			'with Alt',
+			function (done) {
+				var locator = createLocator(),
+					eventBus = locator.resolve('eventBus'),
+					documentRenderer = locator.resolve('documentRenderer'),
+					link = 'http://local1.com/some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
+
+				locator.registerInstance('routeDefinition',
+					'/some/' +
+					'?global=:global[first,second]' +
+					'&first=:first[first]' +
+					'&second=:second[second]'
+				);
+
+				eventBus.on('error', done);
+				eventBus.once('documentRendered', function () {
+					assert.fail('If link changes page this event ' +
+						'should not be triggered');
+				});
+
+				jsdom.env({
+					html: '<a href="' + link + '"></a>',
+					done: function (errors, window) {
+						locator.registerInstance('window', window);
+						window.location
+							.replace('http://local1.com/some');
+						locator.resolveInstance(RequestRouter);
+
+						var event = window.document
+							.createEvent('MouseEvents');
+						event.initEvent('click', true, true);
+						event.button = 0;
+						event.altKey = true;
+
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						setTimeout(function () {
+							assert.strictEqual(
+								window.location.toString(),
+								'http://local1.com/some'
+							);
+							done();
+						}, 10);
+					}
+				});
+			}
+		);
+
+		it('should not change state if link has been clicked ' +
+			'with Shift',
+			function (done) {
+				var locator = createLocator(),
+					eventBus = locator.resolve('eventBus'),
+					documentRenderer = locator.resolve('documentRenderer'),
+					link = 'http://local1.com/some/' +
+						'?global=globalValue' +
+						'&first=firstValue' +
+						'&second=secondValue';
+
+				locator.registerInstance('routeDefinition',
+					'/some/' +
+					'?global=:global[first,second]' +
+					'&first=:first[first]' +
+					'&second=:second[second]'
+				);
+
+				eventBus.on('error', done);
+				eventBus.once('documentRendered', function () {
+					assert.fail('If link changes page this event ' +
+						'should not be triggered');
+				});
+
+				jsdom.env({
+					html: '<a href="' + link + '"></a>',
+					done: function (errors, window) {
+						locator.registerInstance('window', window);
+						window.location
+							.replace('http://local1.com/some');
+						locator.resolveInstance(RequestRouter);
+
+						var event = window.document
+							.createEvent('MouseEvents');
+						event.initEvent('click', true, true);
+						event.button = 0;
+						event.shiftKey = true;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
@@ -588,9 +765,12 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
+
 						var event = window.document
 							.createEvent('MouseEvents');
 						event.initEvent('click', true, true);
+						event.button = 0;
+
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
