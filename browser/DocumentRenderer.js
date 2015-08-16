@@ -188,7 +188,7 @@ DocumentRenderer.prototype.initWithState = function (state, routingContext) {
 		.then(function () {
 			var components = self._componentLoader.getComponentsByNames(),
 				elements = self._findComponents(
-					self._window.document.body, components
+					self._window.document.body, components, true
 				);
 			elements.unshift(self._window.document.head);
 			elements.unshift(self._window.document.documentElement);
@@ -337,7 +337,7 @@ DocumentRenderer.prototype.renderComponent =
 						});
 
 						var promises = self._findComponents(
-							element, renderingContext.components
+							element, renderingContext.components, false
 						)
 							.map(function (innerComponent) {
 								return self.renderComponent(
@@ -508,7 +508,7 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 		promises = [];
 
 	if (element.hasChildNodes()) {
-		self._findComponents(element, renderingContext.components)
+		self._findComponents(element, renderingContext.components, true)
 			.forEach(function (innerElement) {
 				var id = self._getId(innerElement);
 				if (id in renderingContext.unboundIds) {
@@ -696,33 +696,38 @@ DocumentRenderer.prototype._isComponent = function (components, element) {
  * Finds all descendant components of specified component element.
  * @param {Element} element Root component HTML element to begin search with.
  * @param {Object} components Map of components by names.
+ * @param {Boolean} goInComponents Go inside nested components.
  * @private
  */
-DocumentRenderer.prototype._findComponents = function (element, components) {
-	var elements = [],
-		queue = [element],
-		currentChildren, i;
+DocumentRenderer.prototype._findComponents =
+	function (element, components, goInComponents) {
+		var elements = [],
+			queue = [element],
+			currentChildren, i;
 
-	while (queue.length > 0) {
-		currentChildren = queue.shift().childNodes;
-		for (i = 0; i < currentChildren.length; i++) {
-			// we need only Element nodes
-			if (currentChildren[i].nodeType !== 1) {
-				continue;
+		while (queue.length > 0) {
+			currentChildren = queue.shift().childNodes;
+			for (i = 0; i < currentChildren.length; i++) {
+				// we need only Element nodes
+				if (currentChildren[i].nodeType !== 1) {
+					continue;
+				}
+
+				// and they should be components
+				if (!this._isComponent(components, currentChildren[i])) {
+					queue.push(currentChildren[i]);
+					continue;
+				}
+
+				if (goInComponents) {
+					queue.push(currentChildren[i]);
+				}
+				elements.push(currentChildren[i]);
 			}
-
-			queue.push(currentChildren[i]);
-
-			// and they should be components
-			if (!this._isComponent(components, currentChildren[i])) {
-				continue;
-			}
-			elements.push(currentChildren[i]);
 		}
-	}
 
-	return elements;
-};
+		return elements;
+	};
 
 /**
  * Handles error while rendering.
