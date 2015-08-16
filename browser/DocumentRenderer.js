@@ -326,7 +326,14 @@ DocumentRenderer.prototype.renderComponent =
 						}
 						var tmpElement = self._createTemporaryElement(element);
 						tmpElement.innerHTML = html;
-						morphdom(element, tmpElement);
+						morphdom(element, tmpElement, {
+							onBeforeMorphElChildren: function (foundElement) {
+								return foundElement === element ||
+									!self._isComponent(
+										renderingContext.components, element
+									);
+							}
+						});
 
 						var promises = self._findComponents(
 							element, renderingContext.components
@@ -673,6 +680,18 @@ DocumentRenderer.prototype._createBindingHandler =
 	};
 
 /**
+ * Checks if the element is a component.
+ * @param {Object} components Current components.
+ * @param {Element} element DOM element.
+ * @private
+ */
+DocumentRenderer.prototype._isComponent = function (components, element) {
+	var currentNodeName = element.nodeName;
+	return moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName) &&
+		(moduleHelper.getOriginalComponentName(currentNodeName) in components);
+};
+
+/**
  * Finds all descendant components of specified component element.
  * @param {Element} element Root component HTML element to begin search with.
  * @param {Object} components Map of components by names.
@@ -681,7 +700,7 @@ DocumentRenderer.prototype._createBindingHandler =
 DocumentRenderer.prototype._findComponents = function (element, components) {
 	var elements = [],
 		queue = [element],
-		currentNodeName, currentChildren, i;
+		currentChildren, i;
 
 	while (queue.length > 0) {
 		currentChildren = queue.shift().childNodes;
@@ -693,15 +712,11 @@ DocumentRenderer.prototype._findComponents = function (element, components) {
 
 			queue.push(currentChildren[i]);
 
-			currentNodeName = currentChildren[i].nodeName;
 			// and they should be components
-			if (!moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName)) {
+			if (!this._isComponent(components, currentChildren[i])) {
 				continue;
 			}
-			if (moduleHelper.getOriginalComponentName(currentNodeName) in
-					components) {
-				elements.push(currentChildren[i]);
-			}
+			elements.push(currentChildren[i]);
 		}
 	}
 
