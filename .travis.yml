@@ -6,8 +6,10 @@ notifications:
     on_failure: always  # options: [always|never|change] default: always
     on_start: false     # default: false
 language: node_js
+sudo: false
 node_js:
   - "0.10"
   - "0.12"
   - "1"
   - "2"
+  - "3"
