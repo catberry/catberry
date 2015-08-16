@@ -330,7 +330,8 @@ DocumentRenderer.prototype.renderComponent =
 							onBeforeMorphElChildren: function (foundElement) {
 								return foundElement === element ||
 									!self._isComponent(
-										renderingContext.components, element
+										renderingContext.components,
+										foundElement
 									);
 							}
 						});
