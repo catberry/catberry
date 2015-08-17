@@ -1,5 +1,5 @@
 ## Code Style
-Catberry follows its own [Code Style Guide](https://github.com/catberry/catberry/blob/5.4.5/docs/code-style-guide.md) 
+Catberry follows its own [Code Style Guide](https://github.com/catberry/catberry/blob/6.0.0/docs/code-style-guide.md) 
 which is actually similar with [Airbnb style guide](https://github.com/airbnb/javascript/tree/master/es5) except several moments.
 
 Please do not forget to use `npm test` to be sure that your code is awesome. 

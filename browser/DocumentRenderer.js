@@ -33,6 +33,7 @@
 module.exports = DocumentRenderer;
 
 var util = require('util'),
+	morphdom = require('morphdom'),
 	errorHelper = require('../lib/helpers/errorHelper'),
 	moduleHelper = require('../lib/helpers/moduleHelper'),
 	hrTimeHelper = require('../lib/helpers/hrTimeHelper'),
@@ -52,23 +53,7 @@ var SPECIAL_IDS = {
 		'and attributes should be an object',
 	ERROR_CREATE_WRONG_NAME = 'Component for tag "%s" not found',
 	ERROR_CREATE_WRONG_ID = 'The ID is not specified or already used',
-	TAG_NAMES = {
-		TITLE: 'TITLE',
-		HTML: 'HTML',
-		HEAD: 'HEAD',
-		BASE: 'BASE',
-		STYLE: 'STYLE',
-		SCRIPT: 'SCRIPT',
-		NOSCRIPT: 'NOSCRIPT',
-		META: 'META',
-		LINK: 'LINK'
-	},
-	NODE_TYPES = {
-		ELEMENT_NODE: 1,
-		TEXT_NODE: 3,
-		PROCESSING_INSTRUCTION_NODE: 7,
-		COMMENT_NODE: 8
-	},
+	HEAD_TAG_NAME = 'HEAD',
 	// http://www.w3.org/TR/2015/WD-uievents-20150319/#event-types-list
 	NON_BUBBLING_EVENTS = {
 		abort: true,
@@ -203,7 +188,7 @@ DocumentRenderer.prototype.initWithState = function (state, routingContext) {
 		.then(function () {
 			var components = self._componentLoader.getComponentsByNames(),
 				elements = self._findComponents(
-					self._window.document.body, components
+					self._window.document.body, components, true
 				);
 			elements.unshift(self._window.document.head);
 			elements.unshift(self._window.document.documentElement);
@@ -336,13 +321,23 @@ DocumentRenderer.prototype.renderComponent =
 						);
 					})
 					.then(function (html) {
-						if (element.tagName === TAG_NAMES.HEAD) {
-							self._mergeHead(element, html);
-						} else {
-							element.innerHTML = html;
+						if (html === '' && element.tagName === HEAD_TAG_NAME) {
+							return;
 						}
+						var tmpElement = self._createTemporaryElement(element);
+						tmpElement.innerHTML = html;
+						morphdom(element, tmpElement, {
+							onBeforeMorphElChildren: function (foundElement) {
+								return foundElement === element ||
+									!self._isComponent(
+										renderingContext.components,
+										foundElement
+									);
+							}
+						});
+
 						var promises = self._findComponents(
-							element, renderingContext.components
+							element, renderingContext.components, false
 						)
 							.map(function (innerComponent) {
 								return self.renderComponent(
@@ -512,8 +507,12 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 		id = this._getId(element),
 		promises = [];
 
+	if (id in renderingContext.unboundIds) {
+		return Promise.resolve();
+	}
+
 	if (element.hasChildNodes()) {
-		self._findComponents(element, renderingContext.components)
+		self._findComponents(element, renderingContext.components, true)
 			.forEach(function (innerElement) {
 				var id = self._getId(innerElement);
 				if (id in renderingContext.unboundIds) {
@@ -686,40 +685,53 @@ DocumentRenderer.prototype._createBindingHandler =
 	};
 
 /**
+ * Checks if the element is a component.
+ * @param {Object} components Current components.
+ * @param {Element} element DOM element.
+ * @private
+ */
+DocumentRenderer.prototype._isComponent = function (components, element) {
+	var currentNodeName = element.nodeName;
+	return moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName) &&
+		(moduleHelper.getOriginalComponentName(currentNodeName) in components);
+};
+
+/**
  * Finds all descendant components of specified component element.
  * @param {Element} element Root component HTML element to begin search with.
  * @param {Object} components Map of components by names.
+ * @param {Boolean} goInComponents Go inside nested components.
  * @private
  */
-DocumentRenderer.prototype._findComponents = function (element, components) {
-	var elements = [],
-		queue = [element],
-		currentNodeName, currentChildren, i;
+DocumentRenderer.prototype._findComponents =
+	function (element, components, goInComponents) {
+		var elements = [],
+			queue = [element],
+			currentChildren, i;
 
-	while (queue.length > 0) {
-		currentChildren = queue.shift().childNodes;
-		for (i = 0; i < currentChildren.length; i++) {
-			// we need only Element nodes
-			if (currentChildren[i].nodeType !== 1) {
-				continue;
-			}
+		while (queue.length > 0) {
+			currentChildren = queue.shift().childNodes;
+			for (i = 0; i < currentChildren.length; i++) {
+				// we need only Element nodes
+				if (currentChildren[i].nodeType !== 1) {
+					continue;
+				}
 
-			queue.push(currentChildren[i]);
+				// and they should be components
+				if (!this._isComponent(components, currentChildren[i])) {
+					queue.push(currentChildren[i]);
+					continue;
+				}
 
-			currentNodeName = currentChildren[i].nodeName;
-			// and they should be components
-			if (!moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName)) {
-				continue;
-			}
-			if (moduleHelper.getOriginalComponentName(currentNodeName) in
-					components) {
+				if (goInComponents) {
+					queue.push(currentChildren[i]);
+				}
 				elements.push(currentChildren[i]);
 			}
 		}
-	}
 
-	return elements;
-};
+		return elements;
+	};
 
 /**
  * Handles error while rendering.
@@ -734,7 +746,7 @@ DocumentRenderer.prototype._handleRenderError =
 		this._eventBus.emit('error', error);
 
 		// do not corrupt existed HEAD when error occurs
-		if (element.tagName === TAG_NAMES.HEAD) {
+		if (element.tagName === HEAD_TAG_NAME) {
 			return Promise.resolve('');
 		}
 
@@ -824,137 +836,6 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 			self._eventBus.emit('documentUpdated', changedStores);
 			return self._updateStoreComponents();
 		});
-};
-
-/**
- * Merges new and existed head elements and change only difference.
- * @param {Element} head HEAD DOM element.
- * @param {string} htmlText HTML of new HEAD element content.
- * @private
- */
-/*jshint maxcomplexity:false */
-DocumentRenderer.prototype._mergeHead = function (head, htmlText) {
-	if (!htmlText) {
-		return;
-	}
-	var self = this,
-		newHead = this._window.document.createElement('head');
-	newHead.innerHTML = htmlText;
-
-	var map = this._getHeadMap(head.childNodes),
-		current, i, key, oldKey, oldItem,
-		sameMetaElements = Object.create(null);
-
-	for (i = 0; i < newHead.childNodes.length; i++) {
-		current = newHead.childNodes[i];
-
-		if (!(current.nodeName in map)) {
-			map[current.nodeName] = Object.create(null);
-		}
-
-		switch (current.nodeName) {
-			// these elements can be only replaced
-			case TAG_NAMES.TITLE:
-			case TAG_NAMES.BASE:
-			case TAG_NAMES.NOSCRIPT:
-				key = this._getNodeKey(current);
-				oldItem = head.getElementsByTagName(current.nodeName)[0];
-				if (oldItem) {
-					oldKey = this._getNodeKey(oldItem);
-					head.replaceChild(current, oldItem);
-				} else {
-					head.appendChild(current);
-				}
-				// when we do replace or append current is removed from newHead
-				// therefore we need to decrement index
-				i--;
-				break;
-
-			// these elements can not be deleted from head
-			// therefore we just add new elements that differs from existed
-			case TAG_NAMES.STYLE:
-			case TAG_NAMES.LINK:
-			case TAG_NAMES.SCRIPT:
-				key = self._getNodeKey(current);
-				if (!(key in map[current.nodeName])) {
-					head.appendChild(current);
-					i--;
-				}
-				break;
-			// meta and other elements can be deleted
-			// but we should not delete and append same elements
-			default:
-				key = self._getNodeKey(current);
-				if (key in map[current.nodeName]) {
-					sameMetaElements[key] = true;
-				} else {
-					head.appendChild(current);
-					i--;
-				}
-				break;
-		}
-	}
-
-	if (TAG_NAMES.META in map) {
-		// remove meta tags which a not in a new head state
-		Object.keys(map[TAG_NAMES.META])
-			.forEach(function (metaKey) {
-				if (metaKey in sameMetaElements) {
-					return;
-				}
-
-				head.removeChild(map[TAG_NAMES.META][metaKey]);
-			});
-	}
-};
-
-/**
- * Gets map of all HEAD's elements.
- * @param {NodeList} headChildren Head children DOM nodes.
- * @returns {Object} Map of HEAD elements.
- * @private
- */
-DocumentRenderer.prototype._getHeadMap = function (headChildren) {
-	// Create map of <meta>, <link>, <style> and <script> tags
-	// by unique keys that contain attributes and content
-	var map = Object.create(null),
-		i, current,
-		self = this;
-
-	for (i = 0; i < headChildren.length; i++) {
-		current = headChildren[i];
-		if (!(current.nodeName in map)) {
-			map[current.nodeName] = Object.create(null);
-		}
-		map[current.nodeName][self._getNodeKey(current)] = current;
-	}
-	return map;
-};
-
-/**
- * Gets unique element key using element's attributes and its content.
- * @param {Node} node HTML element.
- * @returns {string} Unique key for element.
- * @private
- */
-DocumentRenderer.prototype._getNodeKey = function (node) {
-	var current, i,
-		attributes = [];
-
-	if (node.nodeType !== NODE_TYPES.ELEMENT_NODE) {
-		return node.nodeValue || '';
-	}
-
-	if (node.hasAttributes()) {
-		for (i = 0; i < node.attributes.length; i++) {
-			current = node.attributes[i];
-			attributes.push(current.name + '=' + current.value);
-		}
-	}
-
-	return attributes
-			.sort()
-			.join('|') + '>' + node.textContent;
 };
 
 /**
@@ -1205,6 +1086,21 @@ DocumentRenderer.prototype._getId = function (element) {
 		return SPECIAL_IDS.$$head;
 	}
 	return element.getAttribute(moduleHelper.ATTRIBUTE_ID);
+};
+
+/**
+ * Creates temporary clone of the element;
+ * @param {Element} element DOM element.
+ * @returns {Element} clone.
+ * @private
+ */
+DocumentRenderer.prototype._createTemporaryElement = function (element) {
+	var tmp = this._window.document.createElement(element.tagName),
+		attributes = element.attributes;
+	for (var i = 0; i < attributes.length; i++) {
+		tmp.setAttribute(attributes[i].name, attributes[i].value);
+	}
+	return tmp;
 };
 
 /**
