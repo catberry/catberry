@@ -507,6 +507,10 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 		id = this._getId(element),
 		promises = [];
 
+	if (id in renderingContext.unboundIds) {
+		return Promise.resolve();
+	}
+
 	if (element.hasChildNodes()) {
 		self._findComponents(element, renderingContext.components, true)
 			.forEach(function (innerElement) {
