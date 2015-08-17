@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "5.4.5",
+	"version": "6.0.0-dev4",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -74,7 +74,8 @@
 		"log4js": "~0.6.24",
 		"promise": "^7.0.1",
 		"pretty-hrtime": "^1.0.0",
-		"browser-process-hrtime": "~0.1.1"
+		"browser-process-hrtime": "~0.1.1",
+		"morphdom": "~0.1.10"
 	},
 	"devDependencies": {
 		"istanbul-harmony": "~0.3.12",
