@@ -576,84 +576,119 @@ describe('browser/DocumentRenderer', function () {
 		});
 
 		it('should merge HEAD component ' +
-		'with new rendered HTML', function (done) {
-			var head = '<title>First title</title>' +
-					'<base href="someLink1" target="_parent">' +
-					'<style type="text/css">' +
-					'some styles1' +
-					'</style>' +
-					'<style type="text/css">' +
-					'some styles2' +
-					'</style>' +
-					'<script type="application/javascript">' +
-					'some scripts1' +
-					'</script>' +
-					'<script type="application/javascript">' +
-					'some scripts2' +
-					'</script>' +
-					'<script type="application/javascript" ' +
-					'src="someScriptSrc1">' +
-					'</script>' +
-					'<script type="application/javascript" ' +
-					'src="someScriptSrc2">' +
-					'</script>' +
-					'<link rel="stylesheet" href="someStyleLink1">' +
-					'<link rel="stylesheet" href="someStyleLink2">' +
-					'<meta name="name1" content="value1">' +
-					'<meta name="name2" content="value2">' +
-					'<meta name="name3" content="value3">',
-				expected = '<title>Second title</title>' +
-					'<base href="someLink2" target="_parent">' +
-					'<noscript>noScript2</noscript>' +
-					'<style type="text/css">' +
-					'some styles1' +
-					'</style>' +
-					'<script type="application/javascript">' +
-					'some scripts1' +
-					'</script>' +
-					'<script type="application/javascript" ' +
-					'src="someScriptSrc1">' +
-					'</script>' +
-					'<link rel="stylesheet" href="someStyleLink1">' +
-					'<meta name="name1" content="value1">' +
-					'<style type="text/css">' +
-					'some styles3' +
-					'</style>' +
-					'<script type="application/javascript">' +
-					'some scripts3' +
-					'</script>' +
-					'<script type="application/javascript" ' +
-					'src="someScriptSrc3">' +
-					'</script>' +
-					'<link rel="stylesheet" href="someStyleLink3">' +
-					'<meta name="name4" content="value4">',
-				components = [{
-					name: 'head',
-					templateSource: expected,
-					constructor: Component
-				}],
-				locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			'with new rendered HTML', function (done) {
+				var head = '<title>First title</title>' +
+						'<base href="someLink1" target="_parent">' +
+						'<style type="text/css">' +
+						'some styles1' +
+						'</style>' +
+						'<style type="text/css">' +
+						'some styles2' +
+						'</style>' +
+						'<script type="application/javascript">' +
+						'some scripts1' +
+						'</script>' +
+						'<script type="application/javascript">' +
+						'some scripts2' +
+						'</script>' +
+						'<script type="application/javascript" ' +
+						'src="someScriptSrc1">' +
+						'</script>' +
+						'<script type="application/javascript" ' +
+						'src="someScriptSrc2">' +
+						'</script>' +
+						'<link rel="stylesheet" href="someStyleLink1">' +
+						'<link rel="stylesheet" href="someStyleLink2">' +
+						'<meta name="name1" content="value1">' +
+						'<meta name="name2" content="value2">' +
+						'<meta name="name3" content="value3">',
+					expected = '<title>Second title</title>' +
+						'<base href="someLink2" target="_parent">' +
+						'<style type="text/css">' +
+						'some styles1' +
+						'</style>' +
+						'<style type="text/css">' +
+						'some styles2' +
+						'</style>' +
+						'<script type="application/javascript">' +
+						'some scripts1' +
+						'</script>' +
+						'<script type="application/javascript">' +
+						'some scripts2' +
+						'</script>' +
+						'<script type="application/javascript" ' +
+						'src="someScriptSrc1">' +
+						'</script>' +
+						'<script type="application/javascript" ' +
+						'src="someScriptSrc2">' +
+						'</script>' +
+						'<link rel="stylesheet" href="someStyleLink1">' +
+						'<link rel="stylesheet" href="someStyleLink2">' +
+						'<meta name="name1" content="value1">' +
+						'head<br><noscript>noScript2</noscript>' +
+						'<style type="text/css">' +
+						'some styles3' +
+						'</style>' +
+						'<script type="application/javascript">' +
+						'some scripts3' +
+						'</script>' +
+						'<script type="application/javascript" ' +
+						'src="someScriptSrc3">' +
+						'</script>' +
+						'<link rel="stylesheet" href="someStyleLink3">' +
+						'<meta name="name4" content="value4">',
+					components = [{
+						name: 'head',
+						templateSource: '<title>Second title</title>' +
+						'<base href="someLink2" target="_parent">' +
+						'<noscript>noScript2</noscript>' +
+						'<style type="text/css">' +
+						'some styles1' +
+						'</style>' +
+						'<script type="application/javascript">' +
+						'some scripts1' +
+						'</script>' +
+						'<script type="application/javascript" ' +
+						'src="someScriptSrc1">' +
+						'</script>' +
+						'<link rel="stylesheet" href="someStyleLink1">' +
+						'<meta name="name1" content="value1">' +
+						'<style type="text/css">' +
+						'some styles3' +
+						'</style>' +
+						'<script type="application/javascript">' +
+						'some scripts3' +
+						'</script>' +
+						'<script type="application/javascript" ' +
+						'src="someScriptSrc3">' +
+						'</script>' +
+						'<link rel="stylesheet" href="someStyleLink3">' +
+						'<meta name="name4" content="value4">',
+						constructor: Component
+					}],
+					locator = createLocator(components, {}),
+					eventBus = locator.resolve('eventBus');
 
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function (errors, window) {
-					window.document.head.innerHTML = head;
-					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.renderComponent(window.document.head)
-						.then(function () {
-							assert.strictEqual(
-								window.document.head.innerHTML,
-								'head<br>' + expected
-							);
-							done();
-						})
-						.catch(done);
-				}
+				eventBus.on('error', done);
+				jsdom.env({
+					html: ' ',
+					done: function (errors, window) {
+						window.document.head.innerHTML = head;
+						locator.registerInstance('window', window);
+						var renderer = locator.resolveInstance(
+							DocumentRenderer
+						);
+						renderer.renderComponent(window.document.head)
+							.then(function () {
+								assert.strictEqual(
+									window.document.head.innerHTML, expected
+								);
+								done();
+							})
+							.catch(done);
+					}
+				});
 			});
-		});
 
 		it('should bind all events from bind method', function (done) {
 			function Component1() {}
