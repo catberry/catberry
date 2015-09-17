@@ -313,7 +313,17 @@ DocumentRenderer.prototype.renderComponent =
 				var startTime = hrTimeHelper.get();
 				self._eventBus.emit('componentRender', eventArgs);
 
-				return self._unbindAll(element, renderingContext)
+				return Promise.resolve()
+					.then(function () {
+						// we need unbind the whole hierarchy only at
+						// the beginning and not for new elements
+						if (renderingContext.startElementId !== id ||
+							!hadChildren) {
+							return;
+						}
+
+						return self._unbindAll(element, renderingContext);
+					})
 					.catch(function (reason) {
 						self._eventBus.emit('error', reason);
 					})
@@ -527,29 +537,18 @@ DocumentRenderer.prototype._collectRenderingGarbage =
  */
 DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
 	var self = this,
-		id = this._getId(element),
+		rootId = this._getId(element),
 		promises = [];
 
-	if (id in renderingContext.unboundIds) {
-		return Promise.resolve();
-	}
+	self._findComponents(element, renderingContext.components, true)
+		.forEach(function (innerElement) {
+			var id = self._getId(innerElement);
+			renderingContext.unboundIds[id] = true;
+			promises.push(self._unbindComponent(innerElement));
+		});
 
-	if (element.hasChildNodes()) {
-		self._findComponents(element, renderingContext.components, true)
-			.forEach(function (innerElement) {
-				var id = self._getId(innerElement);
-				if (id in renderingContext.unboundIds) {
-					return;
-				}
-				renderingContext.unboundIds[id] = true;
-				promises.push(self._unbindComponent(innerElement));
-			});
-	}
-
-	if (!(id in renderingContext.unboundIds)) {
-		promises.push(this._unbindComponent(element));
-		renderingContext.unboundIds[id] = true;
-	}
+	renderingContext.unboundIds[rootId] = true;
+	promises.push(this._unbindComponent(element));
 
 	return Promise.all(promises);
 };
