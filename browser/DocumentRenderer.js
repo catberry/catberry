@@ -258,25 +258,27 @@ DocumentRenderer.prototype.renderComponent =
 		var self = this;
 		return this._getPromiseForReadyState()
 			.then(function () {
-				renderingContext = renderingContext ||
-					self._createRenderingContext([]);
+				var id = self._getId(element);
+				if (!id) {
+					self._logger.warn(
+						util.format(WARN_ID_NOT_SPECIFIED, componentName)
+					);
+					return;
+				}
+
+				if (!renderingContext) {
+					renderingContext = self._createRenderingContext([]);
+					renderingContext.rootIds[id] = true;
+				}
 
 				var componentName = moduleHelper.getOriginalComponentName(
 						element.tagName
 					),
 					hadChildren = element.hasChildNodes(),
 					component = renderingContext.components[componentName],
-					id = self._getId(element),
 					instance = self._componentInstances[id];
 
 				if (!component) {
-					return;
-				}
-
-				if (!id) {
-					self._logger.warn(
-						util.format(WARN_ID_NOT_SPECIFIED, componentName)
-					);
 					return;
 				}
 
@@ -288,10 +290,6 @@ DocumentRenderer.prototype.renderComponent =
 				}
 
 				renderingContext.renderedIds[id] = true;
-
-				if (!renderingContext.startElementId) {
-					renderingContext.startElementId = id;
-				}
 
 				if (!instance) {
 					component.constructor.prototype.$context =
@@ -317,7 +315,7 @@ DocumentRenderer.prototype.renderComponent =
 					.then(function () {
 						// we need unbind the whole hierarchy only at
 						// the beginning and not for new elements
-						if (renderingContext.startElementId !== id ||
+						if (!(id in renderingContext.rootIds) ||
 							!hadChildren) {
 							return;
 						}
@@ -390,7 +388,7 @@ DocumentRenderer.prototype.renderComponent =
 					.then(function () {
 						// collecting garbage only when
 						// the entire rendering is finished
-						if (renderingContext.startElementId !== id ||
+						if (!(id in renderingContext.rootIds) ||
 							!hadChildren) {
 							return;
 						}
@@ -846,6 +844,7 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 
 	var renderingContext = this._createRenderingContext(changedStores),
 		promises = renderingContext.roots.map(function (root) {
+			renderingContext.rootIds[self._getId(root)] = true;
 			return self.renderComponent(root, renderingContext);
 		});
 
@@ -1220,6 +1219,7 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
 		bindMethods: [],
 		routingContext: this._currentRoutingContext,
 		components: components,
+		rootIds: Object.create(null),
 		roots: changedStores ? this._findRenderingRoots(changedStores) : []
 	};
 };
