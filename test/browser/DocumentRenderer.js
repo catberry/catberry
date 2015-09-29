@@ -1306,8 +1306,8 @@ describe('browser/DocumentRenderer', function () {
 					renderer.render({store1: {}, store2: {}, store3: {}}, {})
 						.then(function () {
 							assert.strictEqual(renders.length, 4);
-							assert.strictEqual(renders[0], 'unique4');
-							assert.strictEqual(renders[1], 'unique1');
+							assert.strictEqual(renders[0], 'unique1');
+							assert.strictEqual(renders[1], 'unique4');
 							assert.strictEqual(renders[2], 'unique2');
 							assert.strictEqual(renders[3], 'unique3');
 							done();
@@ -1406,8 +1406,8 @@ describe('browser/DocumentRenderer', function () {
 					eventBus.on('documentUpdated', function () {
 						try {
 							assert.strictEqual(renders.length, 4);
-							assert.strictEqual(renders[0], 'unique4');
-							assert.strictEqual(renders[1], 'unique1');
+							assert.strictEqual(renders[0], 'unique1');
+							assert.strictEqual(renders[1], 'unique4');
 							assert.strictEqual(renders[2], 'unique2');
 							assert.strictEqual(renders[3], 'unique3');
 							done();
@@ -1699,8 +1699,8 @@ describe('browser/DocumentRenderer', function () {
 					])
 						.then(function () {
 							assert.strictEqual(renders.length, 4);
-							assert.strictEqual(renders[0], 'unique4');
-							assert.strictEqual(renders[1], 'unique1');
+							assert.strictEqual(renders[0], 'unique1');
+							assert.strictEqual(renders[1], 'unique4');
 							assert.strictEqual(renders[2], 'unique2');
 							assert.strictEqual(renders[3], 'unique3');
 							done();
