@@ -34,8 +34,7 @@ module.exports = ModuleApiProvider;
 
 var util = require('util'),
 	propertyHelper = require('../../lib/helpers/propertyHelper'),
-	ModuleApiProviderBase = require('../../lib/base/ModuleApiProviderBase'),
-	moduleHelper = require('../../lib/helpers/moduleHelper');
+	ModuleApiProviderBase = require('../../lib/base/ModuleApiProviderBase');
 
 util.inherits(ModuleApiProvider, ModuleApiProviderBase);
 
