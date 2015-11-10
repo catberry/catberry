@@ -86,7 +86,7 @@
 		"jshint": "^2.8.0"
 	},
 	"engines": {
-		"node": ">=0.12"
+		"node": ">=4"
 	},
 	"scripts": {
 		"test": "make"
