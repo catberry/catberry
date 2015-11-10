@@ -32,9 +32,7 @@
 
 module.exports = ComponentErrorAsync;
 
-function ComponentErrorAsync() {
-
-}
+function ComponentErrorAsync() { }
 
 ComponentErrorAsync.prototype.render = function () {
 	var self = this;

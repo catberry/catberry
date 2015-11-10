@@ -37,7 +37,9 @@ var assert = require('assert'),
 
 describe('lib/loaders/StoreLoader', function () {
 	it('should properly load stores', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+			isRelease: true
+		});
 
 		locator.registerInstance('store', {
 			name: 'Test1',
@@ -69,7 +71,9 @@ describe('lib/loaders/StoreLoader', function () {
 	});
 
 	it('should not load stores twice', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+			isRelease: true
+		});
 
 		locator.registerInstance('store', {
 			name: 'Test1',
@@ -108,7 +112,9 @@ describe('lib/loaders/StoreLoader', function () {
 	});
 
 	it('should properly transform stores', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+			isRelease: true
+		});
 
 		locator.registerInstance('store', {
 			name: 'Test1',
@@ -153,7 +159,9 @@ describe('lib/loaders/StoreLoader', function () {
 	});
 
 	it('should skip transform errors', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+			isRelease: true
+		});
 
 		locator.registerInstance('store', {
 			name: 'Test1',

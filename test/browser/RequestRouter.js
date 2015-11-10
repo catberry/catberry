@@ -68,7 +68,7 @@ describe('browser/RequestRouter', function () {
 				});
 				eventBus.on('error', done);
 				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof(context), 'object');
+					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
 						'http://local' + link
@@ -138,7 +138,7 @@ describe('browser/RequestRouter', function () {
 				});
 				eventBus.on('error', done);
 				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof(context), 'object');
+					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
 						'http://local' + link
@@ -265,7 +265,7 @@ describe('browser/RequestRouter', function () {
 
 				eventBus.on('error', done);
 				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof(context), 'object');
+					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
 						'http://local:9090/some/' +
@@ -341,7 +341,7 @@ describe('browser/RequestRouter', function () {
 
 				eventBus.on('error', done);
 				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof(context), 'object');
+					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
 						'http://local:9090/a/b/' + link

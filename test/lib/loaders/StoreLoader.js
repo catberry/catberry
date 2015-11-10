@@ -48,7 +48,9 @@ describe('lib/loaders/StoreLoader', function () {
 					path: 'test/cases/lib/loaders/StoreLoader/Test1.js'
 				}
 			},
-			locator = createLocator({isRelease: true}, stores),
+			locator = createLocator({
+				isRelease: true
+			}, stores),
 			loader = locator.resolve('storeLoader');
 
 		loader
@@ -59,7 +61,7 @@ describe('lib/loaders/StoreLoader', function () {
 				assert.strictEqual(storeNames.length, 1);
 				var store = loadedStores[storeNames[0]];
 				assert.strictEqual(store.name, stores.Test1.name);
-				assert.strictEqual(typeof(store.constructor), 'function');
+				assert.strictEqual(typeof (store.constructor), 'function');
 				done();
 			})
 			.catch(done);
@@ -71,7 +73,9 @@ describe('lib/loaders/StoreLoader', function () {
 					path: 'test/cases/lib/loaders/StoreLoader/Test1.js'
 				}
 			},
-			locator = createLocator({isRelease: true}, stores);
+			locator = createLocator({
+				isRelease: true
+			}, stores);
 
 		locator.registerInstance('storeTransform', {
 			transform: function (store) {
@@ -96,7 +100,7 @@ describe('lib/loaders/StoreLoader', function () {
 				assert.strictEqual(storeNames.length, 1);
 				var store = loadedStores[storeNames[0]];
 				assert.strictEqual(store.name, stores.Test1.name + '!?');
-				assert.strictEqual(typeof(store.constructor), 'function');
+				assert.strictEqual(typeof (store.constructor), 'function');
 				done();
 			})
 			.catch(done);
@@ -117,7 +121,9 @@ describe('lib/loaders/StoreLoader', function () {
 				);
 				done();
 			},
-			locator = createLocator({isRelease: true}, stores, errorHandler),
+			locator = createLocator({
+				isRelease: true
+			}, stores, errorHandler),
 			eventBus = locator.resolve('eventBus'),
 			loader = locator.resolve('storeLoader');
 
@@ -141,7 +147,9 @@ describe('lib/loaders/StoreLoader', function () {
 				assert.strictEqual(error instanceof Error, true);
 				done();
 			},
-			locator = createLocator({isRelease: true}, stores, errorHandler),
+			locator = createLocator({
+				isRelease: true
+			}, stores, errorHandler),
 			eventBus = locator.resolve('eventBus'),
 			loader = locator.resolve('storeLoader');
 

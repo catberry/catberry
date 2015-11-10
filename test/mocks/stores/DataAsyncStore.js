@@ -32,13 +32,11 @@
 
 module.exports = DataAsyncStore;
 
-function DataAsyncStore() {
-
-}
+function DataAsyncStore() { }
 
 DataAsyncStore.prototype.load = function () {
 	var self = this;
-	return new Promise(function (fulfill, reject) {
+	return new Promise(function (fulfill) {
 		setTimeout(function () {
 			fulfill(self.$context);
 		}, 10);

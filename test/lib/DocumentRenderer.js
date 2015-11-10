@@ -463,7 +463,7 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render nested components' , function (done) {
+		it('should properly render nested components', function (done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -880,7 +880,7 @@ describe('lib/DocumentRenderer', function () {
 		it('should properly render nothing ' +
 		'if error in error template', function (done) {
 			var errorTemplate = {
-					render: function (context) {
+					render: function () {
 						throw new Error('template');
 					}
 				},
@@ -1130,10 +1130,10 @@ describe('lib/DocumentRenderer', function () {
 						Object.keys(response.setHeaders).length, 2
 					);
 					assert.strictEqual(
-						typeof(response.setHeaders['Content-Type']), 'string'
+						typeof (response.setHeaders['Content-Type']), 'string'
 					);
 					assert.strictEqual(
-						typeof(response.setHeaders['X-Powered-By']), 'string'
+						typeof (response.setHeaders['X-Powered-By']), 'string'
 					);
 					done();
 				});
@@ -1215,10 +1215,12 @@ describe('lib/DocumentRenderer', function () {
 			function Head() {}
 			Head.prototype.render = function () {
 				this.$context.cookie.set({
-					key: 'first', value: 'value1'
+					key: 'first',
+					value: 'value1'
 				});
 				this.$context.cookie.set({
-					key: 'second', value: 'value2'
+					key: 'second',
+					value: 'value2'
 				});
 				return this.$context;
 			};
@@ -1293,10 +1295,10 @@ describe('lib/DocumentRenderer', function () {
 						Object.keys(response.setHeaders).length, 3
 					);
 					assert.strictEqual(
-						typeof(response.setHeaders['Content-Type']), 'string'
+						typeof (response.setHeaders['Content-Type']), 'string'
 					);
 					assert.strictEqual(
-						typeof(response.setHeaders['X-Powered-By']), 'string'
+						typeof (response.setHeaders['X-Powered-By']), 'string'
 					);
 					assert.deepEqual(
 						response.setHeaders['Set-Cookie'], [
@@ -1684,7 +1686,6 @@ describe('lib/DocumentRenderer', function () {
 					done();
 				});
 		});
-
 	});
 });
 
