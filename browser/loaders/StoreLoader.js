@@ -99,7 +99,7 @@ StoreLoader.prototype.load = function () {
 		})
 		.then(function (stores) {
 			stores.forEach(function (store) {
-				if (!store || typeof(store) !== 'object') {
+				if (!store || typeof (store) !== 'object') {
 					return;
 				}
 				self._loadedStores[store.name] = store;

@@ -63,7 +63,9 @@ describe('lib/loaders/ComponentLoader', function () {
 					}
 				}
 			},
-			locator = createLocator({isRelease: true}, components),
+			locator = createLocator({
+				isRelease: true
+			}, components),
 			loader = locator.resolve('componentLoader');
 
 		loader
@@ -80,10 +82,10 @@ describe('lib/loaders/ComponentLoader', function () {
 				assert.strictEqual(
 					component1.name, components['first-cool'].name
 				);
-				assert.strictEqual(typeof(component1.constructor), 'function');
+				assert.strictEqual(typeof (component1.constructor), 'function');
 
 				assert.strictEqual(component2.name, components.second.name);
-				assert.strictEqual(typeof(component2.constructor), 'function');
+				assert.strictEqual(typeof (component2.constructor), 'function');
 				assert.strictEqual(component2.errorTemplate, undefined);
 
 				var expected = [
@@ -101,7 +103,6 @@ describe('lib/loaders/ComponentLoader', function () {
 						done();
 					})
 					.catch(done);
-
 			})
 			.catch(done);
 	});
@@ -128,7 +129,9 @@ describe('lib/loaders/ComponentLoader', function () {
 					}
 				}
 			},
-			locator = createLocator({isRelease: true}, components);
+			locator = createLocator({
+				isRelease: true
+			}, components);
 
 		locator.registerInstance('componentTransform', {
 			transform: function (component) {
@@ -159,10 +162,10 @@ describe('lib/loaders/ComponentLoader', function () {
 				assert.strictEqual(
 					component1.name, 'first-cool!?'
 				);
-				assert.strictEqual(typeof(component1.constructor), 'function');
+				assert.strictEqual(typeof (component1.constructor), 'function');
 
 				assert.strictEqual(component2.name, 'second!?');
-				assert.strictEqual(typeof(component2.constructor), 'function');
+				assert.strictEqual(typeof (component2.constructor), 'function');
 				assert.strictEqual(component2.errorTemplate, undefined);
 
 				var expected = [
@@ -180,7 +183,6 @@ describe('lib/loaders/ComponentLoader', function () {
 						done();
 					})
 					.catch(done);
-
 			})
 			.catch(done);
 	});
@@ -198,7 +200,9 @@ describe('lib/loaders/ComponentLoader', function () {
 					}
 				}
 			},
-			locator = createLocator({isRelease: true}, components),
+			locator = createLocator({
+				isRelease: true
+			}, components),
 			loader = locator.resolve('componentLoader');
 
 		loader
@@ -227,7 +231,9 @@ describe('lib/loaders/ComponentLoader', function () {
 					}
 				}
 			},
-			locator = createLocator({isRelease: true}, components),
+			locator = createLocator({
+				isRelease: true
+			}, components),
 			loader = locator.resolve('componentLoader');
 
 		loader
@@ -256,7 +262,9 @@ describe('lib/loaders/ComponentLoader', function () {
 					}
 				}
 			},
-			locator = createLocator({isRelease: true}, components),
+			locator = createLocator({
+				isRelease: true
+			}, components),
 			loader = locator.resolve('componentLoader');
 
 		loader

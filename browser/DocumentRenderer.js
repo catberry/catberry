@@ -209,7 +209,6 @@ DocumentRenderer.prototype.initWithState = function (state, routingContext) {
 			elements.unshift(self._window.document.head);
 			elements.unshift(self._window.document.documentElement);
 			return self._initialWrap(components, elements);
-
 		});
 };
 
@@ -402,7 +401,7 @@ DocumentRenderer.prototype.renderComponent =
 
 /**
  * Gets component instance by ID.
- * @param {String} id Component ID.
+ * @param {string} id Component ID.
  * @returns {Object|null} Component instance.
  */
 DocumentRenderer.prototype.getComponentById = function (id) {
@@ -429,8 +428,8 @@ DocumentRenderer.prototype.getComponentByElement = function (element) {
  */
 DocumentRenderer.prototype.collectGarbage = function () {
 	var self = this;
-	return this._getPromiseForReadyState().
-		then(function () {
+	return this._getPromiseForReadyState()
+		.then(function () {
 			var promises = [];
 			Object.keys(self._componentElements)
 				.forEach(function (id) {
@@ -454,13 +453,13 @@ DocumentRenderer.prototype.collectGarbage = function () {
 
 /**
  * Creates and renders component element.
- * @param {String} tagName Name of HTML tag.
+ * @param {string} tagName Name of HTML tag.
  * @param {Object} attributes Element attributes.
  * @returns {Promise<Element>} Promise for HTML element with rendered component.
  */
 DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
-	if (typeof(tagName) !== 'string' || !attributes ||
-		typeof(attributes) !== 'object') {
+	if (typeof (tagName) !== 'string' || !attributes ||
+		typeof (attributes) !== 'object') {
 		return Promise.reject(
 			new Error(ERROR_CREATE_WRONG_ARGUMENTS)
 		);
@@ -616,7 +615,7 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 	var bindMethod = moduleHelper.getMethodToInvoke(instance, 'bind');
 	return moduleHelper.getSafePromise(bindMethod)
 		.then(function (bindings) {
-			if (!bindings || typeof(bindings) !== 'object') {
+			if (!bindings || typeof (bindings) !== 'object') {
 				self._eventBus.emit('componentBound', {
 					element: element,
 					id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
@@ -634,7 +633,7 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 					Object.keys(bindings[eventName])
 						.forEach(function (selector) {
 							var handler = bindings[eventName][selector];
-							if (typeof(handler) !== 'function') {
+							if (typeof (handler) !== 'function') {
 								return;
 							}
 							selectorHandlers[selector] = handler.bind(instance);
@@ -685,7 +684,7 @@ DocumentRenderer.prototype._createBindingHandler =
 				return;
 			}
 
-			while(element.parentElement && element !== componentRoot) {
+			while (element.parentElement && element !== componentRoot) {
 				element = element.parentElement;
 				targetMatches = getMatchesMethod(element);
 				for (var i = 0; i < selectors.length; i++) {
@@ -720,7 +719,7 @@ DocumentRenderer.prototype._isComponent = function (components, element) {
  * Finds all descendant components of specified component element.
  * @param {Element} element Root component HTML element to begin search with.
  * @param {Object} components Map of components by names.
- * @param {Boolean} goInComponents Go inside nested components.
+ * @param {boolean} goInComponents Go inside nested components.
  * @private
  */
 DocumentRenderer.prototype._findComponents =
@@ -758,7 +757,7 @@ DocumentRenderer.prototype._findComponents =
  * @param {Element} element Component HTML element.
  * @param {Object} component Component instance.
  * @param {Error} error Error to handle.
- * @returns {Promise<String>} Promise for HTML string.
+ * @returns {Promise<string>} Promise for HTML string.
  * @private
  */
 DocumentRenderer.prototype._handleRenderError =
@@ -990,6 +989,8 @@ DocumentRenderer.prototype._getNodeKey = function (node) {
 
 /**
  * Does initial wrapping for every component on the page.
+ * @param {Array} components Current components list.
+ * @param {Array} element Elements list.
  * @private
  */
 DocumentRenderer.prototype._initialWrap = function (components, elements) {
@@ -1174,7 +1175,7 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 						continue;
 					}
 
-					//// is not an active component
+					// is not an active component
 					if (!(currentComponentName in components)) {
 						continue;
 					}
@@ -1200,12 +1201,12 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
  *   config: Object,
  *   renderedIds: {},
  *   unboundIds: {},
- *   isHeadRendered: Boolean,
+ *   isHeadRendered: boolean,
  *   bindMethods: Array,
  *   routingContext: Object,
  *   components: Object,
  *   roots: Array.<Element>
- * }}
+ * }} The context object.
  * @private
  */
 DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
@@ -1240,7 +1241,7 @@ DocumentRenderer.prototype._getId = function (element) {
 };
 
 /**
- * Creates temporary clone of the element;
+ * Creates temporary clone of the element.
  * @param {Element} element DOM element.
  * @returns {Element} clone.
  * @private
@@ -1273,7 +1274,7 @@ function attributesToObject(attributes) {
  * @returns {Function} "matches" method.
  */
 function getMatchesMethod(element) {
-	var method =  (element.matches ||
+	var method = (element.matches ||
 		element.webkitMatchesSelector ||
 		element.mozMatchesSelector ||
 		element.oMatchesSelector ||
@@ -1292,11 +1293,11 @@ function createCustomEvent(event, currentTargetGetter) {
 	var catEvent = Object.create(event),
 		keys = [],
 		properties = {};
-	for(var key in event) {
+	for (var key in event) {
 		keys.push(key);
 	}
 	keys.forEach(function (key) {
-		if (typeof(event[key]) === 'function') {
+		if (typeof (event[key]) === 'function') {
 			properties[key] = {
 				get: function () {
 					return event[key].bind(event);

@@ -39,7 +39,7 @@ var assert = require('assert'),
 
 global.Promise = require('promise');
 
-describe('lib/providers/ModuleApiProvider', function () {
+describe('browser/providers/ModuleApiProvider', function () {
 	describe('#redirect', function () {
 		it('should redirect to URI', function (done) {
 			var locator = createLocator(),
@@ -72,7 +72,7 @@ describe('lib/providers/ModuleApiProvider', function () {
 					api.clearFragment()
 						.then(function () {
 							assert.strictEqual(
-								window.location.toString(), 'http://local/#'
+								window.location.toString(), 'http://local/'
 							);
 							done();
 						})

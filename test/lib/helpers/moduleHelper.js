@@ -157,7 +157,7 @@ describe('lib/helpers/moduleHelper', function () {
 				name = 'method-to-invoke',
 				method = moduleHelper.getMethodToInvoke(module, 'some', name);
 
-			assert.strictEqual(typeof(method), 'function');
+			assert.strictEqual(typeof (method), 'function');
 			assert.strictEqual(method(), 'hello');
 		});
 
@@ -174,7 +174,7 @@ describe('lib/helpers/moduleHelper', function () {
 						module, 'some', name
 					);
 
-				assert.strictEqual(typeof(method), 'function');
+				assert.strictEqual(typeof (method), 'function');
 				assert.strictEqual(method(), 'hello');
 			});
 
@@ -187,7 +187,7 @@ describe('lib/helpers/moduleHelper', function () {
 						module, 'some', name
 					);
 
-				assert.strictEqual(typeof(method), 'function');
+				assert.strictEqual(typeof (method), 'function');
 				assert.strictEqual(method() instanceof Promise, true);
 			});
 
@@ -199,7 +199,7 @@ describe('lib/helpers/moduleHelper', function () {
 						module, 'some', name
 					);
 
-				assert.strictEqual(typeof(method), 'function');
+				assert.strictEqual(typeof (method), 'function');
 				assert.strictEqual(method() instanceof Promise, true);
 			});
 	});

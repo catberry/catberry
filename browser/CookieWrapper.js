@@ -29,6 +29,7 @@
  */
 
 'use strict';
+
 module.exports = CookieWrapper;
 
 var util = require('util'),
@@ -38,6 +39,7 @@ util.inherits(CookieWrapper, CookieWrapperBase);
 
 /**
  * Creates new instance of the browser cookie wrapper.
+ * @param {Window} $window Window object.
  * @constructor
  */
 function CookieWrapper($window) {
