@@ -39,7 +39,9 @@ var assert = require('assert'),
 
 describe('browser/loaders/ComponentLoader', function () {
 	it('should properly load components', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+			isRelease: true
+		});
 
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
@@ -106,13 +108,14 @@ describe('browser/loaders/ComponentLoader', function () {
 						done();
 					})
 					.catch(done);
-
 			})
 			.catch(done);
 	});
 
 	it('should not load components twice', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+			isRelease: true
+		});
 
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
@@ -168,7 +171,9 @@ describe('browser/loaders/ComponentLoader', function () {
 	});
 
 	it('should properly transform components', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+				isRelease: true
+			});
 
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
@@ -250,13 +255,14 @@ describe('browser/loaders/ComponentLoader', function () {
 						done();
 					})
 					.catch(done);
-
 			})
 			.catch(done);
 	});
 
 	it('should skip transform errors', function (done) {
-		var locator = createLocator({isRelease: true});
+		var locator = createLocator({
+				isRelease: true
+			});
 
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},

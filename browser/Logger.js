@@ -44,7 +44,6 @@ var LEVELS = {
 /**
  * Creates browser logger.
  * @param {Object|string} levels Levels to log.
- * @supported Chrome, Firefox>=2.0, Internet Explorer>=8, Opera, Safari.
  * @constructor
  */
 function Logger(levels) {
@@ -52,7 +51,7 @@ function Logger(levels) {
 		this._levels = levels;
 	}
 
-	if (typeof(levels) === 'string') {
+	if (typeof (levels) === 'string') {
 		this._levels = {};
 		Object.keys(LEVELS)
 			.forEach(function (level) {
@@ -168,7 +167,7 @@ Logger.prototype.fatal = function (error) {
 function writeError(error) {
 	try {
 		if (!(error instanceof Error)) {
-			error = typeof(error) === 'string' ? new Error(error) : new Error();
+			error = typeof (error) === 'string' ? new Error(error) : new Error();
 		}
 		if (console.error) {
 			console.error(error);

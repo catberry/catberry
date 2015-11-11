@@ -319,7 +319,7 @@ RequestRouter.prototype._handleError = function (error) {
  * @returns {Node|null} The closest "A" element or null.
  */
 function closestLink(element) {
-	while(element && element.nodeName !== A_TAG_NAME &&
+	while (element && element.nodeName !== A_TAG_NAME &&
 		element.nodeName !== BODY_TAG_NAME) {
 		element = element.parentNode;
 	}

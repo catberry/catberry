@@ -32,9 +32,7 @@
 
 module.exports = Component;
 
-function Component() {
-
-}
+function Component() { }
 
 Component.prototype.render = function () {
 	return this.$context;

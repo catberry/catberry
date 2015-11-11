@@ -49,7 +49,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -81,7 +83,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -105,7 +109,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -124,7 +130,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -145,7 +153,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -166,7 +176,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -180,7 +192,9 @@ describe('lib/StoreDispatcher', function () {
 		});
 		it('should return null if store name is not a string', function (done) {
 			var locator = createLocator({}),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -193,7 +207,9 @@ describe('lib/StoreDispatcher', function () {
 		});
 		it('should reject promise if there is no such store', function (done) {
 			var locator = createLocator({}),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -227,7 +243,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -266,7 +284,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -305,7 +325,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				eventBus = locator.resolve('eventBus'),
 				dispatcher = locator.resolve('storeDispatcher');
 
@@ -345,7 +367,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				eventBus = locator.resolve('eventBus'),
 				dispatcher = locator.resolve('storeDispatcher');
 
@@ -364,7 +388,9 @@ describe('lib/StoreDispatcher', function () {
 							})
 							.catch(done);
 					});
-					dispatcher.setState({store1: {}}, context);
+					dispatcher.setState({
+						store1: {}
+					}, context);
 				});
 		});
 		it('should emit store\'s changed ' +
@@ -410,7 +436,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				eventBus = locator.resolve('eventBus'),
 				dispatcher = locator.resolve('storeDispatcher');
 
@@ -466,7 +494,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -503,7 +533,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.setState({}, context);
@@ -562,7 +594,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				eventBus = locator.resolve('eventBus'),
 				dispatcher = locator.resolve('storeDispatcher');
 
@@ -594,7 +628,9 @@ describe('lib/StoreDispatcher', function () {
 				}
 			};
 			var locator = createLocator(stores),
-				context = {hello: 'world'},
+				context = {
+					hello: 'world'
+				},
 				eventBus = locator.resolve('eventBus'),
 				dispatcher = locator.resolve('storeDispatcher');
 
@@ -641,7 +677,9 @@ describe('lib/StoreDispatcher', function () {
 			assert.strictEqual(names.length, 0);
 			dispatcher.getStoreData(stores.store2.name)
 				.then(function () {
-					var newContext = {hello: 'world2'},
+					var newContext = {
+							hello: 'world2'
+						},
 						updatedNames = dispatcher.setState(
 							newState, newContext
 						);

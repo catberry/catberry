@@ -32,13 +32,11 @@
 
 module.exports = ComponentAsync;
 
-function ComponentAsync() {
-
-}
+function ComponentAsync() { }
 
 ComponentAsync.prototype.render = function () {
 	var self = this;
-	return new Promise(function (fulfill, reject) {
+	return new Promise(function (fulfill) {
 		setTimeout(function () {
 			fulfill(self.$context);
 		}, 1);

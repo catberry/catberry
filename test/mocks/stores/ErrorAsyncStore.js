@@ -32,9 +32,7 @@
 
 module.exports = ErrorAsyncStore;
 
-function ErrorAsyncStore() {
-
-}
+function ErrorAsyncStore() { }
 
 ErrorAsyncStore.prototype.load = function () {
 	var self = this;

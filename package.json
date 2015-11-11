@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "6.2.2",
+	"version": "7.0.0",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -62,39 +62,34 @@
 	},
 	"dependencies": {
 		"mkdirp": "~0.5.1",
-		"glob": "^5.0.14",
-		"chokidar": "^1.0.5",
-		"catberry-locator": "^1.1.7",
-		"catberry-uhr": "^4.1.1",
-		"catberry-uri": "^2.1.4",
+		"glob": "^5.0.15",
+		"chokidar": "^1.2.0",
+		"catberry-locator": "^1.1.9",
+		"catberry-uhr": "^4.2.2",
+		"catberry-uri": "^2.1.6",
 		"entities": "^1.1.1",
-		"watchify": "^3.3.1",
-		"uglify-js": "^2.4.24",
-		"browserify": "^11.0.1",
-		"log4js": "~0.6.26",
+		"watchify": "^3.6.0",
+		"uglify-js": "^2.5.0",
+		"browserify": "^12.0.1",
+		"log4js": "~0.6.27",
 		"promise": "^7.0.4",
-		"pretty-hrtime": "^1.0.0",
+		"pretty-hrtime": "^1.0.1",
 		"browser-process-hrtime": "~0.1.2",
-		"morphdom": "^1.0.0"
+		"morphdom": "^1.0.3"
 	},
 	"devDependencies": {
-		"istanbul-harmony": "~0.3.16",
-		"codecov.io": "^0.1.6",
-		"jsdom": "^3.1.2",
-		"mocha": "^2.2.5",
-		"jscs": "~1.6.2",
-		"jshint": "^2.6.0"
+		"istanbul": "~0.4.0",
+		"codecov.io": "~0.1.6",
+		"jsdom": "^7.0.2",
+		"mocha": "^2.3.3",
+		"jscs": "^2.5.1",
+		"jshint": "^2.8.0"
 	},
 	"engines": {
-		"node": ">=0.10"
+		"node": ">=4"
 	},
 	"scripts": {
 		"test": "make"
 	},
-	"licenses": [
-		{
-			"type": "MIT",
-			"url": "https://github.com/catberry/catberry/blob/master/LICENSE"
-		}
-	]
+	"license": "MIT"
 }
