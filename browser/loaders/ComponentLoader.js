@@ -106,7 +106,7 @@ ComponentLoader.prototype.load = function () {
 		})
 		.then(function (components) {
 			components.forEach(function (component) {
-				if (!component || typeof(component) !== 'object') {
+				if (!component || typeof (component) !== 'object') {
 					return;
 				}
 				self._loadedComponents[component.name] = component;
@@ -139,7 +139,7 @@ ComponentLoader.prototype._processComponent = function (componentDetails) {
 					);
 				}
 			};
-			if (typeof(component.errorTemplateSource) === 'string') {
+			if (typeof (component.errorTemplateSource) === 'string') {
 				var errorTemplateName = moduleHelper.getNameForErrorTemplate(
 					component.name
 				);

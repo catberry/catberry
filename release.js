@@ -52,7 +52,9 @@ var REPOSITORY_LINK_REGEXP =
 
 PATHS.forEach(function (currentPath) {
 	var absolutePath = path.join(__dirname, currentPath),
-		options = {encoding: 'utf8'},
+		options = {
+			encoding: 'utf8'
+		},
 		buffer = '';
 
 	console.log('Reading...');

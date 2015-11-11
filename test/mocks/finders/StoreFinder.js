@@ -52,6 +52,4 @@ StoreFinder.prototype.find = function () {
 	});
 };
 
-StoreFinder.prototype.watch = function () {
-
-};
+StoreFinder.prototype.watch = function () { };

@@ -32,9 +32,7 @@
 
 module.exports = ErrorStore;
 
-function ErrorStore() {
-
-}
+function ErrorStore() { }
 
 ErrorStore.prototype.load = function () {
 	throw new Error(this.$context.name);

@@ -59,7 +59,7 @@ describe('browser/DocumentRenderer', function () {
 				);
 
 				var bindCalls = [];
-				function NestComponent () {}
+				function NestComponent() {}
 				NestComponent.prototype.bind = function () {
 					var id = this.$context.attributes.id ?
 						'-' + this.$context.attributes.id : '';
@@ -274,7 +274,9 @@ describe('browser/DocumentRenderer', function () {
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
-			var locator = createLocator(components, {isRelease: true}),
+			var locator = createLocator(components, {
+					isRelease: true
+				}),
 				eventBus = locator.resolve('eventBus');
 
 			eventBus.on('error', function (error) {
@@ -322,7 +324,9 @@ describe('browser/DocumentRenderer', function () {
 					templateSource: 'none'
 				}
 			];
-			var locator = createLocator(components, {isRelease: true}),
+			var locator = createLocator(components, {
+					isRelease: true
+				}),
 				eventBus = locator.resolve('eventBus');
 
 			var expected = 'Error<br><div>Hello, Error!</div>' +
@@ -332,7 +336,7 @@ describe('browser/DocumentRenderer', function () {
 				'<cat-error2 id="cat-error2"></cat-error2>' +
 				'</cat-error>';
 
-			eventBus.on('error', function (error) {
+			eventBus.on('error', function () {
 				// nothing to do
 			});
 			jsdom.env({
@@ -356,7 +360,9 @@ describe('browser/DocumentRenderer', function () {
 
 		it('should do nothing if there is no such component', function (done) {
 			var components = [];
-			var locator = createLocator(components, {isRelease: true}),
+			var locator = createLocator(components, {
+					isRelease: true
+				}),
 				eventBus = locator.resolve('eventBus');
 
 			eventBus.on('error', done);
@@ -756,7 +762,7 @@ describe('browser/DocumentRenderer', function () {
 						.then(function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
-							for(var i = 0; i < links.length; i++) {
+							for (var i = 0; i < links.length; i++) {
 								event = window.document
 									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
@@ -817,7 +823,7 @@ describe('browser/DocumentRenderer', function () {
 						.then(function () {
 							var event,
 								toClick = element.querySelectorAll('div.toclick');
-							for(var i = 0; i < toClick.length; i++) {
+							for (var i = 0; i < toClick.length; i++) {
 								event = window.document
 									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
@@ -873,7 +879,7 @@ describe('browser/DocumentRenderer', function () {
 						.then(function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
-							for(var i = 0; i < links.length; i++) {
+							for (var i = 0; i < links.length; i++) {
 								event = window.document
 									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
@@ -927,7 +933,7 @@ describe('browser/DocumentRenderer', function () {
 						.then(function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
-							for(var i = 0; i < links.length; i++) {
+							for (var i = 0; i < links.length; i++) {
 								event = window.document
 									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
@@ -1034,7 +1040,7 @@ describe('browser/DocumentRenderer', function () {
 						.then(function () {
 							var event,
 								links = element.querySelectorAll('a.clickable');
-							for(var i = 0; i < links.length; i++) {
+							for (var i = 0; i < links.length; i++) {
 								event = window.document
 									.createEvent('MouseEvents');
 								event.initEvent('click', true, true);
@@ -1144,7 +1150,7 @@ describe('browser/DocumentRenderer', function () {
 					registerCompiled: function (name, source) {
 						templates[name] = source;
 					},
-					render: function (name, data) {
+					render: function (name) {
 						if (counter % 2 === 0) {
 							return Promise.resolve('');
 						}
@@ -1270,9 +1276,18 @@ describe('browser/DocumentRenderer', function () {
 			];
 
 			var stores = [
-				{name: 'store1', constructor: DataStore},
-				{name: 'store2', constructor: DataStore},
-				{name: 'store3', constructor: DataStore}
+				{
+					name: 'store1',
+					constructor: DataStore
+				},
+				{
+					name: 'store2',
+					constructor: DataStore
+				},
+				{
+					name: 'store3',
+					constructor: DataStore
+				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
 					'test1<br>' +
@@ -1303,7 +1318,12 @@ describe('browser/DocumentRenderer', function () {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
 					renderer.initWithState({}, {});
-					renderer.render({store1: {}, store2: {}, store3: {}}, {})
+					renderer
+						.render({
+							store1: {},
+							store2: {},
+							store3: {}
+						}, {})
 						.then(function () {
 							assert.strictEqual(renders.length, 4);
 							assert.strictEqual(renders[0], 'unique1');
@@ -1370,9 +1390,18 @@ describe('browser/DocumentRenderer', function () {
 			];
 
 			var stores = [
-				{name: 'store1', constructor: DataStore},
-				{name: 'store2', constructor: TimerStore},
-				{name: 'store3', constructor: DataStore}
+				{
+					name: 'store1',
+					constructor: DataStore
+				},
+				{
+					name: 'store2',
+					constructor: TimerStore
+				},
+				{
+					name: 'store3',
+					constructor: DataStore
+				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
 					'test1<br>' +
@@ -1411,7 +1440,7 @@ describe('browser/DocumentRenderer', function () {
 							assert.strictEqual(renders[2], 'unique2');
 							assert.strictEqual(renders[3], 'unique3');
 							done();
-						} catch(e) {
+						} catch (e) {
 							done(e);
 						}
 					});
@@ -1472,9 +1501,18 @@ describe('browser/DocumentRenderer', function () {
 			];
 
 			var stores = [
-				{name: 'store1', constructor: TimerStore},
-				{name: 'store2', constructor: TimerStore},
-				{name: 'store3', constructor: TimerStore}
+				{
+					name: 'store1',
+					constructor: TimerStore
+				},
+				{
+					name: 'store2',
+					constructor: TimerStore
+				},
+				{
+					name: 'store3',
+					constructor: TimerStore
+				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
 					'test1<br>' +
@@ -1557,9 +1595,18 @@ describe('browser/DocumentRenderer', function () {
 			];
 
 			var stores = [
-				{name: 'store1', constructor: DataStore},
-				{name: 'store2', constructor: DataStore},
-				{name: 'store3', constructor: DataStore}
+				{
+					name: 'store1',
+					constructor: DataStore
+				},
+				{
+					name: 'store2',
+					constructor: DataStore
+				},
+				{
+					name: 'store3',
+					constructor: DataStore
+				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
 				'test1<br>' +
@@ -1580,7 +1627,11 @@ describe('browser/DocumentRenderer', function () {
 				'Hello from test3' +
 				'</cat-test3>';
 
-			var state = {store1: {}, store2: {}, store3: {}},
+			var state = {
+					store1: {},
+					store2: {},
+					store3: {}
+				},
 				locator = createLocator(components, {}, stores),
 				eventBus = locator.resolve('eventBus');
 
@@ -1656,9 +1707,18 @@ describe('browser/DocumentRenderer', function () {
 			];
 
 			var stores = [
-				{name: 'store1', constructor: DataStore},
-				{name: 'store2', constructor: DataStore},
-				{name: 'store3', constructor: DataStore}
+				{
+					name: 'store1',
+					constructor: DataStore
+				},
+				{
+					name: 'store2',
+					constructor: DataStore
+				},
+				{
+					name: 'store3',
+					constructor: DataStore
+				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
 					'test1<br>' +
@@ -1691,11 +1751,18 @@ describe('browser/DocumentRenderer', function () {
 
 					renderer.initWithState({}, {});
 					Promise.all([
-						renderer.render({store1: {}}, {}),
-						renderer.render({store1: {}, store2: {}}, {}),
-						renderer.render(
-							{store1: {}, store2: {}, store3: {}}, {}
-						)
+						renderer.render({
+							store1: {}
+						}, {}),
+						renderer.render({
+							store1: {},
+							store2: {}
+						}, {}),
+						renderer.render({
+							store1: {},
+							store2: {},
+							store3: {}
+						}, {})
 					])
 						.then(function () {
 							assert.strictEqual(renders.length, 4);
@@ -1730,7 +1797,9 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.createComponent('cat-test', {id: 'unique'})
+					renderer.createComponent('cat-test', {
+							id: 'unique'
+						})
 						.then(function (element) {
 							assert.strictEqual(element.innerHTML, expected);
 							assert.strictEqual(
@@ -1788,11 +1857,15 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.createComponent('cat-test1', {id: 'test1'})
+					renderer.createComponent('cat-test1', {
+							id: 'test1'
+						})
 						.then(function (element) {
 							assert.strictEqual(element.innerHTML, expected1);
 							return renderer.createComponent(
-								'cat-test4', {id: 'test4'}
+								'cat-test4', {
+									id: 'test4'
+								}
 							);
 						})
 						.then(function (element) {
@@ -1854,7 +1927,9 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.createComponent('cat-wrong', {id: 'unique'})
+					renderer.createComponent('cat-wrong', {
+							id: 'unique'
+						})
 						.then(function () {
 							done(new Error('Should fail'));
 						})
@@ -1918,10 +1993,14 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.createComponent('cat-test', {id: 'some'})
+					renderer.createComponent('cat-test', {
+							id: 'some'
+						})
 						.then(function () {
 							return renderer.createComponent(
-								'cat-test', {id: 'some'}
+								'cat-test', {
+									id: 'some'
+								}
 							);
 						})
 						.then(function () {
@@ -1956,7 +2035,9 @@ describe('browser/DocumentRenderer', function () {
 				done: function (errors, window) {
 					locator.registerInstance('window', window);
 					var renderer = locator.resolveInstance(DocumentRenderer);
-					renderer.createComponent(500, {id: 'some'})
+					renderer.createComponent(500, {
+							id: 'some'
+						})
 						.then(function () {
 							done(new Error('Should fail'));
 						})
@@ -2033,8 +2114,12 @@ describe('browser/DocumentRenderer', function () {
 						element = window.document.createElement('cat-test');
 					element.setAttribute('id', 'unique');
 					Promise.all([
-						renderer.createComponent('cat-test', {id: 'unique1'}),
-						renderer.createComponent('cat-test', {id: 'unique2'})
+						renderer.createComponent('cat-test', {
+							id: 'unique1'
+						}),
+						renderer.createComponent('cat-test', {
+							id: 'unique2'
+						})
 					])
 						.then(function (elements) {
 							window.document.body.appendChild(elements[0]);

@@ -29,6 +29,7 @@
  */
 
 'use strict';
+
 var assert = require('assert'),
 	fs = require('../../../lib/promises/fs');
 

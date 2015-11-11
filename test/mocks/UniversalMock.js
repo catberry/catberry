@@ -52,7 +52,7 @@ function UniversalMock(methodNames) {
 
 UniversalMock.prototype.decorateMethod = function (name, method) {
 	var old = this[name];
-	if (typeof(old) !== 'function') {
+	if (typeof (old) !== 'function') {
 		return;
 	}
 	this[name] = function () {
