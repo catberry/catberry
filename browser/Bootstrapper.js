@@ -45,7 +45,6 @@ var components = [
 
 var util = require('util'),
 	routeDefinitions = '__routeDefinitions' || [],
-	moduleHelper = require('./node_modules/catberry/lib/helpers/moduleHelper.js'),
 	Catberry = require('./node_modules/catberry/browser/Catberry.js'),
 	Logger = require('./node_modules/catberry/browser/Logger.js'),
 	BootstrapperBase =
