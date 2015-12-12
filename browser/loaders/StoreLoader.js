@@ -32,8 +32,7 @@
 
 module.exports = StoreLoader;
 
-var moduleHelper = require('../../lib/helpers/moduleHelper'),
-	util = require('util'),
+var util = require('util'),
 	LoaderBase = require('../../lib/base/LoaderBase');
 
 util.inherits(StoreLoader, LoaderBase);
