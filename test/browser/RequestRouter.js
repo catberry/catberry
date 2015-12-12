@@ -93,10 +93,12 @@ describe('browser/RequestRouter', function () {
 						window.location.replace('http://local/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -163,10 +165,12 @@ describe('browser/RequestRouter', function () {
 						window.location.replace('http://local/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('div')[0]
@@ -225,10 +229,13 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('https://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -290,10 +297,13 @@ describe('browser/RequestRouter', function () {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -359,10 +369,13 @@ describe('browser/RequestRouter', function () {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b/');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -413,10 +426,13 @@ describe('browser/RequestRouter', function () {
 							done();
 						};
 						locator.resolveInstance(RequestRouter);
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -456,10 +472,13 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -508,10 +527,13 @@ describe('browser/RequestRouter', function () {
 						window.location
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('div')[0]
@@ -560,10 +582,12 @@ describe('browser/RequestRouter', function () {
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 1;
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 1
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -612,11 +636,13 @@ describe('browser/RequestRouter', function () {
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
-						event.ctrlKey = true;
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							ctrlKey: true,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -665,11 +691,13 @@ describe('browser/RequestRouter', function () {
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
-						event.altKey = true;
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							altKey: true,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -718,11 +746,13 @@ describe('browser/RequestRouter', function () {
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
-						event.shiftKey = true;
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							shiftKey: true,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
@@ -766,10 +796,12 @@ describe('browser/RequestRouter', function () {
 							.replace('http://local1.com/some');
 						locator.resolveInstance(RequestRouter);
 
-						var event = window.document
-							.createEvent('MouseEvents');
-						event.initEvent('click', true, true);
-						event.button = 0;
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
 
 						window.document
 							.getElementsByTagName('a')[0]
