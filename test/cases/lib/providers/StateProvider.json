@@ -314,6 +314,26 @@
 			}
 		},
 		{
+			"name": "should support parameters with %26 and %3D substrings",
+			"routes": [
+				"/state/w:arg1[Store1, Store2]q/q:arg2[Store2]s?a=:arg3[Store1]z&b=:arg4[Store3]y"
+			],
+			"uri": "/state/wval1q/qval2s?a=%3Dval%263z&b=%3Dval%264y",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1",
+					"arg3": "=val&3"
+				},
+				"Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"Store3": {
+					"arg4": "=val&4"
+				}
+			}
+		},
+		{
 			"name": "should support partial parameters and the empty value",
 			"routes": [
 				"/state/w:arg1[Store1, Store2]q/q:arg2[Store2]s?a=a:arg3[Store1]z&b=x:arg4[Store3]y"
