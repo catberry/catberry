@@ -564,7 +564,7 @@ In previous example `id` value will be set to states of stores
 of store `store1`.
 
 Please keep in mind that parameter **name** in route definition should satisfy
-regular expression `[^\[\],]+` and parameter **value** should satisfy
+regular expression `[$A-Z_][\\dA-Z_$]*` and parameter **value** should satisfy
 regular expression `[^\\\/&?=]*`.
 
 ## Colon-marked Parameters with Additional `map` Function
@@ -1380,20 +1380,34 @@ an object with additional data like this:
 }
 ```
 
-## Browserify Transformation API
+## Browserify Transformation and Plugin API
 You can register a
-[browserify transformation](https://github.com/substack/node-browserify/wiki/list-of-transforms).
-A plugin can be registered as an instance (`locator.registerInstance`) or
-as a constructor (`locator.register`):
+browserify [transformation](https://github.com/substack/node-browserify/wiki/list-of-transforms) or
+[plugin](https://github.com/substack/node-browserify#plugins).
+Both of them can be registered as instances (`locator.registerInstance`) or
+as constructors (`locator.register`):
+
+The transformation example:
 
 ```javascript
 locator.registerInstance(‘browserifyTransformation’, {
-  transform: function (fileStream) {
+  transform: function (filePath, options) {
     return transformStream;
   },
   options: { /* transform options will be passed to the browserify */ }
 );
 ```
+The plugin example:
+
+```javascript
+locator.registerInstance(‘browserifyPlugin’, {
+  plugin: function (bundlerObject, options) {
+    return transformStream;
+  },
+  options: { /* plugin options will be passed to the browserify */ }
+);
+```
+
 ## List of Officially Supported Plugins
 
 * [catberry-assets](https://github.com/catberry/catberry-assets) – The plugin that builds assets for every component using Gulp
