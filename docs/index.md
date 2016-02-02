@@ -39,7 +39,7 @@
 	* [Store Transformation API](#store-transformation-api)
 	* [Component Transformation API](#component-transformation-api)
 	* [Post-build Action API](#post-build-action-api)
-	* [Browserify Transformation API](#browserify-transformation-api)
+	* [Browserify Transformation and Plugin API](#browserify-transformation-and-plugin-api)
 	* [List of Officially Supported Plugins](#list-of-officially-supported-plugins)
 * [Code Style Guide](code-style-guide.md)
 
