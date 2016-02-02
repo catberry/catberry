@@ -204,6 +204,26 @@
 			}
 		},
 		{
+			"name": "should return a proper state if actual parameters contain dots in their names",
+			"routes": [
+				"/state/:arg1[Store1, Store2]/:arg2[Store2]?q.a=:arg3[Store1]&q.b=:arg4[Store3]"
+			],
+			"uri": "/state/va.l1/va.l2?q.a=va.l3&q.b=va.l4",
+			"expectedState": {
+				"Store1": {
+					"arg1": "va.l1",
+					"arg3": "va.l3"
+				},
+				"Store2": {
+					"arg1": "va.l1",
+					"arg2": "va.l2"
+				},
+				"Store3": {
+					"arg4": "va.l4"
+				}
+			}
+		},
+		{
 			"name": "should support another order of query parameters",
 			"routes": [
 				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
