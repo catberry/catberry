@@ -564,7 +564,7 @@ In previous example `id` value will be set to states of stores
 of store `store1`.
 
 Please keep in mind that parameter **name** in route definition should satisfy
-regular expression `[^\[\],]+` and parameter **value** should satisfy
+regular expression `[$A-Z_][\\dA-Z_$]*` and parameter **value** should satisfy
 regular expression `[^\\\/&?=]*`.
 
 ## Colon-marked Parameters with Additional `map` Function
