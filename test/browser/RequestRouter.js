@@ -115,6 +115,52 @@ describe('browser/RequestRouter', function () {
 			}
 		);
 
+		it('should get state from URI only once while changing state',
+			function (done) {
+				var locator = createLocator(),
+					documentRenderer = locator.resolve('documentRenderer'),
+					eventBus = locator.resolve('eventBus'),
+					counter = 0,
+					link = '/some/hello';
+
+				locator.registerInstance('routeDefinition', {
+					expression: '/some/:param[first]',
+					map: function (state) {
+						counter++;
+						return state;
+					}
+				});
+				eventBus.on('error', done);
+
+				jsdom.env({
+					html: '<a href="' + link + '"></a>',
+					done: function (errors, window) {
+						locator.registerInstance('window', window);
+						window.location.replace('http://local/some');
+						locator.resolveInstance(RequestRouter);
+
+						var event = new window.MouseEvent('click', {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						});
+
+						window.document
+							.getElementsByTagName('a')[0]
+							.dispatchEvent(event);
+						setTimeout(function () {
+							assert.strictEqual(counter, 1);
+							assert.strictEqual(window.location.toString(),
+								'http://local' + link);
+							assert.strictEqual(window.history.length, 2);
+							done();
+						}, 10);
+					}
+				});
+			}
+		);
+
 		it('should catch click on item inside link and change state',
 			function (done) {
 				var locator = createLocator(),
