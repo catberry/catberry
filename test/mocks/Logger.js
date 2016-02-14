@@ -34,14 +34,14 @@ module.exports = Logger;
 
 function Logger() { }
 
-Logger.prototype.trace = function () { };
+Logger.prototype.trace = function() { };
 
-Logger.prototype.warn = function () { };
+Logger.prototype.warn = function() { };
 
-Logger.prototype.trace = function () { };
+Logger.prototype.trace = function() { };
 
-Logger.prototype.error = function () { };
+Logger.prototype.error = function() { };
 
-Logger.prototype.info = function () { };
+Logger.prototype.info = function() { };
 
-Logger.prototype.fatal = function () { };
+Logger.prototype.fatal = function() { };

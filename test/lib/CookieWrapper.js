@@ -33,34 +33,34 @@
 var assert = require('assert'),
 	CookieWrapper = require('../../lib/CookieWrapper');
 
-describe('lib/CookieWrapper', function () {
-	describe('#get', function () {
-		it('should return empty string if cookie string is null', function () {
+describe('lib/CookieWrapper', function() {
+	describe('#get', function() {
+		it('should return empty string if cookie string is null', function() {
 			var cookieWrapper = new CookieWrapper();
 			cookieWrapper.initWithString(null);
 			assert.strictEqual(cookieWrapper.get('some'), '');
 		});
 		it('should return empty string if cookie key is not a string',
-			function () {
+			function() {
 				var cookieWrapper = new CookieWrapper();
 				cookieWrapper.initWithString('some=value;');
 				assert.strictEqual(cookieWrapper.get({}), '');
 			});
-		it('should return value if cookie string is right', function () {
+		it('should return value if cookie string is right', function() {
 			var cookieWrapper = new CookieWrapper();
 			cookieWrapper.initWithString('some=value; some2=value2');
 			assert.strictEqual(cookieWrapper.get('some'), 'value');
 			assert.strictEqual(cookieWrapper.get('some2'), 'value2');
 		});
-		it('should return empty string if cookie string is wrong', function () {
+		it('should return empty string if cookie string is wrong', function() {
 			var cookieWrapper = new CookieWrapper();
 			cookieWrapper.initWithString('fasdfa/gafg-sgafga');
 			assert.strictEqual(cookieWrapper.get('fasdfa/gafg-sgafga'), '');
 		});
 	});
-	describe('#set', function () {
+	describe('#set', function() {
 		it('should set cookie by specified parameters',
-			function () {
+			function() {
 				var cookieWrapper = new CookieWrapper(),
 					expiration = new Date(),
 					expected = 'some=value' +
@@ -88,7 +88,7 @@ describe('lib/CookieWrapper', function () {
 				assert.strictEqual(cookieWrapper.setCookie[0], expected);
 			});
 		it('should set several cookies by specified parameters',
-			function () {
+			function() {
 				var cookieWrapper = new CookieWrapper(),
 					expected1 = 'some=value',
 					expected2 = 'some2=value2';
@@ -109,7 +109,7 @@ describe('lib/CookieWrapper', function () {
 				assert.strictEqual(cookieWrapper.setCookie[1], expected2);
 			});
 		it('should set default expire date by max age',
-			function () {
+			function() {
 				var cookieWrapper = new CookieWrapper(),
 					expiration = new Date(Date.now() + 3600000),
 					expected = 'some=value' +
@@ -127,20 +127,20 @@ describe('lib/CookieWrapper', function () {
 				assert.strictEqual(cookieWrapper.setCookie[0], expected);
 			});
 		it('should throw error if wrong key',
-			function () {
+			function() {
 				var cookieWrapper = new CookieWrapper();
 
-				assert.throws(function () {
+				assert.throws(function() {
 					cookieWrapper.set({
 						key: {}
 					});
 				}, Error);
 			});
 		it('should throw error if wrong value',
-			function () {
+			function() {
 				var cookieWrapper = new CookieWrapper();
 
-				assert.throws(function () {
+				assert.throws(function() {
 					cookieWrapper.set({
 						key: 'some',
 						value: {}
@@ -148,8 +148,8 @@ describe('lib/CookieWrapper', function () {
 				}, Error);
 			});
 	});
-	describe('#getCookieString', function () {
-		it('should return right cookie string with init', function () {
+	describe('#getCookieString', function() {
+		it('should return right cookie string with init', function() {
 			var cookieWrapper = new CookieWrapper();
 			cookieWrapper.initWithString('some=value; some2=value2');
 			assert.strictEqual(
@@ -158,7 +158,7 @@ describe('lib/CookieWrapper', function () {
 			);
 		});
 		it('should return right cookie string ' +
-		'without init but with set', function () {
+		'without init but with set', function() {
 			var cookieWrapper = new CookieWrapper();
 			cookieWrapper.set({
 				key: 'some3',
@@ -173,7 +173,7 @@ describe('lib/CookieWrapper', function () {
 				'some3=value3; some4=value4'
 			);
 		});
-		it('should return right cookie string after init and set', function () {
+		it('should return right cookie string after init and set', function() {
 			var cookieWrapper = new CookieWrapper();
 			cookieWrapper.initWithString('some=value; some2=value2');
 			cookieWrapper.set({
@@ -190,8 +190,8 @@ describe('lib/CookieWrapper', function () {
 			);
 		});
 	});
-	describe('#getAll', function () {
-		it('should return right cookie string', function () {
+	describe('#getAll', function() {
+		it('should return right cookie string', function() {
 			var cookieWrapper = new CookieWrapper();
 			cookieWrapper.initWithString('some=value; some2=value2');
 			assert.deepEqual(

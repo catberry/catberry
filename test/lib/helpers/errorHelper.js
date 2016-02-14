@@ -33,9 +33,9 @@
 var assert = require('assert'),
 	routeHelper = require('../../../lib/helpers/errorHelper');
 
-describe('lib/helpers/errorHelper', function () {
-	describe('#prettyPrint', function () {
-		it('should return empty string if wrong error argument', function () {
+describe('lib/helpers/errorHelper', function() {
+	describe('#prettyPrint', function() {
+		it('should return empty string if wrong error argument', function() {
 			var result = routeHelper.prettyPrint(null, null);
 			assert.strictEqual(result, '');
 		});

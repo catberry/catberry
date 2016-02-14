@@ -47,7 +47,7 @@ ServerResponse.prototype.status = 200;
 ServerResponse.prototype.setHeaders = null;
 ServerResponse.prototype.headersSent = false;
 
-ServerResponse.prototype.writeHead = function (code, headers) {
+ServerResponse.prototype.writeHead = function(code, headers) {
 	if (this.headersSent) {
 		throw new Error('Headers were sent');
 	}
@@ -55,7 +55,7 @@ ServerResponse.prototype.writeHead = function (code, headers) {
 	this.setHeaders = headers;
 };
 
-ServerResponse.prototype._write = function (chunk, encoding, callback) {
+ServerResponse.prototype._write = function(chunk, encoding, callback) {
 	if (this.isEnded) {
 		throw new Error('Write after EOF');
 	}
@@ -64,6 +64,6 @@ ServerResponse.prototype._write = function (chunk, encoding, callback) {
 	callback();
 };
 
-ServerResponse.prototype.end = function () {
+ServerResponse.prototype.end = function() {
 	stream.Writable.prototype.end.apply(this, arguments);
 };

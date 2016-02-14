@@ -42,9 +42,9 @@ var CASE_PATH = path.join(
 	'test', 'cases', 'lib', 'finders', 'ComponentFinder'
 );
 
-describe('lib/finders/ComponentFinder', function () {
-	describe('#find', function () {
-		it('should find all valid components', function (done) {
+describe('lib/finders/ComponentFinder', function() {
+	describe('#find', function() {
+		it('should find all valid components', function(done) {
 			var locator = createLocator({
 					componentsGlob: 'test/**/test-cat-component.json'
 				}),
@@ -57,7 +57,7 @@ describe('lib/finders/ComponentFinder', function () {
 
 			finder
 				.find()
-				.then(function (found) {
+				.then(function(found) {
 					assert.strictEqual(
 						Object.keys(found).length,
 						Object.keys(expected).length,
@@ -65,7 +65,7 @@ describe('lib/finders/ComponentFinder', function () {
 					);
 
 					Object.keys(expected)
-						.forEach(function (name) {
+						.forEach(function(name) {
 							assert.strictEqual(
 								(name in found), true,
 								name + ' not found'
@@ -85,7 +85,7 @@ describe('lib/finders/ComponentFinder', function () {
 				})
 				.catch(done);
 		});
-		it('should find all valid components by globs array', function (done) {
+		it('should find all valid components by globs array', function(done) {
 			var caseRoot = 'test/cases/lib/finders/ComponentFinder/components',
 				locator = createLocator({
 					componentsGlob: [
@@ -104,7 +104,7 @@ describe('lib/finders/ComponentFinder', function () {
 
 			finder
 				.find()
-				.then(function (found) {
+				.then(function(found) {
 					assert.strictEqual(
 						Object.keys(found).length,
 						Object.keys(expected).length,
@@ -112,7 +112,7 @@ describe('lib/finders/ComponentFinder', function () {
 					);
 
 					Object.keys(expected)
-						.forEach(function (name) {
+						.forEach(function(name) {
 							assert.strictEqual(
 								(name in found), true,
 								name + ' not found'

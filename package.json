@@ -82,11 +82,10 @@
 		"codecov.io": "~0.1.6",
 		"jsdom": "^7.0.2",
 		"mocha": "^2.3.3",
-		"jscs": "^2.5.1",
-		"jshint": "^2.8.0"
+		"eslint": "^2.0.0"
 	},
 	"engines": {
-		"node": ">=4"
+		"node": ">=5"
 	},
 	"scripts": {
 		"test": "make"

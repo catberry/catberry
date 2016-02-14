@@ -83,7 +83,7 @@ ComponentLoader.prototype._loadedComponents = null;
  * Loads components when it is in a browser.
  * @returns {Promise} Promise for nothing.
  */
-ComponentLoader.prototype.load = function () {
+ComponentLoader.prototype.load = function() {
 	if (this._loadedComponents) {
 		return Promise.resolve(this._loadedComponents);
 	}
@@ -92,20 +92,20 @@ ComponentLoader.prototype.load = function () {
 
 	var self = this;
 	return Promise.resolve()
-		.then(function () {
+		.then(function() {
 			var components = self._serviceLocator.resolveAll('component'),
 				componentPromises = [];
 
 			// the list is a stack, we should reverse it
-			components.forEach(function (component) {
+			components.forEach(function(component) {
 				componentPromises.unshift(
 					self._processComponent(component)
 				);
 			});
 			return Promise.all(componentPromises);
 		})
-		.then(function (components) {
-			components.forEach(function (component) {
+		.then(function(components) {
+			components.forEach(function(component) {
 				if (!component || typeof (component) !== 'object') {
 					return;
 				}
@@ -122,18 +122,18 @@ ComponentLoader.prototype.load = function () {
  * @returns {Object} Component object.
  * @private
  */
-ComponentLoader.prototype._processComponent = function (componentDetails) {
+ComponentLoader.prototype._processComponent = function(componentDetails) {
 	var self = this,
 		component = Object.create(componentDetails);
 
 	return this._applyTransforms(component)
-		.then(function (transformed) {
+		.then(function(transformed) {
 			component = transformed;
 			self._templateProvider.registerCompiled(
 				component.name, component.templateSource
 			);
 			component.template = {
-				render: function (dataContext) {
+				render: function(dataContext) {
 					return self._templateProvider.render(
 						component.name, dataContext
 					);
@@ -147,7 +147,7 @@ ComponentLoader.prototype._processComponent = function (componentDetails) {
 					errorTemplateName, component.errorTemplateSource
 				);
 				component.errorTemplate = {
-					render: function (dataContext) {
+					render: function(dataContext) {
 						return self._templateProvider.render(
 							errorTemplateName, dataContext
 						);
@@ -157,7 +157,7 @@ ComponentLoader.prototype._processComponent = function (componentDetails) {
 			self._eventBus.emit('componentLoaded', component);
 			return component;
 		})
-		.catch(function (reason) {
+		.catch(function(reason) {
 			self._eventBus.emit('error', reason);
 			return null;
 		});
@@ -167,6 +167,6 @@ ComponentLoader.prototype._processComponent = function (componentDetails) {
  * Gets map of components by names.
  * @returns {Object} Map of components by names.
  */
-ComponentLoader.prototype.getComponentsByNames = function () {
+ComponentLoader.prototype.getComponentsByNames = function() {
 	return this._loadedComponents || Object.create(null);
 };

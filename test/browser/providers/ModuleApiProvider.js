@@ -39,30 +39,30 @@ var assert = require('assert'),
 
 global.Promise = require('promise');
 
-describe('browser/providers/ModuleApiProvider', function () {
-	describe('#redirect', function () {
-		it('should redirect to URI', function (done) {
+describe('browser/providers/ModuleApiProvider', function() {
+	describe('#redirect', function() {
+		it('should redirect to URI', function(done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider),
 				requestRouter = locator.resolve('requestRouter');
-			requestRouter.on('go', function (args) {
+			requestRouter.on('go', function(args) {
 				assert.strictEqual(args[0], '/some1');
 				done();
 			});
 			assert.strictEqual(api.redirect('/some1') instanceof Promise, true);
 		});
 	});
-	describe('#clearFragment', function () {
-		it('should clear URI hash', function (done) {
+	describe('#clearFragment', function() {
+		it('should clear URI hash', function(done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider),
 				requestRouter = locator.resolve('requestRouter');
-			requestRouter.on('clearFragment', function (args) {
+			requestRouter.on('clearFragment', function(args) {
 				assert.strictEqual(args.length, 0);
 			});
 			jsdom.env({
 				html: ' ',
-				done: function (errors, window) {
+				done: function(errors, window) {
 					window.location.replace('http://local');
 					window.location.hash = '#some';
 					locator.registerInstance('window', window);
@@ -70,7 +70,7 @@ describe('browser/providers/ModuleApiProvider', function () {
 						window.location.toString(), 'http://local/#some'
 					);
 					api.clearFragment()
-						.then(function () {
+						.then(function() {
 							assert.strictEqual(
 								window.location.toString(), 'http://local/'
 							);
@@ -89,17 +89,17 @@ function createLocator() {
 	var requestRouter = new UniversalMock([
 		'go', 'clearFragment'
 	]);
-	requestRouter.decorateMethod('go', function () {
+	requestRouter.decorateMethod('go', function() {
 		return Promise.resolve();
 	});
 	locator.registerInstance('requestRouter', requestRouter);
 	var templateProvider = new UniversalMock(['render']);
-	templateProvider.decorateMethod('render', function () {
+	templateProvider.decorateMethod('render', function() {
 		return Promise.resolve();
 	});
 	locator.registerInstance('cookieWrapper', {
-		get: function () {},
-		set: function () {}
+		get: function() {},
+		set: function() {}
 	});
 	locator.registerInstance('templateProvider', templateProvider);
 	locator.registerInstance('serviceLocator', locator);

@@ -55,7 +55,7 @@ function ModuleApiProvider($serviceLocator) {
  * Reloads the page for handling "not found" error.
  * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.notFound = function () {
+ModuleApiProvider.prototype.notFound = function() {
 	var window = this.locator.resolve('window');
 	window.location.reload();
 	return Promise.resolve();
@@ -66,7 +66,7 @@ ModuleApiProvider.prototype.notFound = function () {
  * @param {string} uriString URI to redirect.
  * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.redirect = function (uriString) {
+ModuleApiProvider.prototype.redirect = function(uriString) {
 	var requestRouter = this.locator.resolve('requestRouter');
 	return requestRouter.go(uriString);
 };
@@ -75,7 +75,7 @@ ModuleApiProvider.prototype.redirect = function (uriString) {
  * Clears current location URI's fragment.
  * @returns {Promise} Promise for nothing.
  */
-ModuleApiProvider.prototype.clearFragment = function () {
+ModuleApiProvider.prototype.clearFragment = function() {
 	var window = this.locator.resolve('window'),
 		position = window.document.body.scrollTop;
 	window.location.hash = '';

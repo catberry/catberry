@@ -34,10 +34,10 @@ module.exports = ComponentErrorAsync;
 
 function ComponentErrorAsync() { }
 
-ComponentErrorAsync.prototype.render = function () {
+ComponentErrorAsync.prototype.render = function() {
 	var self = this;
-	return new Promise(function (fulfill, reject) {
-		setTimeout(function () {
+	return new Promise(function(fulfill, reject) {
+		setTimeout(function() {
 			reject(new Error(self.$context.name));
 		}, 1);
 	});

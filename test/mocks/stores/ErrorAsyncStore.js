@@ -34,10 +34,10 @@ module.exports = ErrorAsyncStore;
 
 function ErrorAsyncStore() { }
 
-ErrorAsyncStore.prototype.load = function () {
+ErrorAsyncStore.prototype.load = function() {
 	var self = this;
-	return new Promise(function (fulfill, reject) {
-		setTimeout(function () {
+	return new Promise(function(fulfill, reject) {
+		setTimeout(function() {
 			reject(new Error(self.$context.name));
 		}, 10);
 	});

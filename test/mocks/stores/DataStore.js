@@ -34,6 +34,6 @@ module.exports = DataStore;
 
 function DataStore() { }
 
-DataStore.prototype.load = function () {
+DataStore.prototype.load = function() {
 	return this.$context;
 };

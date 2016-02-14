@@ -56,7 +56,7 @@ Catberry.prototype._router = null;
 /**
  * Wraps current HTML document with Catberry event handlers.
  */
-Catberry.prototype.wrapDocument = function () {
+Catberry.prototype.wrapDocument = function() {
 	this._router = this.locator.resolve('requestRouter');
 };
 
@@ -64,14 +64,14 @@ Catberry.prototype.wrapDocument = function () {
  * Starts Catberry application when DOM is ready.
  * @returns {Promise} Promise for nothing.
  */
-Catberry.prototype.startWhenReady = function () {
+Catberry.prototype.startWhenReady = function() {
 	if (window.catberry) {
 		return Promise.resolve();
 	}
 	var self = this;
 
-	return new Promise(function (fulfill) {
-		window.document.addEventListener('DOMContentLoaded', function () {
+	return new Promise(function(fulfill) {
+		window.document.addEventListener('DOMContentLoaded', function() {
 			self.wrapDocument();
 			window.catberry = self;
 			fulfill();

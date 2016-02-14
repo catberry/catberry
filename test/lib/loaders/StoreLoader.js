@@ -40,8 +40,8 @@ var assert = require('assert'),
 	StoreFinder = require('../../mocks/finders/StoreFinder'),
 	Logger = require('../../mocks/Logger');
 
-describe('lib/loaders/StoreLoader', function () {
-	it('should properly load stores', function (done) {
+describe('lib/loaders/StoreLoader', function() {
+	it('should properly load stores', function(done) {
 		var stores = {
 				Test1: {
 					name: 'Test1',
@@ -55,7 +55,7 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 1);
@@ -66,7 +66,7 @@ describe('lib/loaders/StoreLoader', function () {
 			})
 			.catch(done);
 	});
-	it('should properly transform stores', function (done) {
+	it('should properly transform stores', function(done) {
 		var stores = {
 				Test1: {
 					name: 'Test1',
@@ -78,13 +78,13 @@ describe('lib/loaders/StoreLoader', function () {
 			}, stores);
 
 		locator.registerInstance('storeTransform', {
-			transform: function (store) {
+			transform: function(store) {
 				store.name = store.name += '!';
 				return store;
 			}
 		});
 		locator.registerInstance('storeTransform', {
-			transform: function (store) {
+			transform: function(store) {
 				store.name = store.name += '?';
 				return Promise.resolve(store);
 			}
@@ -94,7 +94,7 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 1);
@@ -105,14 +105,14 @@ describe('lib/loaders/StoreLoader', function () {
 			})
 			.catch(done);
 	});
-	it('should emit error when constructor is not a function', function (done) {
+	it('should emit error when constructor is not a function', function(done) {
 		var stores = {
 				Wrong: {
 					name: 'Wrong',
 					path: 'test/cases/lib/loaders/StoreLoader/Wrong.js'
 				}
 			},
-			errorHandler = function (error) {
+			errorHandler = function(error) {
 				assert.strictEqual(error instanceof Error, true);
 				assert.strictEqual(
 					error.message,
@@ -129,21 +129,21 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 0);
 			})
 			.catch(done);
 	});
-	it('should emit error when wrong path', function (done) {
+	it('should emit error when wrong path', function(done) {
 		var stores = {
 				Wrong: {
 					name: 'Wrong',
 					path: 'wrong/path'
 				}
 			},
-			errorHandler = function (error) {
+			errorHandler = function(error) {
 				assert.strictEqual(error instanceof Error, true);
 				done();
 			},
@@ -155,7 +155,7 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 0);

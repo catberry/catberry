@@ -40,8 +40,8 @@ var assert = require('assert'),
 	ComponentFinder = require('../../mocks/finders/ComponentFinder'),
 	Logger = require('../../mocks/Logger');
 
-describe('lib/loaders/ComponentLoader', function () {
-	it('should properly load components', function (done) {
+describe('lib/loaders/ComponentLoader', function() {
+	it('should properly load components', function(done) {
 		var components = {
 				'first-cool': {
 					name: 'first-cool',
@@ -70,7 +70,7 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -98,7 +98,7 @@ describe('lib/loaders/ComponentLoader', function () {
 					component1.errorTemplate.render(),
 					component2.template.render()
 				])
-					.then(function (rendered) {
+					.then(function(rendered) {
 						assert.deepEqual(rendered, expected);
 						done();
 					})
@@ -107,7 +107,7 @@ describe('lib/loaders/ComponentLoader', function () {
 			.catch(done);
 	});
 
-	it('should properly transform components', function (done) {
+	it('should properly transform components', function(done) {
 		var components = {
 				'first-cool': {
 					name: 'first-cool',
@@ -134,13 +134,13 @@ describe('lib/loaders/ComponentLoader', function () {
 			}, components);
 
 		locator.registerInstance('componentTransform', {
-			transform: function (component) {
+			transform: function(component) {
 				component.name = component.name += '!';
 				return component;
 			}
 		});
 		locator.registerInstance('componentTransform', {
-			transform: function (component) {
+			transform: function(component) {
 				component.name = component.name += '?';
 				return Promise.resolve(component);
 			}
@@ -150,7 +150,7 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -178,7 +178,7 @@ describe('lib/loaders/ComponentLoader', function () {
 					component1.errorTemplate.render(),
 					component2.template.render()
 				])
-					.then(function (rendered) {
+					.then(function(rendered) {
 						assert.deepEqual(rendered, expected);
 						done();
 					})
@@ -188,7 +188,7 @@ describe('lib/loaders/ComponentLoader', function () {
 	});
 
 	it('should not load ' +
-	'if component does not export function', function (done) {
+	'if component does not export function', function(done) {
 		var components = {
 				error1: {
 					name: 'error1',
@@ -207,7 +207,7 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -219,7 +219,7 @@ describe('lib/loaders/ComponentLoader', function () {
 	});
 
 	it('should not load ' +
-	'if component has wrong path in "template" field', function (done) {
+	'if component has wrong path in "template" field', function(done) {
 		var components = {
 				error3: {
 					name: 'error3',
@@ -238,7 +238,7 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -250,7 +250,7 @@ describe('lib/loaders/ComponentLoader', function () {
 	});
 
 	it('should not load ' +
-	'if component has no logic file', function (done) {
+	'if component has no logic file', function(done) {
 		var components = {
 				error4: {
 					name: 'error4',
@@ -269,7 +269,7 @@ describe('lib/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -286,17 +286,17 @@ function createLocator(config, stores) {
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	var eventBus = new events.EventEmitter();
-	eventBus.on('error', function () {});
+	eventBus.on('error', function() {});
 
 	var templateProvider = {
 		templates: {},
-		compile: function (str) {
+		compile: function(str) {
 			return Promise.resolve(str);
 		},
-		render: function (name) {
+		render: function(name) {
 			return Promise.resolve(templateProvider[name]);
 		},
-		registerCompiled: function (name, source) {
+		registerCompiled: function(name, source) {
 			templateProvider[name] = source;
 		}
 	};

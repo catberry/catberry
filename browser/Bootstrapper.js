@@ -36,11 +36,11 @@
 'use strict';
 
 var stores = [
-/**__stores**/
+/** __stores**/
 ];
 
 var components = [
-/**__components**/
+/** __components**/
 ];
 
 var util = require('util'),
@@ -74,7 +74,7 @@ function Bootstrapper() {
  * @param {Object} configObject Application config object.
  * @param {ServiceLocator} locator Service locator to configure.
  */
-Bootstrapper.prototype.configure = function (configObject, locator) {
+Bootstrapper.prototype.configure = function(configObject, locator) {
 	BootstrapperBase.prototype.configure.call(this, configObject, locator);
 
 	// if browser still does not have promises then add it.
@@ -100,15 +100,15 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
 	var eventBus = locator.resolve('eventBus');
 	this._wrapEventsWithLogger(configObject, eventBus, logger);
 
-	routeDefinitions.forEach(function (routeDefinition) {
+	routeDefinitions.forEach(function(routeDefinition) {
 		locator.registerInstance('routeDefinition', routeDefinition);
 	});
 
-	stores.forEach(function (store) {
+	stores.forEach(function(store) {
 		locator.registerInstance('store', store);
 	});
 
-	components.forEach(function (component) {
+	components.forEach(function(component) {
 		locator.registerInstance('component', component);
 	});
 };
@@ -121,7 +121,7 @@ Bootstrapper.prototype.configure = function (configObject, locator) {
  * @protected
  */
 Bootstrapper.prototype._wrapEventsWithLogger =
-	function (config, eventBus, logger) {
+	function(config, eventBus, logger) {
 		BootstrapperBase.prototype._wrapEventsWithLogger
 			.call(this, config, eventBus, logger);
 
@@ -130,16 +130,16 @@ Bootstrapper.prototype._wrapEventsWithLogger =
 			return;
 		}
 		eventBus
-			.on('documentUpdated', function (args) {
+			.on('documentUpdated', function(args) {
 				logger.debug(util.format(DEBUG_DOCUMENT_UPDATED, args.length));
 			})
-			.on('componentBound', function (args) {
+			.on('componentBound', function(args) {
 				logger.debug(util.format(
 					DEBUG_COMPONENT_BOUND,
 					args.element.tagName + (args.id ? '#' + args.id : '')
 				));
 			})
-			.on('componentUnbound', function (args) {
+			.on('componentUnbound', function(args) {
 				logger.debug(util.format(
 					DEBUG_COMPONENT_UNBOUND,
 					args.element.tagName + (args.id ? '#' + args.id : '')
