@@ -34,10 +34,10 @@ var assert = require('assert'),
 	testCases = require('../../cases/lib/helpers/routeHelper.json'),
 	routeHelper = require('../../../lib/helpers/routeHelper');
 
-describe('lib/helpers/routeHelper', function () {
-	describe('#removeEndSlash', function () {
-		testCases.removeEndSlash.forEach(function (testCase) {
-			it(testCase.name, function () {
+describe('lib/helpers/routeHelper', function() {
+	describe('#removeEndSlash', function() {
+		testCases.removeEndSlash.forEach(function(testCase) {
+			it(testCase.name, function() {
 				var result = routeHelper.removeEndSlash(testCase.uri);
 				assert.strictEqual(result, testCase.expected);
 			});

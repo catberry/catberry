@@ -34,6 +34,6 @@ module.exports = Component;
 
 function Component() { }
 
-Component.prototype.render = function () {
+Component.prototype.render = function() {
 	return this.$context;
 };

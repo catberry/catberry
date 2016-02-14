@@ -50,7 +50,7 @@ var REPOSITORY_LINK_REGEXP =
 		'lib/base/CatberryBase.js'
 	];
 
-PATHS.forEach(function (currentPath) {
+PATHS.forEach(function(currentPath) {
 	var absolutePath = path.join(__dirname, currentPath),
 		options = {
 			encoding: 'utf8'
@@ -59,10 +59,10 @@ PATHS.forEach(function (currentPath) {
 
 	console.log('Reading...');
 	fs.createReadStream(absolutePath, options)
-		.on('data', function (chunk) {
+		.on('data', function(chunk) {
 			buffer += chunk;
 		})
-		.on('end', function () {
+		.on('end', function() {
 			console.log('Replacing...');
 			buffer = buffer
 				.replace(REPOSITORY_LINK_REGEXP, '$1' + version + '$3')

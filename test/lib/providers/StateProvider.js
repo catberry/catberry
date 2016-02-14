@@ -39,10 +39,10 @@ var assert = require('assert'),
 
 global.Promise = require('promise');
 
-describe('lib/providers/StateProvider', function () {
-	describe('#getStateByUri', function () {
-		testCases.getStateByUri.forEach(function (testCase) {
-			it(testCase.name, function () {
+describe('lib/providers/StateProvider', function() {
+	describe('#getStateByUri', function() {
+		testCases.getStateByUri.forEach(function(testCase) {
+			it(testCase.name, function() {
 				var locator = createLocator(testCase.routes),
 					provider = locator.resolveInstance(StateProvider),
 					uri = new URI(testCase.uri);
@@ -56,7 +56,7 @@ describe('lib/providers/StateProvider', function () {
 function createLocator(routeDefinitions) {
 	var locator = new ServiceLocator();
 	locator.registerInstance('serviceLocator', locator);
-	routeDefinitions.forEach(function (routeDefinition) {
+	routeDefinitions.forEach(function(routeDefinition) {
 		locator.registerInstance('routeDefinition', routeDefinition);
 	});
 

@@ -54,7 +54,7 @@ function Logger(levels) {
 	if (typeof (levels) === 'string') {
 		this._levels = {};
 		Object.keys(LEVELS)
-			.forEach(function (level) {
+			.forEach(function(level) {
 				this._levels[LEVELS[level]] =
 					(levels.search(LEVELS[level]) !== -1);
 			}, this);
@@ -86,7 +86,7 @@ Logger.prototype._levels = {
  * Logs trace message.
  * @param {string} message Trace message.
  */
-Logger.prototype.trace = function (message) {
+Logger.prototype.trace = function(message) {
 	if (!this._levels.trace) {
 		return;
 	}
@@ -100,7 +100,7 @@ Logger.prototype.trace = function (message) {
  * Logs trace message.
  * @param {string} message Trace message.
  */
-Logger.prototype.debug = function (message) {
+Logger.prototype.debug = function(message) {
 	if (!this._levels.debug) {
 		return;
 	}
@@ -114,7 +114,7 @@ Logger.prototype.debug = function (message) {
  * Logs info message.
  * @param {string} message Information message.
  */
-Logger.prototype.info = function (message) {
+Logger.prototype.info = function(message) {
 	if (!this._levels.info) {
 		return;
 	}
@@ -128,7 +128,7 @@ Logger.prototype.info = function (message) {
  * Logs warn message.
  * @param {string} message Warning message.
  */
-Logger.prototype.warn = function (message) {
+Logger.prototype.warn = function(message) {
 	if (!this._levels.warn) {
 		return;
 	}
@@ -141,7 +141,7 @@ Logger.prototype.warn = function (message) {
  * Logs error message.
  * @param {string|Error} error Error object or message.
  */
-Logger.prototype.error = function (error) {
+Logger.prototype.error = function(error) {
 	if (!this._levels.error) {
 		return;
 	}
@@ -153,7 +153,7 @@ Logger.prototype.error = function (error) {
  * Logs error message.
  * @param {string|Error} error Error object or message.
  */
-Logger.prototype.fatal = function (error) {
+Logger.prototype.fatal = function(error) {
 	if (!this._levels.fatal) {
 		return;
 	}

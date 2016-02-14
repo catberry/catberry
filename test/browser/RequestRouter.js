@@ -41,10 +41,10 @@ var assert = require('assert'),
 	CookieWrapper = require('../../browser/CookieWrapper'),
 	RequestRouter = require('../../browser/RequestRouter');
 
-describe('browser/RequestRouter', function () {
-	describe('#route', function () {
+describe('browser/RequestRouter', function() {
+	describe('#route', function() {
 		it('should catch internal link click and change state',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					documentRenderer = locator.resolve('documentRenderer'),
 					eventBus = locator.resolve('eventBus'),
@@ -59,7 +59,7 @@ describe('browser/RequestRouter', function () {
 					'?global=:global[first,second]' +
 					'&first=:first[first]' +
 					'&second=:second[second]',
-					map: function (state) {
+					map: function(state) {
 						if (state.second) {
 							state.second.hello = 'world';
 						}
@@ -67,7 +67,7 @@ describe('browser/RequestRouter', function () {
 					}
 				});
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
+				eventBus.once('documentRendered', function(context) {
 					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -88,7 +88,7 @@ describe('browser/RequestRouter', function () {
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local/some');
 						locator.resolveInstance(RequestRouter);
@@ -103,7 +103,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(isChecked, true);
 							assert.strictEqual(window.location.toString(),
 								'http://local' + link);
@@ -116,7 +116,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should get state from URI only once while changing state',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					documentRenderer = locator.resolve('documentRenderer'),
 					eventBus = locator.resolve('eventBus'),
@@ -125,7 +125,7 @@ describe('browser/RequestRouter', function () {
 
 				locator.registerInstance('routeDefinition', {
 					expression: '/some/:param[first]',
-					map: function (state) {
+					map: function(state) {
 						counter++;
 						return state;
 					}
@@ -134,7 +134,7 @@ describe('browser/RequestRouter', function () {
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local/some');
 						locator.resolveInstance(RequestRouter);
@@ -149,7 +149,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(counter, 1);
 							assert.strictEqual(window.location.toString(),
 								'http://local' + link);
@@ -162,7 +162,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should catch click on item inside link and change state',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					documentRenderer = locator.resolve('documentRenderer'),
 					eventBus = locator.resolve('eventBus'),
@@ -177,7 +177,7 @@ describe('browser/RequestRouter', function () {
 					'?global=:global[first,second]' +
 					'&first=:first[first]' +
 					'&second=:second[second]',
-					map: function (state) {
+					map: function(state) {
 						if (state.second) {
 							state.second.hello = 'world';
 						}
@@ -185,7 +185,7 @@ describe('browser/RequestRouter', function () {
 					}
 				});
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
+				eventBus.once('documentRendered', function(context) {
 					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -206,7 +206,7 @@ describe('browser/RequestRouter', function () {
 
 				jsdom.env({
 					html: '<a href="' + link + '"><span><div></div></span></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local/some');
 						locator.resolveInstance(RequestRouter);
@@ -221,7 +221,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('div')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(isChecked, true);
 							assert.strictEqual(window.location.toString(),
 								'http://local' + link);
@@ -234,7 +234,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should catch link click and change state if link starts with //',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -252,7 +252,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.strictEqual(
 						documentRenderer.state.first.first, 'firstValue'
 					);
@@ -270,7 +270,7 @@ describe('browser/RequestRouter', function () {
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('https://local1.com/some');
@@ -286,7 +286,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(isChecked, true);
 							assert.strictEqual(
 								window.location.toString(),
@@ -299,7 +299,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should properly handle relative URIs with .. and change state',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					documentRenderer = locator.resolve('documentRenderer'),
 					eventBus = locator.resolve('eventBus'),
@@ -317,7 +317,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
+				eventBus.once('documentRendered', function(context) {
 					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -339,7 +339,7 @@ describe('browser/RequestRouter', function () {
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b');
 						locator.resolveInstance(RequestRouter);
@@ -354,7 +354,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(isChecked, true);
 							assert.strictEqual(
 								window.location.toString(),
@@ -371,7 +371,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should properly handle relative URIs without .. and change state',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -383,7 +383,7 @@ describe('browser/RequestRouter', function () {
 
 				locator.registerInstance('routeDefinition', {
 					expression: /\/some$/,
-					map: function () {
+					map: function() {
 						return {
 							first: {
 								first: 'firstValue'
@@ -396,7 +396,7 @@ describe('browser/RequestRouter', function () {
 				});
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
+				eventBus.once('documentRendered', function(context) {
 					assert.strictEqual(typeof (context), 'object');
 					assert.strictEqual(
 						context.location.toString(),
@@ -411,7 +411,7 @@ describe('browser/RequestRouter', function () {
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location.replace('http://local:9090/a/b/');
 						locator.resolveInstance(RequestRouter);
@@ -426,7 +426,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(isChecked, true);
 							assert.strictEqual(
 								window.location.toString(),
@@ -439,7 +439,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should not change state if link changes host',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -456,18 +456,18 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local2.com/some');
-						window.location.assign = function (linkToGo) {
+						window.location.assign = function(linkToGo) {
 							assert.strictEqual(linkToGo, link);
 							done();
 						};
@@ -489,7 +489,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should not change state if link has "target" attribute',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -506,14 +506,14 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
 
 				jsdom.env({
 					html: '<a href="' + link + '" target="_blank"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local1.com/some');
@@ -529,7 +529,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(
 								window.location.toString(),
 								'http://local1.com/some'
@@ -543,7 +543,7 @@ describe('browser/RequestRouter', function () {
 
 		it('should not change state if click on element ' +
 			'that is not inside the link',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -560,7 +560,7 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
@@ -568,7 +568,7 @@ describe('browser/RequestRouter', function () {
 				jsdom.env({
 					html: '<a href="' + link + '"></a>' +
 					'<span><div></div></span>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local1.com/some');
@@ -584,7 +584,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('div')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(
 								window.location.toString(),
 								'http://local1.com/some'
@@ -598,7 +598,7 @@ describe('browser/RequestRouter', function () {
 
 		it('should not change state if link has been clicked ' +
 			'by middle mouse button',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -615,14 +615,14 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local1.com/some');
@@ -638,7 +638,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(
 								window.location.toString(),
 								'http://local1.com/some'
@@ -652,7 +652,7 @@ describe('browser/RequestRouter', function () {
 
 		it('should not change state if link has been clicked ' +
 			'with Control',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -669,14 +669,14 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 						'should not be triggered');
 				});
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local1.com/some');
@@ -693,7 +693,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(
 								window.location.toString(),
 								'http://local1.com/some'
@@ -707,7 +707,7 @@ describe('browser/RequestRouter', function () {
 
 		it('should not change state if link has been clicked ' +
 			'with Alt',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -724,14 +724,14 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 						'should not be triggered');
 				});
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local1.com/some');
@@ -748,7 +748,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(
 								window.location.toString(),
 								'http://local1.com/some'
@@ -762,7 +762,7 @@ describe('browser/RequestRouter', function () {
 
 		it('should not change state if link has been clicked ' +
 			'with Shift',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer'),
@@ -779,14 +779,14 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 						'should not be triggered');
 				});
 
 				jsdom.env({
 					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local1.com/some');
@@ -803,7 +803,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(
 								window.location.toString(),
 								'http://local1.com/some'
@@ -816,7 +816,7 @@ describe('browser/RequestRouter', function () {
 		);
 
 		it('should not change state if link does not have "href" attribute',
-			function (done) {
+			function(done) {
 				var locator = createLocator(),
 					eventBus = locator.resolve('eventBus'),
 					documentRenderer = locator.resolve('documentRenderer');
@@ -829,14 +829,14 @@ describe('browser/RequestRouter', function () {
 				);
 
 				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
+				eventBus.once('documentRendered', function() {
 					assert.fail('If link changes page this event ' +
 					'should not be triggered');
 				});
 
 				jsdom.env({
 					html: '<a></a>',
-					done: function (errors, window) {
+					done: function(errors, window) {
 						locator.registerInstance('window', window);
 						window.location
 							.replace('http://local1.com/some');
@@ -852,7 +852,7 @@ describe('browser/RequestRouter', function () {
 						window.document
 							.getElementsByTagName('a')[0]
 							.dispatchEvent(event);
-						setTimeout(function () {
+						setTimeout(function() {
 							assert.strictEqual(
 								window.location.toString(),
 								'http://local1.com/some'
@@ -875,10 +875,10 @@ function createLocator() {
 	locator.register('logger', Logger);
 	locator.register('cookieWrapper', CookieWrapper);
 	var documentRenderer = {
-		initWithState: function (state, context) {
+		initWithState: function(state, context) {
 			return documentRenderer.render(state, context);
 		},
-		render: function (state, context) {
+		render: function(state, context) {
 			var last = documentRenderer.context;
 			documentRenderer.state = state;
 			documentRenderer.context = context;

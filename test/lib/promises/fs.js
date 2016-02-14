@@ -33,27 +33,27 @@
 var assert = require('assert'),
 	fs = require('../../../lib/promises/fs');
 
-describe('lib/promises/fs', function () {
-	describe('#exists', function () {
-		it('should determine that file exists', function (done) {
+describe('lib/promises/fs', function() {
+	describe('#exists', function() {
+		it('should determine that file exists', function(done) {
 			fs.exists(__filename)
-				.then(function (isExists) {
+				.then(function(isExists) {
 					assert.strictEqual(isExists, true);
 				})
-				.then(function () {
+				.then(function() {
 					done();
-				}, function (reason) {
+				}, function(reason) {
 					done(reason);
 				});
 		});
-		it('should determine that file does not exist', function (done) {
+		it('should determine that file does not exist', function(done) {
 			fs.exists(__filename + '.never')
-				.then(function (isExists) {
+				.then(function(isExists) {
 					assert.strictEqual(isExists, false);
 				})
-				.then(function () {
+				.then(function() {
 					done();
-				}, function (reason) {
+				}, function(reason) {
 					done(reason);
 				});
 		});

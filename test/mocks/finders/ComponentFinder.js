@@ -42,15 +42,15 @@ function ComponentFinder(components) {
 	this._toFind = components;
 }
 
-ComponentFinder.prototype.find = function () {
+ComponentFinder.prototype.find = function() {
 	var self = this;
-	return new Promise(function (fulfill) {
-		setTimeout(function () {
+	return new Promise(function(fulfill) {
+		setTimeout(function() {
 			self._found = self._toFind;
 			fulfill(self._found);
 		}, 100);
 	});
 };
 
-ComponentFinder.prototype.watch = function () {
+ComponentFinder.prototype.watch = function() {
 };

@@ -35,9 +35,9 @@ var assert = require('assert'),
 
 global.Promise = require('promise');
 
-describe('lib/helpers/moduleHelper', function () {
-	describe('#getNameForErrorTemplate', function () {
-		it('should return name with postfix', function () {
+describe('lib/helpers/moduleHelper', function() {
+	describe('#getNameForErrorTemplate', function() {
+		it('should return name with postfix', function() {
 			var templateName = moduleHelper.getNameForErrorTemplate(
 				'some'
 			);
@@ -46,21 +46,21 @@ describe('lib/helpers/moduleHelper', function () {
 				'some' + moduleHelper.COMPONENT_ERROR_TEMPLATE_POSTFIX
 			);
 		});
-		it('should return empty string for null value', function () {
+		it('should return empty string for null value', function() {
 			var templateName = moduleHelper.getNameForErrorTemplate(null);
 			assert.strictEqual(templateName, '');
 		});
 	});
 
-	describe('#getCamelCaseName', function () {
-		it('should convert name to camel case with prefix', function () {
+	describe('#getCamelCaseName', function() {
+		it('should convert name to camel case with prefix', function() {
 			var badName = 'awesome-module_name',
 				camelCaseName = moduleHelper.getCamelCaseName('some', badName);
 
 			assert.strictEqual(camelCaseName, 'someAwesomeModuleName');
 		});
 
-		it('should convert name to camel without prefix', function () {
+		it('should convert name to camel without prefix', function() {
 			var badName = 'awesome-module_name',
 				camelCaseName1 = moduleHelper.getCamelCaseName(null, badName),
 				camelCaseName2 = moduleHelper.getCamelCaseName('', badName);
@@ -70,7 +70,7 @@ describe('lib/helpers/moduleHelper', function () {
 		});
 
 		it('should return string with prefix if input is in camel case',
-			function () {
+			function() {
 				var camelCaseName = moduleHelper.getCamelCaseName(
 					'some', 'awesomeModuleName'
 				);
@@ -79,7 +79,7 @@ describe('lib/helpers/moduleHelper', function () {
 			});
 
 		it('should return input string if input is in camel case',
-			function () {
+			function() {
 				var camelCaseName = moduleHelper.getCamelCaseName(
 					null, 'awesomeModuleName'
 				);
@@ -88,7 +88,7 @@ describe('lib/helpers/moduleHelper', function () {
 			});
 
 		it('should handle separators at the end',
-			function () {
+			function() {
 				var camelCaseName = moduleHelper.getCamelCaseName(
 					null, 'awesome-module-name-'
 				);
@@ -96,7 +96,7 @@ describe('lib/helpers/moduleHelper', function () {
 				assert.strictEqual(camelCaseName, 'awesomeModuleName');
 			});
 
-		it('should return empty string if input is empty', function () {
+		it('should return empty string if input is empty', function() {
 			var camelCaseName1 = moduleHelper.getCamelCaseName(null, null),
 				camelCaseName2 = moduleHelper.getCamelCaseName('', '');
 
@@ -105,21 +105,21 @@ describe('lib/helpers/moduleHelper', function () {
 		});
 	});
 
-	describe('#getOriginalComponentName', function () {
-		it('should return name without prefix', function () {
+	describe('#getOriginalComponentName', function() {
+		it('should return name without prefix', function() {
 			var originalName = moduleHelper.getOriginalComponentName(
 				moduleHelper.COMPONENT_PREFIX + 'some'
 			);
 			assert.strictEqual(originalName, 'some');
 		});
-		it('should return empty string for null value', function () {
+		it('should return empty string for null value', function() {
 			var originalName = moduleHelper.getOriginalComponentName(null);
 			assert.strictEqual(originalName, '');
 		});
 	});
 
-	describe('#getTagNameForComponentName', function () {
-		it('should return name with prefix', function () {
+	describe('#getTagNameForComponentName', function() {
+		it('should return name with prefix', function() {
 			var tagName = moduleHelper.getTagNameForComponentName(
 				'some'
 			);
@@ -127,13 +127,13 @@ describe('lib/helpers/moduleHelper', function () {
 				tagName, moduleHelper.COMPONENT_PREFIX.toUpperCase() + 'SOME'
 			);
 		});
-		it('should return name without prefix for HEAD', function () {
+		it('should return name without prefix for HEAD', function() {
 			var tagName = moduleHelper.getTagNameForComponentName(
 				'head'
 			);
 			assert.strictEqual(tagName, 'HEAD');
 		});
-		it('should return name HTML without prefix for document', function () {
+		it('should return name HTML without prefix for document', function() {
 			var tagName = moduleHelper.getTagNameForComponentName(
 				'document'
 			);
@@ -141,16 +141,16 @@ describe('lib/helpers/moduleHelper', function () {
 				tagName, moduleHelper.DOCUMENT_ELEMENT_NAME.toUpperCase()
 			);
 		});
-		it('should return empty string for null value', function () {
+		it('should return empty string for null value', function() {
 			var tagName = moduleHelper.getTagNameForComponentName(null);
 			assert.strictEqual(tagName, '');
 		});
 	});
 
-	describe('#getMethodToInvoke', function () {
-		it('should find method in module', function () {
+	describe('#getMethodToInvoke', function() {
+		it('should find method in module', function() {
 			var module = {
-					someMethodToInvoke: function () {
+					someMethodToInvoke: function() {
 						return 'hello';
 					}
 				},
@@ -162,10 +162,10 @@ describe('lib/helpers/moduleHelper', function () {
 		});
 
 		it('should find default method in module and pass name into it',
-			function () {
+			function() {
 				var name = 'method-to-invoke',
 					module = {
-						some: function (passedName) {
+						some: function(passedName) {
 							assert.strictEqual(passedName, name);
 							return 'hello';
 						}
@@ -179,7 +179,7 @@ describe('lib/helpers/moduleHelper', function () {
 			});
 
 		it('should return method with promise if do not find in module',
-			function () {
+			function() {
 				var module = {
 					},
 					name = 'method-to-invoke',
@@ -192,7 +192,7 @@ describe('lib/helpers/moduleHelper', function () {
 			});
 
 		it('should return method with promise if arguments are wrong',
-			function () {
+			function() {
 				var module = null,
 					name = '',
 					method = moduleHelper.getMethodToInvoke(

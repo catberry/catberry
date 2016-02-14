@@ -39,9 +39,9 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	StoreDispatcher = require('../../lib/StoreDispatcher');
 
-describe('lib/StoreDispatcher', function () {
-	describe('#getStoreData', function () {
-		it('should properly get store data', function (done) {
+describe('lib/StoreDispatcher', function() {
+	describe('#getStoreData', function() {
+		it('should properly get store data', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -56,20 +56,20 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (data) {
+				.then(function(data) {
 					assert.strictEqual(data.name, stores.store1.name);
 					assert.strictEqual(data.hello, context.hello);
 					done();
 				})
 				.catch(done);
 		});
-		it('should properly get store data from $context', function (done) {
+		it('should properly get store data from $context', function(done) {
 			function Store1() {}
-			Store1.prototype.load = function () {
+			Store1.prototype.load = function() {
 				return this.$context.getStoreData('store2');
 			};
 			function Store2() {}
-			Store2.prototype.load = function () {
+			Store2.prototype.load = function() {
 				return 'hello';
 			};
 			var stores = {
@@ -90,16 +90,16 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (data) {
+				.then(function(data) {
 					assert.strictEqual(data, 'hello');
 					done();
 				})
 				.catch(done);
 		});
 		it('should return null if store name equals ' +
-		'current in $context', function (done) {
+		'current in $context', function(done) {
 			function Store1() {}
-			Store1.prototype.load = function () {
+			Store1.prototype.load = function() {
 				return this.$context.getStoreData('store1');
 			};
 			var stores = {
@@ -116,13 +116,13 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (data) {
+				.then(function(data) {
 					assert.strictEqual(data, null);
 					done();
 				})
 				.catch(done);
 		});
-		it('should pass error from store', function (done) {
+		it('should pass error from store', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -137,15 +137,15 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function () {
+				.then(function() {
 					done(new Error('Should fail'));
 				})
-				.catch(function (reason) {
+				.catch(function(reason) {
 					assert.strictEqual(reason.message, stores.store1.name);
 					done();
 				});
 		});
-		it('should pass error from store asynchronously', function (done) {
+		it('should pass error from store asynchronously', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -160,15 +160,15 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function () {
+				.then(function() {
 					done(new Error('Should fail'));
 				})
-				.catch(function (reason) {
+				.catch(function(reason) {
 					assert.strictEqual(reason.message, stores.store1.name);
 					done();
 				});
 		});
-		it('should properly get store data asynchronously', function (done) {
+		it('should properly get store data asynchronously', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -183,14 +183,14 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (data) {
+				.then(function(data) {
 					assert.strictEqual(data.name, stores.store1.name);
 					assert.strictEqual(data.hello, context.hello);
 					done();
 				})
 				.catch(done);
 		});
-		it('should return null if store name is not a string', function (done) {
+		it('should return null if store name is not a string', function(done) {
 			var locator = createLocator({}),
 				context = {
 					hello: 'world'
@@ -199,13 +199,13 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(100500)
-				.then(function (data) {
+				.then(function(data) {
 					assert.strictEqual(data, null);
 					done();
 				})
 				.catch(done);
 		});
-		it('should reject promise if there is no such store', function (done) {
+		it('should reject promise if there is no such store', function(done) {
 			var locator = createLocator({}),
 				context = {
 					hello: 'world'
@@ -214,10 +214,10 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData('wrong')
-				.then(function () {
+				.then(function() {
 					done(new Error('Should fail'));
 				})
-				.catch(function (reason) {
+				.catch(function(reason) {
 					assert.strictEqual(
 						reason.message, 'Store "wrong" not found'
 					);
@@ -225,13 +225,13 @@ describe('lib/StoreDispatcher', function () {
 				});
 		});
 		it('should not invoke store\'s load method ' +
-		'many times concurrently', function (done) {
+		'many times concurrently', function(done) {
 			var counter = 0;
 			function Store() {}
-			Store.prototype.load = function () {
+			Store.prototype.load = function() {
 				counter++;
-				return new Promise(function (fulfill) {
-					setTimeout(function () {
+				return new Promise(function(fulfill) {
+					setTimeout(function() {
 						fulfill('hello');
 					}, 10);
 				});
@@ -256,9 +256,9 @@ describe('lib/StoreDispatcher', function () {
 				dispatcher.getStoreData(stores.store1.name),
 				dispatcher.getStoreData(stores.store1.name)
 			])
-				.then(function (results) {
+				.then(function(results) {
 					assert.strictEqual(counter, 1);
-					results.forEach(function (result) {
+					results.forEach(function(result) {
 						assert.strictEqual(result, 'hello');
 					});
 					done();
@@ -266,13 +266,13 @@ describe('lib/StoreDispatcher', function () {
 				.catch(done);
 		});
 		it('should not invoke store\'s load method ' +
-		'if store is not changed', function (done) {
+		'if store is not changed', function(done) {
 			var counter = 0;
 			function Store() {}
-			Store.prototype.load = function () {
+			Store.prototype.load = function() {
 				counter++;
-				return new Promise(function (fulfill) {
-					setTimeout(function () {
+				return new Promise(function(fulfill) {
+					setTimeout(function() {
 						fulfill('hello');
 					}, 10);
 				});
@@ -291,11 +291,11 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(result, 'hello');
 					return dispatcher.getStoreData(stores.store1.name);
 				})
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(counter, 1);
 					assert.strictEqual(result, 'hello');
 					done();
@@ -303,15 +303,15 @@ describe('lib/StoreDispatcher', function () {
 				.catch(done);
 		});
 		it('should invoke store\'s load method ' +
-		'if store is changed', function (done) {
+		'if store is changed', function(done) {
 			var counter = 0;
 			function Store() {}
-			Store.prototype.load = function () {
+			Store.prototype.load = function() {
 				counter++;
 				var self = this;
-				return new Promise(function (fulfill) {
+				return new Promise(function(fulfill) {
 					fulfill('hello');
-					setTimeout(function () {
+					setTimeout(function() {
 						if (counter === 1) {
 							self.$context.changed();
 						}
@@ -333,14 +333,14 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(counter, 1);
 					assert.strictEqual(result, 'hello');
 				});
-			eventBus.on('storeChanged', function (storeName) {
+			eventBus.on('storeChanged', function(storeName) {
 				assert.strictEqual(storeName, stores.store1.name);
 				dispatcher.getStoreData(stores.store1.name)
-					.then(function (result) {
+					.then(function(result) {
 						assert.strictEqual(counter, 2);
 						assert.strictEqual(result, 'hello');
 						done();
@@ -349,13 +349,13 @@ describe('lib/StoreDispatcher', function () {
 			});
 		});
 		it('should invoke store\'s load method ' +
-		'if store is changed after state changing', function (done) {
+		'if store is changed after state changing', function(done) {
 			var counter = 0;
 			function Store() {}
-			Store.prototype.load = function () {
+			Store.prototype.load = function() {
 				counter++;
-				return new Promise(function (fulfill) {
-					setTimeout(function () {
+				return new Promise(function(fulfill) {
+					setTimeout(function() {
 						fulfill('hello');
 					}, 10);
 				});
@@ -375,13 +375,13 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(counter, 1);
 					assert.strictEqual(result, 'hello');
-					eventBus.on('storeChanged', function (storeName) {
+					eventBus.on('storeChanged', function(storeName) {
 						assert.strictEqual(storeName, stores.store1.name);
 						dispatcher.getStoreData(stores.store1.name)
-							.then(function (result) {
+							.then(function(result) {
 								assert.strictEqual(counter, 2);
 								assert.strictEqual(result, 'hello');
 								done();
@@ -394,31 +394,31 @@ describe('lib/StoreDispatcher', function () {
 				});
 		});
 		it('should emit store\'s changed ' +
-		'for dependant store ', function (done) {
+		'for dependant store ', function(done) {
 			var loads = [];
 			function Store1() {}
-			Store1.prototype.load = function () {
+			Store1.prototype.load = function() {
 				loads.push(this.$context.name);
 				var self = this;
 				if (loads.length === 1) {
-					setTimeout(function () {
+					setTimeout(function() {
 						self.$context.changed();
 					}, 10);
 				}
-				return new Promise(function (fulfill) {
+				return new Promise(function(fulfill) {
 					fulfill('hello');
 				});
 			};
 			function Store2() {
 				this.$context.setDependency('store1');
 			}
-			Store2.prototype.load = function () {
+			Store2.prototype.load = function() {
 				loads.push(this.$context.name);
 			};
 			function Store3() {
 				this.$context.setDependency('store2');
 			}
-			Store3.prototype.load = function () {
+			Store3.prototype.load = function() {
 				loads.push(this.$context.name);
 			};
 			var stores = {
@@ -450,7 +450,7 @@ describe('lib/StoreDispatcher', function () {
 			])
 				.catch(done);
 
-			eventBus.on('storeChanged', function (storeName) {
+			eventBus.on('storeChanged', function(storeName) {
 				if (storeName !== 'store3') {
 					return;
 				}
@@ -459,7 +459,7 @@ describe('lib/StoreDispatcher', function () {
 					dispatcher.getStoreData(stores.store2.name),
 					dispatcher.getStoreData(stores.store3.name)
 				])
-					.then(function () {
+					.then(function() {
 						assert.strictEqual(loads[0], 'store1');
 						assert.strictEqual(loads[1], 'store2');
 						assert.strictEqual(loads[2], 'store3');
@@ -473,16 +473,16 @@ describe('lib/StoreDispatcher', function () {
 		});
 
 		it('should not cache store\'s data ' +
-		'if there was an error loading data', function (done) {
+		'if there was an error loading data', function(done) {
 			var counter = 0;
 			function Store() {}
-			Store.prototype.load = function () {
+			Store.prototype.load = function() {
 				counter++;
 				if (counter === 1) {
 					throw new Error('error');
 				}
-				return new Promise(function (fulfill) {
-					setTimeout(function () {
+				return new Promise(function(fulfill) {
+					setTimeout(function() {
 						fulfill('hello');
 					}, 10);
 				});
@@ -501,11 +501,11 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.catch(function (error) {
+				.catch(function(error) {
 					assert.strictEqual(error.message, 'error');
 					return dispatcher.getStoreData(stores.store1.name);
 				})
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(counter, 2);
 					assert.strictEqual(result, 'hello');
 					done();
@@ -513,15 +513,15 @@ describe('lib/StoreDispatcher', function () {
 				.catch(done);
 		});
 		it('should cache store\'s data ' +
-		'only for it\'s lifetime', function (done) {
+		'only for it\'s lifetime', function(done) {
 			var counter = 0;
 			function Store() {
 				this.$lifetime = 50;
 			}
-			Store.prototype.load = function () {
+			Store.prototype.load = function() {
 				counter++;
-				return new Promise(function (fulfill) {
-					setTimeout(function () {
+				return new Promise(function(fulfill) {
+					setTimeout(function() {
 						fulfill('hello' + counter);
 					}, 10);
 				});
@@ -540,18 +540,18 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, context);
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function (data) {
+				.then(function(data) {
 					assert.strictEqual(data, 'hello1');
-					return new Promise(function (fulfill) {
-						setTimeout(function () {
+					return new Promise(function(fulfill) {
+						setTimeout(function() {
 							fulfill();
 						}, 100);
 					});
 				})
-				.then(function () {
+				.then(function() {
 					return dispatcher.getStoreData(stores.store1.name);
 				})
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(counter, 2);
 					assert.strictEqual(result, 'hello2');
 					done();
@@ -559,7 +559,7 @@ describe('lib/StoreDispatcher', function () {
 				.catch(done);
 		});
 		it('should reject promise when initial state ' +
-		'is not set', function (done) {
+		'is not set', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -570,10 +570,10 @@ describe('lib/StoreDispatcher', function () {
 				dispatcher = locator.resolve('storeDispatcher');
 
 			dispatcher.getStoreData(stores.store1.name)
-				.then(function () {
+				.then(function() {
 					done(new Error('Should fail'));
 				})
-				.catch(function (reason) {
+				.catch(function(reason) {
 					assert.strictEqual(
 						reason.message, 'State should be set before any request'
 					);
@@ -581,8 +581,8 @@ describe('lib/StoreDispatcher', function () {
 				});
 		});
 	});
-	describe('#setState', function () {
-		it('should set initial state and return empty array', function (done) {
+	describe('#setState', function() {
+		it('should set initial state and return empty array', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -604,7 +604,7 @@ describe('lib/StoreDispatcher', function () {
 			assert.strictEqual(names.length, 0);
 			done();
 		});
-		it('should return names of changed stores', function (done) {
+		it('should return names of changed stores', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -676,7 +676,7 @@ describe('lib/StoreDispatcher', function () {
 			var names = dispatcher.setState(initState, context);
 			assert.strictEqual(names.length, 0);
 			dispatcher.getStoreData(stores.store2.name)
-				.then(function () {
+				.then(function() {
 					var newContext = {
 							hello: 'world2'
 						},
@@ -692,10 +692,10 @@ describe('lib/StoreDispatcher', function () {
 		});
 	});
 
-	describe('#sendAction', function () {
-		it('should send action to store if it has handler', function (done) {
+	describe('#sendAction', function() {
+		it('should send action to store if it has handler', function(done) {
 			function Store() {}
-			Store.prototype.handleSomeAction = function (args) {
+			Store.prototype.handleSomeAction = function(args) {
 				return {
 					args: args,
 					result: 'result'
@@ -715,20 +715,20 @@ describe('lib/StoreDispatcher', function () {
 			dispatcher.sendAction(
 				stores.store1.name, 'some-action', actionParameters
 			)
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(result.args, actionParameters);
 					assert.strictEqual(result.result, 'result');
 					done();
 				})
 				.catch(done);
 		});
-		it('should send action to store if it has handler', function (done) {
+		it('should send action to store if it has handler', function(done) {
 			function Store1() {}
-			Store1.prototype.handleHello = function (name) {
+			Store1.prototype.handleHello = function(name) {
 				return this.$context.sendAction('store2', 'world', name);
 			};
 			function Store2() {}
-			Store2.prototype.handleWorld = function (name) {
+			Store2.prototype.handleWorld = function(name) {
 				return 'hello, ' + name;
 			};
 			var stores = {
@@ -748,14 +748,14 @@ describe('lib/StoreDispatcher', function () {
 			dispatcher.sendAction(
 				stores.store1.name, 'hello', 'catberry'
 			)
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(result, 'hello, catberry');
 					done();
 				})
 				.catch(done);
 		});
 		it('should response with undefined ' +
-		'if there is no such action handler', function (done) {
+		'if there is no such action handler', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -770,15 +770,15 @@ describe('lib/StoreDispatcher', function () {
 			dispatcher.sendAction(
 				stores.store1.name, 'some-action', actionParameters
 			)
-				.then(function (result) {
+				.then(function(result) {
 					assert.strictEqual(result, undefined);
 					done();
 				})
 				.catch(done);
 		});
-		it('should pass error from action handler', function (done) {
+		it('should pass error from action handler', function(done) {
 			function Store() {}
-			Store.prototype.handleSomeAction = function () {
+			Store.prototype.handleSomeAction = function() {
 				throw new Error('error');
 			};
 			var stores = {
@@ -795,19 +795,19 @@ describe('lib/StoreDispatcher', function () {
 			dispatcher.sendAction(
 				stores.store1.name, 'some-action', actionParameters
 			)
-				.then(function () {
+				.then(function() {
 					done(new Error('Should fail'));
 				})
-				.catch(function (reason) {
+				.catch(function(reason) {
 					assert.strictEqual(reason.message, 'error');
 					done();
 				});
 		});
 	});
-	describe('#sendBroadcastAction', function () {
-		it('should send action to all stores with handlers', function (done) {
+	describe('#sendBroadcastAction', function() {
+		it('should send action to all stores with handlers', function(done) {
 			function Store() {}
-			Store.prototype.handleSomeAction = function (args) {
+			Store.prototype.handleSomeAction = function(args) {
 				return {
 					args: args,
 					result: this.$context.name
@@ -835,7 +835,7 @@ describe('lib/StoreDispatcher', function () {
 			dispatcher.sendBroadcastAction(
 				'some-action', actionParameters
 			)
-				.then(function (results) {
+				.then(function(results) {
 					assert.strictEqual(results.length, 2);
 					assert.strictEqual(results[0].args, actionParameters);
 					assert.strictEqual(results[0].result, 'store1');
@@ -846,17 +846,17 @@ describe('lib/StoreDispatcher', function () {
 				.catch(done);
 		});
 		it('should send action to all stores ' +
-		'with handlers from $context', function (done) {
+		'with handlers from $context', function(done) {
 			function Store1() {}
-			Store1.prototype.handleSome = function (name) {
+			Store1.prototype.handleSome = function(name) {
 				return this.$context.sendBroadcastAction('action', name);
 			};
 			function Store2() {}
-			Store2.prototype.handleAction = function (name) {
+			Store2.prototype.handleAction = function(name) {
 				return 'hello from store2, ' + name;
 			};
 			function Store3() {}
-			Store3.prototype.handleAction = function (name) {
+			Store3.prototype.handleAction = function(name) {
 				return 'hello from store3, ' + name;
 			};
 			var stores = {
@@ -878,7 +878,7 @@ describe('lib/StoreDispatcher', function () {
 
 			dispatcher.setState({}, {});
 			dispatcher.sendAction('store1', 'some', 'catberry')
-				.then(function (results) {
+				.then(function(results) {
 					assert.strictEqual(results.length, 2);
 					assert.strictEqual(
 						results[0], 'hello from store2, catberry'
@@ -896,15 +896,15 @@ describe('lib/StoreDispatcher', function () {
 function createLocator(stores, config) {
 	var locator = new ServiceLocator(),
 		eventBus = new events.EventEmitter();
-	eventBus.on('error', function () {});
+	eventBus.on('error', function() {});
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('eventBus', eventBus);
 	locator.registerInstance('config', config || {});
 	locator.registerInstance('storeLoader', {
-		load: function () {
+		load: function() {
 			return Promise.resolve(stores);
 		},
-		getStoresByNames: function () {
+		getStoresByNames: function() {
 			return stores;
 		}
 	});

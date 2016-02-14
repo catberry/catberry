@@ -38,60 +38,60 @@ var assert = require('assert'),
 
 global.Promise = require('promise');
 
-describe('lib/providers/ModuleApiProvider', function () {
-	describe('#on', function () {
-		it('should throw error if handler is not a function', function () {
+describe('lib/providers/ModuleApiProvider', function() {
+	describe('#on', function() {
+		it('should throw error if handler is not a function', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			assert.throws(function () {
+			assert.throws(function() {
 				api.on('some', {});
 			}, Error);
 		});
-		it('should throw error if event name is not a string', function () {
+		it('should throw error if event name is not a string', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			assert.throws(function () {
-				api.on({}, function () {});
+			assert.throws(function() {
+				api.on({}, function() {});
 			}, Error);
 		});
-		it('should properly register handler on event', function (done) {
+		it('should properly register handler on event', function(done) {
 			var locator = createLocator(),
 				bus = locator.resolve('eventBus'),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			api.on('event', function (arg) {
+			api.on('event', function(arg) {
 				assert.strictEqual(arg, 'hello');
 				done();
 			});
 			bus.emit('event', 'hello');
 		});
 	});
-	describe('#once', function () {
-		it('should throw error if handler is not a function', function () {
+	describe('#once', function() {
+		it('should throw error if handler is not a function', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			assert.throws(function () {
+			assert.throws(function() {
 				api.once('some', {});
 			}, Error);
 		});
-		it('should throw error if event name is not a string', function () {
+		it('should throw error if event name is not a string', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			assert.throws(function () {
-				api.once({}, function () {});
+			assert.throws(function() {
+				api.once({}, function() {});
 			}, Error);
 		});
-		it('should properly register handler on event', function (done) {
+		it('should properly register handler on event', function(done) {
 			var locator = createLocator(),
 				bus = locator.resolve('eventBus'),
 				api = locator.resolveInstance(ModuleApiProvider);
 
 			var was = false;
-			api.once('event', function (arg) {
+			api.once('event', function(arg) {
 				if (was) {
 					assert.fail();
 				}
@@ -103,30 +103,30 @@ describe('lib/providers/ModuleApiProvider', function () {
 			done();
 		});
 	});
-	describe('#removeListener', function () {
-		it('should throw error if handler is not a function', function () {
+	describe('#removeListener', function() {
+		it('should throw error if handler is not a function', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			assert.throws(function () {
+			assert.throws(function() {
 				api.removeListener('some', {});
 			}, Error);
 		});
-		it('should throw error if event name is not a string', function () {
+		it('should throw error if event name is not a string', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			assert.throws(function () {
-				api.removeListener({}, function () {});
+			assert.throws(function() {
+				api.removeListener({}, function() {});
 			}, Error);
 		});
-		it('should properly remove listener', function (done) {
+		it('should properly remove listener', function(done) {
 			var locator = createLocator(),
 				bus = locator.resolve('eventBus'),
 				api = locator.resolveInstance(ModuleApiProvider);
 
 			var was = false,
-				handler = function () {
+				handler = function() {
 					was = true;
 				};
 
@@ -137,25 +137,25 @@ describe('lib/providers/ModuleApiProvider', function () {
 			done();
 		});
 	});
-	describe('#removeAllListeners', function () {
-		it('should throw error if event name is not a string', function () {
+	describe('#removeAllListeners', function() {
+		it('should throw error if event name is not a string', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 
-			assert.throws(function () {
+			assert.throws(function() {
 				api.removeAllListeners({});
 			}, Error);
 		});
-		it('should properly remove all listeners', function (done) {
+		it('should properly remove all listeners', function(done) {
 			var locator = createLocator(),
 				bus = locator.resolve('eventBus'),
 				api = locator.resolveInstance(ModuleApiProvider);
 
 			var was = false,
-				handler1 = function () {
+				handler1 = function() {
 					was = true;
 				},
-				handler2 = function () {
+				handler2 = function() {
 					was = true;
 				};
 
@@ -167,8 +167,8 @@ describe('lib/providers/ModuleApiProvider', function () {
 			done();
 		});
 	});
-	describe('#redirect', function () {
-		it('should save last redirected URI', function () {
+	describe('#redirect', function() {
+		it('should save last redirected URI', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 			assert.strictEqual(api.redirect('/some1') instanceof Promise, true);
@@ -176,8 +176,8 @@ describe('lib/providers/ModuleApiProvider', function () {
 			assert.strictEqual(api.actions.redirectedTo, '/some2');
 		});
 	});
-	describe('#clearFragment', function () {
-		it('should save flag that hash has been cleared', function () {
+	describe('#clearFragment', function() {
+		it('should save flag that hash has been cleared', function() {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 			assert.strictEqual(api.actions.isFragmentCleared, false);
@@ -185,8 +185,8 @@ describe('lib/providers/ModuleApiProvider', function () {
 			assert.strictEqual(api.actions.isFragmentCleared, true);
 		});
 	});
-	describe('#getInlineScript', function () {
-		it('should return browser script for redirection', function (done) {
+	describe('#getInlineScript', function() {
+		it('should return browser script for redirection', function(done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 			api.redirect('http://some');
@@ -196,7 +196,7 @@ describe('lib/providers/ModuleApiProvider', function () {
 			assert.strictEqual(api.getInlineScript(), expected);
 			done();
 		});
-		it('should return browser script for cookies', function (done) {
+		it('should return browser script for cookies', function(done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 			api.cookie.set({
@@ -215,7 +215,7 @@ describe('lib/providers/ModuleApiProvider', function () {
 			done();
 		});
 		it('should return browser script ' +
-		'for clearing fragment', function (done) {
+		'for clearing fragment', function(done) {
 			var locator = createLocator(),
 				api = locator.resolveInstance(ModuleApiProvider);
 			api.clearFragment();

@@ -58,7 +58,7 @@ CookieWrapper.prototype._window = null;
  * Gets current cookie string.
  * @returns {string} Cookie string.
  */
-CookieWrapper.prototype.getCookieString = function () {
+CookieWrapper.prototype.getCookieString = function() {
 	return this._window.document.cookie ?
 		this._window.document.cookie.toString() :
 		'';
@@ -77,7 +77,7 @@ CookieWrapper.prototype.getCookieString = function () {
  * @param {boolean?} cookieSetup.httpOnly Is cookie HTTP only.
  * @returns {string} Cookie setup string.
  */
-CookieWrapper.prototype.set = function (cookieSetup) {
+CookieWrapper.prototype.set = function(cookieSetup) {
 	var cookie = this._convertToCookieSetup(cookieSetup);
 	this._window.document.cookie = cookie;
 	return cookie;

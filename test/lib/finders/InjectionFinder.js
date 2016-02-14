@@ -41,20 +41,20 @@ var SOURCE_PATH = path.join(
 	'InjectionFinder', 'source.js'
 );
 
-describe('lib/finders/InjectionFinder', function () {
-	describe('#find', function () {
-		it('should find all dependency injections in source', function (done) {
+describe('lib/finders/InjectionFinder', function() {
+	describe('#find', function() {
+		it('should find all dependency injections in source', function(done) {
 			fs.readFile(SOURCE_PATH, {
-					encoding: 'utf8'
-				},
-				function (error, source) {
+				encoding: 'utf8'
+			},
+				function(error, source) {
 					if (error) {
 						done(error);
 						return;
 					}
 
 					// check sources
-					/*jshint evil:true*/
+					/* jshint evil:true*/
 					eval(source);
 
 					var ast = UglifyJS.parse(source),
@@ -79,7 +79,7 @@ describe('lib/finders/InjectionFinder', function () {
 						'Wrong DI names'
 					);
 
-					names.forEach(function (name) {
+					names.forEach(function(name) {
 						assert.strictEqual(name in expected, true);
 					});
 					done();

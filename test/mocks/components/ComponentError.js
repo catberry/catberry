@@ -34,6 +34,6 @@ module.exports = ComponentError;
 
 function ComponentError() { }
 
-ComponentError.prototype.render = function () {
+ComponentError.prototype.render = function() {
 	throw new Error(this.$context.name);
 };

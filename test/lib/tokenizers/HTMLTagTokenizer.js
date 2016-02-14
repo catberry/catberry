@@ -34,10 +34,10 @@ var assert = require('assert'),
 	tests = require('../../cases/lib/streams/HTMLTagTokenizer.json'),
 	HTMLTagTokenizer = require('../../../lib/tokenizers/HTMLTagTokenizer');
 
-describe('lib/tokenizers/HTMLTagTokenizer', function () {
-	describe('#next', function () {
-		tests.cases.forEach(function (testCase) {
-			it(testCase.description, function (done) {
+describe('lib/tokenizers/HTMLTagTokenizer', function() {
+	describe('#next', function() {
+		tests.cases.forEach(function(testCase) {
+			it(testCase.description, function(done) {
 				var tokenizer = new HTMLTagTokenizer(),
 					tokens = [],
 					next;
@@ -62,7 +62,7 @@ describe('lib/tokenizers/HTMLTagTokenizer', function () {
 function findName(state) {
 	var name = '';
 	Object.keys(HTMLTagTokenizer.STATES)
-		.some(function (key) {
+		.some(function(key) {
 			if (HTMLTagTokenizer.STATES[key] === state) {
 				name = key;
 				return true;

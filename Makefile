@@ -8,7 +8,10 @@ TESTS = test/lib/* \
 all: lint test
 
 lint:
-	./node_modules/.bin/jshint ./ && ./node_modules/.bin/jscs ./
+	./node_modules/.bin/eslint ./
+
+fix-lint:
+	./node_modules/.bin/eslint ./ --fix
 
 test:
 ifeq ($(TRAVIS),true)

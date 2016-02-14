@@ -50,15 +50,15 @@ var assert = require('assert'),
 	StoreDispatcher = require('../../lib/StoreDispatcher'),
 	DocumentRenderer = require('../../lib/DocumentRenderer');
 
-describe('lib/DocumentRenderer', function () {
-	describe('#render', function () {
-		it('should render nothing if no such component', function (done) {
+describe('lib/DocumentRenderer', function() {
+	describe('#render', function() {
+		it('should render nothing if no such component', function(done) {
 			var components = {
 				document: {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head><title>Hello</title></head>' +
@@ -89,7 +89,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -98,13 +98,13 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should ignore second head and document tags', function (done) {
+		it('should ignore second head and document tags', function(done) {
 			var components = {
 				document: {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -122,7 +122,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -147,7 +147,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -156,13 +156,13 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render components without stores', function (done) {
+		it('should properly render components without stores', function(done) {
 			var components = {
 				document: {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 							'<html>' +
 								'<head></head>' +
@@ -180,7 +180,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -192,7 +192,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'comp',
 					constructor: Component,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'content – ' + context.name +
 								'</div>';
@@ -204,7 +204,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -231,7 +231,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -240,7 +240,7 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render components with stores', function (done) {
+		it('should properly render components with stores', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -256,9 +256,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<!DOCTYPE html>' +
 										'<html>' +
 										'<head cat-store="folder/store2">' +
@@ -281,9 +281,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<title>' +
 										'head – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -296,9 +296,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'comp',
 					constructor: Component,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'content – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -311,9 +311,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'test – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -344,7 +344,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -353,20 +353,20 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should render errors with wrong stores', function (done) {
+		it('should render errors with wrong stores', function(done) {
 			var errorTemplate = {
-					render: function (context) {
-						return Promise.resolve('Error: ' + context.message);
-					}
-				};
+				render: function(context) {
+					return Promise.resolve('Error: ' + context.message);
+				}
+			};
 			var components = {
 				document: {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<!DOCTYPE html>' +
 									'<html>' +
 									'<head cat-store="folder/store2"></head>' +
@@ -389,9 +389,9 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					errorTemplate: errorTemplate,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<title>' +
 										'head – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -405,9 +405,9 @@ describe('lib/DocumentRenderer', function () {
 					constructor: Component,
 					errorTemplate: errorTemplate,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'content – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -420,9 +420,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'test – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -454,7 +454,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -463,7 +463,7 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render nested components', function (done) {
+		it('should properly render nested components', function(done) {
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -479,9 +479,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<!DOCTYPE html>' +
 										'<html>' +
 										'<head cat-store="folder/store2"></head>' +
@@ -500,9 +500,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<title>' +
 									'head – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -515,9 +515,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'comp',
 					constructor: Component,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'content – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -533,9 +533,9 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'test – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -568,7 +568,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -577,9 +577,9 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render errors in components', function (done) {
+		it('should properly render errors in components', function(done) {
 			var errorTemplate = {
-					render: function (context) {
+					render: function(context) {
 						return Promise.resolve('Error: ' + context.message);
 					}
 				},
@@ -589,7 +589,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<!DOCTYPE html>' +
 									'<html>' +
 									'<head></head>' +
@@ -608,7 +608,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentErrorAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<title>' +
 									'head – ' + context.name +
 									'</title>';
@@ -621,7 +621,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentError,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<div>' +
 									'content – ' + context.name +
 									'</div>';
@@ -634,7 +634,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentErrorAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<div>' +
 									'test – ' + context.name +
 									'</div>';
@@ -663,7 +663,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -672,12 +672,12 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render errors in component constructor', function (done) {
+		it('should properly render errors in component constructor', function(done) {
 			function ErrorConstructor() {
 				throw new Error('test');
 			}
 			var errorTemplate = {
-					render: function (context) {
+					render: function(context) {
 						return Promise.resolve('Error: ' + context.message);
 					}
 				},
@@ -687,7 +687,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<!DOCTYPE html>' +
 									'<html>' +
 									'<head></head>' +
@@ -705,7 +705,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentErrorAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<title>' +
 									'head – ' + context.name +
 									'</title>';
@@ -718,7 +718,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ErrorConstructor,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<div>' +
 									'content – ' + context.name +
 									'</div>';
@@ -744,7 +744,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -753,12 +753,12 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render errors in stores', function (done) {
+		it('should properly render errors in stores', function(done) {
 			var errorTemplate = {
-					render: function (context) {
-						return Promise.resolve('Error: ' + context.message);
-					}
-				};
+				render: function(context) {
+					return Promise.resolve('Error: ' + context.message);
+				}
+			};
 			var stores = {
 				store1: {
 					name: 'store1',
@@ -775,9 +775,9 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					errorTemplate: errorTemplate,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<!DOCTYPE html>' +
 										'<html>' +
 										'<head cat-store="folder/store2">' +
@@ -801,9 +801,9 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					errorTemplate: errorTemplate,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<title>' +
 										'head – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -817,9 +817,9 @@ describe('lib/DocumentRenderer', function () {
 					constructor: Component,
 					errorTemplate: errorTemplate,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'content – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -833,9 +833,9 @@ describe('lib/DocumentRenderer', function () {
 					constructor: ComponentAsync,
 					errorTemplate: errorTemplate,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							return context.getStoreData()
-								.then(function (storeData) {
+								.then(function(storeData) {
 									return '<div>' +
 										'test – ' + context.name + ' – ' +
 										(storeData ? storeData.name : '') +
@@ -868,7 +868,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -878,9 +878,9 @@ describe('lib/DocumentRenderer', function () {
 		});
 
 		it('should properly render nothing ' +
-		'if error in error template', function (done) {
+		'if error in error template', function(done) {
 			var errorTemplate = {
-					render: function () {
+					render: function() {
 						throw new Error('template');
 					}
 				},
@@ -890,7 +890,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<!DOCTYPE html>' +
 									'<html>' +
 									'<head></head>' +
@@ -909,7 +909,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentErrorAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<title>' +
 									'head – ' + context.name +
 									'</title>';
@@ -922,7 +922,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentError,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<div>' +
 									'content – ' + context.name +
 									'</div>';
@@ -935,7 +935,7 @@ describe('lib/DocumentRenderer', function () {
 						constructor: ComponentErrorAsync,
 						errorTemplate: errorTemplate,
 						template: {
-							render: function (context) {
+							render: function(context) {
 								var template = '<div>' +
 									'test – ' + context.name +
 									'</div>';
@@ -963,7 +963,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result,
 						expected, 'Wrong HTML'
@@ -972,13 +972,13 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should properly render debug info', function (done) {
+		it('should properly render debug info', function(done) {
 			var components = {
-					document: {
-						name: 'document',
-						constructor: ComponentAsync,
-						template: {
-							render: function (context) {
+				document: {
+					name: 'document',
+					constructor: ComponentAsync,
+					template: {
+							render: function(context) {
 								var template = '<!DOCTYPE html>' +
 									'<html>' +
 									'<head></head>' +
@@ -991,44 +991,44 @@ describe('lib/DocumentRenderer', function () {
 								return Promise.resolve(template);
 							}
 						}
-					},
-					head: {
-						name: 'head',
-						constructor: ComponentErrorAsync,
-						template: {
-							render: function (context) {
+				},
+				head: {
+					name: 'head',
+					constructor: ComponentErrorAsync,
+					template: {
+							render: function(context) {
 								var template = '<title>' +
 									'head – ' + context.name +
 									'</title>';
 								return Promise.resolve(template);
 							}
 						}
-					},
-					comp: {
-						name: 'comp',
-						constructor: ComponentError,
-						template: {
-							render: function (context) {
+				},
+				comp: {
+					name: 'comp',
+					constructor: ComponentError,
+					template: {
+							render: function(context) {
 								var template = '<div>' +
 									'content – ' + context.name +
 									'</div>';
 								return Promise.resolve(template);
 							}
 						}
-					},
-					'async-comp': {
-						name: 'async-comp',
-						constructor: ComponentErrorAsync,
-						template: {
-							render: function (context) {
+				},
+				'async-comp': {
+					name: 'async-comp',
+					constructor: ComponentErrorAsync,
+					template: {
+							render: function(context) {
 								var template = '<div>' +
 									'test – ' + context.name +
 									'</div>';
 								return Promise.resolve(template);
 							}
 						}
-					}
-				};
+				}
+			};
 			var routingContext = createRoutingContext({}, {}, components),
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
@@ -1036,7 +1036,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			routingContext.middleware.response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						routingContext.middleware.response.result.length > 0,
 						true, 'Wrong HTML'
@@ -1045,13 +1045,13 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should set code 200 and required headers', function (done) {
+		it('should set code 200 and required headers', function(done) {
 			var components = {
 				document: {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1069,7 +1069,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1081,7 +1081,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'comp',
 					constructor: Component,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'content – ' + context.name +
 								'</div>';
@@ -1093,7 +1093,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1121,7 +1121,7 @@ describe('lib/DocumentRenderer', function () {
 			var response = routingContext.middleware.response;
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						response.result, expected, 'Wrong HTML'
 					);
@@ -1139,9 +1139,9 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should set code 302 and Location if redirect in HEAD', function (done) {
+		it('should set code 302 and Location if redirect in HEAD', function(done) {
 			function Head() {}
-			Head.prototype.render = function () {
+			Head.prototype.render = function() {
 				this.$context.redirect('/to/garden');
 			};
 
@@ -1150,7 +1150,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1167,7 +1167,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: Head,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1179,7 +1179,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1196,7 +1196,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						response.result, '', 'Should be empty content'
 					);
@@ -1211,9 +1211,9 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should set header if set cookie in HEAD', function (done) {
+		it('should set header if set cookie in HEAD', function(done) {
 			function Head() {}
-			Head.prototype.render = function () {
+			Head.prototype.render = function() {
 				this.$context.cookie.set({
 					key: 'first',
 					value: 'value1'
@@ -1230,7 +1230,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1247,7 +1247,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: Head,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1259,7 +1259,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1286,7 +1286,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						response.result, expected, 'Wrong HTML'
 					);
@@ -1310,9 +1310,9 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should pass to the next middleware if notFound()', function (done) {
+		it('should pass to the next middleware if notFound()', function(done) {
 			function Head() {}
-			Head.prototype.render = function () {
+			Head.prototype.render = function() {
 				this.$context.notFound();
 				return this.$context;
 			};
@@ -1322,7 +1322,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1339,7 +1339,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: Head,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1351,7 +1351,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1365,20 +1365,20 @@ describe('lib/DocumentRenderer', function () {
 				documentRenderer = routingContext.locator
 					.resolve('documentRenderer');
 
-			routingContext.middleware.next = function () {
+			routingContext.middleware.next = function() {
 				done();
 			};
 			documentRenderer.render({}, routingContext);
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.fail('Should not finish the response');
 				});
 		});
 
-		it('should render inline script if clearFragment() in HEAD', function (done) {
+		it('should render inline script if clearFragment() in HEAD', function(done) {
 			function Head() {}
-			Head.prototype.render = function () {
+			Head.prototype.render = function() {
 				this.$context.clearFragment();
 				return this.$context;
 			};
@@ -1388,7 +1388,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1405,7 +1405,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: Head,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1417,7 +1417,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'async-comp',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1445,7 +1445,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						response.result, expected, 'Wrong HTML'
 					);
@@ -1453,9 +1453,9 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should render inline script if clearFragment()', function (done) {
+		it('should render inline script if clearFragment()', function(done) {
 			function ClearFragmentComponent() {}
-			ClearFragmentComponent.prototype.render = function () {
+			ClearFragmentComponent.prototype.render = function() {
 				this.$context.clearFragment();
 				return this.$context;
 			};
@@ -1465,7 +1465,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1482,7 +1482,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1494,7 +1494,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'comp',
 					constructor: ClearFragmentComponent,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1522,7 +1522,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						response.result, expected, 'Wrong HTML'
 					);
@@ -1530,9 +1530,9 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should render inline script if redirect()', function (done) {
+		it('should render inline script if redirect()', function(done) {
 			function RedirectComponent() {}
-			RedirectComponent.prototype.render = function () {
+			RedirectComponent.prototype.render = function() {
 				this.$context.redirect('/to/garden');
 				return this.$context;
 			};
@@ -1542,7 +1542,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1559,7 +1559,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1571,7 +1571,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'comp',
 					constructor: RedirectComponent,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1599,7 +1599,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						response.result, expected, 'Wrong HTML'
 					);
@@ -1607,9 +1607,9 @@ describe('lib/DocumentRenderer', function () {
 				});
 		});
 
-		it('should render inline script if cookie.set()', function (done) {
+		it('should render inline script if cookie.set()', function(done) {
 			function CookieComponent() {}
-			CookieComponent.prototype.render = function () {
+			CookieComponent.prototype.render = function() {
 				this.$context.cookie.set({
 					key: 'key',
 					value: 'value'
@@ -1622,7 +1622,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'document',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<!DOCTYPE html>' +
 								'<html>' +
 								'<head></head>' +
@@ -1639,7 +1639,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'head',
 					constructor: ComponentAsync,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<title>' +
 								'head – ' + context.name +
 								'</title>';
@@ -1651,7 +1651,7 @@ describe('lib/DocumentRenderer', function () {
 					name: 'comp',
 					constructor: CookieComponent,
 					template: {
-						render: function (context) {
+						render: function(context) {
 							var template = '<div>' +
 								'test – ' + context.name +
 								'</div>';
@@ -1679,7 +1679,7 @@ describe('lib/DocumentRenderer', function () {
 			documentRenderer.render({}, routingContext);
 			response
 				.on('error', done)
-				.on('finish', function () {
+				.on('finish', function() {
 					assert.strictEqual(
 						response.result, expected, 'Wrong HTML'
 					);
@@ -1698,25 +1698,25 @@ function createRoutingContext(config, stores, components) {
 	locator.register('moduleApiProvider', ModuleApiProvider, config, true);
 	locator.register('storeDispatcher', StoreDispatcher);
 	locator.registerInstance('componentLoader', {
-		load: function () {
+		load: function() {
 			return Promise.resolve();
 		},
-		getComponentsByNames: function () {
+		getComponentsByNames: function() {
 			return components;
 		}
 	});
 	locator.registerInstance('storeLoader', {
-		load: function () {
+		load: function() {
 			return Promise.resolve();
 		},
-		getStoresByNames: function () {
+		getStoresByNames: function() {
 			return stores;
 		}
 	});
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	var eventBus = new events.EventEmitter();
-	eventBus.on('error', function () {});
+	eventBus.on('error', function() {});
 	locator.registerInstance('eventBus', eventBus);
 
 	var contextFactory = locator.resolve('contextFactory');
@@ -1726,7 +1726,7 @@ function createRoutingContext(config, stores, components) {
 		userAgent: 'test',
 		middleware: {
 			response: new ServerResponse(),
-			next: function () {}
+			next: function() {}
 		}
 	});
 }

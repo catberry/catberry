@@ -46,7 +46,7 @@ HttpResponse.prototype.code = -1;
 
 HttpResponse.prototype.headers = null;
 
-HttpResponse.prototype.writeHead = function (code, headers) {
+HttpResponse.prototype.writeHead = function(code, headers) {
 	this.code = code;
 	for (var name in headers) {
 		if (!headers.hasOwnProperty(name)) {

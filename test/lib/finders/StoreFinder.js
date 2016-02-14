@@ -42,9 +42,9 @@ var CASE_PATH = path.join(
 	'test', 'cases', 'lib', 'finders', 'StoreFinder'
 );
 
-describe('lib/finders/StoreFinder', function () {
-	describe('#find', function () {
-		it('should find all valid stores', function (done) {
+describe('lib/finders/StoreFinder', function() {
+	describe('#find', function() {
+		it('should find all valid stores', function(done) {
 			var locator = createLocator({
 					storesDirectory: path.join(CASE_PATH, 'catberry_stores')
 				}),
@@ -57,7 +57,7 @@ describe('lib/finders/StoreFinder', function () {
 
 			finder
 				.find()
-				.then(function (found) {
+				.then(function(found) {
 					assert.strictEqual(
 						Object.keys(found).length,
 						Object.keys(expected).length,
@@ -65,7 +65,7 @@ describe('lib/finders/StoreFinder', function () {
 					);
 
 					Object.keys(expected)
-						.forEach(function (name) {
+						.forEach(function(name) {
 							assert.strictEqual(
 								(name in found), true,
 								name + ' not found'

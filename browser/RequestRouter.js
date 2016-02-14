@@ -66,7 +66,7 @@ function RequestRouter($serviceLocator) {
 
 	this._location = currentLocation;
 	this._changeState(state)
-		.catch(function (reason) {
+		.catch(function(reason) {
 			self._handleError(reason);
 		});
 }
@@ -139,13 +139,13 @@ RequestRouter.prototype._isHistorySupported = false;
  * @param {URI} newLocation New location.
  * @returns {Promise} Promise for nothing.
  */
-RequestRouter.prototype.route = function (newLocation) {
+RequestRouter.prototype.route = function(newLocation) {
 	var self = this;
 	// because now location was not change yet and
 	// different browsers handle `popstate` differently
 	// we need to do route in next iteration of event loop
 	return Promise.resolve()
-		.then(function () {
+		.then(function() {
 			var state = self._stateProvider.getStateByUri(newLocation),
 				newLocationString = newLocation.toString();
 
@@ -176,10 +176,10 @@ RequestRouter.prototype.route = function (newLocation) {
  * @param {string} locationString URI to go.
  * @returns {Promise} Promise for nothing.
  */
-RequestRouter.prototype.go = function (locationString) {
+RequestRouter.prototype.go = function(locationString) {
 	var self = this;
 	return Promise.resolve()
-		.then(function () {
+		.then(function() {
 			var location = new URI(locationString);
 			location = location.resolveRelative(self._location);
 			locationString = location.toString();
@@ -208,15 +208,15 @@ RequestRouter.prototype.go = function (locationString) {
  * @returns {Promise} Promise for nothing.
  * @private
  */
-RequestRouter.prototype._changeState = function (state) {
+RequestRouter.prototype._changeState = function(state) {
 	var self = this;
 	return Promise.resolve()
-		.then(function () {
+		.then(function() {
 			var routingContext = self._contextFactory.create({
-					referrer: self._referrer || self._window.document.referrer,
-					location: self._location,
-					userAgent: self._window.navigator.userAgent
-				});
+				referrer: self._referrer || self._window.document.referrer,
+				location: self._location,
+				userAgent: self._window.navigator.userAgent
+			});
 
 			if (!self._isStateInitialized) {
 				self._isStateInitialized = true;
@@ -234,7 +234,7 @@ RequestRouter.prototype._changeState = function (state) {
 			return self._documentRenderer
 				.render(state, routingContext);
 		})
-		.then(function () {
+		.then(function() {
 			self._referrer = self._location;
 		});
 };
@@ -243,19 +243,19 @@ RequestRouter.prototype._changeState = function (state) {
  * Wraps document with required events to route requests.
  * @private
  */
-RequestRouter.prototype._wrapDocument = function () {
+RequestRouter.prototype._wrapDocument = function() {
 	var self = this;
 
 	if (!this._isHistorySupported) {
 		return;
 	}
 
-	this._window.addEventListener('popstate', function () {
+	this._window.addEventListener('popstate', function() {
 		self.route(new URI(self._window.location.toString()))
 			.catch(self._handleError.bind(self));
 	});
 
-	this._window.document.body.addEventListener('click', function (event) {
+	this._window.document.body.addEventListener('click', function(event) {
 		if (event.defaultPrevented) {
 			return;
 		}
@@ -277,7 +277,7 @@ RequestRouter.prototype._wrapDocument = function () {
  * @param {Element} element Link element.
  * @private
  */
-RequestRouter.prototype._linkClickHandler = function (event, element) {
+RequestRouter.prototype._linkClickHandler = function(event, element) {
 	var targetAttribute = element.getAttribute(TARGET_ATTRIBUTE_NAME);
 	if (targetAttribute) {
 		return;
@@ -307,7 +307,7 @@ RequestRouter.prototype._linkClickHandler = function (event, element) {
  * @param {Error} error Error to handle.
  * @private
  */
-RequestRouter.prototype._handleError = function (error) {
+RequestRouter.prototype._handleError = function(error) {
 	this._eventBus.emit('error', error);
 };
 

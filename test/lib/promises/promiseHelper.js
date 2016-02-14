@@ -33,42 +33,42 @@
 var assert = require('assert'),
 	promiseHelper = require('../../../lib/promises/promiseHelper');
 
-describe('lib/promises/promiseHelper', function () {
-	describe('#callbackToPromise', function () {
+describe('lib/promises/promiseHelper', function() {
+	describe('#callbackToPromise', function() {
 		it('should convert callback to promise and pass result',
-			function (done) {
-				var some = function (callback) {
-					setTimeout(function () {
+			function(done) {
+				var some = function(callback) {
+					setTimeout(function() {
 						callback(null, 'hello');
 					}, 10);
 				};
 				promiseHelper.callbackToPromise(some)()
-					.then(function (value) {
+					.then(function(value) {
 						assert.strictEqual(value, 'hello');
 					})
-					.then(function () {
+					.then(function() {
 						done();
-					}, function (reason) {
+					}, function(reason) {
 						done(reason);
 					});
 			});
 		it('should convert callback to promise and pass error',
-			function (done) {
-				var some = function (callback) {
-					setTimeout(function () {
+			function(done) {
+				var some = function(callback) {
+					setTimeout(function() {
 						callback(new Error('hello'));
 					}, 10);
 				};
 				promiseHelper.callbackToPromise(some)()
-					.then(function () {
+					.then(function() {
 						assert.fail();
-					}, function (reason) {
+					}, function(reason) {
 						assert.strictEqual(reason instanceof Error, true);
 						assert.strictEqual(reason.message, 'hello');
 					})
-					.then(function () {
+					.then(function() {
 						done();
-					}, function (reason) {
+					}, function(reason) {
 						done(reason);
 					});
 			});

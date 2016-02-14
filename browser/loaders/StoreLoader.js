@@ -74,7 +74,7 @@ StoreLoader.prototype._loadedStores = null;
  * Loads all stores when it is in a browser.
  * @returns {Promise} Promise for nothing.
  */
-StoreLoader.prototype.load = function () {
+StoreLoader.prototype.load = function() {
 	if (this._loadedStores) {
 		return Promise.resolve(this._loadedStores);
 	}
@@ -83,12 +83,12 @@ StoreLoader.prototype.load = function () {
 	var self = this;
 
 	return Promise.resolve()
-		.then(function () {
+		.then(function() {
 			var stores = self._serviceLocator.resolveAll('store'),
 				storePromises = [];
 
 			// the list is a stack, we should reverse it
-			stores.forEach(function (store) {
+			stores.forEach(function(store) {
 				storePromises.unshift(
 					self._getStore(store)
 				);
@@ -96,8 +96,8 @@ StoreLoader.prototype.load = function () {
 
 			return Promise.all(storePromises);
 		})
-		.then(function (stores) {
-			stores.forEach(function (store) {
+		.then(function(stores) {
+			stores.forEach(function(store) {
 				if (!store || typeof (store) !== 'object') {
 					return;
 				}
@@ -114,14 +114,14 @@ StoreLoader.prototype.load = function () {
  * @returns {Promise<Object>} Promise for store.
  * @private
  */
-StoreLoader.prototype._getStore = function (storeDetails) {
+StoreLoader.prototype._getStore = function(storeDetails) {
 	var self = this;
 	return this._applyTransforms(storeDetails)
-		.then(function (transformed) {
+		.then(function(transformed) {
 			self._eventBus.emit('storeLoaded', transformed);
 			return transformed;
 		})
-		.catch(function (reason) {
+		.catch(function(reason) {
 			self._eventBus.emit('error', reason);
 			return null;
 		});
@@ -131,6 +131,6 @@ StoreLoader.prototype._getStore = function (storeDetails) {
  * Gets stores map by names.
  * @returns {Object} Map of stores by names.
  */
-StoreLoader.prototype.getStoresByNames = function () {
+StoreLoader.prototype.getStoresByNames = function() {
 	return this._loadedStores || Object.create(null);
 };

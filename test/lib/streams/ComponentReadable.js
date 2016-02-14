@@ -35,10 +35,10 @@ var assert = require('assert'),
 	ServerResponse = require('../../mocks/ServerResponse'),
 	ComponentReadable = require('../../../lib/streams/ComponentReadable');
 
-describe('lib/streams/ComponentReadable', function () {
-	describe('#foundComponentHandler', function () {
-		testCases.cases.forEach(function (testCase) {
-			it(testCase.name, function (done) {
+describe('lib/streams/ComponentReadable', function() {
+	describe('#foundComponentHandler', function() {
+		testCases.cases.forEach(function(testCase) {
+			it(testCase.name, function(done) {
 				var concat = '',
 					parser = new ComponentReadable(
 						createContext(),
@@ -46,7 +46,7 @@ describe('lib/streams/ComponentReadable', function () {
 					);
 
 				parser._isFlushed = true;
-				parser._foundComponentHandler = function (tagDetails) {
+				parser._foundComponentHandler = function(tagDetails) {
 					var id = tagDetails.attributes.id || '';
 					return Promise.resolve(
 						'content-' + tagDetails.name + id
@@ -55,10 +55,10 @@ describe('lib/streams/ComponentReadable', function () {
 				parser.renderHTML(testCase.input);
 
 				parser
-					.on('data', function (chunk) {
+					.on('data', function(chunk) {
 						concat += chunk;
 					})
-					.on('end', function () {
+					.on('end', function() {
 						assert.strictEqual(
 							concat,
 							testCase.expected,
@@ -75,7 +75,7 @@ function createContext() {
 		routingContext: {
 			middleware: {
 				response: new ServerResponse(),
-				next: function () {}
+				next: function() {}
 			}
 		}
 	};

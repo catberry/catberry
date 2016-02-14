@@ -34,6 +34,6 @@ module.exports = ErrorStore;
 
 function ErrorStore() { }
 
-ErrorStore.prototype.load = function () {
+ErrorStore.prototype.load = function() {
 	throw new Error(this.$context.name);
 };

@@ -42,14 +42,14 @@ function StoreFinder(stores) {
 	this._toFind = stores;
 }
 
-StoreFinder.prototype.find = function () {
+StoreFinder.prototype.find = function() {
 	var self = this;
-	return new Promise(function (fulfill) {
-		setTimeout(function () {
+	return new Promise(function(fulfill) {
+		setTimeout(function() {
 			self._found = self._toFind;
 			fulfill(self._found);
 		}, 100);
 	});
 };
 
-StoreFinder.prototype.watch = function () { };
+StoreFinder.prototype.watch = function() { };

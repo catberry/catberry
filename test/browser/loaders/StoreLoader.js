@@ -35,8 +35,8 @@ var assert = require('assert'),
 	ServiceLocator = require('catberry-locator'),
 	StoreLoader = require('../../../browser/loaders/StoreLoader');
 
-describe('lib/loaders/StoreLoader', function () {
-	it('should properly load stores', function (done) {
+describe('lib/loaders/StoreLoader', function() {
+	it('should properly load stores', function(done) {
 		var locator = createLocator({
 			isRelease: true
 		});
@@ -55,7 +55,7 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 2);
@@ -70,7 +70,7 @@ describe('lib/loaders/StoreLoader', function () {
 			.catch(done);
 	});
 
-	it('should not load stores twice', function (done) {
+	it('should not load stores twice', function(done) {
 		var locator = createLocator({
 			isRelease: true
 		});
@@ -89,7 +89,7 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 2);
@@ -102,7 +102,7 @@ describe('lib/loaders/StoreLoader', function () {
 				locator.unregister('store');
 				return loader.load();
 			})
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 2);
@@ -111,7 +111,7 @@ describe('lib/loaders/StoreLoader', function () {
 			.catch(done);
 	});
 
-	it('should properly transform stores', function (done) {
+	it('should properly transform stores', function(done) {
 		var locator = createLocator({
 			isRelease: true
 		});
@@ -126,13 +126,13 @@ describe('lib/loaders/StoreLoader', function () {
 		});
 
 		locator.registerInstance('storeTransform', {
-			transform: function (store) {
+			transform: function(store) {
 				store.name = store.name += '!';
 				return store;
 			}
 		});
 		locator.registerInstance('storeTransform', {
-			transform: function (store) {
+			transform: function(store) {
 				store.name = store.name += '?';
 				return Promise.resolve(store);
 			}
@@ -143,7 +143,7 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 2);
@@ -158,7 +158,7 @@ describe('lib/loaders/StoreLoader', function () {
 			.catch(done);
 	});
 
-	it('should skip transform errors', function (done) {
+	it('should skip transform errors', function(done) {
 		var locator = createLocator({
 			isRelease: true
 		});
@@ -173,13 +173,13 @@ describe('lib/loaders/StoreLoader', function () {
 		});
 
 		locator.registerInstance('storeTransform', {
-			transform: function (store) {
+			transform: function(store) {
 				store.name = store.name += '!';
 				return store;
 			}
 		});
 		locator.registerInstance('storeTransform', {
-			transform: function (store) {
+			transform: function(store) {
 				if (store.name === 'Test1!') {
 					throw new Error('Test');
 				}
@@ -193,7 +193,7 @@ describe('lib/loaders/StoreLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedStores) {
+			.then(function(loadedStores) {
 				assert.strictEqual(loadedStores, loader.getStoresByNames());
 				var storeNames = Object.keys(loadedStores);
 				assert.strictEqual(storeNames.length, 1);
@@ -211,7 +211,7 @@ function createLocator(config) {
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	var eventBus = new events.EventEmitter();
-	eventBus.on('error', function () {});
+	eventBus.on('error', function() {});
 	locator.registerInstance('eventBus', eventBus);
 	locator.register('storeLoader', StoreLoader);
 	return locator;

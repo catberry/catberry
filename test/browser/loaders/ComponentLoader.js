@@ -37,8 +37,8 @@ var assert = require('assert'),
 	ComponentFinder = require('../../mocks/finders/ComponentFinder'),
 	Logger = require('../../mocks/Logger');
 
-describe('browser/loaders/ComponentLoader', function () {
-	it('should properly load components', function (done) {
+describe('browser/loaders/ComponentLoader', function() {
+	it('should properly load components', function(done) {
 		var locator = createLocator({
 			isRelease: true
 		});
@@ -71,7 +71,7 @@ describe('browser/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -103,7 +103,7 @@ describe('browser/loaders/ComponentLoader', function () {
 					component1.errorTemplate.render(),
 					component2.template.render()
 				])
-					.then(function (rendered) {
+					.then(function(rendered) {
 						assert.deepEqual(rendered, expected);
 						done();
 					})
@@ -112,7 +112,7 @@ describe('browser/loaders/ComponentLoader', function () {
 			.catch(done);
 	});
 
-	it('should not load components twice', function (done) {
+	it('should not load components twice', function(done) {
 		var locator = createLocator({
 			isRelease: true
 		});
@@ -145,7 +145,7 @@ describe('browser/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -159,7 +159,7 @@ describe('browser/loaders/ComponentLoader', function () {
 				locator.unregister('component');
 				return loader.load();
 			})
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -170,10 +170,10 @@ describe('browser/loaders/ComponentLoader', function () {
 			.catch(done);
 	});
 
-	it('should properly transform components', function (done) {
+	it('should properly transform components', function(done) {
 		var locator = createLocator({
-				isRelease: true
-			});
+			isRelease: true
+		});
 
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
@@ -199,13 +199,13 @@ describe('browser/loaders/ComponentLoader', function () {
 		});
 
 		locator.registerInstance('componentTransform', {
-			transform: function (component) {
+			transform: function(component) {
 				component.name += '!';
 				return Promise.resolve(component);
 			}
 		});
 		locator.registerInstance('componentTransform', {
-			transform: function (component) {
+			transform: function(component) {
 				component.name += '?';
 				return component;
 			}
@@ -216,7 +216,7 @@ describe('browser/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -250,7 +250,7 @@ describe('browser/loaders/ComponentLoader', function () {
 					component1.errorTemplate.render(),
 					component2.template.render()
 				])
-					.then(function (rendered) {
+					.then(function(rendered) {
 						assert.deepEqual(rendered, expected);
 						done();
 					})
@@ -259,10 +259,10 @@ describe('browser/loaders/ComponentLoader', function () {
 			.catch(done);
 	});
 
-	it('should skip transform errors', function (done) {
+	it('should skip transform errors', function(done) {
 		var locator = createLocator({
-				isRelease: true
-			});
+			isRelease: true
+		});
 
 		locator.registerInstance('component', {
 			constructor: function ctr1() {},
@@ -288,13 +288,13 @@ describe('browser/loaders/ComponentLoader', function () {
 		});
 
 		locator.registerInstance('componentTransform', {
-			transform: function (component) {
+			transform: function(component) {
 				component.name += '!';
 				return Promise.resolve(component);
 			}
 		});
 		locator.registerInstance('componentTransform', {
-			transform: function (component) {
+			transform: function(component) {
 				if (component.name === 'second!') {
 					throw new Error('test');
 				}
@@ -308,7 +308,7 @@ describe('browser/loaders/ComponentLoader', function () {
 
 		loader
 			.load()
-			.then(function (loadedComponents) {
+			.then(function(loadedComponents) {
 				assert.strictEqual(
 					loadedComponents, loader.getComponentsByNames()
 				);
@@ -334,14 +334,14 @@ function createLocator(config) {
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	var eventBus = new events.EventEmitter();
-	eventBus.on('error', function () {});
+	eventBus.on('error', function() {});
 
 	var templateProvider = {
 		templates: {},
-		render: function (name) {
+		render: function(name) {
 			return Promise.resolve(templateProvider[name]);
 		},
-		registerCompiled: function (name, source) {
+		registerCompiled: function(name, source) {
 			templateProvider[name] = source;
 		}
 	};

@@ -102,7 +102,7 @@ function DocumentRenderer($serviceLocator) {
 
 	var self = this;
 
-	this._eventBus.on('storeChanged', function (storeName) {
+	this._eventBus.on('storeChanged', function(storeName) {
 		self._currentChangedStores[storeName] = true;
 		if (self._isStateChanging) {
 			return;
@@ -194,14 +194,14 @@ DocumentRenderer.prototype._awaitingRouting = null;
  * @param {Object} routingContext Routing context.
  * @returns {Promise} Promise for nothing.
  */
-DocumentRenderer.prototype.initWithState = function (state, routingContext) {
+DocumentRenderer.prototype.initWithState = function(state, routingContext) {
 	var self = this;
 	return self._getPromiseForReadyState()
-		.then(function () {
+		.then(function() {
 			self._currentRoutingContext = routingContext;
 			return self._storeDispatcher.setState(state, routingContext);
 		})
-		.then(function () {
+		.then(function() {
 			var components = self._componentLoader.getComponentsByNames(),
 				elements = self._findComponents(
 					self._window.document.body, components, true
@@ -218,7 +218,7 @@ DocumentRenderer.prototype.initWithState = function (state, routingContext) {
  * @param {Object} routingContext Routing context.
  * @returns {Promise} Promise for nothing.
  */
-DocumentRenderer.prototype.render = function (state, routingContext) {
+DocumentRenderer.prototype.render = function(state, routingContext) {
 	this._awaitingRouting = {
 		state: state,
 		routingContext: routingContext
@@ -233,14 +233,14 @@ DocumentRenderer.prototype.render = function (state, routingContext) {
 
 	var self = this;
 	self._renderedPromise = this._getPromiseForReadyState()
-		.then(function () {
+		.then(function() {
 			// and then we update all components of these stores in a batch.
 			return self._updateStoreComponents();
 		})
-		.catch(function (reason) {
+		.catch(function(reason) {
 			self._eventBus.emit('error', reason);
 		})
-		.then(function () {
+		.then(function() {
 			self._isStateChanging = false;
 		});
 
@@ -253,10 +253,10 @@ DocumentRenderer.prototype.render = function (state, routingContext) {
  * @param {Object?} renderingContext Rendering context for group rendering.
  */
 DocumentRenderer.prototype.renderComponent =
-	function (element, renderingContext) {
+	function(element, renderingContext) {
 		var self = this;
 		return this._getPromiseForReadyState()
-			.then(function () {
+			.then(function() {
 				var id = self._getId(element);
 				if (!id) {
 					self._logger.warn(
@@ -311,7 +311,7 @@ DocumentRenderer.prototype.renderComponent =
 				self._eventBus.emit('componentRender', eventArgs);
 
 				return Promise.resolve()
-					.then(function () {
+					.then(function() {
 						// we need unbind the whole hierarchy only at
 						// the beginning and not for new elements
 						if (!(id in renderingContext.rootIds) ||
@@ -321,10 +321,10 @@ DocumentRenderer.prototype.renderComponent =
 
 						return self._unbindAll(element, renderingContext);
 					})
-					.catch(function (reason) {
+					.catch(function(reason) {
 						self._eventBus.emit('error', reason);
 					})
-					.then(function () {
+					.then(function() {
 						if (instance.$context.element !== element) {
 							instance.$context = self._getComponentContext(
 								component, element
@@ -335,15 +335,15 @@ DocumentRenderer.prototype.renderComponent =
 						);
 						return moduleHelper.getSafePromise(renderMethod);
 					})
-					.then(function (dataContext) {
+					.then(function(dataContext) {
 						return component.template.render(dataContext);
 					})
-					.catch(function (reason) {
+					.catch(function(reason) {
 						return self._handleRenderError(
 							element, component, reason
 						);
 					})
-					.then(function (html) {
+					.then(function(html) {
 						var isHead = element.tagName === TAG_NAMES.HEAD;
 						if (html === '' && isHead) {
 							return;
@@ -357,7 +357,7 @@ DocumentRenderer.prototype.renderComponent =
 						}
 
 						morphdom(element, tmpElement, {
-							onBeforeMorphElChildren: function (foundElement) {
+							onBeforeMorphElChildren: function(foundElement) {
 								return foundElement === element ||
 									!self._isComponent(
 										renderingContext.components,
@@ -369,14 +369,14 @@ DocumentRenderer.prototype.renderComponent =
 						var promises = self._findComponents(
 							element, renderingContext.components, false
 						)
-							.map(function (innerComponent) {
+							.map(function(innerComponent) {
 								return self.renderComponent(
 									innerComponent, renderingContext
 								);
 							});
 						return Promise.all(promises);
 					})
-					.then(function () {
+					.then(function() {
 						eventArgs.hrTime = hrTimeHelper.get(startTime);
 						eventArgs.time = hrTimeHelper.toMilliseconds(
 							eventArgs.hrTime
@@ -384,7 +384,7 @@ DocumentRenderer.prototype.renderComponent =
 						self._eventBus.emit('componentRendered', eventArgs);
 						return self._bindComponent(element);
 					})
-					.then(function () {
+					.then(function() {
 						// collecting garbage only when
 						// the entire rendering is finished
 						if (!(id in renderingContext.rootIds) ||
@@ -393,7 +393,7 @@ DocumentRenderer.prototype.renderComponent =
 						}
 						self._collectRenderingGarbage(renderingContext);
 					})
-					.catch(function (reason) {
+					.catch(function(reason) {
 						self._eventBus.emit('error', reason);
 					});
 			});
@@ -404,7 +404,7 @@ DocumentRenderer.prototype.renderComponent =
  * @param {string} id Component ID.
  * @returns {Object|null} Component instance.
  */
-DocumentRenderer.prototype.getComponentById = function (id) {
+DocumentRenderer.prototype.getComponentById = function(id) {
 	return this._componentInstances[id] || null;
 };
 
@@ -413,7 +413,7 @@ DocumentRenderer.prototype.getComponentById = function (id) {
  * @param {Element} element Component's Element.
  * @returns {Object|null} Component instance.
  */
-DocumentRenderer.prototype.getComponentByElement = function (element) {
+DocumentRenderer.prototype.getComponentByElement = function(element) {
 	if (!element) {
 		return null;
 	}
@@ -426,13 +426,13 @@ DocumentRenderer.prototype.getComponentByElement = function (element) {
  * removes all references to components removed from DOM.
  * @returns {Promise} Promise for nothing.
  */
-DocumentRenderer.prototype.collectGarbage = function () {
+DocumentRenderer.prototype.collectGarbage = function() {
 	var self = this;
 	return this._getPromiseForReadyState()
-		.then(function () {
+		.then(function() {
 			var promises = [];
 			Object.keys(self._componentElements)
-				.forEach(function (id) {
+				.forEach(function(id) {
 					if (SPECIAL_IDS.hasOwnProperty(id)) {
 						return;
 					}
@@ -442,7 +442,7 @@ DocumentRenderer.prototype.collectGarbage = function () {
 					}
 
 					var promise = self._unbindComponent(self._componentElements[id])
-						.then(function () {
+						.then(function() {
 							self._removeComponent(id);
 						});
 					promises.push(promise);
@@ -457,7 +457,7 @@ DocumentRenderer.prototype.collectGarbage = function () {
  * @param {Object} attributes Element attributes.
  * @returns {Promise<Element>} Promise for HTML element with rendered component.
  */
-DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
+DocumentRenderer.prototype.createComponent = function(tagName, attributes) {
 	if (typeof (tagName) !== 'string' || !attributes ||
 		typeof (attributes) !== 'object') {
 		return Promise.reject(
@@ -467,7 +467,7 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 
 	var self = this;
 	return this._getPromiseForReadyState()
-		.then(function () {
+		.then(function() {
 			var components = self._componentLoader.getComponentsByNames(),
 				componentName = moduleHelper.getOriginalComponentName(tagName);
 
@@ -488,12 +488,12 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
 
 			var element = self._window.document.createElement(safeTagName);
 			Object.keys(attributes)
-				.forEach(function (attributeName) {
+				.forEach(function(attributeName) {
 					element.setAttribute(attributeName, attributes[attributeName]);
 				});
 
 			return self.renderComponent(element)
-				.then(function () {
+				.then(function() {
 					return element;
 				});
 		});
@@ -505,10 +505,10 @@ DocumentRenderer.prototype.createComponent = function (tagName, attributes) {
  * @private
  */
 DocumentRenderer.prototype._collectRenderingGarbage =
-	function (renderingContext) {
+	function(renderingContext) {
 		var self = this;
 		Object.keys(renderingContext.unboundIds)
-			.forEach(function (id) {
+			.forEach(function(id) {
 				// this component has been rendered again and we do not need to
 				// remove it.
 				if (id in renderingContext.renderedIds) {
@@ -532,13 +532,13 @@ DocumentRenderer.prototype._collectRenderingGarbage =
  * @returns {Promise} Promise for nothing.
  * @private
  */
-DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
+DocumentRenderer.prototype._unbindAll = function(element, renderingContext) {
 	var self = this,
 		rootId = this._getId(element),
 		promises = [];
 
 	self._findComponents(element, renderingContext.components, true)
-		.forEach(function (innerElement) {
+		.forEach(function(innerElement) {
 			var id = self._getId(innerElement);
 			renderingContext.unboundIds[id] = true;
 			promises.push(self._unbindComponent(innerElement));
@@ -556,7 +556,7 @@ DocumentRenderer.prototype._unbindAll = function (element, renderingContext) {
  * @returns {Promise} Promise for nothing.
  * @private
  */
-DocumentRenderer.prototype._unbindComponent = function (element) {
+DocumentRenderer.prototype._unbindComponent = function(element) {
 	var id = this._getId(element),
 		self = this,
 		instance = this._componentInstances[id];
@@ -565,7 +565,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 	}
 	if (id in this._componentBindings) {
 		Object.keys(this._componentBindings[id])
-			.forEach(function (eventName) {
+			.forEach(function(eventName) {
 				element.removeEventListener(
 					eventName,
 					self._componentBindings[id][eventName].handler,
@@ -576,13 +576,13 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
 	}
 	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
 	return moduleHelper.getSafePromise(unbindMethod)
-		.then(function () {
+		.then(function() {
 			self._eventBus.emit('componentUnbound', {
 				element: element,
 				id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
 			});
 		})
-		.catch(function (reason) {
+		.catch(function(reason) {
 			self._eventBus.emit('error', reason);
 		});
 };
@@ -592,7 +592,7 @@ DocumentRenderer.prototype._unbindComponent = function (element) {
  * @param {string} id Component's ID
  * @private
  */
-DocumentRenderer.prototype._removeComponent = function (id) {
+DocumentRenderer.prototype._removeComponent = function(id) {
 	delete this._componentElements[id];
 	delete this._componentInstances[id];
 	delete this._componentBindings[id];
@@ -604,7 +604,7 @@ DocumentRenderer.prototype._removeComponent = function (id) {
  * @returns {Promise} Promise for nothing.
  * @private
  */
-DocumentRenderer.prototype._bindComponent = function (element) {
+DocumentRenderer.prototype._bindComponent = function(element) {
 	var id = this._getId(element),
 		self = this,
 		instance = this._componentInstances[id];
@@ -614,7 +614,7 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 
 	var bindMethod = moduleHelper.getMethodToInvoke(instance, 'bind');
 	return moduleHelper.getSafePromise(bindMethod)
-		.then(function (bindings) {
+		.then(function(bindings) {
 			if (!bindings || typeof (bindings) !== 'object') {
 				self._eventBus.emit('componentBound', {
 					element: element,
@@ -624,14 +624,14 @@ DocumentRenderer.prototype._bindComponent = function (element) {
 			}
 			self._componentBindings[id] = Object.create(null);
 			Object.keys(bindings)
-				.forEach(function (eventName) {
+				.forEach(function(eventName) {
 					eventName = eventName.toLowerCase();
 					if (eventName in self._componentBindings[id]) {
 						return;
 					}
 					var selectorHandlers = Object.create(null);
 					Object.keys(bindings[eventName])
-						.forEach(function (selector) {
+						.forEach(function(selector) {
 							var handler = bindings[eventName][selector];
 							if (typeof (handler) !== 'function') {
 								return;
@@ -665,15 +665,15 @@ DocumentRenderer.prototype._bindComponent = function (element) {
  * @private
  */
 DocumentRenderer.prototype._createBindingHandler =
-	function (componentRoot, selectorHandlers) {
+	function(componentRoot, selectorHandlers) {
 		var selectors = Object.keys(selectorHandlers);
-		return function (event) {
-			var dispatchedEvent = createCustomEvent(event, function () {
+		return function(event) {
+			var dispatchedEvent = createCustomEvent(event, function() {
 					return element;
 				}),
 				element = event.target,
 				targetMatches = getMatchesMethod(element),
-				isHandled = selectors.some(function (selector) {
+				isHandled = selectors.some(function(selector) {
 					if (targetMatches(selector)) {
 						selectorHandlers[selector](dispatchedEvent);
 						return true;
@@ -709,7 +709,7 @@ DocumentRenderer.prototype._createBindingHandler =
  * @param {Element} element DOM element.
  * @private
  */
-DocumentRenderer.prototype._isComponent = function (components, element) {
+DocumentRenderer.prototype._isComponent = function(components, element) {
 	var currentNodeName = element.nodeName;
 	return moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName) &&
 		(moduleHelper.getOriginalComponentName(currentNodeName) in components);
@@ -723,7 +723,7 @@ DocumentRenderer.prototype._isComponent = function (components, element) {
  * @private
  */
 DocumentRenderer.prototype._findComponents =
-	function (element, components, goInComponents) {
+	function(element, components, goInComponents) {
 		var elements = [],
 			queue = [element],
 			currentChildren, i;
@@ -761,7 +761,7 @@ DocumentRenderer.prototype._findComponents =
  * @private
  */
 DocumentRenderer.prototype._handleRenderError =
-	function (element, component, error) {
+	function(element, component, error) {
 		this._eventBus.emit('error', error);
 
 		// do not corrupt existed HEAD when error occurs
@@ -785,7 +785,7 @@ DocumentRenderer.prototype._handleRenderError =
  * @returns {Promise} Promise for nothing.
  * @private
  */
-DocumentRenderer.prototype._updateStoreComponents = function () {
+DocumentRenderer.prototype._updateStoreComponents = function() {
 	if (this._isUpdating) {
 		return Promise.resolve();
 	}
@@ -816,14 +816,14 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 				this._awaitingRouting.routingContext
 			);
 
-		changedByState.forEach(function (name) {
+		changedByState.forEach(function(name) {
 			self._currentChangedStores[name] = true;
 		});
 
 		// we should update contexts of the stores with the new routing context
 		this._currentRoutingContext = this._awaitingRouting.routingContext;
 		Object.keys(this._componentInstances)
-			.forEach(function (id) {
+			.forEach(function(id) {
 				var instance = self._componentInstances[id];
 				instance.$context = self._getComponentContext(
 					components[instance.$context.name],
@@ -842,16 +842,16 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
 	this._currentChangedStores = Object.create(null);
 
 	var renderingContext = this._createRenderingContext(changedStores),
-		promises = renderingContext.roots.map(function (root) {
+		promises = renderingContext.roots.map(function(root) {
 			renderingContext.rootIds[self._getId(root)] = true;
 			return self.renderComponent(root, renderingContext);
 		});
 
 	return Promise.all(promises)
-		.catch(function (reason) {
+		.catch(function(reason) {
 			self._eventBus.emit('error', reason);
 		})
-		.then(function () {
+		.then(function() {
 			self._isUpdating = false;
 			self._eventBus.emit('documentUpdated', changedStores);
 			return self._updateStoreComponents();
@@ -864,8 +864,8 @@ DocumentRenderer.prototype._updateStoreComponents = function () {
  * @param {Element} newHead New head element.
  * @private
  */
-/*jshint maxcomplexity:false */
-DocumentRenderer.prototype._mergeHead = function (head, newHead) {
+/* jshint maxcomplexity:false */
+DocumentRenderer.prototype._mergeHead = function(head, newHead) {
 	if (!newHead) {
 		return;
 	}
@@ -884,51 +884,51 @@ DocumentRenderer.prototype._mergeHead = function (head, newHead) {
 
 		switch (current.nodeName) {
 			// these elements can be only replaced
-			case TAG_NAMES.TITLE:
-			case TAG_NAMES.BASE:
-			case TAG_NAMES.NOSCRIPT:
-				key = this._getNodeKey(current);
-				oldItem = head.getElementsByTagName(current.nodeName)[0];
-				if (oldItem) {
-					oldKey = this._getNodeKey(oldItem);
-					head.replaceChild(current, oldItem);
-				} else {
-					head.appendChild(current);
-				}
+		case TAG_NAMES.TITLE:
+		case TAG_NAMES.BASE:
+		case TAG_NAMES.NOSCRIPT:
+			key = this._getNodeKey(current);
+			oldItem = head.getElementsByTagName(current.nodeName)[0];
+			if (oldItem) {
+				oldKey = this._getNodeKey(oldItem);
+				head.replaceChild(current, oldItem);
+			} else {
+				head.appendChild(current);
+			}
 				// when we do replace or append current is removed from newHead
 				// therefore we need to decrement index
-				i--;
-				break;
+			i--;
+			break;
 
 			// these elements can not be deleted from head
 			// therefore we just add new elements that differs from existed
-			case TAG_NAMES.STYLE:
-			case TAG_NAMES.LINK:
-			case TAG_NAMES.SCRIPT:
-				key = self._getNodeKey(current);
-				if (!(key in map[current.nodeName])) {
-					head.appendChild(current);
-					i--;
-				}
-				break;
+		case TAG_NAMES.STYLE:
+		case TAG_NAMES.LINK:
+		case TAG_NAMES.SCRIPT:
+			key = self._getNodeKey(current);
+			if (!(key in map[current.nodeName])) {
+				head.appendChild(current);
+				i--;
+			}
+			break;
 			// meta and other elements can be deleted
 			// but we should not delete and append same elements
-			default:
-				key = self._getNodeKey(current);
-				if (key in map[current.nodeName]) {
-					sameMetaElements[key] = true;
-				} else {
-					head.appendChild(current);
-					i--;
-				}
-				break;
+		default:
+			key = self._getNodeKey(current);
+			if (key in map[current.nodeName]) {
+				sameMetaElements[key] = true;
+			} else {
+				head.appendChild(current);
+				i--;
+			}
+			break;
 		}
 	}
 
 	if (TAG_NAMES.META in map) {
 		// remove meta tags which a not in a new head state
 		Object.keys(map[TAG_NAMES.META])
-			.forEach(function (metaKey) {
+			.forEach(function(metaKey) {
 				if (metaKey in sameMetaElements) {
 					return;
 				}
@@ -944,7 +944,7 @@ DocumentRenderer.prototype._mergeHead = function (head, newHead) {
  * @returns {Object} Map of HEAD elements.
  * @private
  */
-DocumentRenderer.prototype._getHeadMap = function (headChildren) {
+DocumentRenderer.prototype._getHeadMap = function(headChildren) {
 	// Create map of <meta>, <link>, <style> and <script> tags
 	// by unique keys that contain attributes and content
 	var map = Object.create(null),
@@ -967,7 +967,7 @@ DocumentRenderer.prototype._getHeadMap = function (headChildren) {
  * @returns {string} Unique key for element.
  * @private
  */
-DocumentRenderer.prototype._getNodeKey = function (node) {
+DocumentRenderer.prototype._getNodeKey = function(node) {
 	var current, i,
 		attributes = [];
 
@@ -993,12 +993,12 @@ DocumentRenderer.prototype._getNodeKey = function (node) {
  * @param {Array} element Elements list.
  * @private
  */
-DocumentRenderer.prototype._initialWrap = function (components, elements) {
+DocumentRenderer.prototype._initialWrap = function(components, elements) {
 	var self = this,
 		current = elements.pop();
 
 	return Promise.resolve()
-		.then(function () {
+		.then(function() {
 			var id = self._getId(current);
 			if (!id) {
 				return;
@@ -1032,7 +1032,7 @@ DocumentRenderer.prototype._initialWrap = function (components, elements) {
 			});
 			return self._bindComponent(current);
 		})
-		.then(function () {
+		.then(function() {
 			if (elements.length > 0) {
 				return self._initialWrap(components, elements);
 			}
@@ -1051,7 +1051,7 @@ DocumentRenderer.prototype._initialWrap = function (components, elements) {
  * @private
  */
 DocumentRenderer.prototype._getComponentContext =
-	function (component, element) {
+	function(component, element) {
 		var self = this,
 			storeName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE),
 			componentContext = Object.create(this._currentRoutingContext);
@@ -1061,13 +1061,13 @@ DocumentRenderer.prototype._getComponentContext =
 
 		Object.defineProperties(componentContext, {
 			name: {
-				get: function () {
+				get: function() {
 					return component.name;
 				},
 				enumerable: true
 			},
 			attributes: {
-				get: function () {
+				get: function() {
 					return attributesToObject(element.attributes);
 				},
 				enumerable: true
@@ -1075,31 +1075,31 @@ DocumentRenderer.prototype._getComponentContext =
 		});
 
 		componentContext.element = element;
-		componentContext.getComponentById = function (id) {
+		componentContext.getComponentById = function(id) {
 			return self.getComponentById(id);
 		};
-		componentContext.getComponentByElement = function (element) {
+		componentContext.getComponentByElement = function(element) {
 			return self.getComponentByElement(element);
 		};
-		componentContext.createComponent = function (tagName, attributes) {
+		componentContext.createComponent = function(tagName, attributes) {
 			return self.createComponent(tagName, attributes);
 		};
-		componentContext.collectGarbage = function () {
+		componentContext.collectGarbage = function() {
 			return self.collectGarbage();
 		};
-		componentContext.getStoreData = function () {
+		componentContext.getStoreData = function() {
 			var currentStoreName = element
 				.getAttribute(moduleHelper.ATTRIBUTE_STORE);
 			return self._storeDispatcher
 				.getStoreData(currentStoreName);
 		};
-		componentContext.sendAction = function (name, args) {
+		componentContext.sendAction = function(name, args) {
 			var currentStoreName = element
 				.getAttribute(moduleHelper.ATTRIBUTE_STORE);
 			return self._storeDispatcher
 				.sendAction(currentStoreName, name, args);
 		};
-		componentContext.sendBroadcastAction = function (name, args) {
+		componentContext.sendBroadcastAction = function(name, args) {
 			return self._storeDispatcher
 				.sendBroadcastAction(name, args);
 		};
@@ -1113,7 +1113,7 @@ DocumentRenderer.prototype._getComponentContext =
  * @returns {Array<Element>} HTML elements that are rendering roots.
  * @private
  */
-DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
+DocumentRenderer.prototype._findRenderingRoots = function(changedStoreNames) {
 	var self = this,
 		headStore = this._window.document.head.getAttribute(
 			moduleHelper.ATTRIBUTE_STORE
@@ -1126,7 +1126,7 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 
 	// we should find all components and then looking for roots
 	changedStoreNames
-		.forEach(function (storeName) {
+		.forEach(function(storeName) {
 			storeNamesSet[storeName] = true;
 			componentsElements[storeName] = self._window.document
 				.querySelectorAll(
@@ -1148,7 +1148,7 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
 	}
 
 	changedStoreNames
-		.forEach(function (storeName) {
+		.forEach(function(storeName) {
 			var current, currentId,
 				lastRoot, lastRootId,
 				currentStore, currentComponentName;
@@ -1209,7 +1209,7 @@ DocumentRenderer.prototype._findRenderingRoots = function (changedStoreNames) {
  * }} The context object.
  * @private
  */
-DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
+DocumentRenderer.prototype._createRenderingContext = function(changedStores) {
 	var components = this._componentLoader.getComponentsByNames();
 
 	return {
@@ -1230,7 +1230,7 @@ DocumentRenderer.prototype._createRenderingContext = function (changedStores) {
  * @param {Element} element HTML element of component.
  * @returns {string} ID.
  */
-DocumentRenderer.prototype._getId = function (element) {
+DocumentRenderer.prototype._getId = function(element) {
 	if (element === this._window.document.documentElement) {
 		return SPECIAL_IDS.$$document;
 	}
@@ -1246,7 +1246,7 @@ DocumentRenderer.prototype._getId = function (element) {
  * @returns {Element} clone.
  * @private
  */
-DocumentRenderer.prototype._createTemporaryElement = function (element) {
+DocumentRenderer.prototype._createTemporaryElement = function(element) {
 	var tmp = this._window.document.createElement(element.tagName),
 		attributes = element.attributes;
 	for (var i = 0; i < attributes.length; i++) {
@@ -1296,10 +1296,10 @@ function createCustomEvent(event, currentTargetGetter) {
 	for (var key in event) {
 		keys.push(key);
 	}
-	keys.forEach(function (key) {
+	keys.forEach(function(key) {
 		if (typeof (event[key]) === 'function') {
 			properties[key] = {
-				get: function () {
+				get: function() {
 					return event[key].bind(event);
 				}
 			};
@@ -1307,10 +1307,10 @@ function createCustomEvent(event, currentTargetGetter) {
 		}
 
 		properties[key] = {
-			get: function () {
+			get: function() {
 				return event[key];
 			},
-			set: function (value) {
+			set: function(value) {
 				event[key] = value;
 			}
 		};

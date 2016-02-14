@@ -34,10 +34,10 @@ module.exports = DataAsyncStore;
 
 function DataAsyncStore() { }
 
-DataAsyncStore.prototype.load = function () {
+DataAsyncStore.prototype.load = function() {
 	var self = this;
-	return new Promise(function (fulfill) {
-		setTimeout(function () {
+	return new Promise(function(fulfill) {
+		setTimeout(function() {
 			fulfill(self.$context);
 		}, 10);
 	});
