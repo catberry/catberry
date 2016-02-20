@@ -33,7 +33,7 @@ describe('lib/finders/StoreFinder', function() {
 
 	describe('#find', function() {
 		it('should find all valid stores', function(done) {
-			locator.registerInstance('config',{
+			locator.registerInstance('config', {
 				storesDirectory: path.join(CASE_PATH, 'catberry_stores')
 			});
 			const finder = locator.resolve('storeFinder');
