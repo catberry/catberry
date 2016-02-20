@@ -20,7 +20,7 @@ const EXPECTED = require(EXPECTED_PATH);
 /* eslint prefer-arrow-callback:0 */
 /* eslint max-nested-callbacks:0 */
 /* eslint require-jsdoc:0 */
-describe.only('lib/finders/ComponentFinder', function() {
+describe('lib/finders/ComponentFinder', function() {
 	var locator;
 
 	beforeEach(function() {
@@ -56,14 +56,14 @@ describe.only('lib/finders/ComponentFinder', function() {
 			const finder = locator.resolve('componentFinder');
 			return finder
 				.find()
-				.then(found => foundEqualsExpected(found, EXPECTED))
+				.then(foundEqualsExpected)
 				.then(done)
 				.catch(done);
 		});
 	});
 });
 
-function foundEqualsExpected(found, EXPECTED) {
+function foundEqualsExpected(found) {
 	assert.strictEqual(found.size, Object.keys(EXPECTED).length);
 
 	Object.keys(EXPECTED)
