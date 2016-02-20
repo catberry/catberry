@@ -1,5 +1,5 @@
 
-SOURCES = ./lib/finders ./lib/helpers
+SOURCES = ./lib/finders ./lib/helpers ./lib/base
 TESTS = test/lib/finders test/lib/helpers
 
 all: lint test
