@@ -1,11 +1,11 @@
 {
 	"name": "catberry",
-	"version": "7.1.2",
+	"version": "8.0.0-dev",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
 	},
-	"description": "Catberry is a framework with Flux architecture, isomorphic web-components and progressive rendering.",
+	"description": "Catberry is a isomorphic framework with Flux architecture, universal web-components and progressive rendering.",
 	"homepage": "https://github.com/catberry/catberry",
 	"keywords": [
 		"progressive rendering",
@@ -64,7 +64,7 @@
 		"mkdirp": "~0.5.1",
 		"glob": "^5.0.15",
 		"chokidar": "^1.2.0",
-		"catberry-locator": "^1.1.9",
+		"catberry-locator": "^2.0.0",
 		"catberry-uhr": "^4.2.2",
 		"catberry-uri": "^2.1.6",
 		"entities": "^1.1.1",
@@ -79,13 +79,13 @@
 	},
 	"devDependencies": {
 		"istanbul": "~0.4.0",
-		"codecov.io": "~0.1.6",
+		"codecov": "^1.0.1",
 		"jsdom": "^7.0.2",
-		"mocha": "^2.3.3",
+		"mocha": "^2.4.5",
 		"eslint": "^2.0.0"
 	},
 	"engines": {
-		"node": ">=5"
+		"node": ">=4"
 	},
 	"scripts": {
 		"test": "make"
