@@ -1,13 +1,14 @@
 
-TESTS = test/lib/* test/browser/*
+SOURCES = ./lib/finders
+TESTS = test/lib/finders
 
 all: lint test
 
 lint:
-	./node_modules/.bin/eslint ./
+	./node_modules/.bin/eslint $(SOURCES)
 
 lint-fix:
-	./node_modules/.bin/eslint ./ --fix
+	./node_modules/.bin/eslint $(SOURCES) --fix
 
 test:
 ifeq ($(TRAVIS),true)
