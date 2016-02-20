@@ -13,7 +13,7 @@ const CASE_PATH = path.join(
 );
 
 const EXPECTED_PATH = path.join(
-	process.cwd(), CASE_PATH, 'EXPECTED.json'
+	process.cwd(), CASE_PATH, 'expected.json'
 );
 const EXPECTED = require(EXPECTED_PATH);
 
