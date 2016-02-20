@@ -1,14 +1,14 @@
 
-SOURCES = ./lib/finders
-TESTS = test/lib/finders
+SOURCES = ./lib/finders ./lib/helpers
+TESTS = test/lib/finders test/lib/helpers
 
 all: lint test
 
 lint:
-	./node_modules/.bin/eslint $(SOURCES)
+	./node_modules/.bin/eslint $(SOURCES) $(TESTS)
 
 lint-fix:
-	./node_modules/.bin/eslint $(SOURCES) --fix
+	./node_modules/.bin/eslint $(SOURCES) $(TESTS) --fix
 
 test:
 ifeq ($(TRAVIS),true)
