@@ -47,10 +47,10 @@ describe('lib/finders/ComponentFinder', function() {
 			const caseRoot = 'test/cases/lib/finders/ComponentFinder/components';
 			locator.registerInstance('config', {
 				componentsGlob: [
-					caseRoot + '/test1/**/test-cat-component.json',
-					caseRoot + '/test1/test-cat-component.json',
-					caseRoot + '/test3/**/test-cat-component.json',
-					caseRoot + '/test3/test-cat-component.json'
+					`${caseRoot}/test1/**/test-cat-component.json`,
+					`${caseRoot}/test1/test-cat-component.json`,
+					`${caseRoot}/test3/**/test-cat-component.json`,
+					`${caseRoot}/test3/test-cat-component.json`
 				]
 			});
 			const finder = locator.resolve('componentFinder');
