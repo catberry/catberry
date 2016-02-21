@@ -36,11 +36,15 @@
 'use strict';
 
 var stores = [
-/** __stores**/
+
+/** __stores **/
+
 ];
 
 var components = [
-/** __components**/
+
+/** __components **/
+
 ];
 
 var util = require('util'),
