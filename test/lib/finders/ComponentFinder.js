@@ -39,7 +39,7 @@ describe('lib/finders/ComponentFinder', function() {
 			const finder = locator.resolve('componentFinder');
 			return finder
 				.find()
-				.then(found => foundEqualsExpected(found, EXPECTED))
+				.then(found => assert.deepEqual(found, EXPECTED))
 				.then(done)
 				.catch(done);
 		});
@@ -56,21 +56,9 @@ describe('lib/finders/ComponentFinder', function() {
 			const finder = locator.resolve('componentFinder');
 			return finder
 				.find()
-				.then(foundEqualsExpected)
+				.then(found => assert.deepEqual(found, EXPECTED))
 				.then(done)
 				.catch(done);
 		});
 	});
 });
-
-function foundEqualsExpected(found) {
-	assert.strictEqual(found.size, Object.keys(EXPECTED).length);
-
-	Object.keys(EXPECTED)
-		.forEach(name => {
-			assert.strictEqual(found.has(name), true);
-			assert.strictEqual(found.get(name).name, EXPECTED[name].name);
-			assert.strictEqual(found.get(name).path, EXPECTED[name].path);
-			assert.deepEqual(found.get(name).properties, EXPECTED[name].properties);
-		});
-}
