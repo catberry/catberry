@@ -1,0 +1,77 @@
+{
+	"load": [
+		{
+			"name": "should properly load components",
+			"components": {
+				"first-cool": {
+					"name": "first-cool",
+					"path": "test/cases/lib/loaders/ComponentLoader/first/first.json",
+					"properties": {
+						"logic": "./logic.js",
+						"errorTemplate": "./templates/error.html",
+						"template": "./templates/template.html"
+					}
+				},
+				"second": {
+					"name": "second",
+					"path": "test/cases/lib/loaders/ComponentLoader/Second/second.json",
+					"properties": {
+						"logic": "./index.js",
+						"template": "./template.html"
+					}
+				}
+			},
+			"expectedCount": 2,
+			"expectedTemplates": [
+				"Hello, world!",
+				"Hello from second!"
+			],
+			"expectedErrorTemplates": [
+				"Error occurs :(",
+				null
+			]
+		},
+		{
+			"name": "should not load if component does not export a constructor or a class",
+			"components": {
+				"error1": {
+					"name": "error1",
+					"path": "test/cases/lib/loaders/ComponentLoader/Error1/error1.json",
+					"properties": {
+						"logic": "./index.js",
+						"template": "./template.html"
+					}
+				}
+			},
+			"expectedCount": 0
+		},
+		{
+			"name": "should not load if component has wrong path in \"template\" field",
+			"components": {
+				"error3": {
+					"name": "error3",
+					"path": "test/cases/lib/loaders/ComponentLoader/Error3/error3.json",
+					"properties": {
+						"logic": "./index.js",
+						"template": "./template.html"
+					}
+				}
+			},
+			"expectedCount": 0
+		},
+		{
+			"name": "should not load if component has no logic file",
+			"components": {
+				"error4": {
+					"name": "error4",
+					"path": "test/cases/lib/loaders/ComponentLoader/Error4/error4.json",
+					"properties": {
+						"logic": "./index.js",
+						"template": "./template.html"
+					}
+				}
+			},
+			"expectedCount": 0
+		}
+	]
+}
