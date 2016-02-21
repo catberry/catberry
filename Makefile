@@ -1,6 +1,6 @@
 
-SOURCES = ./lib/finders ./lib/helpers ./lib/base ./lib/builders ./lib/promises
-TESTS = test/lib/finders test/lib/helpers test/lib/promises
+SOURCES = ./lib/finders ./lib/helpers ./lib/base ./lib/builders ./lib/promises ./lib/providers
+TESTS = test/lib/finders test/lib/helpers test/lib/promises test/lib/providers
 
 all: lint test
 
