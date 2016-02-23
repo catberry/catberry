@@ -5,7 +5,7 @@
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
 	},
-	"description": "Catberry is a isomorphic framework with Flux architecture, universal web-components and progressive rendering.",
+	"description": "Catberry is an isomorphic framework for building universal front-end apps using components, Flux architecture and progressive rendering.",
 	"homepage": "https://github.com/catberry/catberry",
 	"keywords": [
 		"progressive rendering",
