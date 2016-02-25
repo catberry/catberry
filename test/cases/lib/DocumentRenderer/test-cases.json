@@ -1,0 +1,372 @@
+{
+	"render": [
+		{
+			"name": "should render nothing if no such component",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document.html"
+				}
+			},
+			"expectedHTML": "no-components.html"
+		},
+		{
+			"name": "should ignore second head and document tags",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "redundant-head-document.html"
+				}
+			},
+			"expectedHTML": "redundant-head-document.html"
+		},
+		{
+			"name": "should properly render components without stores",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document-with-head.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "AsyncComponent",
+					"template": "head.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "SyncComponent",
+					"template": "component.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "AsyncComponent",
+					"template": "component.html"
+				}
+			},
+			"expectedHTML": "components-without-stores.html"
+		},
+		{
+			"name": "should properly render components with stores",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "StoreComponent",
+					"template": "document-with-head-and-stores.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "StoreComponent",
+					"template": "head.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "StoreComponent",
+					"template": "component.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "StoreComponent",
+					"template": "component.html"
+				}
+			},
+			"stores": {
+				"store1": {
+					"name": "store1",
+					"constructor": "SyncDataStore"
+				},
+				"folder/store2": {
+					"name": "folder/store2",
+					"constructor": "AsyncDataStore"
+				}
+			},
+			"expectedHTML": "components-with-stores.html"
+		},
+		{
+			"name": "should render errors in stores",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document-with-head-and-stores.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "StoreComponent",
+					"template": "head.html",
+					"errorTemplate": "error.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "StoreComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "StoreComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				}
+			},
+			"stores": {
+				"store1": {
+					"name": "store1",
+					"constructor": "SyncErrorStore"
+				},
+				"folder/store2": {
+					"name": "folder/store2",
+					"constructor": "AsyncErrorStore"
+				}
+			},
+			"expectedHTML": "components-with-stores-errors.html"
+		},
+		{
+			"name": "should render errors if stores are not found",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document-with-head-and-stores.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "StoreComponent",
+					"template": "head.html",
+					"errorTemplate": "error.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "StoreComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "StoreComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				}
+			},
+			"expectedHTML": "components-with-wrong-stores.html"
+		},
+		{
+			"name": "should properly render errors in components",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document-with-head.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "AsyncErrorComponent",
+					"template": "head.html",
+					"errorTemplate": "error.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "SyncErrorComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "AsyncErrorComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				}
+			},
+			"expectedHTML": "components-with-errors.html"
+		},
+		{
+			"name": "should properly render errors in components' constructors",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document-with-head.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "ConstructorErrorComponent",
+					"template": "head.html",
+					"errorTemplate": "error.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "ConstructorErrorComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "ConstructorErrorComponent",
+					"template": "component.html",
+					"errorTemplate": "error.html"
+				}
+			},
+			"expectedHTML": "components-with-errors.html"
+		},
+		{
+			"name": "should render nothing if an error template throws an exception",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document-with-head.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "AsyncErrorComponent",
+					"template": "head.html",
+					"errorTemplate": "throw-error.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "SyncErrorComponent",
+					"template": "component.html",
+					"errorTemplate": "throw-error.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "AsyncErrorComponent",
+					"template": "component.html",
+					"errorTemplate": "throw-error.html"
+				}
+			},
+			"expectedHTML": "components-with-template-errors.html"
+		},
+		{
+			"name": "should render nothing if document component returns an error",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "ErrorAsyncComponent",
+					"template": "document-with-head.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "AsyncComponent",
+					"template": "head.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "SyncComponent",
+					"template": "component.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "AsyncComponent",
+					"template": "component.html"
+				}
+			},
+			"expectedHTML": ""
+		},
+		{
+			"name": "should render nothing if document component's constructor throws an error",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "ConstructorErrorComponent",
+					"template": "document-with-head.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "AsyncComponent",
+					"template": "head.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "SyncComponent",
+					"template": "component.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "AsyncComponent",
+					"template": "component.html"
+				}
+			},
+			"expectedHTML": ""
+		},
+
+
+
+
+
+		{
+			"name": "should properly render nested components",
+			"config": {
+				"isRelease": true
+			},
+			"components": {
+				"document": {
+					"name": "document",
+					"constructor": "AsyncComponent",
+					"template": "document-with-head.html"
+				},
+				"head": {
+					"name": "head",
+					"constructor": "AsyncComponent",
+					"template": "head.html"
+				},
+				"comp": {
+					"name": "comp",
+					"constructor": "SyncComponent",
+					"template": "component-with-nested.html"
+				},
+				"async-comp": {
+					"name": "async-comp",
+					"constructor": "AsyncComponent",
+					"template": "component-with-nested.html"
+				},
+				"nested": {
+					"name": "nested",
+					"constructor": "SyncComponent",
+					"template": "component.html"
+				},
+				"async-nested": {
+					"name": "async-nested",
+					"constructor": "AsyncComponent",
+					"template": "component.html"
+				}
+			},
+			"expectedHTML": "nested-components.html"
+		}
+	]
+}
