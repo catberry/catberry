@@ -375,7 +375,7 @@ Cool.prototype.bind = function () {
 			'a.clickable': this._clickHandler,
 			'div#some': this._someDivHandler
 		},
-		hover: {
+		mouseenter: {
 			'a.clickable': this._clickableHoverHandler
 		}
 	};
