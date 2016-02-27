@@ -62,27 +62,27 @@
 	},
 	"dependencies": {
 		"mkdirp": "~0.5.1",
-		"glob": "^5.0.15",
-		"chokidar": "^1.2.0",
+		"glob": "^7.0.0",
+		"chokidar": "^1.4.3",
 		"catberry-locator": "^2.0.0",
 		"catberry-uhr": "^4.2.2",
 		"catberry-uri": "^2.1.6",
 		"entities": "^1.1.1",
-		"watchify": "^3.6.0",
-		"uglify-js": "^2.5.0",
-		"browserify": "^12.0.1",
+		"watchify": "^3.7.0",
+		"uglify-js": "^2.6.2",
+		"browserify": "^13.0.0",
 		"log4js": "~0.6.27",
-		"promise": "^7.0.4",
-		"pretty-hrtime": "^1.0.1",
+		"promise": "^7.1.1",
+		"pretty-hrtime": "^1.0.2",
 		"browser-process-hrtime": "~0.1.2",
-		"morphdom": "^1.0.3"
+		"morphdom": "^1.1.2"
 	},
 	"devDependencies": {
-		"istanbul": "~0.4.0",
+		"istanbul": "~0.4.2",
 		"codecov": "^1.0.1",
-		"jsdom": "^7.0.2",
+		"jsdom": "^8.0.4",
 		"mocha": "^2.4.5",
-		"eslint": "^2.0.0"
+		"eslint": "^2.2.0"
 	},
 	"engines": {
 		"node": ">=4"
