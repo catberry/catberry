@@ -38,26 +38,26 @@ describe('browser/CookieWrapper', function() {
 	describe('#get', function() {
 		it('should return empty string if cookie string is null', function() {
 			var locator = createLocator(null),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
+				cookieWrapper = new CookieWrapper(locator);
 
 			assert.strictEqual(cookieWrapper.get('some'), '');
 		});
 		it('should return empty string if cookie key is not a string',
 			function() {
 				var locator = createLocator('some=value;'),
-					cookieWrapper = locator.resolveInstance(CookieWrapper);
+					cookieWrapper = new CookieWrapper(locator);
 				assert.strictEqual(cookieWrapper.get({}), '');
 			});
 		it('should return value if cookie string is right', function() {
 			var locator = createLocator('some=value; some2=value2'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
+				cookieWrapper = new CookieWrapper(locator);
 
 			assert.strictEqual(cookieWrapper.get('some'), 'value');
 			assert.strictEqual(cookieWrapper.get('some2'), 'value2');
 		});
 		it('should return empty string if cookie string is wrong', function() {
 			var locator = createLocator('fasdfa/gafg-sgafga'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
+				cookieWrapper = new CookieWrapper(locator);
 
 			assert.strictEqual(cookieWrapper.get('fasdfa/gafg-sgafga'), '');
 		});
@@ -66,7 +66,7 @@ describe('browser/CookieWrapper', function() {
 		it('should set cookie by specified parameters',
 			function() {
 				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper),
+					cookieWrapper = new CookieWrapper(locator),
 					expiration = new Date(),
 					window = locator.resolve('window'),
 					expected = 'some=value' +
@@ -93,7 +93,7 @@ describe('browser/CookieWrapper', function() {
 		it('should set default expire date by max age',
 			function() {
 				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper),
+					cookieWrapper = new CookieWrapper(locator),
 					expiration = new Date(Date.now() + 3600000),
 					window = locator.resolve('window'),
 					expected = 'some=value' +
@@ -112,7 +112,7 @@ describe('browser/CookieWrapper', function() {
 		it('should throw error if wrong key',
 			function() {
 				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper);
+					cookieWrapper = new CookieWrapper(locator);
 
 				assert.throws(function() {
 					cookieWrapper.set({
@@ -123,7 +123,7 @@ describe('browser/CookieWrapper', function() {
 		it('should throw error if wrong value',
 			function() {
 				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper);
+					cookieWrapper = new CookieWrapper(locator);
 
 				assert.throws(function() {
 					cookieWrapper.set({
@@ -136,7 +136,7 @@ describe('browser/CookieWrapper', function() {
 	describe('#getCookieString', function() {
 		it('should return right cookie string', function() {
 			var locator = createLocator('some=value; some2=value2'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
+				cookieWrapper = new CookieWrapper(locator);
 
 			assert.strictEqual(
 				cookieWrapper.getCookieString(),
@@ -147,7 +147,7 @@ describe('browser/CookieWrapper', function() {
 	describe('#getAll', function() {
 		it('should return right cookie string', function() {
 			var locator = createLocator('some=value; some2=value2'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
+				cookieWrapper = new CookieWrapper(locator);
 
 			assert.deepEqual(
 				cookieWrapper.getAll(), {

@@ -43,7 +43,7 @@ describe('browser/providers/ModuleApiProvider', function() {
 	describe('#redirect', function() {
 		it('should redirect to URI', function(done) {
 			var locator = createLocator(),
-				api = locator.resolveInstance(ModuleApiProvider),
+				api = new ModuleApiProvider(locator),
 				requestRouter = locator.resolve('requestRouter');
 			requestRouter.on('go', function(args) {
 				assert.strictEqual(args[0], '/some1');
@@ -55,15 +55,15 @@ describe('browser/providers/ModuleApiProvider', function() {
 	describe('#clearFragment', function() {
 		it('should clear URI hash', function(done) {
 			var locator = createLocator(),
-				api = locator.resolveInstance(ModuleApiProvider),
+				api = new ModuleApiProvider(locator),
 				requestRouter = locator.resolve('requestRouter');
 			requestRouter.on('clearFragment', function(args) {
 				assert.strictEqual(args.length, 0);
 			});
 			jsdom.env({
+				url: 'http://local',
 				html: ' ',
 				done: function(errors, window) {
-					window.location.replace('http://local');
 					window.location.hash = '#some';
 					locator.registerInstance('window', window);
 					assert.strictEqual(

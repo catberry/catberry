@@ -87,11 +87,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location.replace('http://local/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -133,11 +133,11 @@ describe('browser/RequestRouter', function() {
 				eventBus.on('error', done);
 
 				jsdom.env({
+					url: 'http://local/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location.replace('http://local/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -205,11 +205,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local/some',
 					html: '<a href="' + link + '"><span><div></div></span></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location.replace('http://local/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -269,12 +269,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'https://local1.com/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('https://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -338,11 +337,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local:9090/a/b',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location.replace('http://local:9090/a/b');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -410,11 +409,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local:9090/a/b/',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location.replace('http://local:9090/a/b/');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -462,16 +461,15 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local2.com/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local2.com/some');
 						window.location.assign = function(linkToGo) {
 							assert.strictEqual(linkToGo, link);
 							done();
 						};
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -512,12 +510,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local1.com/some',
 					html: '<a href="' + link + '" target="_blank"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -566,13 +563,12 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local1.com/some',
 					html: '<a href="' + link + '"></a>' +
 					'<span><div></div></span>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -621,12 +617,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local1.com/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -675,12 +670,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local1.com/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -730,12 +724,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local1.com/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -785,12 +778,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local1.com/some',
 					html: '<a href="' + link + '"></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,
@@ -835,12 +827,11 @@ describe('browser/RequestRouter', function() {
 				});
 
 				jsdom.env({
+					url: 'http://local1.com/some',
 					html: '<a></a>',
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
+						new RequestRouter(locator);
 
 						var event = new window.MouseEvent('click', {
 							bubbles: true,

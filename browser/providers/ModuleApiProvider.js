@@ -1,84 +1,58 @@
-/*
- * catberry
- *
- * Copyright (c) 2014 Denis Rechkunov and project contributors.
- *
- * catberry's license follows:
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * This license applies to all parts of catberry that are not externally
- * maintained libraries.
- */
-
 'use strict';
 
-module.exports = ModuleApiProvider;
+const propertyHelper = require('../../lib/helpers/propertyHelper');
+const ModuleApiProviderBase = require('../../lib/base/ModuleApiProviderBase');
 
-var util = require('util'),
-	propertyHelper = require('../../lib/helpers/propertyHelper'),
-	ModuleApiProviderBase = require('../../lib/base/ModuleApiProviderBase');
+class ModuleApiProvider extends ModuleApiProviderBase {
 
-util.inherits(ModuleApiProvider, ModuleApiProviderBase);
+	/**
+	 * Creates new instance of the module API provider.
+	 * @param {ServiceLocator} $serviceLocator Service locator
+	 * to resolve dependencies.
+	 */
+	constructor(locator) {
+		super(locator);
+	}
 
-/**
- * Creates new instance of the module API provider.
- * @param {ServiceLocator} $serviceLocator Service locator
- * to resolve dependencies.
- * @constructor
- * @extends ModuleApiProviderBase
- */
-function ModuleApiProvider($serviceLocator) {
-	ModuleApiProviderBase.call(this, $serviceLocator);
-	propertyHelper.defineReadOnly(this, 'isBrowser', true);
-	propertyHelper.defineReadOnly(this, 'isServer', false);
+	get isBrowser() {
+		return true;
+	}
+
+	get isServer() {
+		return false;
+	}
+
+	/**
+	 * Reloads the page for handling "not found" error.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	notFound() {
+		const window = this.locator.resolve('window');
+		window.location.reload();
+		return Promise.resolve();
+	}
+
+	/**
+	 * Redirects current page to specified URI.
+	 * @param {string} uriString URI to redirect.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	redirect(uriString) {
+		const requestRouter = this.locator.resolve('requestRouter');
+		return requestRouter.go(uriString);
+	}
+
+	/**
+	 * Clears current location URI's fragment.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	clearFragment() {
+		const window = this.locator.resolve('window');
+		const position = window.document.body.scrollTop;
+		window.location.hash = '';
+		window.document.body.scrollTop = position;
+		return Promise.resolve();
+	}
 }
 
-/**
- * Reloads the page for handling "not found" error.
- * @returns {Promise} Promise for nothing.
- */
-ModuleApiProvider.prototype.notFound = function() {
-	var window = this.locator.resolve('window');
-	window.location.reload();
-	return Promise.resolve();
-};
-
-/**
- * Redirects current page to specified URI.
- * @param {string} uriString URI to redirect.
- * @returns {Promise} Promise for nothing.
- */
-ModuleApiProvider.prototype.redirect = function(uriString) {
-	var requestRouter = this.locator.resolve('requestRouter');
-	return requestRouter.go(uriString);
-};
-
-/**
- * Clears current location URI's fragment.
- * @returns {Promise} Promise for nothing.
- */
-ModuleApiProvider.prototype.clearFragment = function() {
-	var window = this.locator.resolve('window'),
-		position = window.document.body.scrollTop;
-	window.location.hash = '';
-	window.document.body.scrollTop = position;
-	return Promise.resolve();
-};
+module.exports = ModuleApiProvider;
