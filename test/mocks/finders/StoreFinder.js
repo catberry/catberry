@@ -2,8 +2,6 @@
 
 const events = require('events');
 
-util.inherits(StoreFinder, events.EventEmitter);
-
 class StoreFinder extends events.EventEmitter {
 	constructor(stores) {
 		super();
