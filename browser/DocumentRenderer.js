@@ -1,514 +1,421 @@
-/*
- * catberry
- *
- * Copyright (c) 2015 Denis Rechkunov and project contributors.
- *
- * catberry's license follows:
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * This license applies to all parts of catberry that are not externally
- * maintained libraries.
- */
-
 'use strict';
 
-module.exports = DocumentRenderer;
+const morphdom = require('morphdom');
+const errorHelper = require('../lib/helpers/errorHelper');
+const moduleHelper = require('../lib/helpers/moduleHelper');
+const hrTimeHelper = require('../lib/helpers/hrTimeHelper');
+const DocumentRendererBase = require('../lib/base/DocumentRendererBase');
 
-var util = require('util'),
-	morphdom = require('morphdom'),
-	errorHelper = require('../lib/helpers/errorHelper'),
-	moduleHelper = require('../lib/helpers/moduleHelper'),
-	hrTimeHelper = require('../lib/helpers/hrTimeHelper'),
-	DocumentRendererBase = require('../lib/base/DocumentRendererBase');
-
-util.inherits(DocumentRenderer, DocumentRendererBase);
-
-var WARN_ID_NOT_SPECIFIED = 'Component "%s" does not have an ID, skipping...',
-	WARN_SAME_ID =
-		'The duplicated ID "%s" has been found, skipping component "%s"...';
-
-var SPECIAL_IDS = {
-		$$head: '$$head',
-		$$document: '$$document'
-	},
-	TAG_NAMES = {
-		TITLE: 'TITLE',
-		HTML: 'HTML',
-		HEAD: 'HEAD',
-		BASE: 'BASE',
-		STYLE: 'STYLE',
-		SCRIPT: 'SCRIPT',
-		NOSCRIPT: 'NOSCRIPT',
-		META: 'META',
-		LINK: 'LINK'
-	},
-	NODE_TYPES = {
-		ELEMENT_NODE: 1,
-		TEXT_NODE: 3,
-		PROCESSING_INSTRUCTION_NODE: 7,
-		COMMENT_NODE: 8
-	},
-	ERROR_CREATE_WRONG_ARGUMENTS = 'Tag name should be a string ' +
-		'and attributes should be an object',
-	ERROR_CREATE_WRONG_NAME = 'Component for tag "%s" not found',
-	ERROR_CREATE_WRONG_ID = 'The ID is not specified or already used',
-	// http://www.w3.org/TR/2015/WD-uievents-20150319/#event-types-list
-	NON_BUBBLING_EVENTS = {
-		abort: true,
-		blur: true,
-		error: true,
-		focus: true,
-		load: true,
-		mouseenter: true,
-		mouseleave: true,
-		resize: true,
-		unload: true
-	};
-
-/**
- * Creates new instance of the document renderer.
- * @param {ServiceLocator} $serviceLocator Locator to resolve dependencies.
- * @constructor
- * @extends DocumentRendererBase
- */
-function DocumentRenderer($serviceLocator) {
-	DocumentRendererBase.call(this, $serviceLocator);
-	this._componentInstances = Object.create(null);
-	this._componentElements = Object.create(null);
-	this._componentBindings = Object.create(null);
-	this._currentChangedStores = Object.create(null);
-	this._window = $serviceLocator.resolve('window');
-	this._logger = $serviceLocator.resolve('logger');
-	this._config = $serviceLocator.resolve('config');
-	this._storeDispatcher = $serviceLocator.resolve('storeDispatcher');
-
-	var self = this;
-
-	this._eventBus.on('storeChanged', function(storeName) {
-		self._currentChangedStores[storeName] = true;
-		if (self._isStateChanging) {
-			return;
-		}
-		self._updateStoreComponents();
-	});
-}
-
-/**
- * Current application config.
- * @type {Object}
- * @private
- */
-DocumentRenderer.prototype._config = null;
-
-/**
- * Current logger.
- * @type {Logger}
- * @private
- */
-DocumentRenderer.prototype._logger = null;
-
-/**
- * Current store dispatcher.
- * @type {StoreDispatcher}
- * @protected
- */
-DocumentRenderer.prototype._storeDispatcher = null;
-
-/**
- * Current set of component instances by unique keys.
- * @type {Object}
- * @private
- */
-DocumentRenderer.prototype._componentInstances = null;
-
-/**
- * Current set of component elements by unique keys.
- * @type {Object}
- * @private
- */
-DocumentRenderer.prototype._componentElements = null;
-
-/**
- * Current set of component bindings by unique keys.
- * @type {Object}
- * @private
- */
-DocumentRenderer.prototype._componentBindings = null;
-
-/**
- * Current routing context.
- * @type {Object}
- * @private
- */
-DocumentRenderer.prototype._currentRoutingContext = null;
-
-/**
- * Current set of changed stores.
- * @type {Object}
- * @private
- */
-DocumentRenderer.prototype._currentChangedStores = null;
-
-/**
- * Current promise for rendered page.
- * @type {Promise}
- * @private
- */
-DocumentRenderer.prototype._renderedPromise = null;
-
-/**
- * Current state of updating components.
- * @type {boolean}
- * @private
- */
-DocumentRenderer.prototype._isUpdating = false;
-
-/**
- * Current awaiting routing.
- * @type {{state: Object, routingContext: Object}}
- * @private
- */
-DocumentRenderer.prototype._awaitingRouting = null;
-
-/**
- * Sets the initial state of the application.
- * @param {Object} state New state of application.
- * @param {Object} routingContext Routing context.
- * @returns {Promise} Promise for nothing.
- */
-DocumentRenderer.prototype.initWithState = function(state, routingContext) {
-	var self = this;
-	return self._getPromiseForReadyState()
-		.then(function() {
-			self._currentRoutingContext = routingContext;
-			return self._storeDispatcher.setState(state, routingContext);
-		})
-		.then(function() {
-			var components = self._componentLoader.getComponentsByNames(),
-				elements = self._findComponents(
-					self._window.document.body, components, true
-				);
-			elements.unshift(self._window.document.head);
-			elements.unshift(self._window.document.documentElement);
-			return self._initialWrap(components, elements);
-		});
+const SPECIAL_IDS = {
+	$$head: '$$head',
+	$$document: '$$document'
+};
+const TAG_NAMES = {
+	TITLE: 'TITLE',
+	HTML: 'HTML',
+	HEAD: 'HEAD',
+	BASE: 'BASE',
+	STYLE: 'STYLE',
+	SCRIPT: 'SCRIPT',
+	NOSCRIPT: 'NOSCRIPT',
+	META: 'META',
+	LINK: 'LINK'
+};
+const NODE_TYPES = {
+	ELEMENT_NODE: 1,
+	TEXT_NODE: 3,
+	PROCESSING_INSTRUCTION_NODE: 7,
+	COMMENT_NODE: 8
 };
 
-/**
- * Renders new state of application.
- * @param {Object} state New state of application.
- * @param {Object} routingContext Routing context.
- * @returns {Promise} Promise for nothing.
- */
-DocumentRenderer.prototype.render = function(state, routingContext) {
-	this._awaitingRouting = {
-		state: state,
-		routingContext: routingContext
-	};
-	if (this._isStateChanging) {
+// http://www.w3.org/TR/2015/WD-uievents-20150319/#event-types-list
+const NON_BUBBLING_EVENTS = {
+	abort: true,
+	blur: true,
+	error: true,
+	focus: true,
+	load: true,
+	mouseenter: true,
+	mouseleave: true,
+	resize: true,
+	unload: true
+};
+
+class DocumentRenderer extends DocumentRendererBase {
+
+	/**
+	 * Creates new instance of the document renderer.
+	 * @param {ServiceLocator} locator Locator to resolve dependencies.
+	 * @constructor
+	 * @extends DocumentRendererBase
+	 */
+	constructor(locator) {
+		super(locator);
+
+		/**
+		 * Current set of component instances by unique keys.
+		 * @type {Object}
+		 * @private
+		 */
+		this._componentInstances = Object.create(null);
+
+		/**
+		 * Current set of component elements by unique keys.
+		 * @type {Object}
+		 * @private
+		 */
+		this._componentElements = Object.create(null);
+
+		/**
+		 * Current set of component bindings by unique keys.
+		 * @type {Object}
+		 * @private
+		 */
+		this._componentBindings = Object.create(null);
+
+		/**
+		 * Current set of changed stores.
+		 * @type {Object}
+		 * @private
+		 */
+		this._currentChangedStores = Object.create(null);
+
+		this._window = locator.resolve('window');
+
+		/**
+		 * Current logger.
+		 * @type {Logger}
+		 * @private
+		 */
+		this._logger = locator.resolve('logger');
+
+		/**
+		 * Current application config.
+		 * @type {Object}
+		 * @private
+		 */
+		this._config = locator.resolve('config');
+
+		/**
+		 * Current store dispatcher.
+		 * @type {StoreDispatcher}
+		 * @protected
+		 */
+		this._storeDispatcher = locator.resolve('storeDispatcher');
+
+		/**
+		 * Current promise for rendered page.
+		 * @type {Promise}
+		 * @private
+		 */
+		this._renderedPromise = null;
+
+		/**
+		 * Current state of updating components.
+		 * @type {boolean}
+		 * @private
+		 */
+		this._isUpdating = false;
+
+		/**
+		 * Current awaiting routing.
+		 * @type {{state: Object, routingContext: Object}}
+		 * @private
+		 */
+		this._awaitingRouting = null;
+
+		/**
+		 * Current routing context.
+		 * @type {Object}
+		 * @private
+		 */
+		this._currentRoutingContext = null;
+
+		this._eventBus.on('storeChanged', storeName => {
+			this._currentChangedStores[storeName] = true;
+			if (this._isStateChanging) {
+				return;
+			}
+			this._updateStoreComponents();
+		});
+	}
+
+	/**
+	 * Sets the initial state of the application.
+	 * @param {Object} state New state of application.
+	 * @param {Object} routingContext Routing context.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	initWithState(state, routingContext) {
+		return this._getPromiseForReadyState()
+			.then(() => {
+				this._currentRoutingContext = routingContext;
+				return this._storeDispatcher.setState(state, routingContext);
+			})
+			.then(() => {
+				const components = this._componentLoader.getComponentsByNames();
+				const elements = this._findComponentElements(
+					this._window.document.documentElement, components, true
+				);
+				elements.unshift(this._window.document.head);
+				elements.unshift(this._window.document.documentElement);
+				return this._initialWrap(components, elements);
+			});
+	}
+
+	/**
+	 * Renders new state of application.
+	 * @param {Object} state New state of application.
+	 * @param {Object} routingContext Routing context.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	render(state, routingContext) {
+		this._awaitingRouting = {
+			state,
+			routingContext
+		};
+		if (this._isStateChanging) {
+			return this._renderedPromise;
+		}
+
+		// we should set this flag to avoid "storeChanged"
+		// event handling for now
+		this._isStateChanging = true;
+
+		this._renderedPromise = this._getPromiseForReadyState()
+			// and then we update all components of these stores in a batch.
+			.then(() => this._updateStoreComponents())
+			.catch(reason => this._eventBus.emit('error', reason))
+			.then(() => {
+				this._isStateChanging = false;
+			});
+
 		return this._renderedPromise;
 	}
 
-	// we should set this flag to avoid "storeChanged"
-	// event handling for now
-	this._isStateChanging = true;
+	/**
+	 * Renders component into HTML element.
+	 * @param {Element} element HTML element of component
+	 * @param {Object?} renderingContext Rendering context for group rendering.
+	 */
+	renderComponent(element, renderingContext) {
 
-	var self = this;
-	self._renderedPromise = this._getPromiseForReadyState()
-		.then(function() {
-			// and then we update all components of these stores in a batch.
-			return self._updateStoreComponents();
-		})
-		.catch(function(reason) {
-			self._eventBus.emit('error', reason);
-		})
-		.then(function() {
-			self._isStateChanging = false;
-		});
-
-	return this._renderedPromise;
-};
-
-/**
- * Renders component into HTML element.
- * @param {Element} element HTML element of component
- * @param {Object?} renderingContext Rendering context for group rendering.
- */
-DocumentRenderer.prototype.renderComponent =
-	function(element, renderingContext) {
-		var self = this;
 		return this._getPromiseForReadyState()
-			.then(function() {
-				var id = self._getId(element);
+			.then(() => {
+				const id = this._getId(element);
+				const componentName = moduleHelper.getOriginalComponentName(element.tagName);
+
 				if (!id) {
-					self._logger.warn(
-						util.format(WARN_ID_NOT_SPECIFIED, componentName)
-					);
-					return;
+					this._logger.warn(`Component "${componentName}" does not have an ID, skipping...`);
+					return null;
 				}
 
 				if (!renderingContext) {
-					renderingContext = self._createRenderingContext([]);
+					renderingContext = this._createRenderingContext([]);
 					renderingContext.rootIds[id] = true;
 				}
 
-				var componentName = moduleHelper.getOriginalComponentName(
-						element.tagName
-					),
-					hadChildren = element.hasChildNodes(),
-					component = renderingContext.components[componentName],
-					instance = self._componentInstances[id];
-
+				const hadChildren = element.hasChildNodes();
+				const component = renderingContext.components[componentName];
 				if (!component) {
-					return;
+					return null;
 				}
 
 				if (id in renderingContext.renderedIds) {
-					self._logger.warn(
-						util.format(WARN_SAME_ID, id, componentName)
+					this._logger.warn(
+						`The duplicated ID "${id}" has been found, skipping component "${componentName}"...`
 					);
-					return;
+					return null;
 				}
 
 				renderingContext.renderedIds[id] = true;
 
+				var instance = this._componentInstances[id];
 				if (!instance) {
 					component.constructor.prototype.$context =
-						self._getComponentContext(component, element);
-					instance = self._serviceLocator.resolveInstance(
-						component.constructor, renderingContext.config
-					);
+						this._getComponentContext(component, element);
+					instance = new component.constructor(this._serviceLocator);
 					instance.$context = component.constructor.prototype.$context;
-					self._componentInstances[id] = instance;
+					this._componentInstances[id] = instance;
 				}
 
-				var eventArgs = {
+				const eventArgs = {
 					name: componentName,
 					context: instance.$context
 				};
 
-				self._componentElements[id] = element;
+				this._componentElements[id] = element;
 
-				var startTime = hrTimeHelper.get();
-				self._eventBus.emit('componentRender', eventArgs);
+				const startTime = hrTimeHelper.get();
+				this._eventBus.emit('componentRender', eventArgs);
 
 				return Promise.resolve()
-					.then(function() {
+					.then(() => {
 						// we need unbind the whole hierarchy only at
 						// the beginning and not for new elements
-						if (!(id in renderingContext.rootIds) ||
-							!hadChildren) {
-							return;
+						if (!(id in renderingContext.rootIds) || !hadChildren) {
+							return [];
 						}
 
-						return self._unbindAll(element, renderingContext);
+						return this._unbindAll(element, renderingContext);
 					})
-					.catch(function(reason) {
-						self._eventBus.emit('error', reason);
-					})
-					.then(function() {
+					.catch(reason => this._eventBus.emit('error', reason))
+					.then(() => {
 						if (instance.$context.element !== element) {
-							instance.$context = self._getComponentContext(
-								component, element
-							);
+							instance.$context = this._getComponentContext(component, element);
 						}
-						var renderMethod = moduleHelper.getMethodToInvoke(
-							instance, 'render'
-						);
+						const renderMethod = moduleHelper.getMethodToInvoke(instance, 'render');
 						return moduleHelper.getSafePromise(renderMethod);
 					})
-					.then(function(dataContext) {
-						return component.template.render(dataContext);
-					})
-					.catch(function(reason) {
-						return self._handleRenderError(
-							element, component, reason
-						);
-					})
-					.then(function(html) {
-						var isHead = element.tagName === TAG_NAMES.HEAD;
+					.then(dataContext => component.template.render(dataContext))
+					.catch(reason => this._handleRenderError(element, component, reason))
+					.then(html => {
+						const isHead = element.tagName === TAG_NAMES.HEAD;
 						if (html === '' && isHead) {
-							return;
+							return [];
 						}
-						var tmpElement = self._createTemporaryElement(element);
+
+						const tmpElement = this._createTemporaryElement(element);
 						tmpElement.innerHTML = html;
 
 						if (isHead) {
-							self._mergeHead(element, tmpElement);
-							return;
+							this._mergeHead(element, tmpElement);
+							return [];
 						}
 
 						morphdom(element, tmpElement, {
-							onBeforeMorphElChildren: function(foundElement) {
-								return foundElement === element ||
-									!self._isComponent(
-										renderingContext.components,
-										foundElement
-									);
-							}
+							onBeforeMorphElChildren: foundElement =>
+								foundElement === element || !this._isComponent(
+									renderingContext.components, foundElement
+								)
 						});
 
-						var promises = self._findComponents(
+						const promises = this._findComponentElements(
 							element, renderingContext.components, false
 						)
-							.map(function(innerComponent) {
-								return self.renderComponent(
-									innerComponent, renderingContext
-								);
-							});
+							.map(child => this.renderComponent(child, renderingContext));
+
 						return Promise.all(promises);
 					})
-					.then(function() {
+					.then(() => {
 						eventArgs.hrTime = hrTimeHelper.get(startTime);
-						eventArgs.time = hrTimeHelper.toMilliseconds(
-							eventArgs.hrTime
-						);
-						self._eventBus.emit('componentRendered', eventArgs);
-						return self._bindComponent(element);
+						eventArgs.time = hrTimeHelper.toMilliseconds(eventArgs.hrTime);
+						this._eventBus.emit('componentRendered', eventArgs);
+						return this._bindComponent(element);
 					})
-					.then(function() {
+					.then(() => {
 						// collecting garbage only when
 						// the entire rendering is finished
-						if (!(id in renderingContext.rootIds) ||
-							!hadChildren) {
+						if (!(id in renderingContext.rootIds) || !hadChildren) {
 							return;
 						}
-						self._collectRenderingGarbage(renderingContext);
+						this._collectRenderingGarbage(renderingContext);
 					})
-					.catch(function(reason) {
-						self._eventBus.emit('error', reason);
-					});
+					.catch(reason => this._eventBus.emit('error', reason));
 			});
-	};
-
-/**
- * Gets component instance by ID.
- * @param {string} id Component ID.
- * @returns {Object|null} Component instance.
- */
-DocumentRenderer.prototype.getComponentById = function(id) {
-	return this._componentInstances[id] || null;
-};
-
-/**
- * Gets component instance by a DOM element.
- * @param {Element} element Component's Element.
- * @returns {Object|null} Component instance.
- */
-DocumentRenderer.prototype.getComponentByElement = function(element) {
-	if (!element) {
-		return null;
-	}
-	var id = element.getAttribute(moduleHelper.ATTRIBUTE_ID);
-	return this.getComponentById(id);
-};
-
-/**
- * Checks that every instance of component has element on the page and
- * removes all references to components removed from DOM.
- * @returns {Promise} Promise for nothing.
- */
-DocumentRenderer.prototype.collectGarbage = function() {
-	var self = this;
-	return this._getPromiseForReadyState()
-		.then(function() {
-			var promises = [];
-			Object.keys(self._componentElements)
-				.forEach(function(id) {
-					if (SPECIAL_IDS.hasOwnProperty(id)) {
-						return;
-					}
-					var element = self._window.document.getElementById(id);
-					if (element) {
-						return;
-					}
-
-					var promise = self._unbindComponent(self._componentElements[id])
-						.then(function() {
-							self._removeComponent(id);
-						});
-					promises.push(promise);
-				});
-			return Promise.all(promises);
-		});
-};
-
-/**
- * Creates and renders component element.
- * @param {string} tagName Name of HTML tag.
- * @param {Object} attributes Element attributes.
- * @returns {Promise<Element>} Promise for HTML element with rendered component.
- */
-DocumentRenderer.prototype.createComponent = function(tagName, attributes) {
-	if (typeof (tagName) !== 'string' || !attributes ||
-		typeof (attributes) !== 'object') {
-		return Promise.reject(
-			new Error(ERROR_CREATE_WRONG_ARGUMENTS)
-		);
 	}
 
-	var self = this;
-	return this._getPromiseForReadyState()
-		.then(function() {
-			var components = self._componentLoader.getComponentsByNames(),
-				componentName = moduleHelper.getOriginalComponentName(tagName);
+	/**
+	 * Gets component instance by ID.
+	 * @param {string} id Component ID.
+	 * @returns {Object|null} Component instance.
+	 */
+	getComponentById(id) {
+		return this._componentInstances[id] || null;
+	}
 
-			if (moduleHelper.isHeadComponent(componentName) ||
-				moduleHelper.isDocumentComponent(componentName) ||
-				!(componentName in components)) {
-				return Promise.reject(
-					new Error(util.format(ERROR_CREATE_WRONG_NAME, tagName))
-				);
-			}
+	/**
+	 * Gets component instance by a DOM element.
+	 * @param {Element} element Component's Element.
+	 * @returns {Object|null} Component instance.
+	 */
+	getComponentByElement(element) {
+		if (!element) {
+			return null;
+		}
+		const id = this._getId(element);
+		return this.getComponentById(id);
+	}
 
-			var safeTagName = moduleHelper.getTagNameForComponentName(componentName);
+	/**
+	 * Checks that every instance of component has element on the page and
+	 * removes all references to components removed from DOM.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	/* eslint max-nested-callbacks: 0 */
+	collectGarbage() {
+		return this._getPromiseForReadyState()
+			.then(() => {
+				const promises = [];
+				Object.keys(this._componentElements)
+					.forEach(id => {
+						if (SPECIAL_IDS.hasOwnProperty(id)) {
+							return;
+						}
+						const element = this._window.document.getElementById(id);
+						if (element) {
+							return;
+						}
 
-			var id = attributes[moduleHelper.ATTRIBUTE_ID];
-			if (!id || id in self._componentInstances) {
-				return Promise.reject(new Error(ERROR_CREATE_WRONG_ID));
-			}
+						const promise = this._unbindComponent(this._componentElements[id])
+							.then(() => this._removeComponent(id));
+						promises.push(promise);
+					});
+				return Promise.all(promises);
+			});
+	}
 
-			var element = self._window.document.createElement(safeTagName);
-			Object.keys(attributes)
-				.forEach(function(attributeName) {
-					element.setAttribute(attributeName, attributes[attributeName]);
-				});
+	/**
+	 * Creates and renders component element.
+	 * @param {string} tagName Name of HTML tag.
+	 * @param {Object} attributes Element attributes.
+	 * @returns {Promise<Element>} Promise for HTML element with rendered component.
+	 */
+	createComponent(tagName, attributes) {
+		if (typeof (tagName) !== 'string' || !attributes ||
+			typeof (attributes) !== 'object') {
+			return Promise.reject(
+				new Error('Tag name should be a string and attributes should be an object')
+			);
+		}
 
-			return self.renderComponent(element)
-				.then(function() {
-					return element;
-				});
-		});
-};
+		return this._getPromiseForReadyState()
+			.then(() => {
+				const components = this._componentLoader.getComponentsByNames();
+				const componentName = moduleHelper.getOriginalComponentName(tagName);
 
-/**
- * Clears all references to removed components during rendering process.
- * @param {Object} renderingContext Context of rendering.
- * @private
- */
-DocumentRenderer.prototype._collectRenderingGarbage =
-	function(renderingContext) {
-		var self = this;
+				if (moduleHelper.isHeadComponent(componentName) ||
+					moduleHelper.isDocumentComponent(componentName) ||
+					!(componentName in components)) {
+					return Promise.reject(new Error(`Component for tag "${tagName}" not found`));
+				}
+
+				const safeTagName = moduleHelper.getTagNameForComponentName(componentName);
+
+				const id = attributes[moduleHelper.ATTRIBUTE_ID];
+				if (!id || id in this._componentInstances) {
+					return Promise.reject(new Error('The ID is not specified or already used'));
+				}
+
+				const element = this._window.document.createElement(safeTagName);
+				Object.keys(attributes)
+					.forEach(attributeName => {
+						element.setAttribute(attributeName, attributes[attributeName]);
+					});
+
+				return this.renderComponent(element)
+					.then(() => element);
+			});
+	}
+
+	/**
+	 * Clears all references to removed components during rendering process.
+	 * @param {Object} renderingContext Context of rendering.
+	 * @private
+	 */
+	_collectRenderingGarbage(renderingContext) {
 		Object.keys(renderingContext.unboundIds)
-			.forEach(function(id) {
+			.forEach(id => {
 				// this component has been rendered again and we do not need to
 				// remove it.
 				if (id in renderingContext.renderedIds) {
@@ -517,169 +424,162 @@ DocumentRenderer.prototype._collectRenderingGarbage =
 
 				// if someone added an element with the same ID during the
 				// rendering process
-				if (self._window.document.getElementById(id) !== null) {
+				if (this._window.document.getElementById(id) !== null) {
 					return;
 				}
 
-				self._removeComponent(id);
+				this._removeComponent(id);
 			});
-	};
-
-/**
- * Unbinds all event handlers from specified component and all it's descendants.
- * @param {Element} element Component HTML element.
- * @param {Object} renderingContext Context of rendering.
- * @returns {Promise} Promise for nothing.
- * @private
- */
-DocumentRenderer.prototype._unbindAll = function(element, renderingContext) {
-	var self = this,
-		rootId = this._getId(element),
-		promises = [];
-
-	self._findComponents(element, renderingContext.components, true)
-		.forEach(function(innerElement) {
-			var id = self._getId(innerElement);
-			renderingContext.unboundIds[id] = true;
-			promises.push(self._unbindComponent(innerElement));
-		});
-
-	renderingContext.unboundIds[rootId] = true;
-	promises.push(this._unbindComponent(element));
-
-	return Promise.all(promises);
-};
-
-/**
- * Unbinds all event handlers from specified component.
- * @param {Element} element Component HTML element.
- * @returns {Promise} Promise for nothing.
- * @private
- */
-DocumentRenderer.prototype._unbindComponent = function(element) {
-	var id = this._getId(element),
-		self = this,
-		instance = this._componentInstances[id];
-	if (!instance) {
-		return Promise.resolve();
-	}
-	if (id in this._componentBindings) {
-		Object.keys(this._componentBindings[id])
-			.forEach(function(eventName) {
-				element.removeEventListener(
-					eventName,
-					self._componentBindings[id][eventName].handler,
-					NON_BUBBLING_EVENTS.hasOwnProperty(eventName)
-				);
-			});
-		delete this._componentBindings[id];
-	}
-	var unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
-	return moduleHelper.getSafePromise(unbindMethod)
-		.then(function() {
-			self._eventBus.emit('componentUnbound', {
-				element: element,
-				id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
-			});
-		})
-		.catch(function(reason) {
-			self._eventBus.emit('error', reason);
-		});
-};
-
-/**
- * Removes component from the list.
- * @param {string} id Component's ID
- * @private
- */
-DocumentRenderer.prototype._removeComponent = function(id) {
-	delete this._componentElements[id];
-	delete this._componentInstances[id];
-	delete this._componentBindings[id];
-};
-
-/**
- * Binds all required event handlers to component.
- * @param {Element} element Component HTML element.
- * @returns {Promise} Promise for nothing.
- * @private
- */
-DocumentRenderer.prototype._bindComponent = function(element) {
-	var id = this._getId(element),
-		self = this,
-		instance = this._componentInstances[id];
-	if (!instance) {
-		return Promise.resolve();
 	}
 
-	var bindMethod = moduleHelper.getMethodToInvoke(instance, 'bind');
-	return moduleHelper.getSafePromise(bindMethod)
-		.then(function(bindings) {
-			if (!bindings || typeof (bindings) !== 'object') {
-				self._eventBus.emit('componentBound', {
-					element: element,
-					id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
-				});
-				return;
-			}
-			self._componentBindings[id] = Object.create(null);
-			Object.keys(bindings)
-				.forEach(function(eventName) {
-					eventName = eventName.toLowerCase();
-					if (eventName in self._componentBindings[id]) {
-						return;
-					}
-					var selectorHandlers = Object.create(null);
-					Object.keys(bindings[eventName])
-						.forEach(function(selector) {
-							var handler = bindings[eventName][selector];
-							if (typeof (handler) !== 'function') {
-								return;
-							}
-							selectorHandlers[selector] = handler.bind(instance);
-						});
-					self._componentBindings[id][eventName] = {
-						handler: self._createBindingHandler(
-							element, selectorHandlers
-						),
-						selectorHandlers: selectorHandlers
-					};
-					element.addEventListener(
+	/**
+	 * Unbinds all event handlers from specified component and all it's descendants.
+	 * @param {Element} element Component HTML element.
+	 * @param {Object} renderingContext Context of rendering.
+	 * @returns {Promise} Promise for nothing.
+	 * @private
+	 */
+	_unbindAll(element, renderingContext) {
+		const rootId = this._getId(element);
+		const promises = [];
+
+		this._findComponentElements(element, renderingContext.components, true)
+			.forEach(innerElement => {
+				const id = this._getId(innerElement);
+				renderingContext.unboundIds[id] = true;
+				promises.push(this._unbindComponent(innerElement));
+			});
+
+		renderingContext.unboundIds[rootId] = true;
+		promises.push(this._unbindComponent(element));
+
+		return Promise.all(promises);
+	}
+
+	/**
+	 * Unbinds all event handlers from specified component.
+	 * @param {Element} element Component HTML element.
+	 * @returns {Promise} Promise for nothing.
+	 * @private
+	 */
+	_unbindComponent(element) {
+		const id = this._getId(element);
+		const instance = this._componentInstances[id];
+
+		if (!instance) {
+			return Promise.resolve();
+		}
+		if (id in this._componentBindings) {
+			Object.keys(this._componentBindings[id])
+				.forEach(eventName => {
+					element.removeEventListener(
 						eventName,
-						self._componentBindings[id][eventName].handler,
+						this._componentBindings[id][eventName].handler,
 						NON_BUBBLING_EVENTS.hasOwnProperty(eventName)
 					);
 				});
-			self._eventBus.emit('componentBound', {
-				element: element,
-				id: id
-			});
-		});
-};
+			delete this._componentBindings[id];
+		}
 
-/**
- * Creates universal event handler for delegated events.
- * @param {Element} componentRoot Root element of component.
- * @param {Object} selectorHandlers Map of event handlers by CSS selectors.
- * @returns {Function} Universal event handler for delegated events.
- * @private
- */
-DocumentRenderer.prototype._createBindingHandler =
-	function(componentRoot, selectorHandlers) {
-		var selectors = Object.keys(selectorHandlers);
-		return function(event) {
-			var dispatchedEvent = createCustomEvent(event, function() {
-					return element;
-				}),
-				element = event.target,
-				targetMatches = getMatchesMethod(element),
-				isHandled = selectors.some(function(selector) {
-					if (targetMatches(selector)) {
-						selectorHandlers[selector](dispatchedEvent);
-						return true;
-					}
-					return false;
+		const unbindMethod = moduleHelper.getMethodToInvoke(instance, 'unbind');
+		return moduleHelper.getSafePromise(unbindMethod)
+			.then(() => {
+				this._eventBus.emit('componentUnbound', {
+					element,
+					id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
 				});
+			})
+			.catch(reason => this._eventBus.emit('error', reason));
+	}
+
+	/**
+	 * Removes component from the list.
+	 * @param {string} id Component's ID
+	 * @private
+	 */
+	_removeComponent(id) {
+		delete this._componentElements[id];
+		delete this._componentInstances[id];
+		delete this._componentBindings[id];
+	}
+
+	/**
+	 * Binds all required event handlers to component.
+	 * @param {Element} element Component HTML element.
+	 * @returns {Promise} Promise for nothing.
+	 * @private
+	 */
+	_bindComponent(element) {
+		const id = this._getId(element);
+		const instance = this._componentInstances[id];
+		if (!instance) {
+			return Promise.resolve();
+		}
+
+		const bindMethod = moduleHelper.getMethodToInvoke(instance, 'bind');
+		return moduleHelper.getSafePromise(bindMethod)
+			.then(bindings => {
+				if (!bindings || typeof (bindings) !== 'object') {
+					this._eventBus.emit('componentBound', {
+						element,
+						id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
+					});
+					return;
+				}
+				this._componentBindings[id] = Object.create(null);
+				Object.keys(bindings)
+					.forEach(eventName => {
+						eventName = eventName.toLowerCase();
+						if (eventName in this._componentBindings[id]) {
+							return;
+						}
+						const selectorHandlers = Object.create(null);
+						Object.keys(bindings[eventName])
+							.forEach(selector => {
+								const handler = bindings[eventName][selector];
+								if (typeof (handler) !== 'function') {
+									return;
+								}
+								selectorHandlers[selector] = handler.bind(instance);
+							});
+						this._componentBindings[id][eventName] = {
+							handler: this._createBindingHandler(element, selectorHandlers),
+							selectorHandlers
+						};
+						element.addEventListener(
+							eventName,
+							this._componentBindings[id][eventName].handler,
+							NON_BUBBLING_EVENTS.hasOwnProperty(eventName)
+						);
+					});
+				this._eventBus.emit('componentBound', {
+					element,
+					id
+				});
+			});
+	}
+
+	/**
+	 * Creates universal event handler for delegated events.
+	 * @param {Element} componentRoot Root element of component.
+	 * @param {Object} selectorHandlers Map of event handlers by CSS selectors.
+	 * @returns {Function} Universal event handler for delegated events.
+	 * @private
+	 */
+	_createBindingHandler(componentRoot, selectorHandlers) {
+		const selectors = Object.keys(selectorHandlers);
+		return event => {
+			var element = event.target;
+			const dispatchedEvent = createCustomEvent(event, () => element);
+			var targetMatches = getMatchesMethod(element);
+			var isHandled = selectors.some(selector => {
+				if (targetMatches(selector)) {
+					selectorHandlers[selector](dispatchedEvent);
+					return true;
+				}
+				return false;
+			});
+
 			if (isHandled || !event.bubbles) {
 				return;
 			}
@@ -687,12 +587,13 @@ DocumentRenderer.prototype._createBindingHandler =
 			while (element.parentElement && element !== componentRoot) {
 				element = element.parentElement;
 				targetMatches = getMatchesMethod(element);
-				for (var i = 0; i < selectors.length; i++) {
-					if (!targetMatches(selectors[i])) {
+				for (let i = 0; i < selectors.length; i++) {
+					const selector = selectors[i];
+					if (!targetMatches(selector)) {
 						continue;
 					}
 					isHandled = true;
-					selectorHandlers[selectors[i]](dispatchedEvent);
+					selectorHandlers[selector](dispatchedEvent);
 					break;
 				}
 
@@ -701,67 +602,64 @@ DocumentRenderer.prototype._createBindingHandler =
 				}
 			}
 		};
-	};
+	}
 
-/**
- * Checks if the element is a component.
- * @param {Object} components Current components.
- * @param {Element} element DOM element.
- * @private
- */
-DocumentRenderer.prototype._isComponent = function(components, element) {
-	var currentNodeName = element.nodeName;
-	return moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName) &&
-		(moduleHelper.getOriginalComponentName(currentNodeName) in components);
-};
+	/**
+	 * Checks if the element is a component.
+	 * @param {Object} components Current components.
+	 * @param {Element} element DOM element.
+	 * @private
+	 */
+	_isComponent(components, element) {
+		const currentNodeName = element.nodeName;
+		return moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName) &&
+			(moduleHelper.getOriginalComponentName(currentNodeName) in components);
+	}
 
-/**
- * Finds all descendant components of specified component element.
- * @param {Element} element Root component HTML element to begin search with.
- * @param {Object} components Map of components by names.
- * @param {boolean} goInComponents Go inside nested components.
- * @private
- */
-DocumentRenderer.prototype._findComponents =
-	function(element, components, goInComponents) {
-		var elements = [],
-			queue = [element],
-			currentChildren, i;
+	/**
+	 * Finds all descendant components of specified component element.
+	 * @param {Element} element Root component HTML element to begin search with.
+	 * @param {Object} components Map of components by names.
+	 * @param {boolean} goInComponents Go inside nested components.
+	 * @private
+	 */
+	_findComponentElements(element, components, goInComponents) {
+		const elements = [];
+		const queue = [element];
 
 		while (queue.length > 0) {
-			currentChildren = queue.shift().childNodes;
-			for (i = 0; i < currentChildren.length; i++) {
+			const currentChildren = queue.shift().childNodes;
+			for (let i = 0; i < currentChildren.length; i++) {
+				const currentChild = currentChildren[i];
 				// we need only Element nodes
-				if (currentChildren[i].nodeType !== 1) {
+				if (currentChild.nodeType !== 1) {
 					continue;
 				}
 
 				// and they should be components
-				if (!this._isComponent(components, currentChildren[i])) {
-					queue.push(currentChildren[i]);
+				if (!this._isComponent(components, currentChild)) {
+					queue.push(currentChild);
 					continue;
 				}
 
 				if (goInComponents) {
-					queue.push(currentChildren[i]);
+					queue.push(currentChild);
 				}
-				elements.push(currentChildren[i]);
+				elements.push(currentChild);
 			}
 		}
-
 		return elements;
-	};
+	}
 
-/**
- * Handles error while rendering.
- * @param {Element} element Component HTML element.
- * @param {Object} component Component instance.
- * @param {Error} error Error to handle.
- * @returns {Promise<string>} Promise for HTML string.
- * @private
- */
-DocumentRenderer.prototype._handleRenderError =
-	function(element, component, error) {
+	/**
+	 * Handles error while rendering.
+	 * @param {Element} element Component HTML element.
+	 * @param {Object} component Component instance.
+	 * @param {Error} error Error to handle.
+	 * @returns {Promise<string>} Promise for HTML string.
+	 * @private
+	 */
+	_handleRenderError(element, component, error) {
 		this._eventBus.emit('error', error);
 
 		// do not corrupt existed HEAD when error occurs
@@ -778,482 +676,429 @@ DocumentRenderer.prototype._handleRenderError =
 		}
 
 		return Promise.resolve('');
-	};
-
-/**
- * Updates all components that depend on current set of changed stores.
- * @returns {Promise} Promise for nothing.
- * @private
- */
-DocumentRenderer.prototype._updateStoreComponents = function() {
-	if (this._isUpdating) {
-		return Promise.resolve();
 	}
 
-	var self = this;
-
-	// if document component is changed we should reload the page
-	var documentStore = this._window.document.documentElement.getAttribute(
-		moduleHelper.ATTRIBUTE_STORE
-	);
-	if (documentStore in this._currentChangedStores) {
-		var newLocation = this._currentRoutingContext.location.toString();
-		if (newLocation === this._window.location.toString()) {
-			this._window.location.reload();
+	/**
+	 * Updates all components that depend on current set of changed stores.
+	 * @returns {Promise} Promise for nothing.
+	 * @private
+	 */
+	_updateStoreComponents() {
+		if (this._isUpdating) {
 			return Promise.resolve();
 		}
-		this._window.location.assign(newLocation);
-		return Promise.resolve();
-	}
 
-	this._isUpdating = true;
+		// if document component is changed we should reload the page
+		const documentStore = this._window.document.documentElement.getAttribute(
+			moduleHelper.ATTRIBUTE_STORE
+		);
+		if (documentStore in this._currentChangedStores) {
+			const newLocation = this._currentRoutingContext.location.toString();
+			if (newLocation === this._window.location.toString()) {
+				this._window.location.reload();
+				return Promise.resolve();
+			}
+			this._window.location.assign(newLocation);
+			return Promise.resolve();
+		}
 
-	// if we have awaiting routing we should apply state to the stores
-	if (this._awaitingRouting) {
-		var components = this._componentLoader.getComponentsByNames(),
-			changedByState = this._storeDispatcher.setState(
+		this._isUpdating = true;
+
+		// if we have awaiting routing we should apply state to the stores
+		if (this._awaitingRouting) {
+			const components = this._componentLoader.getComponentsByNames();
+			const changedByState = this._storeDispatcher.setState(
 				this._awaitingRouting.state,
 				this._awaitingRouting.routingContext
 			);
 
-		changedByState.forEach(function(name) {
-			self._currentChangedStores[name] = true;
-		});
-
-		// we should update contexts of the stores with the new routing context
-		this._currentRoutingContext = this._awaitingRouting.routingContext;
-		Object.keys(this._componentInstances)
-			.forEach(function(id) {
-				var instance = self._componentInstances[id];
-				instance.$context = self._getComponentContext(
-					components[instance.$context.name],
-					instance.$context.element
-				);
+			changedByState.forEach(name => {
+				this._currentChangedStores[name] = true;
 			});
-		this._awaitingRouting = null;
-	}
 
-	var changedStores = Object.keys(this._currentChangedStores);
-	if (changedStores.length === 0) {
-		this._isUpdating = false;
-		return Promise.resolve();
-	}
-
-	this._currentChangedStores = Object.create(null);
-
-	var renderingContext = this._createRenderingContext(changedStores),
-		promises = renderingContext.roots.map(function(root) {
-			renderingContext.rootIds[self._getId(root)] = true;
-			return self.renderComponent(root, renderingContext);
-		});
-
-	return Promise.all(promises)
-		.catch(function(reason) {
-			self._eventBus.emit('error', reason);
-		})
-		.then(function() {
-			self._isUpdating = false;
-			self._eventBus.emit('documentUpdated', changedStores);
-			return self._updateStoreComponents();
-		});
-};
-
-/**
- * Merges new and existed head elements and change only difference.
- * @param {Element} head HEAD DOM element.
- * @param {Element} newHead New head element.
- * @private
- */
-/* jshint maxcomplexity:false */
-DocumentRenderer.prototype._mergeHead = function(head, newHead) {
-	if (!newHead) {
-		return;
-	}
-	var self = this;
-
-	var map = this._getHeadMap(head.childNodes),
-		current, i, key, oldKey, oldItem,
-		sameMetaElements = Object.create(null);
-
-	for (i = 0; i < newHead.childNodes.length; i++) {
-		current = newHead.childNodes[i];
-
-		if (!(current.nodeName in map)) {
-			map[current.nodeName] = Object.create(null);
+			// we should update contexts of the stores with the new routing context
+			this._currentRoutingContext = this._awaitingRouting.routingContext;
+			Object.keys(this._componentInstances)
+				.forEach(id => {
+					const instance = this._componentInstances[id];
+					instance.$context = this._getComponentContext(
+						components[instance.$context.name],
+						instance.$context.element
+					);
+				});
+			this._awaitingRouting = null;
 		}
 
-		switch (current.nodeName) {
-			// these elements can be only replaced
-		case TAG_NAMES.TITLE:
-		case TAG_NAMES.BASE:
-		case TAG_NAMES.NOSCRIPT:
-			key = this._getNodeKey(current);
-			oldItem = head.getElementsByTagName(current.nodeName)[0];
-			if (oldItem) {
-				oldKey = this._getNodeKey(oldItem);
-				head.replaceChild(current, oldItem);
-			} else {
-				head.appendChild(current);
+		const changedStores = Object.keys(this._currentChangedStores);
+		if (changedStores.length === 0) {
+			this._isUpdating = false;
+			return Promise.resolve();
+		}
+
+		this._currentChangedStores = Object.create(null);
+
+		const renderingContext = this._createRenderingContext(changedStores);
+		const promises = renderingContext.roots.map(root => {
+			renderingContext.rootIds[this._getId(root)] = true;
+			return this.renderComponent(root, renderingContext);
+		});
+
+		return Promise.all(promises)
+			.catch(reason => this._eventBus.emit('error', reason))
+			.then(() => {
+				this._isUpdating = false;
+				this._eventBus.emit('documentUpdated', changedStores);
+				return this._updateStoreComponents();
+			});
+	}
+
+	/**
+	 * Merges new and existed head elements and change only difference.
+	 * @param {Element} head HEAD DOM element.
+	 * @param {Element} newHead New head element.
+	 * @private
+	 */
+	/* eslint complexity: 0 */
+	_mergeHead(head, newHead) {
+		if (!newHead) {
+			return;
+		}
+
+		const map = this._getHeadMap(head.childNodes);
+		const sameMetaElements = Object.create(null);
+		let i = 0;
+
+		while (i < newHead.childNodes.length) {
+			const current = newHead.childNodes[i++];
+			const key = this._getNodeKey(current);
+
+			if (!(current.nodeName in map)) {
+				map[current.nodeName] = Object.create(null);
 			}
+
+			switch (current.nodeName) {
+			// these elements can be only replaced
+			case TAG_NAMES.TITLE:
+			case TAG_NAMES.BASE:
+			case TAG_NAMES.NOSCRIPT:
+				const oldItem = head.getElementsByTagName(current.nodeName)[0];
+				if (oldItem) {
+					head.replaceChild(current, oldItem);
+				} else {
+					head.appendChild(current);
+				}
 				// when we do replace or append current is removed from newHead
 				// therefore we need to decrement index
-			i--;
-			break;
+				i--;
+				break;
 
 			// these elements can not be deleted from head
 			// therefore we just add new elements that differs from existed
-		case TAG_NAMES.STYLE:
-		case TAG_NAMES.LINK:
-		case TAG_NAMES.SCRIPT:
-			key = self._getNodeKey(current);
-			if (!(key in map[current.nodeName])) {
-				head.appendChild(current);
-				i--;
+			case TAG_NAMES.STYLE:
+			case TAG_NAMES.LINK:
+			case TAG_NAMES.SCRIPT:
+				if (!(key in map[current.nodeName])) {
+					head.appendChild(current);
+					i--;
+				}
+				break;
+				// meta and other elements can be deleted
+				// but we should not delete and append same elements
+			default:
+				if (key in map[current.nodeName]) {
+					sameMetaElements[key] = true;
+				} else {
+					head.appendChild(current);
+					i--;
+				}
+				break;
 			}
-			break;
-			// meta and other elements can be deleted
-			// but we should not delete and append same elements
-		default:
-			key = self._getNodeKey(current);
-			if (key in map[current.nodeName]) {
-				sameMetaElements[key] = true;
-			} else {
-				head.appendChild(current);
-				i--;
-			}
-			break;
+		}
+
+		if (TAG_NAMES.META in map) {
+			// remove meta tags which a not in a new head state
+			Object.keys(map[TAG_NAMES.META])
+				.forEach(metaKey => {
+					if (metaKey in sameMetaElements) {
+						return;
+					}
+
+					head.removeChild(map[TAG_NAMES.META][metaKey]);
+				});
 		}
 	}
 
-	if (TAG_NAMES.META in map) {
-		// remove meta tags which a not in a new head state
-		Object.keys(map[TAG_NAMES.META])
-			.forEach(function(metaKey) {
-				if (metaKey in sameMetaElements) {
-					return;
+	/**
+	 * Gets map of all HEAD's elements.
+	 * @param {NodeList} headChildren Head children DOM nodes.
+	 * @returns {Object} Map of HEAD elements.
+	 * @private
+	 */
+	_getHeadMap(headChildren) {
+		// Create map of <meta>, <link>, <style> and <script> tags
+		// by unique keys that contain attributes and content
+		const map = Object.create(null);
+
+		for (let i = 0; i < headChildren.length; i++) {
+			const current = headChildren[i];
+			if (!(current.nodeName in map)) {
+				map[current.nodeName] = Object.create(null);
+			}
+			map[current.nodeName][this._getNodeKey(current)] = current;
+		}
+		return map;
+	}
+
+	/**
+	 * Gets unique element key using element's attributes and its content.
+	 * @param {Node} node HTML element.
+	 * @returns {string} Unique key for element.
+	 * @private
+	 */
+	_getNodeKey(node) {
+		const attributes = [];
+
+		if (node.nodeType !== NODE_TYPES.ELEMENT_NODE) {
+			return node.nodeValue || '';
+		}
+
+		if (node.hasAttributes()) {
+			for (let i = 0; i < node.attributes.length; i++) {
+				const current = node.attributes[i];
+				attributes.push(`${current.name}=${current.value}`);
+			}
+		}
+
+		return `${attributes.sort().join('|')}>${node.textContent}`;
+	}
+
+	/**
+	 * Does initial wrapping for every component on the page.
+	 * @param {Array} components Current components list.
+	 * @param {Array} element Elements list.
+	 * @private
+	 */
+	_initialWrap(components, elements) {
+		const current = elements.pop();
+
+		return Promise.resolve()
+			.then(() => {
+				const id = this._getId(current);
+				if (!id) {
+					return null;
 				}
 
-				head.removeChild(map[TAG_NAMES.META][metaKey]);
-			});
-	}
-};
-
-/**
- * Gets map of all HEAD's elements.
- * @param {NodeList} headChildren Head children DOM nodes.
- * @returns {Object} Map of HEAD elements.
- * @private
- */
-DocumentRenderer.prototype._getHeadMap = function(headChildren) {
-	// Create map of <meta>, <link>, <style> and <script> tags
-	// by unique keys that contain attributes and content
-	var map = Object.create(null),
-		i, current,
-		self = this;
-
-	for (i = 0; i < headChildren.length; i++) {
-		current = headChildren[i];
-		if (!(current.nodeName in map)) {
-			map[current.nodeName] = Object.create(null);
-		}
-		map[current.nodeName][self._getNodeKey(current)] = current;
-	}
-	return map;
-};
-
-/**
- * Gets unique element key using element's attributes and its content.
- * @param {Node} node HTML element.
- * @returns {string} Unique key for element.
- * @private
- */
-DocumentRenderer.prototype._getNodeKey = function(node) {
-	var current, i,
-		attributes = [];
-
-	if (node.nodeType !== NODE_TYPES.ELEMENT_NODE) {
-		return node.nodeValue || '';
-	}
-
-	if (node.hasAttributes()) {
-		for (i = 0; i < node.attributes.length; i++) {
-			current = node.attributes[i];
-			attributes.push(current.name + '=' + current.value);
-		}
-	}
-
-	return attributes
-			.sort()
-			.join('|') + '>' + node.textContent;
-};
-
-/**
- * Does initial wrapping for every component on the page.
- * @param {Array} components Current components list.
- * @param {Array} element Elements list.
- * @private
- */
-DocumentRenderer.prototype._initialWrap = function(components, elements) {
-	var self = this,
-		current = elements.pop();
-
-	return Promise.resolve()
-		.then(function() {
-			var id = self._getId(current);
-			if (!id) {
-				return;
-			}
-
-			var componentName = moduleHelper.getOriginalComponentName(
-					current.nodeName
+				const componentName = moduleHelper.getOriginalComponentName(current.nodeName);
+				if (!(componentName in components)) {
+					return null;
+				}
+				const ComponentConstructor = components[componentName].constructor;
+				ComponentConstructor.prototype.$context = this._getComponentContext(
+					components[componentName], current
 				);
-			if (!(componentName in components)) {
-				return;
-			}
-			var constructor = components[componentName].constructor;
-			constructor.prototype.$context = self._getComponentContext(
-				components[componentName], current
-			);
 
-			var instance = self._serviceLocator.resolveInstance(
-				constructor, self._config
-			);
-			instance.$context = constructor.prototype.$context;
-			self._componentElements[id] = current;
-			self._componentInstances[id] = instance;
-			// initialize the store of the component
-			self._storeDispatcher.getStore(
-				current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
-			);
-			self._eventBus.emit('componentRendered', {
-				name: componentName,
-				attributes: instance.$context.attributes,
-				context: instance.$context
+				const instance = new ComponentConstructor(this._serviceLocator);
+				instance.$context = ComponentConstructor.prototype.$context;
+				this._componentElements[id] = current;
+				this._componentInstances[id] = instance;
+				// initialize the store of the component
+				this._storeDispatcher.getStore(
+					current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
+				);
+				this._eventBus.emit('componentRendered', {
+					name: componentName,
+					attributes: instance.$context.attributes,
+					context: instance.$context
+				});
+				return this._bindComponent(current);
+			})
+			.then(() => {
+				if (elements.length > 0) {
+					return this._initialWrap(components, elements);
+				}
+
+				this._eventBus.emit(
+					'documentRendered', this._currentRoutingContext
+				);
+				return null;
 			});
-			return self._bindComponent(current);
-		})
-		.then(function() {
-			if (elements.length > 0) {
-				return self._initialWrap(components, elements);
-			}
+	}
 
-			self._eventBus.emit(
-				'documentRendered', self._currentRoutingContext
-			);
-		});
-};
-
-/**
- * Gets component context using basic context.
- * @param {Object} component Component details.
- * @param {Element} element DOM element of component.
- * @returns {Object} Component context.
- * @private
- */
-DocumentRenderer.prototype._getComponentContext =
-	function(component, element) {
-		var self = this,
-			storeName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE),
-			componentContext = Object.create(this._currentRoutingContext);
+	/**
+	 * Gets component context using basic context.
+	 * @param {Object} component Component details.
+	 * @param {Element} element DOM element of component.
+	 * @returns {Object} Component context.
+	 * @private
+	 */
+	_getComponentContext(component, element) {
+		const storeName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE);
+		const componentContext = Object.create(this._currentRoutingContext);
 
 		// initialize the store of the component
 		this._storeDispatcher.getStore(storeName);
 
 		Object.defineProperties(componentContext, {
 			name: {
-				get: function() {
-					return component.name;
-				},
+				get: () => component.name,
 				enumerable: true
 			},
 			attributes: {
-				get: function() {
-					return attributesToObject(element.attributes);
-				},
+				get: () => attributesToObject(element.attributes),
 				enumerable: true
 			}
 		});
 
 		componentContext.element = element;
-		componentContext.getComponentById = function(id) {
-			return self.getComponentById(id);
+		componentContext.getComponentById = id => this.getComponentById(id);
+		componentContext.getComponentByElement = element =>
+			this.getComponentByElement(element);
+		componentContext.createComponent = (tagName, attributes) =>
+			this.createComponent(tagName, attributes);
+		componentContext.collectGarbage = () => this.collectGarbage();
+		componentContext.getStoreData = () => {
+			const currentStoreName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE);
+			return this._storeDispatcher.getStoreData(currentStoreName);
 		};
-		componentContext.getComponentByElement = function(element) {
-			return self.getComponentByElement(element);
+		componentContext.sendAction = (name, args) => {
+			const currentStoreName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE);
+			return this._storeDispatcher.sendAction(currentStoreName, name, args);
 		};
-		componentContext.createComponent = function(tagName, attributes) {
-			return self.createComponent(tagName, attributes);
-		};
-		componentContext.collectGarbage = function() {
-			return self.collectGarbage();
-		};
-		componentContext.getStoreData = function() {
-			var currentStoreName = element
-				.getAttribute(moduleHelper.ATTRIBUTE_STORE);
-			return self._storeDispatcher
-				.getStoreData(currentStoreName);
-		};
-		componentContext.sendAction = function(name, args) {
-			var currentStoreName = element
-				.getAttribute(moduleHelper.ATTRIBUTE_STORE);
-			return self._storeDispatcher
-				.sendAction(currentStoreName, name, args);
-		};
-		componentContext.sendBroadcastAction = function(name, args) {
-			return self._storeDispatcher
-				.sendBroadcastAction(name, args);
-		};
+		componentContext.sendBroadcastAction = (name, args) =>
+			this._storeDispatcher.sendBroadcastAction(name, args);
 
 		return Object.freeze(componentContext);
-	};
-
-/**
- * Finds all rendering roots on page for all changed stores.
- * @param {Array} changedStoreNames List of store names which has been changed.
- * @returns {Array<Element>} HTML elements that are rendering roots.
- * @private
- */
-DocumentRenderer.prototype._findRenderingRoots = function(changedStoreNames) {
-	var self = this,
-		headStore = this._window.document.head.getAttribute(
-			moduleHelper.ATTRIBUTE_STORE
-		),
-		components = this._componentLoader.getComponentsByNames(),
-		componentsElements = Object.create(null),
-		storeNamesSet = Object.create(null),
-		rootsSet = Object.create(null),
-		roots = [];
-
-	// we should find all components and then looking for roots
-	changedStoreNames
-		.forEach(function(storeName) {
-			storeNamesSet[storeName] = true;
-			componentsElements[storeName] = self._window.document
-				.querySelectorAll(
-					'[' +
-					moduleHelper.ATTRIBUTE_ID +
-					']' +
-					'[' +
-					moduleHelper.ATTRIBUTE_STORE +
-					'="' +
-					storeName +
-					'"]'
-				);
-		});
-
-	if (moduleHelper.HEAD_COMPONENT_NAME in components &&
-		headStore in storeNamesSet) {
-		rootsSet[this._getId(this._window.document.head)] = true;
-		roots.push(this._window.document.head);
 	}
 
-	changedStoreNames
-		.forEach(function(storeName) {
-			var current, currentId,
-				lastRoot, lastRootId,
-				currentStore, currentComponentName;
+	/**
+	 * Finds all rendering roots on page for all changed stores.
+	 * @param {Array} changedStoreNames List of store names which has been changed.
+	 * @returns {Array<Element>} HTML elements that are rendering roots.
+	 * @private
+	 */
+	_findRenderingRoots(changedStoreNames) {
+		const headStore = this._window.document.head.getAttribute(moduleHelper.ATTRIBUTE_STORE);
+		const components = this._componentLoader.getComponentsByNames();
+		const componentElements = Object.create(null);
+		const storeNamesSet = Object.create(null);
+		const rootsSet = Object.create(null);
+		const roots = [];
 
-			for (var i = 0; i < componentsElements[storeName].length; i++) {
-				current = componentsElements[storeName][i];
-				currentId = componentsElements[storeName][i]
-					.getAttribute(moduleHelper.ATTRIBUTE_ID);
-				lastRoot = current;
-				lastRootId = currentId;
-				currentComponentName = moduleHelper.getOriginalComponentName(
-					current.tagName
-				);
+		// we should find all components and then looking for roots
+		changedStoreNames
+			.forEach(storeName => {
+				storeNamesSet[storeName] = true;
+				componentElements[storeName] = this._window.document
+					.querySelectorAll(`[${moduleHelper.ATTRIBUTE_ID}][${moduleHelper.ATTRIBUTE_STORE}="${storeName}"]`);
+			});
 
-				while (current.parentElement) {
-					current = current.parentElement;
-					currentId = self._getId(current);
-					currentStore = current.getAttribute(
-						moduleHelper.ATTRIBUTE_STORE
-					);
+		if (moduleHelper.HEAD_COMPONENT_NAME in components && headStore in storeNamesSet) {
+			rootsSet[this._getId(this._window.document.head)] = true;
+			roots.push(this._window.document.head);
+		}
 
-					// store did not change state
-					if (!currentStore || !(currentStore in storeNamesSet)) {
-						continue;
+		changedStoreNames
+			.forEach(storeName => {
+				for (let i = 0; i < componentElements[storeName].length; i++) {
+					const current = componentElements[storeName][i];
+					let currentRoot = current;
+					let lastRoot = currentRoot;
+					let lastRootId = this._getId(current);
+
+					while (currentRoot.parentElement) {
+						currentRoot = currentRoot.parentElement;
+
+						const currentId = this._getId(currentRoot);
+						const currentStore = currentRoot.getAttribute(moduleHelper.ATTRIBUTE_STORE);
+						const currentComponentName = moduleHelper.getOriginalComponentName(currentRoot.tagName);
+
+						// store did not change state
+						if (!currentStore || !(currentStore in storeNamesSet)) {
+							continue;
+						}
+
+						// is not an active component
+						if (!(currentComponentName in components)) {
+							continue;
+						}
+
+						lastRoot = currentRoot;
+						lastRootId = currentId;
 					}
 
-					// is not an active component
-					if (!(currentComponentName in components)) {
+					if (lastRootId in rootsSet) {
 						continue;
 					}
-
-					lastRoot = current;
-					lastRootId = currentId;
+					rootsSet[lastRootId] = true;
+					roots.push(lastRoot);
 				}
-				if (lastRootId in rootsSet) {
-					continue;
-				}
-				rootsSet[lastRootId] = true;
-				roots.push(lastRoot);
-			}
-		});
+			});
 
-	return roots;
-};
-
-/**
- * Creates rendering context.
- * @param {Array?} changedStores Names of changed stores.
- * @returns {{
- *   config: Object,
- *   renderedIds: {},
- *   unboundIds: {},
- *   isHeadRendered: boolean,
- *   bindMethods: Array,
- *   routingContext: Object,
- *   components: Object,
- *   roots: Array.<Element>
- * }} The context object.
- * @private
- */
-DocumentRenderer.prototype._createRenderingContext = function(changedStores) {
-	var components = this._componentLoader.getComponentsByNames();
-
-	return {
-		config: this._config,
-		renderedIds: Object.create(null),
-		unboundIds: Object.create(null),
-		isHeadRendered: false,
-		bindMethods: [],
-		routingContext: this._currentRoutingContext,
-		components: components,
-		rootIds: Object.create(null),
-		roots: changedStores ? this._findRenderingRoots(changedStores) : []
-	};
-};
-
-/**
- * Gets ID of the element.
- * @param {Element} element HTML element of component.
- * @returns {string} ID.
- */
-DocumentRenderer.prototype._getId = function(element) {
-	if (element === this._window.document.documentElement) {
-		return SPECIAL_IDS.$$document;
+		return roots;
 	}
-	if (element === this._window.document.head) {
-		return SPECIAL_IDS.$$head;
-	}
-	return element.getAttribute(moduleHelper.ATTRIBUTE_ID);
-};
 
-/**
- * Creates temporary clone of the element.
- * @param {Element} element DOM element.
- * @returns {Element} clone.
- * @private
- */
-DocumentRenderer.prototype._createTemporaryElement = function(element) {
-	var tmp = this._window.document.createElement(element.tagName),
-		attributes = element.attributes;
-	for (var i = 0; i < attributes.length; i++) {
-		tmp.setAttribute(attributes[i].name, attributes[i].value);
+	/**
+	 * Creates rendering context.
+	 * @param {Array?} changedStores Names of changed stores.
+	 * @returns {{
+	 *   config: Object,
+	 *   renderedIds: {},
+	 *   unboundIds: {},
+	 *   isHeadRendered: boolean,
+	 *   bindMethods: Array,
+	 *   routingContext: Object,
+	 *   components: Object,
+	 *   roots: Array.<Element>
+	 * }} The context object.
+	 * @private
+	 */
+	_createRenderingContext(changedStores) {
+		const components = this._componentLoader.getComponentsByNames();
+
+		return {
+			config: this._config,
+			renderedIds: Object.create(null),
+			unboundIds: Object.create(null),
+			isHeadRendered: false,
+			bindMethods: [],
+			routingContext: this._currentRoutingContext,
+			components,
+			rootIds: Object.create(null),
+			roots: changedStores ? this._findRenderingRoots(changedStores) : []
+		};
 	}
-	return tmp;
-};
+
+	/**
+	 * Gets ID of the element.
+	 * @param {Element} element HTML element of component.
+	 * @returns {string} ID.
+	 */
+	_getId(element) {
+		if (element === this._window.document.documentElement) {
+			return SPECIAL_IDS.$$document;
+		}
+		if (element === this._window.document.head) {
+			return SPECIAL_IDS.$$head;
+		}
+		return element.getAttribute(moduleHelper.ATTRIBUTE_ID);
+	}
+
+	/**
+	 * Creates temporary clone of the element.
+	 * @param {Element} element DOM element.
+	 * @returns {Element} clone.
+	 * @private
+	 */
+	_createTemporaryElement(element) {
+		const tmp = this._window.document.createElement(element.tagName);
+
+		for (let i = 0; i < element.attributes.length; i++) {
+			const current = element.attributes[i];
+			tmp.setAttribute(current.name, current.value);
+		}
+		return tmp;
+	}
+}
 
 /**
  * Converts NamedNodeMap of Attr items to key-value object map.
@@ -1261,9 +1106,10 @@ DocumentRenderer.prototype._createTemporaryElement = function(element) {
  * @returns {Object} Map of attribute values by names.
  */
 function attributesToObject(attributes) {
-	var result = Object.create(null);
-	for (var i = 0; i < attributes.length; i++) {
-		result[attributes[i].name] = attributes[i].value;
+	const result = Object.create(null);
+	for (let i = 0; i < attributes.length; i++) {
+		const current = attributes[i];
+		result[current.name] = current.value;
 	}
 	return result;
 }
@@ -1274,7 +1120,7 @@ function attributesToObject(attributes) {
  * @returns {Function} "matches" method.
  */
 function getMatchesMethod(element) {
-	var method = (element.matches ||
+	const method = (element.matches ||
 		element.webkitMatchesSelector ||
 		element.mozMatchesSelector ||
 		element.oMatchesSelector ||
@@ -1290,27 +1136,25 @@ function getMatchesMethod(element) {
  * @returns {Event} Wrapped event.
  */
 function createCustomEvent(event, currentTargetGetter) {
-	var catEvent = Object.create(event),
-		keys = [],
-		properties = {};
-	for (var key in event) {
+	const catEvent = Object.create(event);
+	const keys = [];
+	const properties = {};
+
+	/* eslint guard-for-in: 0 */
+	for (const key in event) {
 		keys.push(key);
 	}
-	keys.forEach(function(key) {
+	keys.forEach(key => {
 		if (typeof (event[key]) === 'function') {
 			properties[key] = {
-				get: function() {
-					return event[key].bind(event);
-				}
+				get: () => event[key].bind(event)
 			};
 			return;
 		}
 
 		properties[key] = {
-			get: function() {
-				return event[key];
-			},
-			set: function(value) {
+			get: () => event[key],
+			set: value => {
 				event[key] = value;
 			}
 		};
@@ -1324,3 +1168,5 @@ function createCustomEvent(event, currentTargetGetter) {
 	Object.freeze(catEvent);
 	return catEvent;
 }
+
+module.exports = DocumentRenderer;

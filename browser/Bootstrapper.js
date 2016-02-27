@@ -1,33 +1,3 @@
-/*
- * catberry
- *
- * Copyright (c) 2014 Denis Rechkunov and project contributors.
- *
- * catberry's license follows:
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * This license applies to all parts of catberry that are not externally
- * maintained libraries.
- */
-
 /**
  * This module is a template and it is used only with some string replaces
  * by BrowserBundleBuilder module. It does not work by itself.
@@ -35,120 +5,101 @@
 
 'use strict';
 
-var stores = [
+const stores = [
 
 /** __stores **/
 
 ];
 
-var components = [
+const components = [
 
 /** __components **/
 
 ];
 
-var util = require('util'),
-	routeDefinitions = '__routeDefinitions' || [],
-	Catberry = require('./node_modules/catberry/browser/Catberry.js'),
-	Logger = require('./node_modules/catberry/browser/Logger.js'),
-	BootstrapperBase =
-		require('./node_modules/catberry/lib/base/BootstrapperBase.js'),
-	StoreDispatcher = require('./node_modules/catberry/lib/StoreDispatcher'),
-	ModuleApiProvider =
-		require('./node_modules/catberry/browser/providers/ModuleApiProvider'),
-	CookieWrapper = require('./node_modules/catberry/browser/CookieWrapper');
+const routeDefinitions = '__routeDefinitions' || [];
+const Catberry = require('./node_modules/catberry/browser/Catberry.js');
+const Logger = require('./node_modules/catberry/browser/Logger.js');
+const BootstrapperBase = require('./node_modules/catberry/lib/base/BootstrapperBase.js');
+const StoreDispatcher = require('./node_modules/catberry/lib/StoreDispatcher');
+const ModuleApiProvider = require('./node_modules/catberry/browser/providers/ModuleApiProvider');
+const CookieWrapper = require('./node_modules/catberry/browser/CookieWrapper');
+const Promise = require('promise');
 
-var DEBUG_DOCUMENT_UPDATED = 'Document updated (%d store(s) changed)',
-	DEBUG_COMPONENT_BOUND = 'Component "%s" is bound',
-	DEBUG_COMPONENT_UNBOUND = 'Component "%s" is unbound';
+class Bootstrapper extends BootstrapperBase {
 
-util.inherits(Bootstrapper, BootstrapperBase);
-
-/**
- * Creates new instance of the browser Catberry's bootstrapper.
- * @constructor
- * @extends BootstrapperBase
- */
-function Bootstrapper() {
-	BootstrapperBase.call(this, Catberry);
-}
-
-/**
- * Configures Catberry's service locator.
- * @param {Object} configObject Application config object.
- * @param {ServiceLocator} locator Service locator to configure.
- */
-Bootstrapper.prototype.configure = function(configObject, locator) {
-	BootstrapperBase.prototype.configure.call(this, configObject, locator);
-
-	// if browser still does not have promises then add it.
-	if (!('Promise' in window)) {
-		window.Promise = locator.resolve('promise');
+	/**
+	 * Creates new instance of the browser Catberry's bootstrapper.
+	 */
+	constructor() {
+		super(Catberry);
 	}
 
-	locator.register('storeDispatcher', StoreDispatcher, configObject, true);
-	locator.register(
-		'moduleApiProvider', ModuleApiProvider, configObject, true
-	);
-	locator.register('cookieWrapper', CookieWrapper, configObject, true);
+	/**
+	 * Configures Catberry's service locator.
+	 * @param {Object} configObject Application config object.
+	 * @param {ServiceLocator} locator Service locator to configure.
+	 */
+	configure(configObject, locator) {
+		super.configure(configObject, locator);
 
-	locator.registerInstance('window', window);
+		// if browser still does not have promises then add it.
+		if (!('Promise' in window)) {
+			window.Promise = Promise;
+		}
 
-	var loggerConfig = configObject.logger || {},
-		logger = new Logger(loggerConfig.levels);
-	locator.registerInstance('logger', logger);
-	window.onerror = function errorHandler(msg, uri, line) {
-		logger.fatal(uri + ':' + line + ' ' + msg);
-		return true;
-	};
-	var eventBus = locator.resolve('eventBus');
-	this._wrapEventsWithLogger(configObject, eventBus, logger);
+		locator.register('storeDispatcher', StoreDispatcher, true);
+		locator.register('moduleApiProvider', ModuleApiProvider, true);
+		locator.register('cookieWrapper', CookieWrapper, true);
 
-	routeDefinitions.forEach(function(routeDefinition) {
-		locator.registerInstance('routeDefinition', routeDefinition);
-	});
+		locator.registerInstance('window', window);
 
-	stores.forEach(function(store) {
-		locator.registerInstance('store', store);
-	});
+		const loggerConfig = configObject.logger || {};
+		const logger = new Logger(loggerConfig.levels);
+		locator.registerInstance('logger', logger);
 
-	components.forEach(function(component) {
-		locator.registerInstance('component', component);
-	});
-};
+		window.onerror = function errorHandler(msg, uri, line) {
+			logger.fatal(`${uri}:${line} ${msg}`);
+			return true;
+		};
 
-/**
- * Wraps event bus with log messages.
- * @param {Object} config Application config.
- * @param {EventEmitter} eventBus Event emitter that implements event bus.
- * @param {Logger} logger Logger to write messages.
- * @protected
- */
-Bootstrapper.prototype._wrapEventsWithLogger =
-	function(config, eventBus, logger) {
-		BootstrapperBase.prototype._wrapEventsWithLogger
-			.call(this, config, eventBus, logger);
+		const eventBus = locator.resolve('eventBus');
+		this.wrapEventsWithLogger(configObject, eventBus, logger);
 
-		var isRelease = Boolean(config.isRelease);
+		routeDefinitions.forEach(routeDefinition =>
+			locator.registerInstance('routeDefinition', routeDefinition));
+
+		stores.forEach(store => locator.registerInstance('store', store));
+
+		components.forEach(component => locator.registerInstance('component', component));
+	}
+
+	/**
+	 * Wraps event bus with log messages.
+	 * @param {Object} config Application config.
+	 * @param {EventEmitter} eventBus Event emitter that implements event bus.
+	 * @param {Logger} logger Logger to write messages.
+	 * @protected
+	 */
+	wrapEventsWithLogger(config, eventBus, logger) {
+		super.wrapEventsWithLogger(config, eventBus, logger);
+
+		const isRelease = Boolean(config.isRelease);
 		if (isRelease) {
 			return;
 		}
 		eventBus
-			.on('documentUpdated', function(args) {
-				logger.debug(util.format(DEBUG_DOCUMENT_UPDATED, args.length));
+			.on('documentUpdated', args =>
+				logger.debug(`Document updated (${args.length} store(s) changed)`))
+			.on('componentBound', args => {
+				const id = args.id ? `#${args.id}` : '';
+				logger.debug(`Component "${args.element.tagName}${id}" is bound`);
 			})
-			.on('componentBound', function(args) {
-				logger.debug(util.format(
-					DEBUG_COMPONENT_BOUND,
-					args.element.tagName + (args.id ? '#' + args.id : '')
-				));
-			})
-			.on('componentUnbound', function(args) {
-				logger.debug(util.format(
-					DEBUG_COMPONENT_UNBOUND,
-					args.element.tagName + (args.id ? '#' + args.id : '')
-				));
+			.on('componentUnbound', args => {
+				const id = args.id ? `#${args.id}` : '';
+				logger.debug(`Component "${args.element.tagName}${id}" is unbound`);
 			});
-	};
+	}
+}
 
 module.exports = new Bootstrapper();

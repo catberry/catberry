@@ -1,33 +1,3 @@
-/*
- * catberry
- *
- * Copyright (c) 2015 Denis Rechkunov and project contributors.
- *
- * catberry's license follows:
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * This license applies to all parts of catberry that are not externally
- * maintained libraries.
- */
-
 'use strict';
 
 var fs = require('fs'),
@@ -36,11 +6,8 @@ var fs = require('fs'),
 	jsdom = require('jsdom'),
 	StoreDispatcher = require('../../lib/StoreDispatcher'),
 	Logger = require('../mocks/Logger'),
-	Component = require('../mocks/components/Component'),
-	DataStore = require('../mocks/stores/DataStore'),
-	ComponentAsync = require('../mocks/components/ComponentAsync'),
-	ComponentError = require('../mocks/components/ComponentError'),
-	ComponentErrorAsync = require('../mocks/components/ComponentErrorAsync'),
+	storeMocks = require('../mocks/stores'),
+	componentMocks = require('../mocks/components'),
 	ContextFactory = require('../../lib/ContextFactory'),
 	ModuleApiProvider = require('../../lib/providers/ModuleApiProvider'),
 	CookieWrapper = require('../../browser/CookieWrapper'),
@@ -49,6 +16,9 @@ var fs = require('fs'),
 	DocumentRenderer = require('../../browser/DocumentRenderer'),
 	ServiceLocator = require('catberry-locator');
 
+/* eslint prefer-arrow-callback:0 */
+/* eslint max-nested-callbacks:0 */
+/* eslint require-jsdoc:0 */
 describe('browser/DocumentRenderer', function() {
 	describe('#initWithState', function() {
 		it('should init and bind all components in right order',
@@ -114,9 +84,7 @@ describe('browser/DocumentRenderer', function() {
 					html: html,
 					done: function(errors, window) {
 						locator.registerInstance('window', window);
-						var renderer = locator.resolveInstance(
-								DocumentRenderer
-							);
+						var renderer = new DocumentRenderer(locator);
 						renderer.initWithState({}, {})
 							.then(function() {
 								assert.deepEqual(bindCalls, expected);
@@ -127,12 +95,13 @@ describe('browser/DocumentRenderer', function() {
 				});
 			});
 	});
+
 	describe('#renderComponent', function() {
 		it('should render component into HTML element', function(done) {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -145,7 +114,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test');
 					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
@@ -163,7 +132,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test-async',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -176,7 +145,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document
 							.createElement('cat-test-async');
 					element.setAttribute('id', 'unique');
@@ -195,7 +164,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: ComponentError,
+					constructor: componentMocks.SyncErrorComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -211,7 +180,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test');
 					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
@@ -232,7 +201,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test-async',
-					constructor: ComponentErrorAsync,
+					constructor: componentMocks.AsyncErrorComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -248,7 +217,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement(
 							'cat-test-async'
 						);
@@ -270,7 +239,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test-async',
-					constructor: ComponentErrorAsync,
+					constructor: componentMocks.AsyncErrorComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -286,7 +255,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement(
 							'cat-test-async'
 						);
@@ -306,7 +275,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test-async',
-					constructor: ComponentErrorAsync,
+					constructor: componentMocks.AsyncErrorComponent,
 					templateSource: '<div>Hello, World!</div>',
 					errorTemplateSource: '<div>Hello, Error!</div>' +
 						'<cat-error id="cat-error" test="error-text">' +
@@ -314,13 +283,13 @@ describe('browser/DocumentRenderer', function() {
 				},
 				{
 					name: 'error',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: '<div>Hello, Error Component!</div>' +
 					'<cat-error2 id="cat-error2"></cat-error2>'
 				},
 				{
 					name: 'error2',
-					constructor: ComponentErrorAsync,
+					constructor: componentMocks.AsyncErrorComponent,
 					templateSource: 'none'
 				}
 			];
@@ -329,7 +298,7 @@ describe('browser/DocumentRenderer', function() {
 				}),
 				eventBus = locator.resolve('eventBus');
 
-			var expected = 'Error<br><div>Hello, Error!</div>' +
+			var expected = 'Error: test-async<br><div>Hello, Error!</div>' +
 				'<cat-error id="cat-error" test="error-text">' +
 				'error<br>' +
 				'<div>Hello, Error Component!</div>' +
@@ -343,7 +312,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement(
 							'cat-test-async'
 						);
@@ -370,7 +339,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement(
 							'cat-test-async'
 						);
@@ -415,7 +384,7 @@ describe('browser/DocumentRenderer', function() {
 				components = [{
 					name: 'head',
 					templateSource: '<title>Second title</title>',
-					constructor: ComponentError
+					constructor: componentMocks.SyncErrorComponent
 				}],
 				locator = createLocator(components, {}),
 				eventBus = locator.resolve('eventBus');
@@ -428,7 +397,7 @@ describe('browser/DocumentRenderer', function() {
 				done: function(errors, window) {
 					window.document.head.innerHTML = head;
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.renderComponent(window.document.head)
 						.then(function() {
 							assert.strictEqual(
@@ -445,7 +414,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -457,7 +426,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test');
 					renderer.renderComponent(element)
 						.then(function() {
@@ -473,13 +442,13 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test1',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: '<div>Hello from test1</div>' +
 					'<cat-test2 id="unique2"/>'
 				},
 				{
 					name: 'test2',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: '<span>' +
 					'Hello from test2' +
 					'<cat-test3 id="unique3"/>' +
@@ -487,7 +456,7 @@ describe('browser/DocumentRenderer', function() {
 				},
 				{
 					name: 'test3',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: 'Hello from test3'
 
 				}
@@ -512,7 +481,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -529,13 +498,13 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test1',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: '<div>Hello from test1</div>' +
 					'<cat-test2 id="unique2"/>'
 				},
 				{
 					name: 'test2',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: '<span>' +
 					'Hello from test2' +
 					'<cat-test3 id="unique3"/>' +
@@ -543,7 +512,7 @@ describe('browser/DocumentRenderer', function() {
 				},
 				{
 					name: 'test3',
-					constructor: ComponentAsync,
+					constructor: componentMocks.AsyncComponent,
 					templateSource: '<cat-test1 id="unique1"/>'
 
 				}
@@ -568,7 +537,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -670,7 +639,7 @@ describe('browser/DocumentRenderer', function() {
 						'</script>' +
 						'<link rel="stylesheet" href="someStyleLink3">' +
 						'<meta name="name4" content="value4">',
-						constructor: Component
+						constructor: componentMocks.SyncComponent
 					}],
 				locator = createLocator(components, {}),
 				eventBus = locator.resolve('eventBus');
@@ -681,9 +650,7 @@ describe('browser/DocumentRenderer', function() {
 				done: function(errors, window) {
 						window.document.head.innerHTML = head;
 						locator.registerInstance('window', window);
-						var renderer = locator.resolveInstance(
-							DocumentRenderer
-						);
+						var renderer = new DocumentRenderer(locator);
 						renderer.renderComponent(window.document.head)
 							.then(function() {
 								assert.strictEqual(
@@ -699,7 +666,7 @@ describe('browser/DocumentRenderer', function() {
 		it('should bind all events from bind method', function(done) {
 			function Component1() {}
 			Component1.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			Component1.prototype.bind = function() {
 				return {
@@ -713,7 +680,7 @@ describe('browser/DocumentRenderer', function() {
 
 			function Component2() {}
 			Component2.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			Component2.prototype.bind = function() {
 				return {
@@ -755,7 +722,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -782,7 +749,7 @@ describe('browser/DocumentRenderer', function() {
 		it('should handle dispatched events', function(done) {
 			function Component1() {}
 			Component1.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			Component1.prototype.bind = function() {
 				return {
@@ -816,7 +783,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -844,7 +811,7 @@ describe('browser/DocumentRenderer', function() {
 		'does not match', function(done) {
 			function Component1() {}
 			Component1.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			Component1.prototype.bind = function() {
 				return {
@@ -872,7 +839,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -900,7 +867,7 @@ describe('browser/DocumentRenderer', function() {
 		'is not a function', function(done) {
 			function Component1() {}
 			Component1.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			Component1.prototype.bind = function() {
 				return {
@@ -926,7 +893,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -961,7 +928,7 @@ describe('browser/DocumentRenderer', function() {
 			};
 			function Component1() {}
 			Component1.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			Component1.prototype.bind = function() {
 				bindCounters.first++;
@@ -982,7 +949,7 @@ describe('browser/DocumentRenderer', function() {
 
 			function Component2() {}
 			Component2.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			Component2.prototype.bind = function() {
 				bindCounters.second++;
@@ -1030,7 +997,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -1072,19 +1039,19 @@ describe('browser/DocumentRenderer', function() {
 				instances.first.push(this);
 			}
 			Component1.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component2() {
 				instances.second.push(this);
 			}
 			Component2.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component3() {
 				instances.third.push(this);
 			}
 			Component3.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			var components = [
 				{
@@ -1116,7 +1083,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
@@ -1162,19 +1129,19 @@ describe('browser/DocumentRenderer', function() {
 				instances.first.push(this);
 			}
 			Component1.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component2() {
 				instances.second.push(this);
 			}
 			Component2.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component3() {
 				instances.third.push(this);
 			}
 			Component3.prototype.render = function() {
-				return this.$context;
+				return this.$context.name;
 			};
 			var components = [
 				{
@@ -1209,7 +1176,7 @@ describe('browser/DocumentRenderer', function() {
 					locator.registerInstance(
 						'templateProvider', templateProvider
 					);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					counter++;
@@ -1241,17 +1208,17 @@ describe('browser/DocumentRenderer', function() {
 			function Component1() {}
 			Component1.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component2() {}
 			Component2.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component3() {}
 			Component3.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			var components = [
 				{
@@ -1278,15 +1245,15 @@ describe('browser/DocumentRenderer', function() {
 			var stores = [
 				{
 					name: 'store1',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				},
 				{
 					name: 'store2',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				},
 				{
 					name: 'store3',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
@@ -1311,12 +1278,12 @@ describe('browser/DocumentRenderer', function() {
 			var locator = createLocator(components, {}, stores),
 				eventBus = locator.resolve('eventBus');
 
-			eventBus.on('error', done);
+			// eventBus.on('error', done);
 			jsdom.env({
 				html: html,
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.initWithState({}, {});
 					renderer
 						.render({
@@ -1348,17 +1315,17 @@ describe('browser/DocumentRenderer', function() {
 			}
 			Component1.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component2() {}
 			Component2.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component3() {}
 			Component3.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function TimerStore() {}
 			TimerStore.prototype.handleTest = function() {
@@ -1392,7 +1359,7 @@ describe('browser/DocumentRenderer', function() {
 			var stores = [
 				{
 					name: 'store1',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				},
 				{
 					name: 'store2',
@@ -1400,7 +1367,7 @@ describe('browser/DocumentRenderer', function() {
 				},
 				{
 					name: 'store3',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
@@ -1430,7 +1397,7 @@ describe('browser/DocumentRenderer', function() {
 				html: html,
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.initWithState({}, {});
 					eventBus.on('documentUpdated', function() {
 						try {
@@ -1459,17 +1426,17 @@ describe('browser/DocumentRenderer', function() {
 			}
 			Component1.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component2() {}
 			Component2.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component3() {}
 			Component3.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function TimerStore() {}
 			TimerStore.prototype.handleTest = function(delay) {
@@ -1541,7 +1508,7 @@ describe('browser/DocumentRenderer', function() {
 				html: html,
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.initWithState({}, {});
 					setTimeout(function() {
 						assert.strictEqual(renders.length, 4);
@@ -1560,17 +1527,17 @@ describe('browser/DocumentRenderer', function() {
 			function Component1() {}
 			Component1.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component2() {}
 			Component2.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			function Component3() {}
 			Component3.prototype.render = function() {
 				renders.push(this.$context.attributes.id);
-				return this.$context;
+				return this.$context.name;
 			};
 			var components = [
 				{
@@ -1597,15 +1564,15 @@ describe('browser/DocumentRenderer', function() {
 			var stores = [
 				{
 					name: 'store1',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				},
 				{
 					name: 'store2',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				},
 				{
 					name: 'store3',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
@@ -1640,7 +1607,7 @@ describe('browser/DocumentRenderer', function() {
 				html: html,
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.initWithState(state, {});
 					renderer.render(state, {})
 						.then(function() {
@@ -1709,15 +1676,15 @@ describe('browser/DocumentRenderer', function() {
 			var stores = [
 				{
 					name: 'store1',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				},
 				{
 					name: 'store2',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				},
 				{
 					name: 'store3',
-					constructor: DataStore
+					constructor: storeMocks.SyncDataStore
 				}
 			];
 			var html = '<cat-test1 id="unique1" cat-store="store2">' +
@@ -1747,7 +1714,7 @@ describe('browser/DocumentRenderer', function() {
 				html: html,
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 
 					renderer.initWithState({}, {});
 					Promise.all([
@@ -1783,7 +1750,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -1796,7 +1763,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-test', {
 						id: 'unique'
 					})
@@ -1805,7 +1772,7 @@ describe('browser/DocumentRenderer', function() {
 							assert.strictEqual(
 								renderer
 									.getComponentByElement(element) instanceof
-								Component, true
+								componentMocks.SyncComponent, true
 							);
 							done();
 						})
@@ -1818,24 +1785,24 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test1',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello from test1!</div>' +
 					'<cat-test2 id="test2"></cat-test2>' +
 					'<cat-test3 id="test3"></cat-test3>'
 				},
 				{
 					name: 'test2',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello from test2!</div>'
 				},
 				{
 					name: 'test3',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello from test3!</div>'
 				},
 				{
 					name: 'test4',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello from test4!</div>'
 				}
 			];
@@ -1856,7 +1823,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-test1', {
 						id: 'test1'
 					})
@@ -1872,19 +1839,19 @@ describe('browser/DocumentRenderer', function() {
 							assert.strictEqual(element.innerHTML, expected2);
 							assert.strictEqual(
 								renderer.getComponentById('test1') instanceof
-								Component, true
+								componentMocks.SyncComponent, true
 							);
 							assert.strictEqual(
 								renderer.getComponentById('test2') instanceof
-								Component, true
+								componentMocks.SyncComponent, true
 							);
 							assert.strictEqual(
 								renderer.getComponentById('test3') instanceof
-								Component, true
+								componentMocks.SyncComponent, true
 							);
 							assert.strictEqual(
 								renderer.getComponentById('test4') instanceof
-								Component, true
+								componentMocks.SyncComponent, true
 							);
 
 							return renderer.collectGarbage();
@@ -1914,7 +1881,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -1926,7 +1893,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-wrong', {
 						id: 'unique'
 					})
@@ -1938,8 +1905,9 @@ describe('browser/DocumentRenderer', function() {
 								reason.message,
 								'Component for tag "cat-wrong" not found'
 							);
-							done();
-						});
+						})
+						.then(done)
+						.catch(done);
 				}
 			});
 		});
@@ -1948,7 +1916,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -1960,7 +1928,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-test', {})
 						.then(function() {
 							done(new Error('Should fail'));
@@ -1980,7 +1948,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -1992,7 +1960,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-test', {
 						id: 'some'
 					})
@@ -2022,7 +1990,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -2034,7 +2002,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.createComponent(500, {
 						id: 'some'
 					})
@@ -2058,7 +2026,7 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -2070,7 +2038,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer);
+					var renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-test', 100)
 						.then(function() {
 							done(new Error('Should fail'));
@@ -2093,12 +2061,12 @@ describe('browser/DocumentRenderer', function() {
 			var components = [
 				{
 					name: 'test',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				},
 				{
 					name: 'head',
-					constructor: Component,
+					constructor: componentMocks.SyncComponent,
 					templateSource: '<div>Hello, World!</div>'
 				}
 			];
@@ -2110,7 +2078,7 @@ describe('browser/DocumentRenderer', function() {
 				html: ' ',
 				done: function(errors, window) {
 					locator.registerInstance('window', window);
-					var renderer = locator.resolveInstance(DocumentRenderer),
+					var renderer = new DocumentRenderer(locator),
 						element = window.document.createElement('cat-test');
 					element.setAttribute('id', 'unique');
 					Promise.all([
@@ -2130,10 +2098,10 @@ describe('browser/DocumentRenderer', function() {
 									'unique2'
 								);
 							assert.strictEqual(
-								instance1 instanceof Component, true
+								instance1 instanceof componentMocks.SyncComponent, true
 							);
 							assert.strictEqual(
-								instance2 instanceof Component, true
+								instance2 instanceof componentMocks.SyncComponent, true
 							);
 							return renderer.collectGarbage();
 						})
@@ -2145,7 +2113,7 @@ describe('browser/DocumentRenderer', function() {
 									'unique2'
 								);
 							assert.strictEqual(
-								instance1 instanceof Component, true
+								instance1 instanceof componentMocks.SyncComponent, true
 							);
 							assert.strictEqual(instance2, null);
 							done();
@@ -2171,11 +2139,11 @@ function createLocator(components, config, stores) {
 			});
 	}
 
-	locator.register('componentLoader', ComponentLoader, config, true);
-	locator.register('storeLoader', StoreLoader, config, true);
-	locator.register('contextFactory', ContextFactory, config, true);
-	locator.register('moduleApiProvider', ModuleApiProvider, config);
-	locator.register('cookieWrapper', CookieWrapper, config);
+	locator.register('componentLoader', ComponentLoader, true);
+	locator.register('storeLoader', StoreLoader, true);
+	locator.register('contextFactory', ContextFactory, true);
+	locator.register('moduleApiProvider', ModuleApiProvider);
+	locator.register('cookieWrapper', CookieWrapper);
 	locator.register('storeDispatcher', StoreDispatcher);
 	locator.register('logger', Logger);
 	locator.registerInstance('serviceLocator', locator);
@@ -2187,9 +2155,9 @@ function createLocator(components, config, stores) {
 		registerCompiled: function(name, compiled) {
 			templates[name] = compiled;
 		},
-		render: function(name, context) {
+		render: function(name, value) {
 			return Promise.resolve(
-				context.name + '<br>' + templates[name]
+				value + '<br>' + templates[name]
 			);
 		}
 	});
