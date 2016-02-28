@@ -2,7 +2,6 @@
 
 const assert = require('assert');
 const events = require('events');
-const fs = require('fs');
 
 const URI = require('catberry-uri').URI;
 const Logger = require('../mocks/Logger');
@@ -16,80 +15,31 @@ const DocumentRenderer = require('../../lib/DocumentRenderer');
 
 const componentMocks = require('../mocks/components');
 const storeMocks = require('../mocks/stores');
+const testUtils = require('../utils');
 
 const testCases = require('../cases/lib/DocumentRenderer/test-cases.json');
-const templateCache = Object.create(null);
-const expectedHTMLCache = Object.create(null);
-
-function createTemplateObject(templateFilename) {
-	if (!templateFilename) {
-		return null;
-	}
-	if (templateFilename in templateCache) {
-		return templateCache[templateFilename];
-	}
-
-	/* eslint no-sync: 0 */
-	const templateSource = fs.readFileSync(
-		`${__dirname}/../cases/lib/DocumentRenderer/templates/${templateFilename}`
-	).toString();
-
-	templateCache[templateFilename] = {
-		render: data => /%%throw%%/i.test(templateSource) ?
-			Promise.reject(new Error('Template Error')) :
-			Promise.resolve(
-				templateSource
-					.replace(/%%value%%/gi, typeof (data) === 'string' ? data : 'null')
-					.replace(/%%error\.message%%/gi, data instanceof Error ? data.message : 'null')
-			)
-	};
-
-	return templateCache[templateFilename];
-}
-
-function getExpectedHTML(documentName) {
-	if (documentName in expectedHTMLCache) {
-		return expectedHTMLCache[documentName];
-	}
-
-	/* eslint no-sync: 0 */
-	const html = documentName ?
-		fs.readFileSync(`${__dirname}/../cases/lib/DocumentRenderer/expected/${documentName}`).toString() :
-		'';
-
-	expectedHTMLCache[documentName] = html;
-	return expectedHTMLCache[documentName];
-}
+const TEMPLATES_DIR = `${__dirname}/../cases/lib/DocumentRenderer/templates/`;
+const EXPECTED_DIR = `${__dirname}/../cases/lib/DocumentRenderer/expected/`;
 
 function prepareTestCase(testCase) {
-	const preparedComponents = {};
+	const preparedTestCase = Object.create(testCase);
+	preparedTestCase.components = {};
+	preparedTestCase.stores = {};
 
 	if (testCase.components) {
-		Object.keys(testCase.components).forEach(componentName => {
-			const component = testCase.components[componentName];
-			const preparedComponent = Object.create(component);
-			preparedComponent.template = createTemplateObject(preparedComponent.template);
-			preparedComponent.errorTemplate = createTemplateObject(preparedComponent.errorTemplate);
-			preparedComponent.constructor = componentMocks[preparedComponent.constructor];
-			preparedComponents[componentName] = preparedComponent;
-		});
+		preparedTestCase.components = testUtils.prepareComponents(TEMPLATES_DIR, testCase.components);
 	}
-
-	const preparedStores = {};
 
 	if (testCase.stores) {
-		Object.keys(testCase.stores).forEach(storeName => {
-			const store = testCase.stores[storeName];
-			const preparedStore = Object.create(store);
-			preparedStore.constructor = storeMocks[preparedStore.constructor];
-			preparedStores[storeName] = preparedStore;
-		});
+		preparedTestCase.stores = testUtils.prepareStores(testCase.stores);
 	}
 
-	const preparedTestCase = Object.create(testCase);
-	preparedTestCase.components = preparedComponents;
-	preparedTestCase.stores = preparedStores;
-	preparedTestCase.expectedHTML = getExpectedHTML(testCase.expectedHTML);
+	if (preparedTestCase.expectedHTML !== '') {
+		preparedTestCase.expectedHTML = testUtils.getHTML(
+			`${EXPECTED_DIR}${testCase.expectedHTML}`
+		);
+	}
+
 	return preparedTestCase;
 }
 
@@ -129,7 +79,7 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document.html`)
 				}
 			};
 			const routingContext = createRoutingContext({}, {}, components);
@@ -160,17 +110,17 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document-with-head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document-with-head.html`)
 				},
 				head: {
 					name: 'head',
 					constructor: Head,
-					template: createTemplateObject('head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}head.html`)
 				},
 				'async-comp': {
 					name: 'async-comp',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 
@@ -209,17 +159,17 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document-with-head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document-with-head.html`)
 				},
 				head: {
 					name: 'head',
 					constructor: Head,
-					template: createTemplateObject('head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}head.html`)
 				},
 				'async-comp': {
 					name: 'async-comp',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 
@@ -253,17 +203,17 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document-with-head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document-with-head.html`)
 				},
 				head: {
 					name: 'head',
 					constructor: Head,
-					template: createTemplateObject('head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}head.html`)
 				},
 				'async-comp': {
 					name: 'async-comp',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 
@@ -293,17 +243,17 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document-with-head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document-with-head.html`)
 				},
 				head: {
 					name: 'head',
 					constructor: Head,
-					template: createTemplateObject('head.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}head.html`)
 				},
 				'async-comp': {
 					name: 'async-comp',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 
@@ -333,12 +283,12 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document.html`)
 				},
 				comp: {
 					name: 'comp',
 					constructor: ClearFragmentComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 
@@ -368,12 +318,12 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document.html`)
 				},
 				comp: {
 					name: 'comp',
 					constructor: RedirectComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 
@@ -406,12 +356,12 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document.html`)
 				},
 				comp: {
 					name: 'comp',
 					constructor: CookieComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 
@@ -435,12 +385,12 @@ describe('lib/DocumentRenderer', function() {
 				document: {
 					name: 'document',
 					constructor: componentMocks.AsyncComponent,
-					template: createTemplateObject('document.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document.html`)
 				},
 				comp: {
 					name: 'comp',
 					constructor: componentMocks.AsyncErrorComponent,
-					template: createTemplateObject('component.html')
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
 				}
 			};
 			const routingContext = createRoutingContext({}, {}, components);

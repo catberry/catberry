@@ -10,6 +10,8 @@ const StateProvider = require('../../lib/providers/StateProvider');
 const ContextFactory = require('../../lib/ContextFactory');
 const CookieWrapper = require('../../browser/CookieWrapper');
 const RequestRouter = require('../../browser/RequestRouter');
+const testCases = require('../cases/browser/RequestRouter.json');
+const testUtils = require('../utils');
 
 	/* eslint prefer-arrow-callback:0 */
 	/* eslint max-nested-callbacks:0 */
@@ -42,11 +44,6 @@ describe('browser/RequestRouter', function() {
 		locator.register('stateProvider', StateProvider);
 		locator.register('contextFactory', ContextFactory);
 	});
-
-	function click(element, options) {
-		const event = new options.view.MouseEvent('click', options);
-		element.dispatchEvent(event);
-	}
 
 	function clickTest(options) {
 		// name, location, html, clickSelector, clickOptions
@@ -103,7 +100,7 @@ describe('browser/RequestRouter', function() {
 					locator.registerInstance('window', window);
 					const router = new RequestRouter(locator);
 					counter = 0;
-					click(window.document.querySelector(clickSelector), clickOptions);
+					testUtils.click(window.document.querySelector(clickSelector), clickOptions);
 
 					setTimeout(() => {
 						try {
@@ -126,128 +123,6 @@ describe('browser/RequestRouter', function() {
 	}
 
 	describe('#route', function() {
-		clickTest({
-			name: 'should catch internal link click and change state',
-			location: 'http://local/some/global1Value',
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a>'
-		});
-
-		clickTest({
-			name: 'should catch click on item inside link and change state',
-			location: 'http://local/some/global1Value',
-			clickSelector: 'div',
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"><div>test</div></a>'
-		});
-
-		clickTest({
-			name: 'should catch link click and change state if link starts with //',
-			location: 'http://local/some/global1Value',
-			html: '<a href="//local/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a>'
-		});
-
-		clickTest({
-			name: 'should properly handle relative URIs with .. and change state',
-			location: 'http://local/some/test1/test2',
-			html: '<a href="../../../some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a>'
-		});
-
-		clickTest({
-			name: 'should properly handle relative URIs without .. and change state',
-			location: 'http://local/some/',
-			html: '<a href="global1Value?global2=global2Value&first=firstValue&second=secondValue"></a>'
-		});
-
-		clickTest({
-			name: 'should not change state if link changes host',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			html: '<a href="http://local2/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a>'
-		});
-
-		clickTest({
-			name: 'should not change state if link has "target" attribute',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue" target="_blank"></a>'
-		});
-
-		clickTest({
-			name: 'should not change state if link does not have "href" attribute',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			html: '<a></a>'
-		});
-
-		clickTest({
-			name: 'should not change state if click on element that is not inside the link',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			clickSelector: 'div',
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a><div>test</div>'
-		});
-
-		clickTest({
-			name: 'should not change state if link has been clicked by middle mouse button',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			clickOptions: {
-				bubbles: true,
-				cancelable: true,
-				button: 1
-			},
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a><div>test</div>'
-		});
-
-		clickTest({
-			name: 'should not change state if link has been clicked with Control',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			clickOptions: {
-				bubbles: true,
-				cancelable: true,
-				ctrlKey: true,
-				button: 0
-			},
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a><div>test</div>'
-		});
-
-		clickTest({
-			name: 'should not change state if link has been clicked with Alt',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			clickOptions: {
-				bubbles: true,
-				cancelable: true,
-				altKey: true,
-				button: 0
-			},
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a><div>test</div>'
-		});
-
-		clickTest({
-			name: 'should not change state if link has been clicked with Shift',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			clickOptions: {
-				bubbles: true,
-				cancelable: true,
-				shiftKey: true,
-				button: 0
-			},
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a><div>test</div>'
-		});
-
-		clickTest({
-			name: 'should not change state if link has been clicked with Meta',
-			shouldNot: true,
-			location: 'http://local/some/global1Value',
-			clickOptions: {
-				bubbles: true,
-				cancelable: true,
-				metaKey: true,
-				button: 0
-			},
-			html: '<a href="/some/global1Value?global2=global2Value&first=firstValue&second=secondValue"></a><div>test</div>'
-		});
+		testCases.route.forEach(testCase => clickTest(testCase));
 	});
 });
