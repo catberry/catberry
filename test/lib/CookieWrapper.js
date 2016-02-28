@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const CookieWrapper = require('../../lib/CookieWrapper');
-const cases = require('../cases/lib/CookieWrapper.json');
+const testCases = require('../cases/lib/CookieWrapper.json');
 
 /* eslint prefer-arrow-callback:0 */
 /* eslint max-nested-callbacks:0 */
@@ -15,7 +15,7 @@ describe('lib/CookieWrapper', function() {
 	});
 
 	describe('#get', function() {
-		cases.get.forEach(testCase => {
+		testCases.get.forEach(testCase => {
 			it(testCase.name, function() {
 				cookieWrapper.initWithString(testCase.cookieString);
 				testCase.checkCookies.forEach(check => {
@@ -26,7 +26,7 @@ describe('lib/CookieWrapper', function() {
 	});
 
 	describe('#set', function() {
-		cases.set.forEach(testCase => {
+		testCases.set.forEach(testCase => {
 			it(testCase.name, function() {
 				cookieWrapper.initWithString(null);
 				testCase.cookies.forEach(cookie => {
@@ -68,48 +68,20 @@ describe('lib/CookieWrapper', function() {
 	});
 
 	describe('#getCookieString', function() {
-		it('should return right cookie string with init', function() {
-			const cookieString = 'some=value; some2=value2';
-			cookieWrapper.initWithString(cookieString);
-			assert.strictEqual(cookieWrapper.getCookieString(), cookieString);
-		});
-
-		it('should return right cookie string without init but with set', function() {
-			const expected = 'some3=value3; some4=value4';
-			cookieWrapper.set({
-				key: 'some3',
-				value: 'value3'
+		testCases.getCookieString.forEach(testCase => {
+			it(testCase.name, function() {
+				cookieWrapper.initWithString(testCase.initString);
+				testCase.cookies.forEach(cookie => cookieWrapper.set(cookie));
+				assert.strictEqual(cookieWrapper.getCookieString(), testCase.expected);
 			});
-			cookieWrapper.set({
-				key: 'some4',
-				value: 'value4'
-			});
-			assert.strictEqual(cookieWrapper.getCookieString(), expected);
-		});
-
-		it('should return right cookie string after init and set', function() {
-			var cookieWrapper = new CookieWrapper();
-			cookieWrapper.initWithString('some=value; some2=value2');
-			cookieWrapper.set({
-				key: 'some3',
-				value: 'value3'
-			});
-			cookieWrapper.set({
-				key: 'some4',
-				value: 'value4'
-			});
-			assert.strictEqual(
-				cookieWrapper.getCookieString(),
-				'some=value; some2=value2; some3=value3; some4=value4'
-			);
 		});
 	});
 	describe('#getAll', function() {
-		it('should return right cookie string', function() {
-			cookieWrapper.initWithString('some=value; some2=value2');
-			assert.deepEqual(cookieWrapper.getAll(), {
-				some: 'value',
-				some2: 'value2'
+		testCases.getAll.forEach(testCase => {
+			it(testCase.name, function() {
+				cookieWrapper.initWithString(testCase.initString);
+				testCase.cookies.forEach(cookie => cookieWrapper.set(cookie));
+				assert.deepEqual(cookieWrapper.getAll(), testCase.expected);
 			});
 		});
 	});

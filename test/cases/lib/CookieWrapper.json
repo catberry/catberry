@@ -36,6 +36,7 @@
 			"expectedStrings": [
 				"some=value; Max-Age=100; Expires=Tue, 23 Feb 2016 19:57:16 GMT; Path=/some; Domain=.new.domain; Secure; HttpOnly"
 			],
+			"expectedDocumentString": "some=value",
 			"cookies": [
 				{
 					"key": "some",
@@ -55,6 +56,7 @@
 				"some1=value1; Max-Age=100; Expires=Tue, 23 Feb 2016 19:57:16 GMT; Path=/some1; Domain=.new.domain1; Secure; HttpOnly",
 				"some2=value2; Max-Age=200; Expires=Tue, 23 Feb 2016 20:57:16 GMT; Path=/some2; Domain=.new.domain2; Secure; HttpOnly"
 			],
+			"expectedDocumentString": "some1=value1; some2=value2",
 			"cookies": [
 				{
 					"key": "some1",
@@ -77,6 +79,55 @@
 					"httpOnly": true
 				}
 			]
+		}
+	],
+	"getCookieString": [
+		{
+			"name": "should return right cookie string with init",
+			"initString": "some=value; some2=value2",
+			"cookies": [],
+			"expected": "some=value; some2=value2"
+		},
+		{
+			"name": "should return right cookie string without init but with set",
+			"initString": "",
+			"cookies": [
+				{
+					"key": "some3",
+					"value": "value3"
+				},
+				{
+					"key": "some4",
+					"value": "value4"
+				}
+			],
+			"expected": "some3=value3; some4=value4"
+		},
+		{
+			"name": "should return right cookie string after init and set",
+			"initString": "some=value; some2=value2",
+			"cookies": [
+				{
+					"key": "some3",
+					"value": "value3"
+				},
+				{
+					"key": "some4",
+					"value": "value4"
+				}
+			],
+			"expected": "some=value; some2=value2; some3=value3; some4=value4"
+		}
+	],
+	"getAll": [
+		{
+			"name": "should return right cookie string",
+			"initString": "some=value; some2=value2",
+			"cookies": [],
+			"expected": {
+				"some": "value",
+				"some2": "value2"
+			}
 		}
 	]
 }
