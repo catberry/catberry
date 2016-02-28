@@ -16,7 +16,7 @@ class ComponentLoader extends LoaderBase {
 		} catch (e) {
 			componentTransforms = [];
 		}
-		super(componentTransforms);
+		super(locator, componentTransforms);
 
 		/**
 		 * Current service locator.

@@ -17,7 +17,7 @@ class StoreLoader extends LoaderBase {
 		} catch (e) {
 			storeTransforms = [];
 		}
-		super(storeTransforms);
+		super(locator, storeTransforms);
 
 		/**
 		 * Current service locator.
