@@ -21,7 +21,7 @@ endif
 
 test-cov:
 	@echo "Getting coverage report..."
-	./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha $(TESTS) --recursive
+	./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- $(TESTS) --recursive
 
 travis-cov:
 	@echo "Getting coverage for Travis..."
