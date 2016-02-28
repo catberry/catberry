@@ -232,7 +232,7 @@ class RequestRouter {
 
 		// if middle mouse button was clicked
 		if (event.button !== MOUSE_PRIMARY_KEY ||
-			event.ctrlKey || event.altKey || event.shiftKey) {
+			event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
 			return;
 		}
 
