@@ -51,13 +51,13 @@ describe('lib/loaders/StoreLoader', function() {
 
 		locator.registerInstance('storeTransform', {
 			transform: store => {
-				store.name = store.name += '!';
+				store.name += '!';
 				return store;
 			}
 		});
 		locator.registerInstance('storeTransform', {
 			transform: store => {
-				store.name = store.name += '?';
+				store.name += '?';
 				return Promise.resolve(store);
 			}
 		});
@@ -74,6 +74,40 @@ describe('lib/loaders/StoreLoader', function() {
 				assert.strictEqual(store.name, `${stores.Test1.name}!?`);
 				assert.strictEqual(typeof (store.constructor), 'function');
 			})
+			.then(done)
+			.catch(done);
+	});
+
+	it('should skip transform errors', function(done) {
+		const stores = {
+			Test1: {
+				name: 'Test1',
+				path: 'test/cases/lib/loaders/StoreLoader/Test1.js'
+			}
+		};
+
+		const locator = createLocator(stores, () => {});
+
+		locator.registerInstance('storeTransform', {
+			transform: store => {
+				store.name += '!';
+				return store;
+			}
+		});
+		locator.registerInstance('storeTransform', {
+			transform: store => Promise.reject(new Error('Wrong!'))
+		});
+		locator.registerInstance('storeTransform', {
+			transform: store => {
+				throw new Error('Wrong!');
+			}
+		});
+
+		const loader = locator.resolve('storeLoader');
+
+		loader
+			.load()
+			.then(loadedStores => assert.strictEqual(loadedStores['Test1!'].name, 'Test1!'))
 			.then(done)
 			.catch(done);
 	});
@@ -102,6 +136,7 @@ describe('lib/loaders/StoreLoader', function() {
 			})
 			.catch(done);
 	});
+
 	it('should emit error when wrong path', function(done) {
 		const stores = {
 			Wrong: {
