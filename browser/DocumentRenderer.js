@@ -662,20 +662,22 @@ class DocumentRenderer extends DocumentRendererBase {
 	_handleRenderError(element, component, error) {
 		this._eventBus.emit('error', error);
 
-		// do not corrupt existed HEAD when error occurs
-		if (element.tagName === TAG_NAMES.HEAD) {
-			return Promise.resolve('');
-		}
+		return Promise.resolve()
+			.then(() => {
+				// do not corrupt existed HEAD when error occurs
+				if (element.tagName === TAG_NAMES.HEAD) {
+					return '';
+				}
 
-		if (!this._config.isRelease && error instanceof Error) {
-			return Promise.resolve(errorHelper.prettyPrint(
-				error, this._window.navigator.userAgent
-			));
-		} else if (component.errorTemplate) {
-			return component.errorTemplate.render(error);
-		}
+				if (!this._config.isRelease && error instanceof Error) {
+					errorHelper.prettyPrint(error, this._window.navigator.userAgent);
+				} else if (component.errorTemplate) {
+					return component.errorTemplate.render(error);
+				}
 
-		return Promise.resolve('');
+				return '';
+			})
+			.catch(() => '');
 	}
 
 	/**
