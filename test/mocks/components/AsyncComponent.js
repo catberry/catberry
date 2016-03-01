@@ -1,8 +1,10 @@
 'use strict';
 
+const testUtils = require('../../utils');
+
 class AsyncComponent {
 	render() {
-		return new Promise(fulfill => setTimeout(() => fulfill(this.$context.name), 1));
+		return testUtils.wait(1).then(() => this.$context.name);
 	}
 }
 

@@ -1,6 +1,7 @@
 'use strict';
 
 const events = require('events');
+const testUtils = require('../../utils');
 
 class StoreFinder extends events.EventEmitter {
 	constructor(stores) {
@@ -9,10 +10,10 @@ class StoreFinder extends events.EventEmitter {
 	}
 
 	find() {
-		return new Promise(fulfill => setTimeout(() => {
+		return testUtils.wait(100).then(() => {
 			this._found = this._toFind;
-			fulfill(this._found);
-		}, 100));
+			return this._found;
+		});
 	}
 
 	watch() { }
