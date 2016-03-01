@@ -780,40 +780,40 @@ class DocumentRenderer extends DocumentRendererBase {
 
 			switch (current.nodeName) {
 			// these elements can be only replaced
-			case TAG_NAMES.TITLE:
-			case TAG_NAMES.BASE:
-			case TAG_NAMES.NOSCRIPT:
-				const oldItem = head.getElementsByTagName(current.nodeName)[0];
-				if (oldItem) {
-					head.replaceChild(current, oldItem);
-				} else {
-					head.appendChild(current);
-				}
+				case TAG_NAMES.TITLE:
+				case TAG_NAMES.BASE:
+				case TAG_NAMES.NOSCRIPT:
+					const oldItem = head.getElementsByTagName(current.nodeName)[0];
+					if (oldItem) {
+						head.replaceChild(current, oldItem);
+					} else {
+						head.appendChild(current);
+					}
 				// when we do replace or append current is removed from newHead
 				// therefore we need to decrement index
-				i--;
-				break;
+					i--;
+					break;
 
 			// these elements can not be deleted from head
 			// therefore we just add new elements that differs from existed
-			case TAG_NAMES.STYLE:
-			case TAG_NAMES.LINK:
-			case TAG_NAMES.SCRIPT:
-				if (!(key in map[current.nodeName])) {
-					head.appendChild(current);
-					i--;
-				}
-				break;
+				case TAG_NAMES.STYLE:
+				case TAG_NAMES.LINK:
+				case TAG_NAMES.SCRIPT:
+					if (!(key in map[current.nodeName])) {
+						head.appendChild(current);
+						i--;
+					}
+					break;
 				// meta and other elements can be deleted
 				// but we should not delete and append same elements
-			default:
-				if (key in map[current.nodeName]) {
-					sameMetaElements[key] = true;
-				} else {
-					head.appendChild(current);
-					i--;
-				}
-				break;
+				default:
+					if (key in map[current.nodeName]) {
+						sameMetaElements[key] = true;
+					} else {
+						head.appendChild(current);
+						i--;
+					}
+					break;
 			}
 		}
 
