@@ -1,9 +1,12 @@
 'use strict';
 
+const testUtils = require('../../utils');
+
 class AsyncErrorStore {
 	load() {
-		return new Promise((fulfill, reject) =>
-			setTimeout(() => reject(new Error(this.$context.name)), 1));
+		return testUtils.wait(1).then(() => {
+			throw new Error(this.$context.name);
+		});
 	}
 }
 

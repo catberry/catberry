@@ -102,8 +102,8 @@ describe('browser/RequestRouter', function() {
 					counter = 0;
 					testUtils.click(window.document.querySelector(clickSelector), clickOptions);
 
-					setTimeout(() => {
-						try {
+					testUtils.wait(1)
+						.then(() => {
 							if (options.shouldNot) {
 								assert.strictEqual(isRouted, false);
 							} else {
@@ -112,11 +112,9 @@ describe('browser/RequestRouter', function() {
 								assert.strictEqual(window.history.length, 2);
 								assert.strictEqual(isRouted, true);
 							}
-							done();
-						} catch (e) {
-							done(e);
-						}
-					}, 1);
+						})
+						.then(done)
+						.catch(done);
 				}
 			});
 		});

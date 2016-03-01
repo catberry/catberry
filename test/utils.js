@@ -2,13 +2,11 @@
 
 const fs = require('fs');
 
-const componentMocks = require('./mocks/components');
-const storeMocks = require('./mocks/stores');
-
 const templateCache = Object.create(null);
 const HTMLCache = Object.create(null);
 
 const testUtils = {
+	wait: milliseconds => new Promise(fulfill => setTimeout(() => fulfill(), milliseconds)),
 	click: (element, options) => {
 		const event = new options.view.MouseEvent('click', options);
 		element.dispatchEvent(event);
@@ -38,6 +36,7 @@ const testUtils = {
 	},
 
 	prepareComponents: (templatesDir, components) => {
+		const componentMocks = require('./mocks/components');
 		const preparedComponents = {};
 		Object.keys(components).forEach(componentName => {
 			const component = components[componentName];
@@ -57,6 +56,7 @@ const testUtils = {
 	},
 
 	prepareStores: stores => {
+		const storeMocks = require('./mocks/stores');
 		const preparedStores = {};
 		Object.keys(stores).forEach(storeName => {
 			const store = stores[storeName];

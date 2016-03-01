@@ -1,1200 +1,685 @@
 'use strict';
 
-var fs = require('fs'),
-	assert = require('assert'),
-	events = require('events'),
-	jsdom = require('jsdom'),
-	StoreDispatcher = require('../../lib/StoreDispatcher'),
-	Logger = require('../mocks/Logger'),
-	storeMocks = require('../mocks/stores'),
-	componentMocks = require('../mocks/components'),
-	ContextFactory = require('../../lib/ContextFactory'),
-	ModuleApiProvider = require('../../lib/providers/ModuleApiProvider'),
-	CookieWrapper = require('../../browser/CookieWrapper'),
-	ComponentLoader = require('../../browser/loaders/ComponentLoader'),
-	StoreLoader = require('../../browser/loaders/StoreLoader'),
-	DocumentRenderer = require('../../browser/DocumentRenderer'),
-	ServiceLocator = require('catberry-locator');
+const fs = require('fs');
+const assert = require('assert');
+const events = require('events');
+const jsdom = require('jsdom');
+
+const StoreDispatcher = require('../../lib/StoreDispatcher');
+const Logger = require('../mocks/Logger');
+const ContextFactory = require('../../lib/ContextFactory');
+const ModuleApiProvider = require('../../lib/providers/ModuleApiProvider');
+const CookieWrapper = require('../../browser/CookieWrapper');
+const DocumentRenderer = require('../../browser/DocumentRenderer');
+const ServiceLocator = require('catberry-locator');
+
+const storeMocks = require('../mocks/stores');
+const componentMocks = require('../mocks/components');
+
+const testUtils = require('../utils');
+const testCases = require('../cases/browser/DocumentRenderer/test-cases.json');
+
+const TEMPLATES_DIR = `${__dirname}/../cases/browser/DocumentRenderer/templates/`;
+const EXPECTED_DIR = `${__dirname}/../cases/browser/DocumentRenderer/expected/`;
 
 /* eslint prefer-arrow-callback:0 */
 /* eslint max-nested-callbacks:0 */
 /* eslint require-jsdoc:0 */
 describe('browser/DocumentRenderer', function() {
+
+	function prepareTestCase(testCase) {
+		const preparedTestCase = Object.create(testCase);
+		preparedTestCase.components = {};
+		preparedTestCase.stores = {};
+
+		if (testCase.components) {
+			preparedTestCase.components = testUtils.prepareComponents(TEMPLATES_DIR, testCase.components);
+		}
+
+		if (testCase.stores) {
+			preparedTestCase.stores = testUtils.prepareStores(testCase.stores);
+		}
+
+		if (preparedTestCase.html) {
+			preparedTestCase.html = testUtils.getHTML(`${TEMPLATES_DIR}${testCase.html}`);
+		}
+
+		if (preparedTestCase.elementHTML) {
+			preparedTestCase.elementHTML = testUtils.getHTML(`${TEMPLATES_DIR}${testCase.elementHTML}`);
+		}
+
+		if (preparedTestCase.expectedHTML !== '') {
+			preparedTestCase.expectedHTML = testUtils.getHTML(`${EXPECTED_DIR}${testCase.expectedHTML}`);
+		}
+		return preparedTestCase;
+	}
+
 	describe('#initWithState', function() {
-		it('should init and bind all components in right order',
-			function(done) {
-				var html = fs.readFileSync(
-					__dirname + '/../cases/browser' +
-					'/DocumentRenderer/initWithState.html'
+		it('should init and bind all components in right order', function(done) {
+
+			/* eslint no-sync: 0 */
+			const html = testUtils.getHTML(`${TEMPLATES_DIR}document-many-nested.html`);
+			const bindCalls = [];
+			class NestComponent {
+				bind() {
+					const id = this.$context.attributes.id ?
+						`-${this.$context.attributes.id}` : '';
+					bindCalls.push(this.$context.name + id);
+				}
+			}
+
+			const components = {
+				comp: {
+					name: 'comp',
+					constructor: NestComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+				},
+				head: {
+					name: 'head',
+					constructor: NestComponent,
+					templateSource: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+				},
+				document: {
+					name: 'document',
+					constructor: NestComponent,
+					templateSource: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+				}
+			};
+
+			const locator = createLocator({}, components, {});
+
+			const expected = [
+				'comp-1',
+				'comp-2',
+				'comp-3',
+				'comp-4',
+				'comp-5',
+				'comp-6',
+				'comp-7',
+				'comp-8',
+				'comp-9',
+				'comp-10',
+				'comp-11',
+				'comp-12',
+				'comp-13',
+				'comp-14',
+				'comp-15',
+				'comp-16',
+				'comp-17',
+				'comp-18',
+				'head',
+				'document'
+			];
+
+			jsdom.env({
+				html,
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					const renderer = new DocumentRenderer(locator);
+					renderer.initWithState({}, {})
+						.then(() => assert.deepEqual(bindCalls, expected))
+						.then(done)
+						.catch(done);
+				}
+			});
+		});
+	});
+
+	describe('#renderComponent', function() {
+		testCases.renderComponent.forEach(testCase => {
+			it(testCase.name, function(done) {
+				const preparedTestCase = prepareTestCase(testCase);
+				const locator = createLocator(
+					preparedTestCase.config || {}, preparedTestCase.components, preparedTestCase.stores
 				);
 
-				var bindCalls = [];
-				function NestComponent() {}
-				NestComponent.prototype.bind = function() {
-					var id = this.$context.attributes.id ?
-						'-' + this.$context.attributes.id : '';
-					bindCalls.push(this.$context.name + id);
-				};
-
-				var components = [
-					{
-						name: 'comp',
-						constructor: NestComponent,
-						templateSource: ''
-					},
-					{
-						name: 'head',
-						constructor: NestComponent,
-						templateSource: ''
-					},
-					{
-						name: 'document',
-						constructor: NestComponent,
-						templateSource: ''
-					}
-				];
-
-				var locator = createLocator(components, {}),
-					eventBus = locator.resolve('eventBus');
-
-				var expected = [
-					'comp-1',
-					'comp-2',
-					'comp-3',
-					'comp-4',
-					'comp-5',
-					'comp-6',
-					'comp-7',
-					'comp-8',
-					'comp-9',
-					'comp-10',
-					'comp-11',
-					'comp-12',
-					'comp-13',
-					'comp-14',
-					'comp-15',
-					'comp-16',
-					'comp-17',
-					'comp-18',
-					'head',
-					'document'
-				];
-				eventBus.on('error', done);
 				jsdom.env({
-					html: html,
-					done: function(errors, window) {
+					html: preparedTestCase.html,
+					done: (errors, window) => {
+						if (errors) {
+							assert.fail(errors);
+						}
+						const element = window.document.querySelector(preparedTestCase.tagName) ||
+							window.document.createElement(preparedTestCase.tagName);
+						if (preparedTestCase.elementHTML) {
+							element.innerHTML = preparedTestCase.elementHTML;
+						}
+						if (preparedTestCase.attributes) {
+							Object.keys(preparedTestCase.attributes)
+								.forEach(name => element.setAttribute(name, preparedTestCase.attributes[name]));
+						}
+
 						locator.registerInstance('window', window);
-						var renderer = new DocumentRenderer(locator);
-						renderer.initWithState({}, {})
-							.then(function() {
-								assert.deepEqual(bindCalls, expected);
-								done();
+						const renderer = new DocumentRenderer(locator);
+
+						renderer.renderComponent(element)
+							.then(() => assert.strictEqual(
+								element.innerHTML.trim(), preparedTestCase.expectedHTML.trim())
+							)
+							.catch(error => {
+								if (preparedTestCase.errorMessage) {
+									assert.strictEqual(error.message, preparedTestCase.errorMessage);
+								} else {
+									throw error;
+								}
 							})
+							.then(done)
 							.catch(done);
 					}
 				});
 			});
-	});
-
-	describe('#renderComponent', function() {
-		it('should render component into HTML element', function(done) {
-			var components = [
-				{
-					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			var expected = 'test<br><div>Hello, World!</div>';
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test');
-					element.setAttribute('id', 'unique');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, expected);
-							done();
-						})
-						.catch(done);
-				}
-			});
 		});
 
-		it('should render asynchronous component ' +
-		'into HTML element', function(done) {
-			var components = [
-				{
-					name: 'test-async',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			var expected = 'test-async<br><div>Hello, World!</div>';
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document
-							.createElement('cat-test-async');
-					element.setAttribute('id', 'unique');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, expected);
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should render debug output ' +
-		'instead the content when error in debug mode', function(done) {
-			var components = [
-				{
+		it('should render debug output instead the content when error in debug mode', function(done) {
+			const components = {
+				test: {
 					name: 'test',
 					constructor: componentMocks.SyncErrorComponent,
-					templateSource: '<div>Hello, World!</div>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			var check = /Error: test/;
+			const locator = createLocator({}, components, {});
 
-			eventBus.on('error', function(error) {
-				assert.strictEqual(error.message, 'test');
-			});
+			const check = /Error: test/;
+
 			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
+				html: testUtils.getHTML(`${TEMPLATES_DIR}stub.html`),
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test');
 					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(
-								check.test(element.innerHTML), true
-							);
-							done();
+						.catch(error => {
+							assert.strictEqual(error.message, 'test');
+							assert.strictEqual(check.test(element.innerHTML), true);
 						})
+						.then(done)
 						.catch(done);
 				}
-			});
-		});
-
-		it('should render debug output ' +
-		'instead the content when error in debug mode ' +
-		'and async component', function(done) {
-			var components = [
-				{
-					name: 'test-async',
-					constructor: componentMocks.AsyncErrorComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			var check = /Error: test-async/;
-
-			eventBus.on('error', function(error) {
-				assert.strictEqual(error.message, 'test-async');
-			});
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement(
-							'cat-test-async'
-						);
-					element.setAttribute('id', 'unique');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(
-								check.test(element.innerHTML), true
-							);
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should render empty string ' +
-		'instead the content when error in release mode', function(done) {
-			var components = [
-				{
-					name: 'test-async',
-					constructor: componentMocks.AsyncErrorComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {
-					isRelease: true
-				}),
-				eventBus = locator.resolve('eventBus');
-
-			eventBus.on('error', function(error) {
-				assert.strictEqual(error.message, 'test-async');
-			});
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement(
-							'cat-test-async'
-						);
-					element.setAttribute('id', 'unique');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, '');
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should render error template ' +
-		'instead the content when error in release mode', function(done) {
-			var components = [
-				{
-					name: 'test-async',
-					constructor: componentMocks.AsyncErrorComponent,
-					templateSource: '<div>Hello, World!</div>',
-					errorTemplateSource: '<div>Hello, Error!</div>' +
-						'<cat-error id="cat-error" test="error-text">' +
-						'</cat-error>'
-				},
-				{
-					name: 'error',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: '<div>Hello, Error Component!</div>' +
-					'<cat-error2 id="cat-error2"></cat-error2>'
-				},
-				{
-					name: 'error2',
-					constructor: componentMocks.AsyncErrorComponent,
-					templateSource: 'none'
-				}
-			];
-			var locator = createLocator(components, {
-					isRelease: true
-				}),
-				eventBus = locator.resolve('eventBus');
-
-			var expected = 'Error: test-async<br><div>Hello, Error!</div>' +
-				'<cat-error id="cat-error" test="error-text">' +
-				'error<br>' +
-				'<div>Hello, Error Component!</div>' +
-				'<cat-error2 id="cat-error2"></cat-error2>' +
-				'</cat-error>';
-
-			eventBus.on('error', function() {
-				// nothing to do
-			});
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement(
-							'cat-test-async'
-						);
-					element.setAttribute('id', 'unique');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, expected);
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should do nothing if there is no such component', function(done) {
-			var components = [];
-			var locator = createLocator(components, {
-					isRelease: true
-				}),
-				eventBus = locator.resolve('eventBus');
-
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement(
-							'cat-test-async'
-						);
-					element.setAttribute('id', 'unique');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, '');
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should do nothing if component is HEAD', function(done) {
-			var head = '<title>First title</title>' +
-					'<base href="someLink1" target="_parent">' +
-					'<noscript>noScript1</noscript>' +
-					'<style type="text/css">' +
-					'some styles1' +
-					'</style>' +
-					'<style type="text/css">' +
-					'some styles2' +
-					'</style>' +
-					'<script type="application/javascript">' +
-					'some scripts1' +
-					'</script>' +
-					'<script type="application/javascript">' +
-					'some scripts2' +
-					'</script>' +
-					'<script type="application/javascript" ' +
-					'src="someScriptSrc1">' +
-					'</script>' +
-					'<script type="application/javascript" ' +
-					'src="someScriptSrc2">' +
-					'</script>' +
-					'<link rel="stylesheet" href="someStyleLink1">' +
-					'<link rel="stylesheet" href="someStyleLink2">' +
-					'<meta name="name1" content="value1">' +
-					'<meta name="name2" content="value2">' +
-					'<meta name="name3" content="value3">',
-				components = [{
-					name: 'head',
-					templateSource: '<title>Second title</title>',
-					constructor: componentMocks.SyncErrorComponent
-				}],
-				locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			eventBus.on('error', function(error) {
-				assert.strictEqual(error.message, 'head');
-			});
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					window.document.head.innerHTML = head;
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
-					renderer.renderComponent(window.document.head)
-						.then(function() {
-							assert.strictEqual(
-								window.document.head.innerHTML, head
-							);
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should do nothing if there is no Element\'s ID', function(done) {
-			var components = [
-				{
-					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, '');
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should render nested components', function(done) {
-			var components = [
-				{
-					name: 'test1',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
-				},
-				{
-					name: 'test2',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
-				},
-				{
-					name: 'test3',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: 'Hello from test3'
-
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			var expected = 'test1<br>' +
-				'<div>Hello from test1</div>' +
-				'<cat-test2 id="unique2">' +
-					'test2<br>' +
-					'<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3">' +
-						'test3<br>' +
-						'Hello from test3' +
-					'</cat-test3>' +
-					'</span>' +
-				'</cat-test2>';
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, expected);
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should render nested components with cycles', function(done) {
-			var components = [
-				{
-					name: 'test1',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
-				},
-				{
-					name: 'test2',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
-				},
-				{
-					name: 'test3',
-					constructor: componentMocks.AsyncComponent,
-					templateSource: '<cat-test1 id="unique1"/>'
-
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			var expected = 'test1<br>' +
-				'<div>Hello from test1</div>' +
-				'<cat-test2 id="unique2">' +
-					'test2<br>' +
-					'<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3">' +
-					'test3<br>' +
-					'<cat-test1 id="unique1"></cat-test1>' +
-					'</cat-test3>' +
-					'</span>' +
-				'</cat-test2>';
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
-					renderer.renderComponent(element)
-						.then(function() {
-							assert.strictEqual(element.innerHTML, expected);
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
-
-		it('should merge HEAD component ' +
-			'with new rendered HTML', function(done) {
-			var head = '<title>First title</title>' +
-						'<base href="someLink1" target="_parent">' +
-						'<style type="text/css">' +
-						'some styles1' +
-						'</style>' +
-						'<style type="text/css">' +
-						'some styles2' +
-						'</style>' +
-						'<script type="application/javascript">' +
-						'some scripts1' +
-						'</script>' +
-						'<script type="application/javascript">' +
-						'some scripts2' +
-						'</script>' +
-						'<script type="application/javascript" ' +
-						'src="someScriptSrc1">' +
-						'</script>' +
-						'<script type="application/javascript" ' +
-						'src="someScriptSrc2">' +
-						'</script>' +
-						'<link rel="stylesheet" href="someStyleLink1">' +
-						'<link rel="stylesheet" href="someStyleLink2">' +
-						'<meta name="name1" content="value1">' +
-						'<meta name="name2" content="value2">' +
-						'<meta name="name3" content="value3">',
-				expected = '<title>Second title</title>' +
-						'<base href="someLink2" target="_parent">' +
-						'<style type="text/css">' +
-						'some styles1' +
-						'</style>' +
-						'<style type="text/css">' +
-						'some styles2' +
-						'</style>' +
-						'<script type="application/javascript">' +
-						'some scripts1' +
-						'</script>' +
-						'<script type="application/javascript">' +
-						'some scripts2' +
-						'</script>' +
-						'<script type="application/javascript" ' +
-						'src="someScriptSrc1">' +
-						'</script>' +
-						'<script type="application/javascript" ' +
-						'src="someScriptSrc2">' +
-						'</script>' +
-						'<link rel="stylesheet" href="someStyleLink1">' +
-						'<link rel="stylesheet" href="someStyleLink2">' +
-						'<meta name="name1" content="value1">' +
-						'head<br><noscript>noScript2</noscript>' +
-						'<style type="text/css">' +
-						'some styles3' +
-						'</style>' +
-						'<script type="application/javascript">' +
-						'some scripts3' +
-						'</script>' +
-						'<script type="application/javascript" ' +
-						'src="someScriptSrc3">' +
-						'</script>' +
-						'<link rel="stylesheet" href="someStyleLink3">' +
-						'<meta name="name4" content="value4">',
-				components = [{
-						name: 'head',
-						templateSource: '<title>Second title</title>' +
-						'<base href="someLink2" target="_parent">' +
-						'<noscript>noScript2</noscript>' +
-						'<style type="text/css">' +
-						'some styles1' +
-						'</style>' +
-						'<script type="application/javascript">' +
-						'some scripts1' +
-						'</script>' +
-						'<script type="application/javascript" ' +
-						'src="someScriptSrc1">' +
-						'</script>' +
-						'<link rel="stylesheet" href="someStyleLink1">' +
-						'<meta name="name1" content="value1">' +
-						'<style type="text/css">' +
-						'some styles3' +
-						'</style>' +
-						'<script type="application/javascript">' +
-						'some scripts3' +
-						'</script>' +
-						'<script type="application/javascript" ' +
-						'src="someScriptSrc3">' +
-						'</script>' +
-						'<link rel="stylesheet" href="someStyleLink3">' +
-						'<meta name="name4" content="value4">',
-						constructor: componentMocks.SyncComponent
-					}],
-				locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-						window.document.head.innerHTML = head;
-						locator.registerInstance('window', window);
-						var renderer = new DocumentRenderer(locator);
-						renderer.renderComponent(window.document.head)
-							.then(function() {
-								assert.strictEqual(
-									window.document.head.innerHTML, expected
-								);
-								done();
-							})
-							.catch(done);
-					}
 			});
 		});
 
 		it('should bind all events from bind method', function(done) {
-			function Component1() {}
-			Component1.prototype.render = function() {
-				return this.$context.name;
-			};
-			Component1.prototype.bind = function() {
-				return {
-					click: {
-						'a.clickable': function(event) {
-							event.target.innerHTML += 'Component1';
+			class Component1 {
+				render() {
+					return this.$context.name;
+				}
+				bind() {
+					return {
+						click: {
+							'a.clickable': event => {
+								event.target.innerHTML += 'Component1';
+							}
 						}
-					}
-				};
-			};
+					};
+				}
+			}
 
-			function Component2() {}
-			Component2.prototype.render = function() {
-				return this.$context.name;
-			};
-			Component2.prototype.bind = function() {
-				return {
-					click: {
-						'a.clickable': function(event) {
-							event.currentTarget.innerHTML = 'Component2';
+			class Component2 {
+				render() {
+					return this.$context.name;
+				}
+				bind() {
+					return {
+						click: {
+							'a.clickable': event => {
+								event.currentTarget.innerHTML = 'Component2';
+							}
 						}
-					}
-				};
-			};
+					};
+				}
+			}
 
-			var components = [
-				{
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div><a class="clickable"></a></div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable1.html`)
 				},
-				{
+				test2: {
 					name: 'test2',
 					constructor: Component2,
-					templateSource: '<span><a class="clickable"></a></span>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable2.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			var expected = 'test1<br><div><a class="clickable">' +
-				'Component1' +
-				'</a></div>' +
-				'<cat-test2 id="unique2">' +
-					'test2<br>' +
-					'<span><a class="clickable">' +
-					'Component2Component1' +
-					'</a></span>' +
-				'</cat-test2>';
-			eventBus.on('error', done);
+			const locator = createLocator({}, components, {});
+			const expected = testUtils.getHTML(`${EXPECTED_DIR}clickable.html`);
+
 			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
+				html: testUtils.getHTML(`${TEMPLATES_DIR}stub.html`),
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test1');
 					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
-						.then(function() {
-							var event,
-								links = element.querySelectorAll('a.clickable');
-							for (var i = 0; i < links.length; i++) {
-								event = window.document
-									.createEvent('MouseEvents');
-								event.initEvent('click', true, true);
-								links[i].dispatchEvent(event);
+						.then(() => {
+							const links = element.querySelectorAll('a.clickable');
+							for (let i = 0; i < links.length; i++) {
+								testUtils.click(links[i], {
+									view: window,
+									bubbles: true,
+									cancelable: true,
+									button: 0
+								});
 							}
 
-							setTimeout(function() {
-								assert.strictEqual(element.innerHTML, expected);
-								done();
-							}, 10);
+							return testUtils.wait(1);
 						})
+						.then(() => assert.strictEqual(element.innerHTML, expected))
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
 		it('should handle dispatched events', function(done) {
-			function Component1() {}
-			Component1.prototype.render = function() {
-				return this.$context.name;
-			};
-			Component1.prototype.bind = function() {
-				return {
-					click: {
-						'a.clickable': function(event) {
-							event.target.parentNode.innerHTML += 'Component1';
-							event.currentTarget
-								.parentNode.innerHTML += 'Component1';
+			class Component1 {
+				render() {
+					return this.$context.name;
+				}
+				bind() {
+					return {
+						click: {
+							'a.clickable': event => {
+								event.target.parentNode.innerHTML += 'Component1';
+								event.currentTarget.parentNode.innerHTML += 'Component1';
+							}
 						}
-					}
-				};
-			};
+					};
+				}
+			}
 
-			var components = [
-				{
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div><a class="clickable">' +
-					'<span><div class="toclick"></div></span>' +
-					'</a></div>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable3.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			var expected = 'test1<br><div><a class="clickable">' +
-				'<span><div class="toclick"></div>Component1</span>' +
-				'</a>Component1</div>';
-			eventBus.on('error', done);
+			const locator = createLocator({}, components, {});
+			const expected = testUtils.getHTML(`${EXPECTED_DIR}dispatched-event.html`);
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
-						.then(function() {
-							var event,
-								toClick = element.querySelectorAll('div.toclick');
-							for (var i = 0; i < toClick.length; i++) {
-								event = window.document
-									.createEvent('MouseEvents');
-								event.initEvent('click', true, true);
-								toClick[i].dispatchEvent(event);
+						.then(() => {
+							const toClick = element.querySelectorAll('div.toclick');
+							for (let i = 0; i < toClick.length; i++) {
+								testUtils.click(toClick[i], {
+									view: window,
+									bubbles: true,
+									cancelable: true,
+									button: 0
+								});
 							}
-
-							setTimeout(function() {
-								assert.strictEqual(element.innerHTML, expected);
-								done();
-							}, 10);
+							return testUtils.wait(1);
 						})
+						.then(() => assert.strictEqual(element.innerHTML, expected))
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
-		it('should do nothing if event selector ' +
-		'does not match', function(done) {
-			function Component1() {}
-			Component1.prototype.render = function() {
-				return this.$context.name;
-			};
-			Component1.prototype.bind = function() {
-				return {
-					click: {
-						'a.non-clickable': function(event) {
-							event.target.innerHTML = 'Component1';
+		it('should do nothing if event selector does not match', function(done) {
+			class Component1 {
+				render() {
+					return this.$context.name;
+				}
+				bind() {
+					return {
+						click: {
+							'a.non-clickable': event => {
+								event.target.parentNode.innerHTML += 'Component1';
+								event.currentTarget.parentNode.innerHTML += 'Component1';
+							}
 						}
-					}
-				};
-			};
+					};
+				}
+			}
 
-			var components = [
-				{
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div><a class="clickable"></a></div>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable3.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			var expected = 'test1<br><div><a class="clickable"></a></div>';
-			eventBus.on('error', done);
+			const locator = createLocator({}, components, {});
+			const expected = testUtils.getHTML(`${EXPECTED_DIR}not-dispatched-event.html`);
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
-						.then(function() {
-							var event,
-								links = element.querySelectorAll('a.clickable');
-							for (var i = 0; i < links.length; i++) {
-								event = window.document
-									.createEvent('MouseEvents');
-								event.initEvent('click', true, true);
-								links[i].dispatchEvent(event);
+						.then(() => {
+							const toClick = element.querySelectorAll('div.toclick');
+							for (let i = 0; i < toClick.length; i++) {
+								testUtils.click(toClick[i], {
+									view: window,
+									bubbles: true,
+									cancelable: true,
+									button: 0
+								});
 							}
-
-							setTimeout(function() {
-								assert.strictEqual(element.innerHTML, expected);
-								done();
-							}, 10);
+							return testUtils.wait(1);
 						})
+						.then(() => assert.strictEqual(element.innerHTML, expected))
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
-		it('should do nothing if event handler ' +
-		'is not a function', function(done) {
-			function Component1() {}
-			Component1.prototype.render = function() {
-				return this.$context.name;
-			};
-			Component1.prototype.bind = function() {
-				return {
-					click: {
-						'a.clickable': 'wrong'
-					}
-				};
-			};
+		it('should do nothing if event handler is not a function', function(done) {
+			class Component1 {
+				render() {
+					return this.$context.name;
+				}
+				bind() {
+					return {
+						click: {
+							'a.non-clickable': 'wrong handler'
+						}
+					};
+				}
+			}
 
-			var components = [
-				{
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div><a class="clickable"></a></div>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable3.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			var expected = 'test1<br><div><a class="clickable"></a></div>';
-			eventBus.on('error', done);
+			const locator = createLocator({}, components, {});
+			const expected = testUtils.getHTML(`${EXPECTED_DIR}not-dispatched-event.html`);
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
-						.then(function() {
-							var event,
-								links = element.querySelectorAll('a.clickable');
-							for (var i = 0; i < links.length; i++) {
-								event = window.document
-									.createEvent('MouseEvents');
-								event.initEvent('click', true, true);
-								links[i].dispatchEvent(event);
+						.then(() => {
+							const toClick = element.querySelectorAll('div.toclick');
+							for (let i = 0; i < toClick.length; i++) {
+								testUtils.click(toClick[i], {
+									view: window,
+									bubbles: true,
+									cancelable: true,
+									button: 0
+								});
 							}
-
-							setTimeout(function() {
-								assert.strictEqual(element.innerHTML, expected);
-								done();
-							}, 10);
+							return testUtils.wait(1);
 						})
+						.then(() => assert.strictEqual(element.innerHTML, expected))
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
 		it('should unbind all events and call unbind', function(done) {
-			var bindCounters = {
+			const bindCounters = {
 				first: 0,
 				second: 0
 			};
-			var unbindCounters = {
+			const unbindCounters = {
 				first: 0,
 				second: 0
 			};
-			function Component1() {}
-			Component1.prototype.render = function() {
-				return this.$context.name;
-			};
-			Component1.prototype.bind = function() {
-				bindCounters.first++;
-				if (bindCounters.first > 1) {
-					return;
+			class Component1 {
+				render() {
+					return this.$context.name;
 				}
-				return {
-					click: {
-						'a.clickable': function(event) {
-							event.target.innerHTML = 'Component1';
-						}
-					}
-				};
-			};
-			Component1.prototype.unbind = function() {
-				unbindCounters.first++;
-			};
-
-			function Component2() {}
-			Component2.prototype.render = function() {
-				return this.$context.name;
-			};
-			Component2.prototype.bind = function() {
-				bindCounters.second++;
-				if (bindCounters.second > 1) {
-					return;
+				bind() {
+					bindCounters.first++;
 				}
-				return {
-					click: {
-						'a.clickable': function(event) {
-							event.target.innerHTML = 'Component2';
-						}
-					}
-				};
-			};
-			Component2.prototype.unbind = function() {
-				unbindCounters.second++;
-			};
+				unbind() {
+					unbindCounters.first++;
+				}
+			}
 
-			var components = [
-				{
+			class Component2 {
+				render() {
+					return this.$context.name;
+				}
+				bind() {
+					bindCounters.second++;
+				}
+				unbind() {
+					unbindCounters.second++;
+				}
+			}
+
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div><a class="clickable"></a></div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable1.html`)
 				},
-				{
+				test2: {
 					name: 'test2',
 					constructor: Component2,
-					templateSource: '<span><a class="clickable"></a></span>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable2.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			var expected = 'test1<br><div><a class="clickable">' +
-				'</a></div>' +
-				'<cat-test2 id="unique2">' +
-				'test2<br>' +
-				'<span><a class="clickable">' +
-				'</a></span>' +
-				'</cat-test2>';
+			const locator = createLocator({}, components, {});
 
-			eventBus.on('error', done);
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
-						.then(function() {
+						.then(() => {
 							return renderer.renderComponent(element);
 						})
-						.then(function() {
-							var event,
-								links = element.querySelectorAll('a.clickable');
-							for (var i = 0; i < links.length; i++) {
-								event = window.document
-									.createEvent('MouseEvents');
-								event.initEvent('click', true, true);
-								links[i].dispatchEvent(event);
+						.then(() => {
+							const toClick = element.querySelectorAll('a.clickable');
+							for (let i = 0; i < toClick.length; i++) {
+								testUtils.click(toClick[i], {
+									view: window,
+									bubbles: true,
+									cancelable: true,
+									button: 0
+								});
 							}
-
-							setTimeout(function() {
-								assert.strictEqual(element.innerHTML, expected);
-								assert.strictEqual(bindCounters.first, 2);
-								assert.strictEqual(bindCounters.second, 2);
-								assert.strictEqual(unbindCounters.first, 1);
-								assert.strictEqual(unbindCounters.second, 1);
-								done();
-							}, 10);
+							return testUtils.wait(1);
 						})
+						.then(() => {
+							assert.deepEqual(bindCounters, {first: 2, second: 2});
+							assert.deepEqual(unbindCounters, {first: 1, second: 1});
+						})
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
-		it('should use the same component instance ' +
-		'if it\'s element recreated after rendering', function(done) {
-			var instances = {
+		it('should use the same component instance if it\'s element recreated after rendering', function(done) {
+			const instances = {
 				first: [],
 				second: [],
 				third: []
 			};
-			function Component1() {
-				instances.first.push(this);
+			class Component1 {
+				constructor() {
+					instances.first.push(this);
+				}
+				render() {
+					return this.$context.name;
+				}
 			}
-			Component1.prototype.render = function() {
-				return this.$context.name;
-			};
-			function Component2() {
-				instances.second.push(this);
+			class Component2 {
+				constructor() {
+					instances.second.push(this);
+				}
+				render() {
+					return this.$context.name;
+				}
 			}
-			Component2.prototype.render = function() {
-				return this.$context.name;
-			};
-			function Component3() {
-				instances.third.push(this);
+
+			class Component3 {
+				constructor() {
+					instances.third.push(this);
+				}
+				render() {
+					return this.$context.name;
+				}
 			}
-			Component3.prototype.render = function() {
-				return this.$context.name;
-			};
-			var components = [
-				{
+
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
-				{
+				test2: {
 					name: 'test2',
 					constructor: Component2,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
 				},
-				{
+				test3: {
 					name: 'test3',
 					constructor: Component3,
-					templateSource: 'Hello from test3'
-
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			eventBus.on('error', done);
+			const locator = createLocator({}, components, {});
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
-						.then(function() {
-							return renderer.renderComponent(element);
-						})
-						.then(function() {
-							return renderer.renderComponent(element);
-						})
-						.then(function() {
+						.then(() => renderer.renderComponent(element))
+						.then(() => renderer.renderComponent(element))
+						.then(() => {
 							assert.strictEqual(instances.first.length, 1);
 							assert.strictEqual(instances.second.length, 1);
-							assert.strictEqual(instances.third.length, 1);
-							done();
+							assert.strictEqual(instances.third.length, 2);
 						})
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
-		it('should use new component instance ' +
-		'if it\'s element removed after rendering', function(done) {
-			var instances = {
+		it('should use new component instance if it\'s element removed after rendering', function(done) {
+			const instances = {
 				first: [],
 				second: [],
 				third: []
 			};
-			var templates = {},
-				counter = 0,
-				templateProvider = {
-					registerCompiled: function(name, source) {
-						templates[name] = source;
-					},
-					render: function(name) {
-						if (counter % 2 === 0) {
-							return Promise.resolve('');
-						}
 
-						return Promise.resolve(templates[name]);
-					}
-				};
-			function Component1() {
-				instances.first.push(this);
+			var counter = 0;
+			var shouldRender = true;
+
+			class Component1 {
+				constructor() {
+					instances.first.push(this);
+				}
+				render() {
+					return this.$context.name;
+				}
 			}
-			Component1.prototype.render = function() {
-				return this.$context.name;
-			};
-			function Component2() {
-				instances.second.push(this);
+			class Component2 {
+				constructor() {
+					instances.second.push(this);
+				}
+				render() {
+					return this.$context.name;
+				}
 			}
-			Component2.prototype.render = function() {
-				return this.$context.name;
-			};
-			function Component3() {
-				instances.third.push(this);
+
+			class Component3 {
+				constructor() {
+					instances.third.push(this);
+				}
+				render() {
+					return this.$context.name;
+				}
 			}
-			Component3.prototype.render = function() {
-				return this.$context.name;
-			};
-			var components = [
-				{
+
+			const template1 = testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`);
+			const template2 = testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`);
+			const template3 = testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`);
+
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
+					template: {
+						render: data => shouldRender ? template1.render(data) : ''
+					}
 				},
-				{
+				test2: {
 					name: 'test2',
 					constructor: Component2,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
+					template: {
+						render: data => shouldRender ? template2.render(data) : ''
+					}
 				},
-				{
+				test3: {
 					name: 'test3',
 					constructor: Component3,
-					templateSource: 'Hello from test3'
-
+					template: {
+						render: data => shouldRender ? template3.render(data) : ''
+					}
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			eventBus.on('error', done);
+			const locator = createLocator({}, components, {});
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					locator.registerInstance(
-						'templateProvider', templateProvider
-					);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
-					counter++;
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test1');
+					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
-						.then(function() {
-							counter++;
+						.then(() => {
+							shouldRender = false;
 							return renderer.renderComponent(element);
 						})
-						.then(function() {
-							counter++;
+						.then(() => {
+							shouldRender = true;
 							return renderer.renderComponent(element);
 						})
-						.then(function() {
+						.then(() => {
 							assert.strictEqual(instances.first.length, 1);
 							assert.strictEqual(instances.second.length, 2);
-							assert.strictEqual(instances.third.length, 2);
-							done();
+							assert.strictEqual(instances.third.length, 4);
 						})
+						.then(done)
 						.catch(done);
 				}
 			});
@@ -1202,88 +687,56 @@ describe('browser/DocumentRenderer', function() {
 	});
 
 	describe('#render', function() {
-		it('should update all components ' +
-		'that depend on changed stores in descending order', function(done) {
-			var renders = [];
-			function Component1() {}
-			Component1.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component2() {}
-			Component2.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component3() {}
-			Component3.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			var components = [
-				{
+		it('should update all components that depend on changed stores', function(done) {
+			const renders = [];
+			class Component1 {
+				render() {
+					renders.push(this.$context.attributes.id);
+					return this.$context.name;
+				}
+			}
+
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
-				{
+				test2: {
 					name: 'test2',
-					constructor: Component2,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
+					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
 				},
-				{
+				test3: {
 					name: 'test3',
-					constructor: Component3,
-					templateSource: 'Hello from test3'
+					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
+			};
 
-			var stores = [
-				{
+			const stores = {
+				store1: {
 					name: 'store1',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				},
-				{
+				store2: {
 					name: 'store2',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				},
-				{
+				store3: {
 					name: 'store3',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				}
-			];
-			var html = '<cat-test1 id="unique1" cat-store="store2">' +
-					'test1<br>' +
-					'<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2">' +
-						'test2<br>' +
-						'<span>' +
-						'Hello from test2' +
-							'<cat-test3 id="unique3" cat-store="store1">' +
-							'test3<br>' +
-							'Hello from test3' +
-							'</cat-test3>' +
-						'</span>' +
-					'</cat-test2>' +
-				'</cat-test1>' +
-				'<cat-test3 id="unique4" cat-store="store1">' +
-					'test3<br>' +
-					'Hello from test3' +
-				'</cat-test3>';
+			};
 
-			var locator = createLocator(components, {}, stores),
-				eventBus = locator.resolve('eventBus');
+			const locator = createLocator({}, components, stores);
+			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
 
-			// eventBus.on('error', done);
 			jsdom.env({
-				html: html,
-				done: function(errors, window) {
+				html,
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
+					const renderer = new DocumentRenderer(locator);
 					renderer.initWithState({}, {});
 					renderer
 						.render({
@@ -1291,431 +744,217 @@ describe('browser/DocumentRenderer', function() {
 							store2: {},
 							store3: {}
 						}, {})
-						.then(function() {
-							assert.strictEqual(renders.length, 4);
-							assert.strictEqual(renders[0], 'unique1');
-							assert.strictEqual(renders[1], 'unique4');
-							assert.strictEqual(renders[2], 'unique2');
-							assert.strictEqual(renders[3], 'unique3');
-							done();
+						.then(() => {
+							assert.strictEqual(renders.length, 3);
+							assert.strictEqual(renders[0], 'test1-1');
+							assert.strictEqual(renders[1], 'test1-2');
+							assert.strictEqual(renders[2], 'test2-1');
 						})
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
-		it('should update all components ' +
-		'that depend on changed store by .changed() method', function(done) {
-			var renders = [];
-			function Component1() {
-				var self = this;
-				setTimeout(function() {
-					self.$context.sendAction('test');
-				}, 10);
+		it('should update all components that depend on changed store by .changed() method', function(done) {
+			const renders = [];
+			class Component1 {
+				constructor() {
+					testUtils.wait(1)
+						.then(() => this.$context.sendAction('test'));
+				}
+				render() {
+					renders.push(this.$context.attributes.id);
+					return this.$context.name;
+				}
 			}
-			Component1.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component2() {}
-			Component2.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component3() {}
-			Component3.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function TimerStore() {}
-			TimerStore.prototype.handleTest = function() {
-				var self = this;
-				setTimeout(function() {
-					self.$context.changed();
-				}, 10);
-			};
-			var components = [
-				{
+
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
-				{
+				test2: {
 					name: 'test2',
-					constructor: Component2,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
-				},
-				{
-					name: 'test3',
-					constructor: Component3,
-					templateSource: 'Hello from test3'
-				}
-			];
-
-			var stores = [
-				{
-					name: 'store1',
-					constructor: storeMocks.SyncDataStore
-				},
-				{
-					name: 'store2',
-					constructor: TimerStore
-				},
-				{
-					name: 'store3',
-					constructor: storeMocks.SyncDataStore
-				}
-			];
-			var html = '<cat-test1 id="unique1" cat-store="store2">' +
-					'test1<br>' +
-					'<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2">' +
-						'test2<br>' +
-						'<span>' +
-						'Hello from test2' +
-						'<cat-test3 id="unique3" cat-store="store1">' +
-							'test3<br>' +
-							'Hello from test3' +
-						'</cat-test3>' +
-						'</span>' +
-					'</cat-test2>' +
-					'</cat-test1>' +
-				'<cat-test3 id="unique4" cat-store="store2">' +
-				'test3<br>' +
-				'Hello from test3' +
-				'</cat-test3>';
-
-			var locator = createLocator(components, {}, stores),
-				eventBus = locator.resolve('eventBus');
-
-			eventBus.on('error', done);
-			jsdom.env({
-				html: html,
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
-					renderer.initWithState({}, {});
-					eventBus.on('documentUpdated', function() {
-						try {
-							assert.strictEqual(renders.length, 4);
-							assert.strictEqual(renders[0], 'unique1');
-							assert.strictEqual(renders[1], 'unique4');
-							assert.strictEqual(renders[2], 'unique2');
-							assert.strictEqual(renders[3], 'unique3');
-							done();
-						} catch (e) {
-							done(e);
-						}
-					});
-				}
-			});
-		});
-
-		it('should update all components ' +
-		'that depend on changed stores by .changed() method', function(done) {
-			var renders = [];
-			function Component1() {
-				var self = this;
-				setTimeout(function() {
-					self.$context.sendBroadcastAction('test', 10);
-				}, 10);
-			}
-			Component1.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component2() {}
-			Component2.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component3() {}
-			Component3.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function TimerStore() {}
-			TimerStore.prototype.handleTest = function(delay) {
-				var self = this;
-				setTimeout(function() {
-					self.$context.changed();
-				}, delay);
-			};
-			var components = [
-				{
-					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
 				},
-				{
-					name: 'test2',
-					constructor: Component2,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
-				},
-				{
+				test3: {
 					name: 'test3',
-					constructor: Component3,
-					templateSource: 'Hello from test3'
+					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
+			};
 
-			var stores = [
-				{
+			class TimerStore {
+				handleTest() {
+					testUtils.wait(1)
+						.then(() => this.$context.changed());
+				}
+			}
+
+			const stores = {
+				store1: {
 					name: 'store1',
 					constructor: TimerStore
 				},
-				{
+				store2: {
 					name: 'store2',
 					constructor: TimerStore
 				},
-				{
+				store3: {
 					name: 'store3',
 					constructor: TimerStore
 				}
-			];
-			var html = '<cat-test1 id="unique1" cat-store="store2">' +
-					'test1<br>' +
-					'<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2">' +
-						'test2<br>' +
-						'<span>' +
-						'Hello from test2' +
-						'<cat-test3 id="unique3" cat-store="store1">' +
-							'test3<br>' +
-							'Hello from test3' +
-						'</cat-test3>' +
-						'</span>' +
-					'</cat-test2>' +
-					'</cat-test1>' +
-					'<cat-test3 id="unique4" cat-store="store3">' +
-					'test3<br>' +
-					'Hello from test3' +
-				'</cat-test3>';
+			};
 
-			var locator = createLocator(components, {}, stores),
-				eventBus = locator.resolve('eventBus');
+			const locator = createLocator({}, components, stores);
+			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
 
-			eventBus.on('error', done);
 			jsdom.env({
-				html: html,
-				done: function(errors, window) {
+				html,
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
+					const renderer = new DocumentRenderer(locator);
 					renderer.initWithState({}, {});
-					setTimeout(function() {
-						assert.strictEqual(renders.length, 4);
-						assert.strictEqual(renders[0], 'unique4');
-						assert.strictEqual(renders[1], 'unique1');
-						assert.strictEqual(renders[2], 'unique2');
-						assert.strictEqual(renders[3], 'unique3');
-						done();
-					}, 1000);
+					renderer
+						.render({
+							store1: {},
+							store2: {},
+							store3: {}
+						}, {})
+						.then(() => {
+							assert.strictEqual(renders.length, 3);
+							assert.strictEqual(renders[0], 'test1-1');
+							assert.strictEqual(renders[1], 'test1-2');
+							assert.strictEqual(renders[2], 'test2-1');
+						})
+						.then(done)
+						.catch(done);
 				}
 			});
 		});
 
 		it('should do nothing if nothing changes', function(done) {
-			var renders = [];
-			function Component1() {}
-			Component1.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component2() {}
-			Component2.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			function Component3() {}
-			Component3.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				return this.$context.name;
-			};
-			var components = [
-				{
+			const renders = [];
+			class Component1 {
+				constructor() {
+					testUtils.wait(1)
+						.then(() => this.$context.sendAction('test'));
+				}
+				render() {
+					renders.push(this.$context.attributes.id);
+					return this.$context.name;
+				}
+			}
+
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
-				{
+				test2: {
 					name: 'test2',
-					constructor: Component2,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
+					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
 				},
-				{
+				test3: {
 					name: 'test3',
-					constructor: Component3,
-					templateSource: 'Hello from test3'
+					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
+			};
 
-			var stores = [
-				{
+			const stores = {
+				store1: {
 					name: 'store1',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				},
-				{
+				store2: {
 					name: 'store2',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				},
-				{
+				store3: {
 					name: 'store3',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				}
-			];
-			var html = '<cat-test1 id="unique1" cat-store="store2">' +
-				'test1<br>' +
-				'<div>Hello from test1</div>' +
-				'<cat-test2 id="unique2">' +
-				'test2<br>' +
-				'<span>' +
-				'Hello from test2' +
-				'<cat-test3 id="unique3" cat-store="store1">' +
-				'test3<br>' +
-				'Hello from test3' +
-				'</cat-test3>' +
-				'</span>' +
-				'</cat-test2>' +
-				'</cat-test1>' +
-				'<cat-test3 id="unique4" cat-store="store1">' +
-				'test3<br>' +
-				'Hello from test3' +
-				'</cat-test3>';
+			};
 
-			var state = {
-					store1: {},
-					store2: {},
-					store3: {}
-				},
-				locator = createLocator(components, {}, stores),
-				eventBus = locator.resolve('eventBus');
+			const locator = createLocator({}, components, stores);
+			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
+			const state = {
+				store1: {},
+				store2: {},
+				store3: {}
+			};
 
-			eventBus.on('error', done);
 			jsdom.env({
-				html: html,
-				done: function(errors, window) {
+				html,
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
+					const renderer = new DocumentRenderer(locator);
 					renderer.initWithState(state, {});
-					renderer.render(state, {})
-						.then(function() {
-							assert.strictEqual(renders.length, 0);
-							done();
-						})
+					renderer
+						.render(state, {})
+						.then(() => assert.strictEqual(renders.length, 0))
+						.then(done)
 						.catch(done);
 				}
 			});
 		});
 
 		it('should not do rendering concurrently', function(done) {
-			var renders = [];
-			function Component1() {}
-			Component1.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				var self = this;
-				return new Promise(function(fulfill) {
-					setTimeout(function() {
-						fulfill(self.$context);
-					}, 10);
-				});
-			};
-			function Component2() {}
-			Component2.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				var self = this;
-				return new Promise(function(fulfill) {
-					setTimeout(function() {
-						fulfill(self.$context);
-					}, 10);
-				});
-			};
-			function Component3() {}
-			Component3.prototype.render = function() {
-				renders.push(this.$context.attributes.id);
-				var self = this;
-				return new Promise(function(fulfill) {
-					setTimeout(function() {
-						fulfill(self.$context);
-					}, 10);
-				});
-			};
-			var components = [
-				{
+			const renders = [];
+			class Component1 {
+				render() {
+					renders.push(this.$context.attributes.id);
+					return this.$context.name;
+				}
+			}
+
+			const components = {
+				test1: {
 					name: 'test1',
 					constructor: Component1,
-					templateSource: '<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2"/>'
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
-				{
+				test2: {
 					name: 'test2',
-					constructor: Component2,
-					templateSource: '<span>' +
-					'Hello from test2' +
-					'<cat-test3 id="unique3"/>' +
-					'</span>'
+					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
 				},
-				{
+				test3: {
 					name: 'test3',
-					constructor: Component3,
-					templateSource: 'Hello from test3'
+					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
+			};
 
-			var stores = [
-				{
+			const stores = {
+				store1: {
 					name: 'store1',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				},
-				{
+				store2: {
 					name: 'store2',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				},
-				{
+				store3: {
 					name: 'store3',
-					constructor: storeMocks.SyncDataStore
+					constructor: storeMocks.AsyncDataStore
 				}
-			];
-			var html = '<cat-test1 id="unique1" cat-store="store2">' +
-					'test1<br>' +
-					'<div>Hello from test1</div>' +
-					'<cat-test2 id="unique2" cat-store="store3">' +
-						'test2<br>' +
-						'<span>' +
-						'Hello from test2' +
-						'<cat-test3 id="unique3" cat-store="store1">' +
-							'test3<br>' +
-							'Hello from test3' +
-						'</cat-test3>' +
-						'</span>' +
-					'</cat-test2>' +
-					'</cat-test1>' +
-				'<cat-test3 id="unique4" cat-store="store1">' +
-				'test3<br>' +
-				'Hello from test3' +
-				'</cat-test3>';
+			};
 
-			var locator = createLocator(components, {}, stores),
-				eventBus = locator.resolve('eventBus');
+			const locator = createLocator({}, components, stores);
+			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
 
-			eventBus.on('error', done);
 			jsdom.env({
-				html: html,
-				done: function(errors, window) {
+				html,
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
-
+					const renderer = new DocumentRenderer(locator);
 					renderer.initWithState({}, {});
 					Promise.all([
 						renderer.render({
@@ -1731,14 +970,13 @@ describe('browser/DocumentRenderer', function() {
 							store3: {}
 						}, {})
 					])
-						.then(function() {
-							assert.strictEqual(renders.length, 4);
-							assert.strictEqual(renders[0], 'unique1');
-							assert.strictEqual(renders[1], 'unique4');
-							assert.strictEqual(renders[2], 'unique2');
-							assert.strictEqual(renders[3], 'unique3');
-							done();
+						.then(() => {
+							assert.strictEqual(renders.length, 3);
+							assert.strictEqual(renders[0], 'test1-1');
+							assert.strictEqual(renders[1], 'test1-2');
+							assert.strictEqual(renders[2], 'test2-1');
 						})
+						.then(done)
 						.catch(done);
 				}
 			});
@@ -1746,166 +984,51 @@ describe('browser/DocumentRenderer', function() {
 	});
 
 	describe('#createComponent', function() {
-		it('should properly create and render component', function(done) {
-			var components = [
-				{
-					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+		testCases.renderComponent.forEach(testCase => {
+			it(testCase.name, function(done) {
+				const preparedTestCase = prepareTestCase(testCase);
+				const locator = createLocator(
+					preparedTestCase.config || {}, preparedTestCase.components, preparedTestCase.stores
+				);
 
-			var expected = 'test<br><div>Hello, World!</div>';
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
-					renderer.createComponent('cat-test', {
-						id: 'unique'
-					})
-						.then(function(element) {
-							assert.strictEqual(element.innerHTML, expected);
-							assert.strictEqual(
-								renderer
-									.getComponentByElement(element) instanceof
-								componentMocks.SyncComponent, true
-							);
-							done();
-						})
-						.catch(done);
-				}
-			});
-		});
+				jsdom.env({
+					html: preparedTestCase.html,
+					done: (errors, window) => {
+						if (errors) {
+							assert.fail(errors);
+						}
 
-		it('should properly bind nested components', function(done) {
-			var components = [
-				{
-					name: 'test1',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello from test1!</div>' +
-					'<cat-test2 id="test2"></cat-test2>' +
-					'<cat-test3 id="test3"></cat-test3>'
-				},
-				{
-					name: 'test2',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello from test2!</div>'
-				},
-				{
-					name: 'test3',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello from test3!</div>'
-				},
-				{
-					name: 'test4',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello from test4!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
-
-			var expected1 = 'test1<br><div>Hello from test1!</div>' +
-				'<cat-test2 id="test2">' +
-				'test2<br><div>Hello from test2!</div>' +
-				'</cat-test2>' +
-				'<cat-test3 id="test3">' +
-				'test3<br><div>Hello from test3!</div>' +
-				'</cat-test3>';
-
-			var expected2 = 'test4<br><div>Hello from test4!</div>';
-			eventBus.on('error', done);
-			jsdom.env({
-				html: ' ',
-				done: function(errors, window) {
-					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
-					renderer.createComponent('cat-test1', {
-						id: 'test1'
-					})
-						.then(function(element) {
-							assert.strictEqual(element.innerHTML, expected1);
-							return renderer.createComponent(
-								'cat-test4', {
-									id: 'test4'
-								}
-							);
-						})
-						.then(function(element) {
-							assert.strictEqual(element.innerHTML, expected2);
-							assert.strictEqual(
-								renderer.getComponentById('test1') instanceof
-								componentMocks.SyncComponent, true
-							);
-							assert.strictEqual(
-								renderer.getComponentById('test2') instanceof
-								componentMocks.SyncComponent, true
-							);
-							assert.strictEqual(
-								renderer.getComponentById('test3') instanceof
-								componentMocks.SyncComponent, true
-							);
-							assert.strictEqual(
-								renderer.getComponentById('test4') instanceof
-								componentMocks.SyncComponent, true
-							);
-
-							return renderer.collectGarbage();
-						})
-						.then(function() {
-							assert.strictEqual(
-								renderer.getComponentById('test1'), null
-							);
-							assert.strictEqual(
-								renderer.getComponentById('test2'), null
-							);
-							assert.strictEqual(
-								renderer.getComponentById('test3'), null
-							);
-							assert.strictEqual(
-								renderer.getComponentById('test4'), null
-							);
-
-							done();
-						})
-						.catch(done);
-				}
+						locator.registerInstance('window', window);
+						var element = null;
+						const renderer = new DocumentRenderer(locator);
+						renderer.createComponent(preparedTestCase.tagName, preparedTestCase.attributes || {})
+							.then(el => {
+								element = el;
+								assert.strictEqual(element.innerHTML.trim(), preparedTestCase.expectedHTML.trim());
+							})
+							// in case of error it should not return an element
+							.catch(error => assert.strictEqual(element, null))
+							.then(done)
+							.catch(done);
+					}
+				});
 			});
 		});
 
 		it('should reject promise if wrong component', function(done) {
-			var components = [
-				{
-					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			const locator = createLocator({}, {});
 
-			eventBus.on('error', done);
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
+					const renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-wrong', {
 						id: 'unique'
 					})
-						.then(function() {
-							done(new Error('Should fail'));
-						})
-						.catch(function(reason) {
-							assert.strictEqual(
-								reason.message,
-								'Component for tag "cat-wrong" not found'
-							);
-						})
+						.then(() => assert.fail('Should fail'))
+						.catch(reason =>
+							assert.strictEqual(reason.message, 'Component for tag "cat-wrong" not found'))
 						.then(done)
 						.catch(done);
 				}
@@ -1913,144 +1036,102 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should reject promise if ID is not specified', function(done) {
-			var components = [
-				{
+			const components = {
+				test: {
 					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
+					constructor: componentMocks.AsyncComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			eventBus.on('error', done);
+			const locator = createLocator({}, components);
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
+					const renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-test', {})
-						.then(function() {
-							done(new Error('Should fail'));
-						})
-						.catch(function(reason) {
-							assert.strictEqual(
-								reason.message,
-								'The ID is not specified or already used'
-							);
-							done();
-						});
+						.then(() => assert.fail('Should fail'))
+						.catch(reason =>
+							assert.strictEqual(reason.message, 'The ID is not specified or already used'))
+						.then(done)
+						.catch(done);
 				}
 			});
 		});
 
 		it('should reject promise if ID is already used', function(done) {
-			var components = [
-				{
+			const components = {
+				test: {
 					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
+					constructor: componentMocks.AsyncComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			eventBus.on('error', done);
+			const locator = createLocator({}, components);
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
+					const renderer = new DocumentRenderer(locator);
 					renderer.createComponent('cat-test', {
 						id: 'some'
 					})
-						.then(function() {
-							return renderer.createComponent(
-								'cat-test', {
-									id: 'some'
-								}
-							);
-						})
-						.then(function() {
-							done(new Error('Should fail'));
-						})
-						.catch(function(reason) {
-							assert.strictEqual(
-								reason.message,
-								'The ID is not specified or already used'
-							);
-							done();
-						});
+						.then(() => renderer.createComponent('cat-test', {
+							id: 'some'
+						}))
+						.then(() => assert.fail('Should fail'))
+						.catch(reason =>
+							assert.strictEqual(reason.message, 'The ID is not specified or already used'))
+						.then(done)
+						.catch(done);
 				}
 			});
 		});
 
-		it('should reject promise if tag name ' +
-		'is not a string', function(done) {
-			var components = [
-				{
-					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+		it('should reject promise if tag name is not a string', function(done) {
+			const locator = createLocator({}, {});
 
-			eventBus.on('error', done);
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
-					renderer.createComponent(500, {
+					const renderer = new DocumentRenderer(locator);
+					renderer.createComponent(100500, {
 						id: 'some'
 					})
-						.then(function() {
-							done(new Error('Should fail'));
-						})
-						.catch(function(reason) {
+						.then(() => assert.fail('Should fail'))
+						.catch(reason =>
 							assert.strictEqual(
 								reason.message,
-								'Tag name should be a string ' +
-								'and attributes should be an object'
-							);
-							done();
-						});
+								'Tag name should be a string and attributes should be an object')
+							)
+						.then(done)
+						.catch(done);
 				}
 			});
 		});
 
-		it('should reject promise if attributes set ' +
-		'is not an object', function(done) {
-			var components = [
-				{
-					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
-				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+		it('should reject promise if attributes set is not an object', function(done) {
+			const locator = createLocator({}, {});
 
-			eventBus.on('error', done);
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator);
-					renderer.createComponent('cat-test', 100)
-						.then(function() {
-							done(new Error('Should fail'));
-						})
-						.catch(function(reason) {
+					const renderer = new DocumentRenderer(locator);
+					renderer.createComponent('cat-test', 100500)
+						.then(() => assert.fail('Should fail'))
+						.catch(reason =>
 							assert.strictEqual(
 								reason.message,
-								'Tag name should be a string ' +
-								'and attributes should be an object'
-							);
-							done();
-						});
+								'Tag name should be a string and attributes should be an object')
+							)
+						.then(done)
+						.catch(done);
 				}
 			});
 		});
@@ -2058,66 +1139,63 @@ describe('browser/DocumentRenderer', function() {
 
 	describe('#collectGarbage', function() {
 		it('should unlink component if it is not in DOM', function(done) {
-			var components = [
-				{
-					name: 'test',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
+			const components = {
+				test1: {
+					name: 'test1',
+					constructor: componentMocks.AsyncComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
-				{
-					name: 'head',
-					constructor: componentMocks.SyncComponent,
-					templateSource: '<div>Hello, World!</div>'
+				test2: {
+					name: 'test2',
+					constructor: componentMocks.AsyncComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
+				},
+				test3: {
+					name: 'test3',
+					constructor: componentMocks.AsyncComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
-			];
-			var locator = createLocator(components, {}),
-				eventBus = locator.resolve('eventBus');
+			};
 
-			eventBus.on('error', done);
+			const locator = createLocator({}, components, {});
+
 			jsdom.env({
 				html: ' ',
-				done: function(errors, window) {
+				done: (errors, window) => {
 					locator.registerInstance('window', window);
-					var renderer = new DocumentRenderer(locator),
-						element = window.document.createElement('cat-test');
-					element.setAttribute('id', 'unique');
+					const renderer = new DocumentRenderer(locator);
+					const element = window.document.createElement('cat-test3');
+					element.setAttribute('id', 'unique1');
+					window.document.body.appendChild(element);
 					Promise.all([
-						renderer.createComponent('cat-test', {
-							id: 'unique1'
-						}),
-						renderer.createComponent('cat-test', {
+						renderer.renderComponent(element).then(() => element),
+						renderer.createComponent('cat-test1', {
 							id: 'unique2'
+						}),
+						renderer.createComponent('cat-test3', {
+							id: 'unique3'
 						})
 					])
-						.then(function(elements) {
-							window.document.body.appendChild(elements[0]);
-							var instance1 = renderer.getComponentById(
-									'unique1'
-								),
-								instance2 = renderer.getComponentById(
-									'unique2'
-								);
-							assert.strictEqual(
-								instance1 instanceof componentMocks.SyncComponent, true
-							);
-							assert.strictEqual(
-								instance2 instanceof componentMocks.SyncComponent, true
-							);
+						.then(elements => {
+							window.document.body.appendChild(elements[2]);
+							const areInstances = elements.every(el => {
+								const id = el.getAttribute('id');
+								const instance = renderer.getComponentById(id);
+								return instance instanceof componentMocks.AsyncComponent;
+							});
+							assert.strictEqual(areInstances, true);
 							return renderer.collectGarbage();
 						})
-						.then(function() {
-							var instance1 = renderer.getComponentById(
-									'unique1'
-								),
-								instance2 = renderer.getComponentById(
-									'unique2'
-								);
-							assert.strictEqual(
-								instance1 instanceof componentMocks.SyncComponent, true
-							);
+						.then(() => {
+							const instance1 = renderer.getComponentById('unique1');
+							const instance2 = renderer.getComponentById('unique2');
+							const instance3 = renderer.getComponentById('unique3');
+
+							assert.strictEqual(instance1 instanceof componentMocks.AsyncComponent, true);
 							assert.strictEqual(instance2, null);
-							done();
+							assert.strictEqual(instance3 instanceof componentMocks.AsyncComponent, true);
 						})
+						.then(done)
 						.catch(done);
 				}
 			});
@@ -2125,22 +1203,18 @@ describe('browser/DocumentRenderer', function() {
 	});
 });
 
-function createLocator(components, config, stores) {
-	var locator = new ServiceLocator();
-	components.forEach(function(component) {
-		locator.registerInstance('component', component);
+function createLocator(config, components, stores) {
+	const locator = new ServiceLocator();
+
+	locator.registerInstance('componentLoader', {
+		load: () => Promise.resolve(),
+		getComponentsByNames: () => components
+	});
+	locator.registerInstance('storeLoader', {
+		load: () => Promise.resolve(),
+		getStoresByNames: () => stores
 	});
 
-	if (stores) {
-		stores
-			.reverse()
-			.forEach(function(store) {
-				locator.registerInstance('store', store);
-			});
-	}
-
-	locator.register('componentLoader', ComponentLoader, true);
-	locator.register('storeLoader', StoreLoader, true);
 	locator.register('contextFactory', ContextFactory, true);
 	locator.register('moduleApiProvider', ModuleApiProvider);
 	locator.register('cookieWrapper', CookieWrapper);
@@ -2148,18 +1222,9 @@ function createLocator(components, config, stores) {
 	locator.register('logger', Logger);
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
-	locator.registerInstance('eventBus', new events.EventEmitter());
+	const eventBus = new events.EventEmitter();
+	eventBus.on('error', () => {});
+	locator.registerInstance('eventBus', eventBus);
 
-	var templates = {};
-	locator.registerInstance('templateProvider', {
-		registerCompiled: function(name, compiled) {
-			templates[name] = compiled;
-		},
-		render: function(name, value) {
-			return Promise.resolve(
-				value + '<br>' + templates[name]
-			);
-		}
-	});
 	return locator;
 }

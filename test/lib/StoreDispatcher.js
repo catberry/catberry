@@ -6,6 +6,8 @@ const storeMocks = require('../mocks/stores');
 const ServiceLocator = require('catberry-locator');
 const StoreDispatcher = require('../../lib/StoreDispatcher');
 
+const testUtils = require('../utils');
+
 /* eslint prefer-arrow-callback:0 */
 /* eslint max-nested-callbacks:0 */
 /* eslint require-jsdoc:0 */
@@ -162,7 +164,7 @@ describe('lib/StoreDispatcher', function() {
 			class Store {
 				load() {
 					counter++;
-					return new Promise(fulfill => setTimeout(() => fulfill('hello'), 1));
+					return testUtils.wait(1).then(() => 'hello');
 				}
 			}
 			const stores = {
@@ -196,7 +198,7 @@ describe('lib/StoreDispatcher', function() {
 			class Store {
 				load() {
 					counter++;
-					return new Promise(fulfill => setTimeout(() => fulfill('hello'), 1));
+					return testUtils.wait(1).then(() => 'hello');
 				}
 			}
 			const stores = {
@@ -227,14 +229,14 @@ describe('lib/StoreDispatcher', function() {
 			class Store {
 				load() {
 					counter++;
-					return new Promise(fulfill => {
-						fulfill('hello');
-						setTimeout(() => {
-							if (counter === 1) {
-								this.$context.changed();
+					testUtils.wait(5)
+						.then(() => {
+							if (counter !== 1) {
+								return;
 							}
-						}, 1);
-					});
+							this.$context.changed();
+						});
+					return Promise.resolve('hello');
 				}
 			}
 			const stores = {
@@ -271,7 +273,7 @@ describe('lib/StoreDispatcher', function() {
 			class Store {
 				load() {
 					counter++;
-					return new Promise(fulfill => setTimeout(() => fulfill('hello'), 1));
+					return testUtils.wait(1).then(() => 'hello');
 				}
 			}
 
@@ -314,7 +316,7 @@ describe('lib/StoreDispatcher', function() {
 				load() {
 					loads.push(this.$context.name);
 					if (loads.length === 1) {
-						setTimeout(() => this.$context.changed(), 1);
+						testUtils.wait(1).then(() => this.$context.changed());
 					}
 					return new Promise(fulfill => fulfill('hello'));
 				}
@@ -395,7 +397,7 @@ describe('lib/StoreDispatcher', function() {
 					if (counter === 1) {
 						throw new Error('error');
 					}
-					return new Promise(fulfill => setTimeout(() => fulfill('hello'), 1));
+					return testUtils.wait(1).then(() => 'hello');
 				}
 			}
 			const stores = {
@@ -429,7 +431,7 @@ describe('lib/StoreDispatcher', function() {
 				}
 				load() {
 					counter++;
-					return new Promise(fulfill => setTimeout(() => fulfill(`hello${counter}`), 1));
+					return testUtils.wait(1).then(() => `hello${counter}`);
 				}
 			}
 			const stores = {
@@ -446,7 +448,7 @@ describe('lib/StoreDispatcher', function() {
 			dispatcher.getStoreData(stores.store1.name)
 				.then(data => {
 					assert.strictEqual(data, 'hello1');
-					return new Promise(fulfill => setTimeout(() => fulfill(), 10));
+					return testUtils.wait(10);
 				})
 				.then(() => dispatcher.getStoreData(stores.store1.name))
 				.then(result => {
