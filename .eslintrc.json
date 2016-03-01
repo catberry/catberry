@@ -31,7 +31,7 @@
 		"computed-property-spacing": [2, "never"],
 		"consistent-this": [2, "self"],
 		"eol-last": 2,
-		"indent": [2, "tab"],
+		"indent": [2, "tab", {"SwitchCase": 1}],
 		"key-spacing": [2, {"beforeColon": false, "afterColon": true}],
 		"keyword-spacing": [2, {"before": true, "after": true}],
 		"linebreak-style": [2, "unix"],
