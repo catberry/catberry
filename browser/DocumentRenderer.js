@@ -44,10 +44,8 @@ const NON_BUBBLING_EVENTS = {
 class DocumentRenderer extends DocumentRendererBase {
 
 	/**
-	 * Creates new instance of the document renderer.
-	 * @param {ServiceLocator} locator Locator to resolve dependencies.
-	 * @constructor
-	 * @extends DocumentRendererBase
+	 * Creates a new instance of the document renderer.
+	 * @param {ServiceLocator} locator Locator for resolving dependencies.
 	 */
 	constructor(locator) {
 		super(locator);
@@ -142,7 +140,7 @@ class DocumentRenderer extends DocumentRendererBase {
 
 	/**
 	 * Sets the initial state of the application.
-	 * @param {Object} state New state of application.
+	 * @param {Object} state New state of the application.
 	 * @param {Object} routingContext Routing context.
 	 * @returns {Promise} Promise for nothing.
 	 */
@@ -164,8 +162,8 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Renders new state of application.
-	 * @param {Object} state New state of application.
+	 * Renders a new state of the application.
+	 * @param {Object} state New state of the application.
 	 * @param {Object} routingContext Routing context.
 	 * @returns {Promise} Promise for nothing.
 	 */
@@ -194,8 +192,8 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Renders component into HTML element.
-	 * @param {Element} element HTML element of component
+	 * Renders a component into the HTML element.
+	 * @param {Element} element HTML element of the component.
 	 * @param {Object?} renderingContext Rendering context for group rendering.
 	 */
 	renderComponent(element, renderingContext) {
@@ -316,7 +314,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Gets component instance by ID.
+	 * Gets a component instance by ID.
 	 * @param {string} id Component ID.
 	 * @returns {Object|null} Component instance.
 	 */
@@ -338,8 +336,8 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Checks that every instance of component has element on the page and
-	 * removes all references to components removed from DOM.
+	 * Checks that every instance of the component has an element on the page and
+	 * removes all references to those components which were removed from DOM.
 	 * @returns {Promise} Promise for nothing.
 	 */
 	/* eslint max-nested-callbacks: 0 */
@@ -366,10 +364,10 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Creates and renders component element.
-	 * @param {string} tagName Name of HTML tag.
+	 * Creates and renders a component element.
+	 * @param {string} tagName Name of the HTML tag.
 	 * @param {Object} attributes Element attributes.
-	 * @returns {Promise<Element>} Promise for HTML element with rendered component.
+	 * @returns {Promise<Element>} Promise for HTML element with the rendered component.
 	 */
 	createComponent(tagName, attributes) {
 		if (typeof (tagName) !== 'string' || !attributes ||
@@ -409,7 +407,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Clears all references to removed components during rendering process.
+	 * Clears all references to removed components during the rendering process.
 	 * @param {Object} renderingContext Context of rendering.
 	 * @private
 	 */
@@ -433,7 +431,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Unbinds all event handlers from specified component and all it's descendants.
+	 * Unbinds all event handlers from the specified component and all it's descendants.
 	 * @param {Element} element Component HTML element.
 	 * @param {Object} renderingContext Context of rendering.
 	 * @returns {Promise} Promise for nothing.
@@ -457,7 +455,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Unbinds all event handlers from specified component.
+	 * Unbinds all event handlers from the specified component.
 	 * @param {Element} element Component HTML element.
 	 * @returns {Promise} Promise for nothing.
 	 * @private
@@ -493,7 +491,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Removes component from the list.
+	 * Removes a component from the current list.
 	 * @param {string} id Component's ID
 	 * @private
 	 */
@@ -504,8 +502,8 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Binds all required event handlers to component.
-	 * @param {Element} element Component HTML element.
+	 * Binds all required event handlers to the component.
+	 * @param {Element} element Component's HTML element.
 	 * @returns {Promise} Promise for nothing.
 	 * @private
 	 */
@@ -560,9 +558,9 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Creates universal event handler for delegated events.
-	 * @param {Element} componentRoot Root element of component.
-	 * @param {Object} selectorHandlers Map of event handlers by CSS selectors.
+	 * Creates a universal event handler for delegated events.
+	 * @param {Element} componentRoot Root element of the component.
+	 * @param {Object} selectorHandlers Map of event handlers by their CSS selectors.
 	 * @returns {Function} Universal event handler for delegated events.
 	 * @private
 	 */
@@ -617,9 +615,9 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Finds all descendant components of specified component element.
-	 * @param {Element} element Root component HTML element to begin search with.
-	 * @param {Object} components Map of components by names.
+	 * Finds all descendant components of the specified component element.
+	 * @param {Element} element Root component's HTML element to begin search with.
+	 * @param {Object} components Map of components by their names.
 	 * @param {boolean} goInComponents Go inside nested components.
 	 * @private
 	 */
@@ -652,9 +650,9 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Handles error while rendering.
-	 * @param {Element} element Component HTML element.
-	 * @param {Object} component Component instance.
+	 * Handles an error while rendering.
+	 * @param {Element} element Component's HTML element.
+	 * @param {Object} component Component's instance.
 	 * @param {Error} error Error to handle.
 	 * @returns {Promise<string>} Promise for HTML string.
 	 * @private
@@ -681,7 +679,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Updates all components that depend on current set of changed stores.
+	 * Updates all components that depend on the current set of changed stores.
 	 * @returns {Promise} Promise for nothing.
 	 * @private
 	 */
@@ -755,9 +753,9 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Merges new and existed head elements and change only difference.
+	 * Merges new and existed head elements and applies only difference.
 	 * @param {Element} head HEAD DOM element.
-	 * @param {Element} newHead New head element.
+	 * @param {Element} newHead New HEAD element.
 	 * @private
 	 */
 	/* eslint complexity: 0 */
@@ -833,7 +831,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	/**
 	 * Gets map of all HEAD's elements.
 	 * @param {NodeList} headChildren Head children DOM nodes.
-	 * @returns {Object} Map of HEAD elements.
+	 * @returns {Object} Map of HEAD's elements.
 	 * @private
 	 */
 	_getHeadMap(headChildren) {
@@ -852,9 +850,9 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Gets unique element key using element's attributes and its content.
+	 * Gets an unique element key using element's attributes and its content.
 	 * @param {Node} node HTML element.
-	 * @returns {string} Unique key for element.
+	 * @returns {string} Unique key for the element.
 	 * @private
 	 */
 	_getNodeKey(node) {
@@ -876,8 +874,8 @@ class DocumentRenderer extends DocumentRendererBase {
 
 	/**
 	 * Does initial wrapping for every component on the page.
-	 * @param {Array} components Current components list.
-	 * @param {Array} element Elements list.
+	 * @param {Object} components Current components map by their names.
+	 * @param {Array} elements Elements list.
 	 * @private
 	 */
 	_initialWrap(components, elements) {
@@ -927,10 +925,10 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Gets component context using basic context.
+	 * Gets a component context using the basic context.
 	 * @param {Object} component Component details.
-	 * @param {Element} element DOM element of component.
-	 * @returns {Object} Component context.
+	 * @param {Element} element DOM element of the component.
+	 * @returns {Object} Component's context.
 	 * @private
 	 */
 	_getComponentContext(component, element) {
@@ -973,8 +971,8 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Finds all rendering roots on page for all changed stores.
-	 * @param {Array} changedStoreNames List of store names which has been changed.
+	 * Finds all rendering roots on the page for all changed stores.
+	 * @param {Array} changedStoreNames List of changed store's names.
 	 * @returns {Array<Element>} HTML elements that are rendering roots.
 	 * @private
 	 */
@@ -1040,7 +1038,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Creates rendering context.
+	 * Creates a rendering context.
 	 * @param {Array?} changedStores Names of changed stores.
 	 * @returns {{
 	 *   config: Object,
@@ -1071,8 +1069,8 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Gets ID of the element.
-	 * @param {Element} element HTML element of component.
+	 * Gets an ID of the element.
+	 * @param {Element} element HTML element of the component.
 	 * @returns {string} ID.
 	 */
 	_getId(element) {
@@ -1086,9 +1084,9 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Creates temporary clone of the element.
+	 * Creates a temporary clone of the element.
 	 * @param {Element} element DOM element.
-	 * @returns {Element} clone.
+	 * @returns {Element} Clone element.
 	 * @private
 	 */
 	_createTemporaryElement(element) {
@@ -1103,9 +1101,9 @@ class DocumentRenderer extends DocumentRendererBase {
 }
 
 /**
- * Converts NamedNodeMap of Attr items to key-value object map.
+ * Converts NamedNodeMap of Attr items to the key-value object map.
  * @param {NamedNodeMap} attributes List of Element attributes.
- * @returns {Object} Map of attribute values by names.
+ * @returns {Object} Map of attribute values by their names.
  */
 function attributesToObject(attributes) {
 	const result = Object.create(null);
@@ -1117,7 +1115,7 @@ function attributesToObject(attributes) {
 }
 
 /**
- * Gets cross-browser "matches" method for the element.
+ * Gets a cross-browser "matches" method for the element.
  * @param {Element} element HTML element.
  * @returns {Function} "matches" method.
  */
@@ -1132,9 +1130,9 @@ function getMatchesMethod(element) {
 }
 
 /**
- * Creates imitation of original Event object but with specified currentTarget.
+ * Creates an imitation of the original Event object but with specified currentTarget.
  * @param {Event} event Original event object.
- * @param {Function} currentTargetGetter Getter for currentTarget.
+ * @param {Function} currentTargetGetter Getter for the currentTarget.
  * @returns {Event} Wrapped event.
  */
 function createCustomEvent(event, currentTargetGetter) {

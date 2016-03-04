@@ -1,5 +1,5 @@
 /**
- * This module is a template and it is used only with some string replaces
+ * This file is a template and it is used only for some string replaces
  * by BrowserBundleBuilder module. It does not work by itself.
  */
 
@@ -29,16 +29,16 @@ const Promise = require('promise');
 class Bootstrapper extends BootstrapperBase {
 
 	/**
-	 * Creates new instance of the browser Catberry's bootstrapper.
+	 * Creates a new instance of the browser Catberry's bootstrapper.
 	 */
 	constructor() {
 		super(Catberry);
 	}
 
 	/**
-	 * Configures Catberry's service locator.
-	 * @param {Object} configObject Application config object.
-	 * @param {ServiceLocator} locator Service locator to configure.
+	 * Configures a Catberry's service locator.
+	 * @param {Object} configObject The application config object.
+	 * @param {ServiceLocator} locator The service locator to configure.
 	 */
 	configure(configObject, locator) {
 		super.configure(configObject, locator);
@@ -75,10 +75,10 @@ class Bootstrapper extends BootstrapperBase {
 	}
 
 	/**
-	 * Wraps event bus with log messages.
-	 * @param {Object} config Application config.
-	 * @param {EventEmitter} eventBus Event emitter that implements event bus.
-	 * @param {Logger} logger Logger to write messages.
+	 * Wraps an event bus with log messages.
+	 * @param {Object} config The application config.
+	 * @param {EventEmitter} eventBus The Event Emitter that implements event bus.
+	 * @param {Logger} logger The logger for writing messages.
 	 * @protected
 	 */
 	wrapEventsWithLogger(config, eventBus, logger) {

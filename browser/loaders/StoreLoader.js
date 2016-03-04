@@ -5,10 +5,8 @@ const LoaderBase = require('../../lib/base/LoaderBase');
 class StoreLoader extends LoaderBase {
 
 	/**
-	 * Creates instance of the store loader.
-	 * @param {ServiceLocator} locator Locator to resolve stores.
-	 * @constructor
-	 * @extends LoaderBase
+	 * Creates a new instance of the store loader.
+	 * @param {ServiceLocator} locator The service locator for resolving stores.
 	 */
 	constructor(locator) {
 		var storeTransforms;
@@ -42,8 +40,8 @@ class StoreLoader extends LoaderBase {
 	}
 
 	/**
-	 * Loads all stores when it is in a browser.
-	 * @returns {Promise} Promise for nothing.
+	 * Loads all stores inside the browser bundle.
+	 * @returns {Promise<Object>} The promise loaded stores.
 	 */
 	load() {
 		if (this._loadedStores) {
@@ -74,9 +72,9 @@ class StoreLoader extends LoaderBase {
 	}
 
 	/**
-	 * Gets the store from store details.
-	 * @param {Object} storeDetails Store details.
-	 * @returns {Promise<Object>} Promise for store.
+	 * Gets astore from store details.
+	 * @param {Object} storeDetails The store details.
+	 * @returns {Promise<Object>} The promise for the store.
 	 * @private
 	 */
 	_getStore(storeDetails) {
@@ -92,8 +90,8 @@ class StoreLoader extends LoaderBase {
 	}
 
 	/**
-	 * Gets stores map by names.
-	 * @returns {Object} Map of stores by names.
+	 * Gets a stores map by their names.
+	 * @returns {Object} The map of stores by their names.
 	 */
 	getStoresByNames() {
 		return this._loadedStores || Object.create(null);

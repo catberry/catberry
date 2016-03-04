@@ -6,8 +6,8 @@ const LoaderBase = require('../../lib/base/LoaderBase');
 class ComponentLoader extends LoaderBase {
 
 	/**
-	 * Creates new instance of the component loader.
-	 * @param {ServiceLocator} locator Locator to resolve dependencies.
+	 * Creates a new instance of the component loader.
+	 * @param {ServiceLocator} locator The service locator for resolving dependencies.
 	 */
 	constructor(locator) {
 		var componentTransforms;
@@ -48,8 +48,8 @@ class ComponentLoader extends LoaderBase {
 	}
 
 	/**
-	 * Loads components when it is in a browser.
-	 * @returns {Promise} Promise for nothing.
+	 * Loads components inside the browser bundle.
+	 * @returns {Promise<Object>} The promise for loaded components.
 	 */
 	load() {
 		if (this._loadedComponents) {
@@ -82,9 +82,9 @@ class ComponentLoader extends LoaderBase {
 	}
 
 	/**
-	 * Processes component and apply required operations.
-	 * @param {Object} componentDetails Loaded component details.
-	 * @returns {Object} Component object.
+	 * Processes a component and applies required operations.
+	 * @param {Object} componentDetails The loaded component details.
+	 * @returns {Promise<Object>} The promise for the component object.
 	 * @private
 	 */
 	_processComponent(componentDetails) {
@@ -116,8 +116,8 @@ class ComponentLoader extends LoaderBase {
 	}
 
 	/**
-	 * Gets map of components by names.
-	 * @returns {Object} Map of components by names.
+	 * Gets a map of components by their names.
+	 * @returns {Object} The map of the components by their names.
 	 */
 	getComponentsByNames() {
 		return this._loadedComponents || Object.create(null);

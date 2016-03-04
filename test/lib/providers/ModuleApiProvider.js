@@ -127,7 +127,7 @@ describe('lib/providers/ModuleApiProvider', function() {
 		});
 	});
 
-	describe('#getInlineScript', function(done) {
+	describe('#getInlineScript', function() {
 		it('should return browser script for redirection', function(done) {
 			const expected = '<script>window.location.assign(\'http://some\');</script>';
 

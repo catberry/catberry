@@ -73,9 +73,7 @@ const testUtils = {
 		}
 
 		/* eslint no-sync: 0 */
-		const html = documentName ? fs.readFileSync(documentName).toString() : '';
-
-		HTMLCache[documentName] = html;
+		HTMLCache[documentName] = documentName ? fs.readFileSync(documentName).toString() : '';
 		return HTMLCache[documentName];
 	}
 };

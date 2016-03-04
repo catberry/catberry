@@ -5,8 +5,8 @@ const CookieWrapperBase = require('../lib/base/CookieWrapperBase');
 class CookieWrapper extends CookieWrapperBase {
 
 	/**
-	 * Creates new instance of the browser cookie wrapper.
-	 * @param {Window} $window Window object.
+	 * Creates a new instance of the browser cookie wrapper.
+	 * @param {ServiceLocator} locator The service locator for resolving dependencies.
 	 */
 	constructor(locator) {
 		super();

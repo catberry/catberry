@@ -14,7 +14,6 @@ const StoreDispatcher = require('../../lib/StoreDispatcher');
 const DocumentRenderer = require('../../lib/DocumentRenderer');
 
 const componentMocks = require('../mocks/components');
-const storeMocks = require('../mocks/stores');
 const testUtils = require('../utils');
 
 const testCases = require('../cases/lib/DocumentRenderer/test-cases.json');

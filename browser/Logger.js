@@ -13,7 +13,7 @@ const LEVELS = {
 class Logger {
 
 	/**
-	 * Creates browser logger.
+	 * Creates a new instance of the browser logger.
 	 * @param {Object|string} levels Levels to log.
 	 */
 	constructor(levels) {
@@ -46,7 +46,7 @@ class Logger {
 	}
 
 	/**
-	 * Logs trace message.
+	 * Logs a trace message.
 	 * @param {string} message Trace message.
 	 */
 	trace(message) {
@@ -60,7 +60,7 @@ class Logger {
 	}
 
 	/**
-	 * Logs trace message.
+	 * Logs a trace message.
 	 * @param {string} message Trace message.
 	 */
 	debug(message) {
@@ -74,7 +74,7 @@ class Logger {
 	}
 
 	/**
-	 * Logs info message.
+	 * Logs a info message.
 	 * @param {string} message Information message.
 	 */
 	info(message) {
@@ -88,7 +88,7 @@ class Logger {
 	}
 
 	/**
-	 * Logs warn message.
+	 * Logs a warn message.
 	 * @param {string} message Warning message.
 	 */
 	warn(message) {
@@ -102,7 +102,7 @@ class Logger {
 	}
 
 	/**
-	 * Logs error message.
+	 * Logs an error message.
 	 * @param {string|Error} error Error object or message.
 	 */
 	error(error) {
@@ -114,7 +114,7 @@ class Logger {
 	}
 
 	/**
-	 * Logs error message.
+	 * Logs an error message.
 	 * @param {string|Error} error Error object or message.
 	 */
 	fatal(error) {
@@ -126,7 +126,7 @@ class Logger {
 }
 
 /**
- * Writes error to console.
+ * Writes an error to the console.
  * @param {Error|string} error Error to write.
  */
 function writeError(error) {
