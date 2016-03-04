@@ -64,7 +64,7 @@
 		"mkdirp": "~0.5.1",
 		"glob": "^7.0.0",
 		"chokidar": "^1.4.3",
-		"catberry-locator": "^2.0.0",
+		"catberry-locator": "^2.1.0",
 		"catberry-uri": "^2.1.6",
 		"entities": "^1.1.1",
 		"watchify": "^3.7.0",
