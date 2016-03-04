@@ -6,18 +6,25 @@ const ModuleApiProviderBase = require('../../lib/base/ModuleApiProviderBase');
 class ModuleApiProvider extends ModuleApiProviderBase {
 
 	/**
-	 * Creates new instance of the module API provider.
-	 * @param {ServiceLocator} $serviceLocator Service locator
-	 * to resolve dependencies.
+	 * Creates a new instance of the module API provider.
+	 * @param {ServiceLocator} locator The service locator for resolving dependencies.
 	 */
 	constructor(locator) {
 		super(locator);
 	}
 
+	/**
+	 * Returns true because works in a browser.
+	 * @returns {boolean}
+	 */
 	get isBrowser() {
 		return true;
 	}
 
+	/**
+	 * Returns false because works in a browser.
+	 * @returns {boolean}
+	 */
 	get isServer() {
 		return false;
 	}

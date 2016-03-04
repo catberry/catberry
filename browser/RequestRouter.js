@@ -11,9 +11,8 @@ const BODY_TAG_NAME = 'BODY';
 class RequestRouter {
 
 	/**
-	 * Creates new instance of the browser request router.
-	 * @param {ServiceLocator} locator Service locator to resolve services.
-	 * @constructor
+	 * Creates a new instance of the browser request router.
+	 * @param {ServiceLocator} locator The service locator for resolving dependencies.
 	 */
 	constructor(locator) {
 
@@ -93,7 +92,7 @@ class RequestRouter {
 	}
 
 	/**
-	 * Routes browser render request.
+	 * Routes a browser render request.
 	 * @param {URI} newLocation New location.
 	 * @returns {Promise} Promise for nothing.
 	 */
@@ -128,7 +127,7 @@ class RequestRouter {
 	}
 
 	/**
-	 * Sets application state to specified URI.
+	 * Sets an application state for the specified URI.
 	 * @param {string} locationString URI to go.
 	 * @returns {Promise} Promise for nothing.
 	 */
@@ -156,7 +155,7 @@ class RequestRouter {
 	}
 
 	/**
-	 * Changes current application state with new location.
+	 * Changes the current application state with the new location.
 	 * @param {Object} state New state.
 	 * @returns {Promise} Promise for nothing.
 	 * @private
@@ -189,7 +188,7 @@ class RequestRouter {
 	}
 
 	/**
-	 * Wraps document with required events to route requests.
+	 * Wraps the document with required events to route requests.
 	 * @private
 	 */
 	_wrapDocument() {
@@ -219,7 +218,7 @@ class RequestRouter {
 	}
 
 	/**
-	 * Handles link click on the page.
+	 * Handles a link click on the page.
 	 * @param {Event} event Event-related object.
 	 * @param {Element} element Link element.
 	 * @private

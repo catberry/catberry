@@ -599,7 +599,6 @@ describe('browser/DocumentRenderer', function() {
 				third: []
 			};
 
-			var counter = 0;
 			var shouldRender = true;
 
 			class Component1 {

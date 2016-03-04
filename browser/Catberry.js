@@ -6,8 +6,6 @@ class Catberry extends CatberryBase {
 
 	/**
 	 * Creates new instance of the browser version of Catberry.
-	 * @constructor
-	 * @extends CatberryBase
 	 */
 	constructor() {
 		super();
