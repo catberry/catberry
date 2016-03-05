@@ -56,12 +56,17 @@ class StoreLoader extends LoaderBase {
 			.then(stores => {
 				const storePromises = [];
 				// the list is a stack, we should reverse it
-				stores.forEach(store => storePromises.unshift(this._getStore(store)));
+				stores.forEach(store => {
+					if (!store || typeof (store) !== 'object') {
+						return;
+					}
+					storePromises.unshift(this._getStore(store));
+				});
 				return Promise.all(storePromises);
 			})
 			.then(stores => {
 				stores.forEach(store => {
-					if (!store || typeof (store) !== 'object') {
+					if (!store) {
 						return;
 					}
 					this._loadedStores[store.name] = store;
@@ -80,6 +85,9 @@ class StoreLoader extends LoaderBase {
 	_getStore(storeDetails) {
 		return this._applyTransforms(storeDetails)
 			.then(transformed => {
+				if (!transformed) {
+					throw new Error(`Transformation for the "${storeDetails.name}" store returned a bad result`);
+				}
 				this._eventBus.emit('storeLoaded', transformed);
 				return transformed;
 			})

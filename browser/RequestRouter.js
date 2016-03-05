@@ -62,16 +62,20 @@ class RequestRouter {
 		// add event handlers
 		this._wrapDocument();
 
-		// set initial state from current URI
-		const currentLocation = new URI(this._window.location.toString());
-		const state = this._stateProvider.getStateByUri(currentLocation);
-
 		/**
 		 * Current location.
 		 * @type {URI}
 		 * @private
 		 */
-		this._location = currentLocation;
+		this._location = new URI(this._window.location.toString());
+
+		// set initial state from current URI
+		/**
+		 * Current state.
+		 * @type {Object}
+		 * @private
+		 */
+		this._state = this._stateProvider.getStateByUri(this._location);
 
 		/**
 		 * Current initialization flag.
@@ -87,7 +91,7 @@ class RequestRouter {
 		 */
 		this._referrer = '';
 
-		this._changeState(state)
+		this._changeState(this._state)
 			.catch(reason => this._handleError(reason));
 	}
 
@@ -109,8 +113,6 @@ class RequestRouter {
 					this._window.location.assign(newLocationString);
 					return null;
 				}
-
-				this._window.history.pushState(state, '', newLocationString);
 
 				// if only URI fragment is changed
 				const newQuery = newLocation.query ?
@@ -150,7 +152,10 @@ class RequestRouter {
 					return null;
 				}
 
-				return this.route(newLocation);
+				return this.route(newLocation)
+					.then(() => this._window.history.pushState(
+						this._state, '', this._location.toString()
+					));
 			});
 	}
 
@@ -169,20 +174,21 @@ class RequestRouter {
 					userAgent: this._window.navigator.userAgent
 				});
 
+				// for "not found" state
+				if (state === null) {
+					this._window.location.reload();
+					return null;
+				}
+
 				if (!this._isStateInitialized) {
 					this._isStateInitialized = true;
 					return this._documentRenderer.initWithState(state, routingContext);
 				}
 
-				// for "not found" state
-				if (state === null) {
-					window.location.reload();
-					return null;
-				}
-
 				return this._documentRenderer.render(state, routingContext);
 			})
 			.then(() => {
+				this._state = state;
 				this._referrer = this._location;
 			});
 	}
