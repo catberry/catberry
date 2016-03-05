@@ -1,0 +1,133 @@
+{
+	"get": [
+		{
+			"name": "should return empty string if cookie string is null",
+			"cookieString": null,
+			"checkCookies": [
+				{"key": "some", "value": ""}
+			]
+		},
+		{
+			"name": "should return empty string if cookie key is not a string",
+			"cookieString": "some=value;",
+			"checkCookies": [
+				{"key": {}, "value": ""}
+			]
+		},
+		{
+			"name": "should return value if cookie string is right",
+			"cookieString": "some=value; some2=value2",
+			"checkCookies": [
+				{"key": "some", "value": "value"},
+				{"key": "some2", "value": "value2"}
+			]
+		},
+		{
+			"name": "should return empty string if cookie string is wrong",
+			"cookieString": "fasdfa/gafg-sgafga",
+			"checkCookies": [
+				{"key": "fasdfa/gafg-sgafga", "value": ""}
+			]
+		}
+	],
+	"set": [
+		{
+			"name": "should set cookie by specified parameters",
+			"expectedStrings": [
+				"some=value; Max-Age=100; Expires=Tue, 23 Feb 2016 19:57:16 GMT; Path=/some; Domain=.new.domain; Secure; HttpOnly"
+			],
+			"expectedDocumentString": "some=value",
+			"cookies": [
+				{
+					"key": "some",
+					"value": "value",
+					"maxAge": 100,
+					"expires": "Tue, 23 Feb 2016 19:57:16 GMT",
+					"domain": ".new.domain",
+					"path": "/some",
+					"secure": true,
+					"httpOnly": true
+				}
+			]
+		},
+		{
+			"name": "should set cookies by specified list of parameters",
+			"expectedStrings": [
+				"some1=value1; Max-Age=100; Expires=Tue, 23 Feb 2016 19:57:16 GMT; Path=/some1; Domain=.new.domain1; Secure; HttpOnly",
+				"some2=value2; Max-Age=200; Expires=Tue, 23 Feb 2016 20:57:16 GMT; Path=/some2; Domain=.new.domain2; Secure; HttpOnly"
+			],
+			"expectedDocumentString": "some1=value1; some2=value2",
+			"cookies": [
+				{
+					"key": "some1",
+					"value": "value1",
+					"maxAge": 100,
+					"expires": "Tue, 23 Feb 2016 19:57:16 GMT",
+					"domain": ".new.domain1",
+					"path": "/some1",
+					"secure": true,
+					"httpOnly": true
+				},
+				{
+					"key": "some2",
+					"value": "value2",
+					"maxAge": 200,
+					"expires": "Tue, 23 Feb 2016 20:57:16 GMT",
+					"domain": ".new.domain2",
+					"path": "/some2",
+					"secure": true,
+					"httpOnly": true
+				}
+			]
+		}
+	],
+	"getCookieString": [
+		{
+			"name": "should return right cookie string with init",
+			"initString": "some=value; some2=value2",
+			"cookies": [],
+			"expected": "some=value; some2=value2"
+		},
+		{
+			"name": "should return right cookie string without init but with set",
+			"initString": "",
+			"cookies": [
+				{
+					"key": "some3",
+					"value": "value3"
+				},
+				{
+					"key": "some4",
+					"value": "value4"
+				}
+			],
+			"expected": "some3=value3; some4=value4"
+		},
+		{
+			"name": "should return right cookie string after init and set",
+			"initString": "some=value; some2=value2",
+			"cookies": [
+				{
+					"key": "some3",
+					"value": "value3"
+				},
+				{
+					"key": "some4",
+					"value": "value4"
+				}
+			],
+			"expected": "some=value; some2=value2; some3=value3; some4=value4"
+		}
+	],
+	"getAll": [
+		{
+			"name": "should return right cookie string",
+			"initString": "some=value; some2=value2",
+			"cookies": [],
+			"expected": {
+				"some": "value",
+				"some2": "value2"
+			}
+		}
+	]
+}

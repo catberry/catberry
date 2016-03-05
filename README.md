@@ -1,7 +1,7 @@
 # Catberry
 
 [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry) [![codecov.io](http://codecov.io/github/catberry/catberry/coverage.svg?branch=master)](http://codecov.io/github/catberry/catberry?branch=master)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/catberry/catberry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/catberry/main?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
 
 [![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
 
@@ -17,7 +17,7 @@ This means you write the code only once, and deploy it the way you want.
 Catberry handles all the differences between these two environments.
 
 You will get
-[Single Page Application](http://en.wikipedia.org/wiki/Single-page_application) 
+[Single Page Application](http://en.wikipedia.org/wiki/Single-page_application)
 using browser's
 [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 And back-end that renders exactly the same page on the server.
@@ -53,10 +53,10 @@ and shared links
 (using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) and [npm](https://www.npmjs.org/)
 * Entire architecture of the framework is built using
 [Service Locator](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#service-locator)
-pattern and 
+pattern and
 [Dependency Injection](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#dependency-injection)
 * Framework itself is an
-[express](https://github.com/visionmedia/express)/[connect](https://github.com/senchalabs/connect) 
+[express](https://github.com/visionmedia/express)/[connect](https://github.com/senchalabs/connect)
 middleware, it means you can use it with any other middlewares
 
 For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md).
@@ -64,7 +64,7 @@ For more details please proceed to [Catberry Documentation](https://github.com/c
 Also, you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
 
 ## Browser Support
-Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/) 
+Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/)
 and some HTML5 features like [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history)
 therefore it does not support old browsers at all. Catberry can render pages
 for any browser at the server, but Catberry's browser script does not work
@@ -75,7 +75,7 @@ and provide user with the best experience.
 
 Actually a user gets HTML page from the server only once and all the rest of the time
 the whole page is rendered in a browser receiving only pure data from some
-API service(s). Thanks to Catberry's very fast page rendering engine, 
+API service(s). Thanks to Catberry's very fast page rendering engine,
 user receives refreshed page as fast as API server could provide data for it.
 
 All supported browsers are listed below:

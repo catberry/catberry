@@ -1,169 +1,113 @@
-/*
- * catberry
- *
- * Copyright (c) 2014 Denis Rechkunov and project contributors.
- *
- * catberry's license follows:
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * This license applies to all parts of catberry that are not externally
- * maintained libraries.
- */
-
 'use strict';
 
-var assert = require('assert'),
-	ServiceLocator = require('catberry-locator'),
-	CookieWrapper = require('../../browser/CookieWrapper');
+const assert = require('assert');
+const ServiceLocator = require('catberry-locator');
+const CookieWrapper = require('../../browser/CookieWrapper');
+const testCases = require('../cases/lib/CookieWrapper.json');
 
-describe('browser/CookieWrapper', function () {
-	describe('#get', function () {
-		it('should return empty string if cookie string is null', function () {
-			var locator = createLocator(null),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
-
-			assert.strictEqual(cookieWrapper.get('some'), '');
-		});
-		it('should return empty string if cookie key is not a string',
-			function () {
-				var locator = createLocator('some=value;'),
-					cookieWrapper = locator.resolveInstance(CookieWrapper);
-				assert.strictEqual(cookieWrapper.get({}), '');
-			});
-		it('should return value if cookie string is right', function () {
-			var locator = createLocator('some=value; some2=value2'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
-
-			assert.strictEqual(cookieWrapper.get('some'), 'value');
-			assert.strictEqual(cookieWrapper.get('some2'), 'value2');
-		});
-		it('should return empty string if cookie string is wrong', function () {
-			var locator = createLocator('fasdfa/gafg-sgafga'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
-
-			assert.strictEqual(cookieWrapper.get('fasdfa/gafg-sgafga'), '');
-		});
-	});
-	describe('#set', function () {
-		it('should set cookie by specified parameters',
-			function () {
-				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper),
-					expiration = new Date(),
-					window = locator.resolve('window'),
-					expected = 'some=value' +
-						'; Max-Age=100' +
-						'; Expires=' +
-						expiration.toUTCString() +
-						'; Path=/some' +
-						'; Domain=.new.domain' +
-						'; Secure; HttpOnly';
-
-				cookieWrapper.set({
-					key: 'some',
-					value: 'value',
-					maxAge: 100,
-					expires: expiration,
-					domain: '.new.domain',
-					path: '/some',
-					secure: true,
-					httpOnly: true
+/* eslint prefer-arrow-callback:0 */
+/* eslint max-nested-callbacks:0 */
+/* eslint require-jsdoc:0 */
+describe('browser/CookieWrapper', function() {
+	describe('#get', function() {
+		testCases.get.forEach(testCase => {
+			it(testCase.name, function() {
+				const locator = createLocator(testCase.cookieString);
+				const cookieWrapper = new CookieWrapper(locator);
+				testCase.checkCookies.forEach(check => {
+					assert.strictEqual(cookieWrapper.get(check.key), check.value);
 				});
-
-				assert.strictEqual(window.document.cookie, expected);
 			});
-		it('should set default expire date by max age',
-			function () {
-				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper),
-					expiration = new Date(Date.now() + 3600000),
-					window = locator.resolve('window'),
-					expected = 'some=value' +
-						'; Max-Age=3600' +
-						'; Expires=' +
-						expiration.toUTCString();
-
-				cookieWrapper.set({
-					key: 'some',
-					value: 'value',
-					maxAge: 3600
-				});
-
-				assert.strictEqual(window.document.cookie, expected);
-			});
-		it('should throw error if wrong key',
-			function () {
-				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper);
-
-				assert.throws(function () {
-					cookieWrapper.set({
-						key: {}
-					});
-				}, Error);
-			});
-		it('should throw error if wrong value',
-			function () {
-				var locator = createLocator(null),
-					cookieWrapper = locator.resolveInstance(CookieWrapper);
-
-				assert.throws(function () {
-					cookieWrapper.set({
-						key: 'some',
-						value: {}
-					});
-				}, Error);
-			});
-	});
-	describe('#getCookieString', function () {
-		it('should return right cookie string', function () {
-			var locator = createLocator('some=value; some2=value2'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
-
-			assert.strictEqual(
-				cookieWrapper.getCookieString(),
-				'some=value; some2=value2'
-			);
 		});
 	});
-	describe('#getAll', function () {
-		it('should return right cookie string', function () {
-			var locator = createLocator('some=value; some2=value2'),
-				cookieWrapper = locator.resolveInstance(CookieWrapper);
+	describe('#set', function() {
+		testCases.set.forEach(testCase => {
+			it(testCase.name, function() {
+				const locator = createLocator(null);
+				const cookieWrapper = new CookieWrapper(locator);
+				const window = locator.resolve('window');
+				testCase.cookies.forEach(cookie => {
+					if (cookie.expires) {
+						cookie.expires = new Date(cookie.expires);
+					}
+					cookieWrapper.set(cookie);
+				});
+				assert.deepEqual(window.document.cookieSetups, testCase.expectedStrings);
+				assert.deepEqual(window.document.cookie, testCase.expectedDocumentString);
+			});
+		});
 
-			assert.deepEqual(
-				cookieWrapper.getAll(), {
-					some: 'value',
-					some2: 'value2'
-				}
-			);
+		it('should set default expire date by max age', function() {
+			const locator = createLocator(null);
+			const cookieWrapper = new CookieWrapper(locator);
+			const expiration = new Date(Date.now() + 3600000);
+			const window = locator.resolve('window');
+			const expected = `some=value; Max-Age=3600; Expires=${expiration.toUTCString()}`;
+
+			cookieWrapper.set({
+				key: 'some',
+				value: 'value',
+				maxAge: 3600
+			});
+
+			assert.strictEqual(window.document.cookieSetups.length, 1);
+			assert.strictEqual(window.document.cookieSetups[0], expected);
+		});
+
+		it('should throw error if wrong key', function() {
+			assert.throws(() => cookieWrapper.set({
+				key: {}
+			}));
+		});
+
+		it('should throw error if wrong value', function() {
+			assert.throws(() => cookieWrapper.set({
+				key: 'some',
+				value: {}
+			}));
+		});
+	});
+
+	describe('#getCookieString', function() {
+		testCases.getCookieString.forEach(testCase => {
+			it(testCase.name, function() {
+				const locator = createLocator(testCase.initString);
+				const cookieWrapper = new CookieWrapper(locator);
+				testCase.cookies.forEach(cookie => cookieWrapper.set(cookie));
+				assert.strictEqual(cookieWrapper.getCookieString(), testCase.expected);
+			});
+		});
+	});
+
+	describe('#getAll', function() {
+		testCases.getAll.forEach(testCase => {
+			it(testCase.name, function() {
+				const locator = createLocator(testCase.initString);
+				const cookieWrapper = new CookieWrapper(locator);
+				testCase.cookies.forEach(cookie => cookieWrapper.set(cookie));
+				assert.deepEqual(cookieWrapper.getAll(), testCase.expected);
+			});
 		});
 	});
 });
 
 function createLocator(cookieString) {
-	var locator = new ServiceLocator();
+	const locator = new ServiceLocator();
+	const documentCookie = cookieString ? cookieString.split(/ |;/g) : [];
 	locator.registerInstance('window', {
 		document: {
-			cookie: cookieString
+			get cookieSetups() {
+				return documentCookie;
+			},
+			get cookie() {
+				return documentCookie
+					.map(str => str.match(/^([^; ]+)/gi))
+					.filter(str => str)
+					.join('; ');
+			},
+			set cookie(str) {
+				documentCookie.push(str);
+			}
 		}
 	});
 	return locator;
