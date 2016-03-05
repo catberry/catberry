@@ -101,6 +101,34 @@ describe('lib/loaders/ComponentLoader', function() {
 				.catch(done);
 		});
 	});
+
+	it('should throw error if transform returns a bad result', function(done) {
+		const components = {
+			'first-cool': {
+				name: 'first-cool',
+				path: 'test/cases/lib/loaders/ComponentLoader/first/first.json',
+				properties: {
+					logic: './logic.js',
+					template: './templates/template.html'
+				}
+			}
+		};
+
+		const locator = createLocator(components);
+
+		locator.registerInstance('componentTransform', {
+			transform: component => null
+		});
+
+		const eventBus = locator.resolve('eventBus');
+		const loader = locator.resolve('componentLoader');
+
+		eventBus.once('error', () => done());
+
+		loader
+			.load()
+			.catch(done);
+	});
 });
 
 function createLocator(components) {

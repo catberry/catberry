@@ -18,6 +18,18 @@ describe('browser/providers/ModuleApiProvider', function() {
 		requestRouter = locator.resolve('requestRouter');
 	});
 
+	describe('isBrowser', function() {
+		it('should be true', function() {
+			assert.strictEqual(api.isBrowser, true);
+		});
+	});
+
+	describe('isServer', function() {
+		it('should be false', function() {
+			assert.strictEqual(api.isServer, false);
+		});
+	});
+
 	describe('#redirect', function() {
 		it('should redirect to URI', function(done) {
 			requestRouter.on('go', function(args) {
@@ -43,6 +55,22 @@ describe('browser/providers/ModuleApiProvider', function() {
 					api.clearFragment()
 						.then(() => assert.strictEqual(window.location.toString(), 'http://local/'))
 						.then(done)
+						.catch(done);
+				}
+			});
+		});
+	});
+
+	describe('#notFound', function() {
+		it('should reload the page', function(done) {
+			jsdom.env({
+				url: 'http://local',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+
+					window.location.reload = () => done();
+					api.notFound()
 						.catch(done);
 				}
 			});

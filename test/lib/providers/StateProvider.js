@@ -21,7 +21,25 @@ describe('lib/providers/StateProvider', function() {
 				const state = provider.getStateByUri(uri);
 				assert.deepEqual(state, testCase.expectedState);
 			});
+		});
 
+		it('should get the state using regular expression', function() {
+			const locator = createLocator([
+				{
+					expression: /^\/some\/(.+)$/i,
+					map: uri => {
+						return {
+							param: uri.path
+						};
+					}
+				}
+			]);
+			const provider = new StateProvider(locator);
+			const uri = new URI('/some/value');
+			const state = provider.getStateByUri(uri);
+			assert.deepEqual(state, {
+				param: '/some/value'
+			});
 		});
 	});
 });

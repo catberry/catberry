@@ -78,6 +78,58 @@ describe('browser/loaders/ComponentLoader', function() {
 			.catch(done);
 	});
 
+	it('should not load component if an error occurs', function(done) {
+		const components = {
+			'first-cool': {
+				constructor: componentMocks.SyncComponent,
+				name: 'first-cool',
+				properties: {},
+				templateSource: 'Hello, world!',
+				errorTemplateSource: 'Error occurs :('
+			}
+		};
+
+		registerComponents(components);
+		locator.unregister('remplateProvider');
+		locator.registerInstance('templateProvider', {
+			register: () => Promise.reject(new Error('TestError'))
+		});
+		const loader = locator.resolve('componentLoader');
+
+		loader
+			.load()
+			.then(loadedComponents => assert.deepEqual(loadedComponents, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should load nothing if no components are registered', function(done) {
+		registerComponents({});
+		const loader = locator.resolve('componentLoader');
+
+		loader
+			.load()
+			.then(loadedComponents => assert.deepEqual(loadedComponents, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should load nothing if no component objects are registered', function(done) {
+		registerComponents({some: 'wrong'});
+		const loader = locator.resolve('componentLoader');
+
+		loader
+			.load()
+			.then(loadedComponents => assert.deepEqual(loadedComponents, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should return an empty object if the load method has not been called yet', function() {
+		const loader = locator.resolve('componentLoader');
+		assert.deepEqual(loader.getComponentsByNames(), {});
+	});
+
 	it('should not load components twice', function(done) {
 		const components = {
 			'first-cool': {
@@ -164,6 +216,33 @@ describe('browser/loaders/ComponentLoader', function() {
 				assert.strictEqual(loadedComponents['second!?'].name, 'second!?');
 			})
 			.then(done)
+			.catch(done);
+	});
+
+	it('should throw error if transform returns a bad result', function(done) {
+		const components = {
+			'first-cool': {
+				constructor: componentMocks.SyncComponent,
+				name: 'first-cool',
+				properties: {},
+				templateSource: 'Hello, world!',
+				errorTemplateSource: null
+			}
+		};
+
+		registerComponents(components);
+
+		locator.registerInstance('componentTransform', {
+			transform: component => null
+		});
+
+		const eventBus = locator.resolve('eventBus');
+		const loader = locator.resolve('componentLoader');
+
+		eventBus.once('error', () => done());
+
+		loader
+			.load()
 			.catch(done);
 	});
 

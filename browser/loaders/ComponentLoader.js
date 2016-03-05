@@ -64,14 +64,17 @@ class ComponentLoader extends LoaderBase {
 			.then(components => {
 				const componentPromises = [];
 				// the list is a stack, we should reverse it
-				components.forEach(component => componentPromises.unshift(
-					this._processComponent(component)
-				));
+				components.forEach(component => {
+					if (!component || typeof (component) !== 'object') {
+						return;
+					}
+					componentPromises.unshift(this._processComponent(component));
+				});
 				return Promise.all(componentPromises);
 			})
 			.then(components => {
 				components.forEach(component => {
-					if (!component || typeof (component) !== 'object') {
+					if (!component) {
 						return;
 					}
 					this._loadedComponents[component.name] = component;
@@ -92,6 +95,9 @@ class ComponentLoader extends LoaderBase {
 
 		return this._applyTransforms(component)
 			.then(transformed => {
+				if (!transformed) {
+					throw new Error(`Transformation for the "${componentDetails.name}" component returned a bad result`);
+				}
 				component = transformed;
 				this._templateProvider.registerCompiled(
 					component.name, component.templateSource

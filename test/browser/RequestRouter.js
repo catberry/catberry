@@ -59,6 +59,9 @@ describe('browser/RequestRouter', function() {
 				}
 			});
 
+			locator.registerInstance('routeDefinition', '/some/');
+			locator.registerInstance('routeDefinition', '/some/test1/test2');
+
 			const expectedLocation = 'http://local/some/global1Value?global2=global2Value&first=firstValue&second=secondValue';
 			const expectedState = {
 				first: {
@@ -122,5 +125,349 @@ describe('browser/RequestRouter', function() {
 
 	describe('#route', function() {
 		testCases.route.forEach(testCase => clickTest(testCase));
+	});
+
+	describe('#go', function() {
+		it('should properly handle an error while clicking a link', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => Promise.reject(new Error('TestError')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', error => {
+				assert.strictEqual(error.message, 'TestError');
+				done();
+			});
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="http://local/some?first=x"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					testUtils.click(window.document.querySelector('a'), clickOptions);
+				}
+			});
+		});
+
+		it('should properly handle an error while going back in the history', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => Promise.reject(new Error('TestError')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', error => {
+				assert.strictEqual(error.message, 'TestError');
+				done();
+			});
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.history.pushState({}, '', 'http://local/some?first=x');
+					const router = new RequestRouter(locator);
+					window.history.back();
+				}
+			});
+		});
+
+		it('should properly handle an error while wrapping the document', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => Promise.resolve(),
+				initWithState: () => Promise.reject(new Error('TestError'))
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', error => {
+				assert.strictEqual(error.message, 'TestError');
+				done();
+			});
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.history.pushState({}, '', 'http://local/some?first=x');
+					const router = new RequestRouter(locator);
+				}
+			});
+		});
+
+		it('should do nothing if only URI fragment is changing while clicking', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="#fragment"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					testUtils.click(window.document.querySelector('a'), clickOptions);
+					testUtils.wait(10).then(done);
+				}
+			});
+		});
+
+		it('should do nothing if only URI fragment is changing', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					router.go('http://local/some?first=z#fragment')
+						.then(done)
+						.catch(done);
+				}
+			});
+		});
+
+		it('should do nothing if history is not supported while clicking', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="http://local/some?first=x"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+
+					window.history.pushState = undefined;
+
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					testUtils.click(window.document.querySelector('a'), clickOptions);
+					testUtils.wait(10).then(done);
+				}
+			});
+		});
+
+		it('should do nothing if defaultPrevented while clicking', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="http://local/some?first=x"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					const element = window.document.querySelector('a');
+					element.addEventListener('click', event => event.preventDefault());
+					testUtils.click(element, clickOptions);
+					testUtils.wait(10).then(done);
+				}
+			});
+		});
+
+		it('should assign a new location if the state is null', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.location.assign = location => {
+						try {
+							assert.strictEqual(location, 'http://local');
+							done();
+						} catch (e) {
+							done(e);
+						}
+					};
+
+					const router = new RequestRouter(locator);
+					router.go('http://local')
+						.catch(done);
+				}
+			});
+		});
+
+		it('should reload page if the state is null', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/wrong',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.location.reload = () => done();
+
+					const router = new RequestRouter(locator);
+				}
+			});
+		});
+
+		it('should set previous state if "back" is called', function(done) {
+			locator.registerInstance('routeDefinition',
+				'/some?global=:global[first, second]&first=:first[first]&second=:second[second]'
+			);
+
+			const expectedState = [
+				{
+					first: {
+						first: '0',
+						global: '0'
+					},
+					second: {
+						second: '0',
+						global: '0'
+					}
+				},
+				{
+					first: {
+						first: '1',
+						global: '1'
+					},
+					second: {
+						second: '1',
+						global: '1'
+					}
+				},
+				{
+					first: {
+						first: '2',
+						global: '2'
+					},
+					second: {
+						second: '2',
+						global: '2'
+					}
+				}
+			];
+
+			const locations = [
+				'http://local/some?global=0&first=0&second=0',
+				'http://local/some?global=1&first=1&second=1',
+				'http://local/some?global=2&first=2&second=2'
+			];
+
+			eventBus.on('error', done);
+
+			const initialLocation = 'http://local/some?global=x&first=x&second=x';
+			const initialState = {
+				first: {
+					first: 'x',
+					global: 'x'
+				},
+				second: {
+					second: 'x',
+					global: 'x'
+				}
+			};
+			jsdom.env({
+				url: initialLocation,
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+
+					router.go(locations[0])
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[0]);
+							assert.strictEqual(window.history.length, 2);
+							assert.deepEqual(documentRenderer.state, expectedState[0]);
+							return router.go(locations[1]);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[1]);
+							assert.strictEqual(window.history.length, 3);
+							assert.deepEqual(documentRenderer.state, expectedState[1]);
+							return router.go(locations[2]);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[2]);
+							assert.strictEqual(window.history.length, 4);
+							assert.deepEqual(documentRenderer.state, expectedState[2]);
+							window.history.back();
+							return testUtils.wait(10);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[1]);
+							assert.deepEqual(documentRenderer.state, expectedState[1]);
+							window.history.back();
+							return testUtils.wait(10);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[0]);
+							assert.deepEqual(documentRenderer.state, expectedState[0]);
+							window.history.back();
+							return testUtils.wait(10);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), initialLocation);
+							assert.deepEqual(documentRenderer.state, initialState);
+						})
+						.then(done)
+						.catch(done);
+				}
+			});
+		});
 	});
 });

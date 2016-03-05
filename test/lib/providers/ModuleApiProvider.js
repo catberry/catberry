@@ -27,6 +27,18 @@ describe('lib/providers/ModuleApiProvider', function() {
 		api = new ModuleApiProvider(locator);
 	});
 
+	describe('isBrowser', function() {
+		it('should be false', function() {
+			assert.strictEqual(api.isBrowser, false);
+		});
+	});
+
+	describe('isServer', function() {
+		it('should be true', function() {
+			assert.strictEqual(api.isServer, true);
+		});
+	});
+
 	describe('Proper type checks and exceptions', function() {
 		TYPE_CHECK_METHOD_NAMES.forEach(methodName => {
 			describe(`#${methodName}`, function() {

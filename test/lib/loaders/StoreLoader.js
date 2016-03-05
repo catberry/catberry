@@ -39,6 +39,28 @@ describe('lib/loaders/StoreLoader', function() {
 			.catch(done);
 	});
 
+	it('should load nothing if an error occurs', function(done) {
+		const stores = {
+			Test1: {
+				name: 'Test1',
+				path: 'test/cases/lib/loaders/StoreLoader/Test1.js'
+			}
+		};
+
+		const locator = createLocator(stores, () => done());
+		const eventBus = locator.resolve('eventBus');
+		const loader = locator.resolve('storeLoader');
+
+		eventBus.on('storeLoaded', () => {
+			throw new Error('TestError');
+		});
+
+		loader
+			.load()
+			.then(loadedStores => assert.deepEqual(loadedStores, {}))
+			.catch(done);
+	});
+
 	it('should properly transform stores', function(done) {
 		const stores = {
 			Test1: {
@@ -109,6 +131,26 @@ describe('lib/loaders/StoreLoader', function() {
 			.load()
 			.then(loadedStores => assert.strictEqual(loadedStores['Test1!'].name, 'Test1!'))
 			.then(done)
+			.catch(done);
+	});
+
+	it('should throw error if transform returns a bad result', function(done) {
+		const stores = {
+			Test1: {
+				name: 'Test1',
+				path: 'test/cases/lib/loaders/StoreLoader/Test1.js'
+			}
+		};
+
+		const locator = createLocator(stores, () => done());
+		locator.registerInstance('storeTransform', {
+			transform: store => null
+		});
+
+		const loader = locator.resolve('storeLoader');
+
+		loader
+			.load()
 			.catch(done);
 	});
 

@@ -42,6 +42,55 @@ describe('browser/loaders/StoreLoader', function() {
 			.catch(done);
 	});
 
+	it('should load nothing if an error occurs', function(done) {
+		const stores = {
+			Test1: {
+				name: 'Test1',
+				constructor: storeMocks.SyncDataStore
+			}
+		};
+		registerStores(stores);
+
+		const eventBus = locator.resolve('eventBus');
+		eventBus.on('storeLoaded', () => {
+			throw new Error('TestError');
+		});
+		const loader = locator.resolve('storeLoader');
+
+		loader
+			.load()
+			.then(loadedStores => assert.deepEqual(loadedStores, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should load nothing if no stores are registered', function(done) {
+		registerStores({});
+		const loader = locator.resolve('storeLoader');
+
+		loader
+			.load()
+			.then(loadedStores => assert.deepEqual(loadedStores, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should load nothing if no store objects are registered', function(done) {
+		registerStores({some: 'wrong'});
+		const loader = locator.resolve('storeLoader');
+
+		loader
+			.load()
+			.then(loadedStores => assert.deepEqual(loadedStores, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should return an empty object if the load method has not been called yet', function() {
+		const loader = locator.resolve('storeLoader');
+		assert.deepEqual(loader.getStoresByNames(), {});
+	});
+
 	it('should not load stores twice', function(done) {
 		const stores = {
 			Test1: {
@@ -147,6 +196,28 @@ describe('browser/loaders/StoreLoader', function() {
 				assert.strictEqual(loadedStores['Test2!'].name, 'Test2!');
 			})
 			.then(done)
+			.catch(done);
+	});
+
+	it('should throw error if transform returns a bad result', function(done) {
+		const stores = {
+			Test1: {
+				name: 'Test1',
+				constructor: storeMocks.SyncDataStore
+			}
+		};
+		registerStores(stores);
+		locator.registerInstance('storeTransform', {
+			transform: store => null
+		});
+
+		const eventBus = locator.resolve('eventBus');
+		const loader = locator.resolve('storeLoader');
+
+		eventBus.once('error', () => done());
+
+		loader
+			.load()
 			.catch(done);
 	});
 
