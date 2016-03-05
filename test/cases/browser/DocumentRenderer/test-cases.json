@@ -1,0 +1,216 @@
+{
+	"renderComponent": [
+		{
+			"name": "should render component into HTML element",
+			"tagName": "cat-test",
+			"attributes": {
+				"id": "unique"
+			},
+			"components": {
+				"test": {
+					"name": "test",
+					"constructor": "SyncComponent",
+					"template": "simple-component.html"
+				}
+			},
+			"html": "stub.html",
+			"expectedHTML": "test-simple-component.html"
+		},
+		{
+			"name": "should render asynchronous component into HTML element",
+			"tagName": "cat-test",
+			"attributes": {
+				"id": "unique"
+			},
+			"components": {
+				"test": {
+					"name": "test",
+					"constructor": "AsyncComponent",
+					"template": "simple-component.html"
+				}
+			},
+			"html": "stub.html",
+			"expectedHTML": "test-simple-component.html"
+		},
+		{
+			"name": "should render nested components",
+			"tagName": "cat-test1",
+			"attributes": {
+				"id": "unique"
+			},
+			"components": {
+				"test1": {
+					"name": "test1",
+					"constructor": "AsyncComponent",
+					"template": "nested1.html"
+				},
+				"test2": {
+					"name": "test2",
+					"constructor": "SyncComponent",
+					"template": "nested2.html"
+				},
+				"test3": {
+					"name": "test3",
+					"constructor": "AsyncComponent",
+					"template": "simple-component.html"
+				}
+			},
+			"html": "stub.html",
+			"expectedHTML": "nested-components.html"
+		},
+		{
+			"name": "should render nested components with cycles",
+			"tagName": "cat-test1",
+			"attributes": {
+				"id": "unique"
+			},
+			"components": {
+				"test1": {
+					"name": "test1",
+					"constructor": "AsyncComponent",
+					"template": "nested1.html"
+				},
+				"test2": {
+					"name": "test2",
+					"constructor": "SyncComponent",
+					"template": "nested2.html"
+				},
+				"test3": {
+					"name": "test3",
+					"constructor": "AsyncComponent",
+					"template": "nested3-cycle.html"
+				}
+			},
+			"html": "stub.html",
+			"expectedHTML": "nested-components-with-cycles.html"
+		},
+		{
+			"name": "should merge HEAD component with new rendered HTML",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "head",
+			"components": {
+				"head": {
+					"name": "head",
+					"constructor": "AsyncComponent",
+					"template": "complex-head2.html"
+				}
+			},
+			"html": "stub.html",
+			"elementHTML": "complex-head.html",
+			"expectedHTML": "merged-head.html"
+		},
+
+
+		{
+			"name": "should render error template instead the content when error in release mode",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "cat-test",
+			"attributes": {
+				"id": "unique"
+			},
+			"components": {
+				"test": {
+					"name": "test",
+					"constructor": "SyncErrorComponent",
+					"template": "simple-component.html",
+					"errorTemplate": "error.html"
+				}
+			},
+			"errorMessage": "test",
+			"html": "stub.html",
+			"expectedHTML": "test-error-component.html"
+		},
+		{
+			"name": "should render nothing if an error while rendering an error template in release mode",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "cat-test",
+			"attributes": {
+				"id": "unique"
+			},
+			"components": {
+				"test": {
+					"name": "test",
+					"constructor": "AsyncErrorComponent",
+					"template": "simple-component.html",
+					"errorTemplate": "throw-error.html"
+				}
+			},
+			"errorMessage": "test",
+			"html": "stub.html",
+			"expectedHTML": ""
+		},
+		{
+			"name": "should render empty string instead the content when error in release mode",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "cat-test",
+			"attributes": {
+				"id": "unique"
+			},
+			"components": {
+				"test": {
+					"name": "test",
+					"constructor": "SyncErrorComponent",
+					"template": "simple-component.html"
+				}
+			},
+			"errorMessage": "test",
+			"html": "stub.html",
+			"expectedHTML": ""
+		},
+		{
+			"name": "should do nothing with HEAD when error",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "head",
+			"components": {
+				"head": {
+					"name": "head",
+					"constructor": "AsyncErrorComponent",
+					"template": "simple-component.html"
+				}
+			},
+			"errorMessage": "head",
+			"html": "stub.html",
+			"elementHTML": "complex-head.html",
+			"expectedHTML": "complex-head.html"
+		},
+		{
+			"name": "should do nothing if there is no such component",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "cat-test",
+			"attributes": {
+				"id": "unique"
+			},
+			"html": "stub.html",
+			"expectedHTML": ""
+		},
+		{
+			"name": "should do nothing if there is no Element's ID",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "cat-test",
+			"components": {
+				"test": {
+					"name": "test",
+					"constructor": "SyncComponent",
+					"template": "simple-component.html"
+				}
+			},
+			"errorMessage": "test",
+			"html": "stub.html",
+			"expectedHTML": ""
+		}
+	]
+}
