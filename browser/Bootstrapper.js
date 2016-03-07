@@ -19,7 +19,6 @@ const components = [
 
 const routeDefinitions = '__routeDefinitions' || [];
 const Catberry = require('./node_modules/catberry/browser/Catberry.js');
-const Logger = require('./node_modules/catberry/browser/Logger.js');
 const BootstrapperBase = require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 const StoreDispatcher = require('./node_modules/catberry/lib/StoreDispatcher');
 const ModuleApiProvider = require('./node_modules/catberry/browser/providers/ModuleApiProvider');
@@ -54,16 +53,13 @@ class Bootstrapper extends BootstrapperBase {
 
 		locator.registerInstance('window', window);
 
-		const loggerConfig = configObject.logger || {};
-		const logger = new Logger(loggerConfig.levels);
-		locator.registerInstance('logger', logger);
+		const logger = locator.resolve('logger');
+		const eventBus = locator.resolve('eventBus');
 
 		window.onerror = function errorHandler(msg, uri, line) {
 			logger.fatal(`${uri}:${line} ${msg}`);
 			return true;
 		};
-
-		const eventBus = locator.resolve('eventBus');
 		this.wrapEventsWithLogger(configObject, eventBus, logger);
 
 		routeDefinitions.forEach(routeDefinition =>
@@ -84,8 +80,7 @@ class Bootstrapper extends BootstrapperBase {
 	wrapEventsWithLogger(config, eventBus, logger) {
 		super.wrapEventsWithLogger(config, eventBus, logger);
 
-		const isRelease = Boolean(config.isRelease);
-		if (isRelease) {
+		if (logger.level() > 20) {
 			return;
 		}
 		eventBus
