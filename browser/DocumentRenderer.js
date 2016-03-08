@@ -78,14 +78,10 @@ class DocumentRenderer extends DocumentRendererBase {
 		 */
 		this._currentChangedStores = Object.create(null);
 
-		this._window = locator.resolve('window');
-
 		/**
-		 * Current logger.
-		 * @type {Logger}
-		 * @private
+		 * Current browser's window.
 		 */
-		this._logger = locator.resolve('logger');
+		this._window = locator.resolve('window');
 
 		/**
 		 * Current application config.
@@ -204,7 +200,7 @@ class DocumentRenderer extends DocumentRendererBase {
 				const componentName = moduleHelper.getOriginalComponentName(element.tagName);
 
 				if (!id) {
-					this._logger.warn(`Component "${componentName}" does not have an ID, skipping...`);
+					this._eventBus.emit('warn', `Component "${componentName}" does not have an ID, skipping...`);
 					return null;
 				}
 
@@ -220,7 +216,7 @@ class DocumentRenderer extends DocumentRendererBase {
 				}
 
 				if (id in renderingContext.renderedIds) {
-					this._logger.warn(
+					this._eventBus.emit('warn',
 						`The duplicated ID "${id}" has been found, skipping component "${componentName}"...`
 					);
 					return null;
