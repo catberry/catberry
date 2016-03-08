@@ -41,81 +41,68 @@
 	* [List of officially supported plugins](#list-of-officially-supported-plugins)
 
 # Get Started
-First of all you need to install the [CLI](https://github.com/catberry/catberry-cli):
+First, you need to install the [CLI](https://github.com/catberry/catberry-cli):
 
 ```bash
 npm install -g catberry-cli
 ```
-
-After that, you can create a project.
-So, create a directory for your new pretty awesone project and change to the new directory.
+Next, create a new directory.
 
 ```bash
 mkdir ~/new-project
 cd ~/new-project
 ```
 
-Now you can initialize one of the Catberry's project templates.
+Finally, initialize your new project with one of the following Catberry templates:
 
-Please choose one:
-
-* `example` - the project that works with GitHub API and demonstrates how to implement such kind of isomorphic/universal application using the Catberry Framework.
+* `example` - the project that works with the GitHub API and demonstrates how to implement such kind of isomorphic/universal application using the Catberry Framework.
 * `empty-handlebars` - the empty project using the [Handlebars](http://handlebarsjs.com/) template engine.
 * `empty-dust` - the empty project using the [Dust](https://github.com/catberry/catberry-dust) template engine.
 * `empty-jade` - the empty project using the [Jade](http://jade-lang.com/) template engine.
 
-After you have chosen a template, please do the following:
-
 ```bash
-catberry init <template>
+catberry init <template-name>
 ```
-Where `<template>` is a chosen name.
-
 For example,
 
 ```bash
 catberry init empty-handlebars
 ```
 
-Now you have created the project structure.
-Also, you can see some instructions on the console that say how to install and start
-the application.
-
-You need to install the dependencies:
+Though you've created the project structure, you still need to install the dependencies:
 
 ```bash
 npm install --production
 ```
 
-Then you can start your application, but you must choose the mode:
+Now you may start your application, choosing from between:
 
- * Debug mode – no code minification, watching files for changes and rebuilding/re-initializing
- * Release mode – code is minified, no watching for changes, production-ready
+ * `debug` mode – no code minification, watching files for changes and rebuilding/re-initializing
+ * `release` mode – code is minified, no watching for changes, production-ready
 
-To start in the release mode:
+To start in the `release` mode:
 
 ```bash
 npm start
 ```
 
-To start in the debug mode:
+To start in the `debug` mode:
 
 ```bash
 npm run debug
 ```
 
-Or
+or
 
 ```bash
 npm run debug-win
 ```
 
-in case you're using Windows.
+if you're using Windows.
 
-The application will output on the console which port it's listening to.
-The address would be [http://localhost:3000](http://localhost:3000) by default.
+The application will output on the console which port it's listening to -- [http://localhost:3000](http://localhost:3000) by default.
 
-Now you have your very first Catberry application, create your own [Stores](#stores) and
+Now that you have your very first Catberry application, go ahead and create your own [Stores](#stores) and
 [Cat-components](#cat-components).
 
 The CLI can help you with that as well.
@@ -136,7 +123,7 @@ catberry addcomp <component-name>
 
 where `<component-name>` is a component's name like `hello-world`.
 
-Hope now you are an expert in the Catberry Framework. Enjoy it!
+By now you should be an expert in setting up the Catberry Framework, go ahead and give it a spin!
 
 **[↑ back to top](#table-of-contents)**
 
