@@ -4,7 +4,6 @@ const assert = require('assert');
 const events = require('events');
 
 const URI = require('catberry-uri').URI;
-const Logger = require('../mocks/Logger');
 const ServerResponse = require('../mocks/ServerResponse');
 const ModuleApiProvider = require('../../lib/providers/ModuleApiProvider');
 const CookieWrapper = require('../../lib/CookieWrapper');
@@ -411,7 +410,6 @@ describe('lib/DocumentRenderer', function() {
 function createRoutingContext(config, stores, components) {
 	const locator = new ServiceLocator();
 	locator.register('cookieWrapper', CookieWrapper, config);
-	locator.register('logger', Logger, config);
 	locator.register('contextFactory', ContextFactory, config, true);
 	locator.register('documentRenderer', DocumentRenderer, config, true);
 	locator.register('moduleApiProvider', ModuleApiProvider, config, true);
