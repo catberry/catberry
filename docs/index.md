@@ -159,18 +159,15 @@ Catberry is an isomorphic framework for building front-end apps using universal 
 **[↑ back to top](#table-of-contents)**
 
 # Flux
-Catberry uses [Flux](https://facebook.github.io/flux/docs/overview.html)-like architecture. It defines that you should use [store](#stores) as a data source and some kind of view/component that gets and renders data from the store. So, Catberry uses [cat-components](#cat-components) as those views.
+Catberry uses a [Flux](https://facebook.github.io/flux/docs/overview.html)-like architecture, which defines the use of [stores](#stores)--data sources--and views/components that get & render data from stores. Catberry uses [cat-components](#cat-components) for these views. This is a robust and high-performance architecture that allows you to create large, as well as complex applications with many data dependencies.
 
-Everything you need to know that there are [stores](#stores), [cat-components](#cat-components) and the store dispatcher that controls the whole communication among them. But everything happens inside the framework you shouldn't care about it.
+Asynchronous workflow is controlled by using [Promises](https://www.promisejs.org/). Catberry uses the native `Promise` in the browser or in Node.js (V8). If global type `Promise` is not found, the framework will define it for you using the ["Bare bones Promises/A+ implementation"](https://www.npmjs.org/package/promise).
 
-[Store](#stores) – can handle some action messages from [cat-components](#cat-components) and all stores can trigger the `changed` event.
-The `changed` event means that Catberry should re-render every component in the browser that depends on the changed store.
+From a high-level, all you really need to know is that there are [stores](#stores), [cat-components](#cat-components), and a store dispatcher that controls communication between them.
 
-Store dispatcher works in such way that does not allow to call store data loading while previous loading is not finished, also it helps to avoid some crazy cases when all your [stores](#stores) trigger `changed` event at
-the same time and the re-rendering process breaks the page.
-This is a robust and high-performance architecture that allows to create huge and complex applications with many data dependencies.
+[Stores](#stores) handle action messages from [cat-components](#cat-components), which trigger a `changed` event, that then cause Catberry to re-render every component that depends on the changed store.
 
-One more thing about Catberry's architecture: the main approach for controlling asynchronous workflow is [Promise](https://www.promisejs.org/). Catberry uses the native `Promise` in a browser or in Node.js (V8). If global type `Promise` is not found in a browser the framework defines it using ["Bare bones Promises/A+ implementation"](https://www.npmjs.org/package/promise). It means you can use the `Promise` type wherever you want without any doubt.
+The store dispatcher works in such way that once a store has been called to load data, it will not respect successive loading calls until the first has resolved.
 
 **[↑ back to top](#table-of-contents)**
 
