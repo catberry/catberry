@@ -3,7 +3,6 @@
 const assert = require('assert');
 const events = require('events');
 const jsdom = require('jsdom');
-const Logger = require('../mocks/Logger');
 const UniversalMock = require('../mocks/UniversalMock');
 const ServiceLocator = require('catberry-locator');
 const StateProvider = require('../../lib/providers/StateProvider');
@@ -25,7 +24,6 @@ describe('browser/RequestRouter', function() {
 		eventBus = new events.EventEmitter();
 		locator.registerInstance('eventBus', eventBus);
 		locator.registerInstance('serviceLocator', locator);
-		locator.register('logger', Logger);
 		locator.register('cookieWrapper', CookieWrapper);
 		documentRenderer = {
 			initWithState: (state, context) => documentRenderer.render(state, context),

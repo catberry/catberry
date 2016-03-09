@@ -8,7 +8,6 @@ const ContextFactory = require('../../../lib/ContextFactory');
 const ModuleApiProvider = require('../../../lib/providers/ModuleApiProvider');
 const CookieWrapper = require('../../../lib/CookieWrapper');
 const StoreFinder = require('../../mocks/finders/StoreFinder');
-const Logger = require('../../mocks/Logger');
 
 /* eslint prefer-arrow-callback:0 */
 /* eslint max-nested-callbacks:0 */
@@ -219,6 +218,5 @@ function createLocator(stores, errorHandler) {
 	locator.register('moduleApiProvider', ModuleApiProvider);
 	locator.register('cookieWrapper', CookieWrapper);
 	locator.register('storeLoader', StoreLoader);
-	locator.register('logger', Logger);
 	return locator;
 }
