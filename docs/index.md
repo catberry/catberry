@@ -141,27 +141,20 @@ Hope now you are an expert in the Catberry Framework. Enjoy it!
 **[↑ back to top](#table-of-contents)**
 
 # Isomorphic/Universal applications
-Make a long story short, isomorphic/universal applications are built to make it possible to write a module once and use it for pages rendering both on the server (for SEO, shared links, fast initialization etc) and in a browser (as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)) with not having the server-side part at all.
+TL,DR; of some of the immediate benefits solved by isomorphic/universal applications:
 
-It means that in both environments your modules are executing the same source code. It makes your modules "universal" and the framework that has its different implementations for the server and browser environments but the same API is called "isomorphic". Using an isomorphic framework you're getting a front-end application that works as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application) in a browser and has its efficient back-end version that works as a server-side copy of the application using mostly the same source code and data.
+* _Search-engine crawlable single page application_ -- the same page can be rendered as easily on the server as in the browser.
+* _*D.R.Y* templating & logic_ -- since universal modules are written only once and in JavaScript, you never have to repeat yourself or maintain the same logic in two separate code-bases.
 
-There is an awesome [blog post in Airbnb technical blog](http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) that explains the idea of isomorphic JavaScript applications and what exactly it is.
-Also, you can find a video [Spike Brehm: Building Isomorphic Apps](http://www.youtube.com/watch?v=CH6icJbLhlI)
-from the JSConf 2014 talks.
+_Isomorphic/universal applications_ are built such that given modules can be used identically on the server and/or client.
 
-There is a list of problems which are solved by isomorphic/universal applications:
+Take, for example, code used for rendering pages. It could be used first on the server--for SEO, shared links, fast initialization, etc.--and then in the browser, or entirely in the browser, as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application), no server rendering required.
 
-* *Using Single Page Applications causes SEO problems*. Your universal modules would render exactly the same page on the server as it is in a browser
-* *Code duplication for rendering parts of the page at the server and in the browser, sometimes it is even written in different programming languages*. Since universal modules are written only once and in JavaScript
-you do not have this problem.
-* *Maintenance is complicated because you need to synchronize changes in server-side and browser modules*. Obviously, you do not have to do that using universal modules. It is always one module to change.
-* *Overhead related to rendering all pages on the server in traditional web-applications*. Since browser
-receives a page from the server only once and then renders all other pages using client-side JavaScript,
-your server's CPU load number would be reduced dramatically.
+There is an awesome [Airbnb blog post](http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) that explains the idea behind isomorphic JavaScript applications and what they constitute.
 
-And maybe a lot of other problems... who knows?
+Also, you can checkout the the JSConf 2014 talk by Spike Brehm: [Building Isomorphic Apps](http://www.youtube.com/watch?v=CH6icJbLhlI).
 
-Catberry is an isomorphic framework for building front-end apps using universal components. The idea behind the framework is to build a front-end only application that communicates with a set of RESTful API servers and renders pages using data from it. That approach is a perfect fit for back-ends built using [microservices](https://en.wikipedia.org/wiki/Microservices). You can have several back-end services built in different platforms by several teams using different programming languages. This workflow is perfect for a scalable approach building a complex web-application.
+Catberry is an isomorphic framework for building front-end apps using universal components. The idea behind Catberry is to build a front-end only application that can get its data through a set of RESTful APIs, and quickly render the resulting pages.
 
 **[↑ back to top](#table-of-contents)**
 
