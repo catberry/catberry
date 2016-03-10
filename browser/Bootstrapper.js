@@ -18,12 +18,12 @@ const components = [
 ];
 
 const routeDefinitions = '__routeDefinitions' || [];
+
 const Catberry = require('./node_modules/catberry/browser/Catberry.js');
 const BootstrapperBase = require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 const StoreDispatcher = require('./node_modules/catberry/lib/StoreDispatcher');
 const ModuleApiProvider = require('./node_modules/catberry/browser/providers/ModuleApiProvider');
 const CookieWrapper = require('./node_modules/catberry/browser/CookieWrapper');
-const Promise = require('promise');
 
 class Bootstrapper extends BootstrapperBase {
 
