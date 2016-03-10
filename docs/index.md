@@ -294,23 +294,23 @@ module.exports = Some;
 **[↑ back to top](#table-of-contents)**
 
 # Cat-components
-You might think that cat-components are mustaches, paws or a tail but that's not actually always so.
+You might think that cat-components are whiskers, paws, or even tails, but that's not always so.
 
-The "Cat-component" is an universal implementation of the [Web-Component](http://webcomponents.org/)-like view. If dig deeper it is a subset of features that web-components specification declares and a couple of additional features specific for the framework.
+A `cat-component` is an universal implementation of [Web-Component](http://webcomponents.org/)--a mix of features declared in the web-components specification and features specific to the Catberry framework--designed to work on both server and client, and publishable as a [NPM dependency](https://docs.npmjs.com/files/package.json#dependencies).
 
-The main point of the "Cat-component" is the declaration of a custom tag that has its own template (any template engine), its own logic written in JavaScript, can be rendered at the server and is organized as a directory that you can publish/install as a [NPM dependency](https://docs.npmjs.com/files/package.json#dependencies) (a public package or a private repo).
-
-The "Cat-component" is declared as a directory with the `cat-component.json` file by default. But you can change it in the [config](#config). When Catberry initializes the application it does recursive search for such directories starting with your project root including first-level dependencies in `node_modules` directory. It means that you can publish and use Cat-components from [NPM](https://docs.npmjs.com/files/package.json#dependencies).
+Each `cat-component` is declared as a directory with the `cat-component.json` file by default. But you can change this via [config](#config). When Catberry initializes the application it recursively searches for such directories starting with your project root, and then via first-level dependencies in the `./node_modules` directory.
 
 The `cat-component.json` file consists of following:
 
-* `name` – the name of the component and a postfix of the full custom tag name which would be `cat-name` (optional, by default it is a name of the directory).
-* `description` – some additional information about the cat-component (optional). It's not used yet but reserved for the future usage.
+* `name` – the name of the component (optional). By default, this is the name of the directory.
+* `description` – some additional information about the cat-component (optional). While not currently in use, this property has been reserved potential future features.
 * `template` – a relative path to the component's template (required).
-* `errorTemplate` – a relative path to the component's error template that would be rendered in case of an error occurs (optional).
-* `logic` – a relative path to the file that exports a class or a constructor function for the component's logic object (optional, index.js by default).
+* `errorTemplate` – a relative path to the component's error template that would be rendered in case an error occurs (optional).
+* `logic` – a relative path to the file that exports a class or a constructor function for the component's logic object (optional). By default, `index.js` will be used.
 
-For example, the file would look like this:
+**NB** Component names are always prefixed with `cat-`, and _are not_ case sensitive.
+
+An example `cat-component.json` could look like this:
 
 ```json
 {
@@ -322,38 +322,32 @@ For example, the file would look like this:
 }
 ```
 
-In this example above, you would get a custom tag `<cat-cool></cat-cool>` available in your application.
-
-Please, keep in mind that *all component names are NOT case-sensitive*. If you declared a component with the same name twice you would receive a warning message on the console at startup.
-
-After you define a cat-component you can use it like this:
+In the example above, the tag name of your component would be `cat-cool`, and may be used like:
 
 ```html
 <cat-cool id="unique-value" cat-store="group/store1" some-additional="value" ></cat-cool>
 ```
 
-There are several important moments here:
-* Every component's tag must have an `id` attribute with a unique value for the entire application, otherwise
-it would not rendered and throws an error.
-* You can set the `cat-store` attribute which means if the store is changed this component must be re-rendered automatically.
-* You can set any additional attribute you want and use it inside the component's source code.
-* You must always use opening and closing tags (not self-closing tags). The majority of the browsers do not support self-closing custom tags correctly.
-* You can use tags of other components inside the template of the component. Nested components are supported but don't forget about unique IDs. *The best practice is to build IDs of nested components using the current component's ID as a prefix*.
+Important things to note:
+* Every component's tag must have an unique `id` attribute, otherwise it will not rendered and throw an error.
+* Setting the `cat-store` attribute connects the `store` to the `cat-component`, which means as the `store` is changed, the `cat-component` will be re-rendered automatically.
+* You can set any additional attribute you want and use it inside the component.
+* You must always use opening and closing tags (i.e. no self-closing tags). The majority of the browsers do not support self-closing custom tags correctly.
+* Nested components (using `cat-component`s inside component templates) are supported but still require unique IDs. **The best practice is to build IDs of nested components using the current component's ID as a prefix**.
 
-There are two reserved component names that are used in unusual way:
-* `document` – the root template of the entire application (doctype, html, body etc.).
-It can not depend on any store. `cat-store` attribute is ignored.
+There are two reserved component names that are used in an unusual way:
+* `document` – the root template of the entire application (doctype, html, body, etc.). It can not depend on any store, thus the `cat-store` attribute is ignored.
 * `head` – the component for the HEAD element in the document. It is always rendered using special diff/merge mode, otherwise all styles and scripts would be re-loaded every time. It can depend on a store and works as usual cat-component except the rendering approach.
 
 ## Cat-component's interface
 The cat-component's logic file should export a class or a constructor function for creating its instances. Catberry creates a separate instance for each custom tag on the page. Also, you can optionally define the following methods in the class/prototype:
 
-* `render()` – creates and returns data (or Promise of it) for the component's template. The method is called every time when a component's custom tag appears on the page or needs to be updated with new data. The method is called in both server and browser environments.
-* `bind()` – creates and returns an object with the event bindings (or Promise of it, see the example below). The method is called only in the browser environment every time the page is changed and the component is remounted or on the initial document loading.
-* `unbind()` – this method behaves like a destructor and if you want to manually remove some event listeners or to do anything else to clean up you can implement this method. The method is called only in the browser environment every time the component is removed from the DOM.
+* `render()` – creates and returns data, or a Promise, for the component's template. The method is called every time when a component's custom tag appears on the page or needs to be updated with new data. The method is called in both server and browser environments.
+* `bind()` – creates and returns an object with the event bindings, or a Promise. This method is called only in the browser, every time the page is changed and the component is remounted, or on the initial document loading. See the example below.
+* `unbind()` – this method behaves like a destructor. Use this if you want to manually remove some event listeners or clean up after yourself. The method is called only in the browser environment, and every time the component is removed from the DOM.
 
-Some more details about the `bind()` method:
-The `bind()` method optionally returns an object that describes all event bindings inside the template of the current component. You can return a binding object (or Promise of it) like this.
+
+Here is an example of an object the `bind()` method could return.
 
 ```javascript
 bind() {
@@ -369,13 +363,11 @@ bind() {
 }
 ```
 
-As you might notice, every event handler is bound to the current instance of the component, you do not need to use [`.bind(this)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
-on your own. Additionally, you can add event handlers manually inside the `bind` method and then remove them manually in `unbind` method. For example, to handle some global events in the window object.
+Every event handler is bound to the current instance of the component automatically, you do not need to use [`.bind(this)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) on your own. Additionally, you can add event handlers manually inside the `bind` method and then remove them manually in `unbind` method. For example, to handle some global events in the window object.
 
-After the component will have been removed from the DOM all event listeners will be removed
-correctly and then the `unbind` method will be called (if it's declared).
+Once the component has been removed from the DOM, all event listeners will be removed, and then, if it has been declared, the `unbind` method will be called.
 
-Please, keep in mind that the cat-component's constructor and `render` methods are being executed in both server and browser environments because the cat-components are universal. Therefore you can not use environment-specific global objects or functions like `window`, `process` or DOM methods.
+**NB** Component `constructor` and `render` methods are executed on both the server and browser. Therefore you can not use environment-specific global objects or functions like `window`, `process` or DOM methods.
 
 ## Cat-component's context
 Every component's [`$context`](#shared-context) is extended with the following properties & methods:
@@ -431,7 +423,7 @@ class Some {
 	 * @returns {Promise|undefined} Promise of nothing.
 	 */
 	unbind() {
-		// nothing to do here we have used bind properly
+		// nothing to do here since we used bind properly
 	}
 }
 
