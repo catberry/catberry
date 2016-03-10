@@ -128,7 +128,7 @@ By now you should be an expert in setting up the Catberry Framework, go ahead an
 **[↑ back to top](#table-of-contents)**
 
 # Isomorphic/Universal applications
-TL,DR; of some of the immediate benefits solved by isomorphic/universal applications:
+TL;DR of some of the immediate benefits solved by isomorphic/universal applications:
 
 * _Search-engine crawlable single page application_ -- the same page can be rendered as easily on the server as in the browser.
 * _*D.R.Y* templating & logic_ -- since universal modules are written only once and in JavaScript, you never have to repeat yourself or maintain the same logic in two separate code-bases.
@@ -152,20 +152,20 @@ Asynchronous workflow is controlled by using [Promises](https://www.promisejs.or
 
 From a high-level, all you really need to know is that there are [stores](#stores), [cat-components](#cat-components), and a store dispatcher that controls communication between them.
 
-[Stores](#stores) handle action messages from [cat-components](#cat-components), which trigger a `changed` event, that then cause Catberry to re-render every component that depends on the changed store.
+[`Stores`](#stores) handle action messages from [`cat-components`](#cat-components), which trigger a `changed` event, that then cause Catberry to re-render every component that depends on the changed store.
 
 The store dispatcher works in such way that once a store has been called to load data, it will not respect successive loading calls until the first has resolved.
 
 **[↑ back to top](#table-of-contents)**
 
 # Stores
-The store is a module that loads data from a remote resource using routing parameters. It also can handle action messages from cat-components or other stores and send requests to the remote resource changing data. It can emit `changed` event whenever it decides that data on the remote resource is changed and the application need to reload it.
+A `store` is a module that loads data from a remote resource using routing parameters. It also can handle action messages from cat-components or other stores and send requests to the remote resource changing data. It can also emit a `changed` event whenever it decides that data on the remote resource has changed and the application should reload it.
 
-By default, all stores should be placed into `./catberry_stores` directory in your project. But you can change this directory by the [config](#config) parameter. Every file should export a class or a constructor function for creating store's instances.
+By default, all stores should be placed into the `./catberry_stores` directory in your project. But you can change this directory via a [config](#config) parameter.
 
-When Catberry initializes it does a recursive search in this directory and loads every store file. The relative file path without an extension becomes a store name.
+When Catberry initializes, it does a recursive search in `./catberry_stores/` and loads every store file. The store name will become the relative file-path.
 
-So, if you had the file hierarchy as following:
+For example, if you had the following structure:
 ```
 ./catberry_stores/
 	group1/
@@ -177,7 +177,7 @@ So, if you had the file hierarchy as following:
 	store1.js
 	store2.js
 ```
-then you would have such store list:
+then you would have the store list:
 ```
 group1/store1
 group1/store2
@@ -187,24 +187,31 @@ store1
 store2
 ```
 
-Please, keep in mind that all store names are case-sensitive.
+**NB** because store names are relative paths, they _are_ case-sensitive.
 
 ## Store's interface
-Every store should export a class or a constructor function for creating its instances. Also, you can
-optionally define following methods and properties in the class/prototype.
+Every `store` must export a class or a constructor function for creating its instances.
+
+Optionally, you may define the following methods and properties in the class/prototype.
 
 * `$lifetime` – the value means how long Catberry should cache data loaded from this store (milliseconds). By default, it is set to 60000 ms.
-* `load()` – loads data from a remote resource and returns it (usually a Promise of it).
-* `handle<SomeActionNameHere>(args)` – handles an action and returns a result (or a Promise of it). You can submit form data to a remote resource here or just change some internal state in the store and then call `this.$context.changed()`. For example, you can name a store's method `handleFormSubmit` and when a component or another store send an action to the store with a name like following `form-submit`/`form_submit`/`FORM_SUBMIT`/`formSubmit`/`FormSubmit` it will trigger the `handleFormSubmit` method of the store.
+* `load()` – loads data from a remote resource and returns it or a Promise.
+* `handle<SomeActionNameHere>(args)` – handles an action and returns a result or a Promise.
 
-Please, keep in mind that stores are universal and their source code is being executed in both server and browser environments. Therefore you can not use environment-specific global objects or functions like `window`, `process` or DOM methods.
+Handlers can be used to submit data to a remote resource here or simply change the state within the store--in which case, you would have to emit your own `changed` event via `this.$context.changed()`.
+
+For example, you can name a store's method `handleFormSubmit` and when a component or another store sends an action to the store with a name like: `form-submit`, `form_submit`, `FORM_SUBMIT`, `formSubmit`, or `FormSubmit`, it will trigger that stores' `handleFormSubmit` method.
+
+Please, keep in mind that stores are universal and their source code is being executed in both server and browser environments. Therefore you can not use environment-specific global objects or functions like `window`, `process` or other DOM methods.
 
 ## Store's context
-Every store always has a context. Catberry sets the property `$context`
-to every instance of each store. It has following properties and methods:
+Each store has a context; which Catberry sets as the property `$context`
+in every instance of each store.
 
-* `this.$context.isBrowser` – `true` if the source code is being executed in the browser environment.
-* `this.$context.isServer` – `true` if the source code is being executed in the server environment.
+`$context` has following properties and methods:
+
+* `this.$context.isBrowser` – `true` if code is being executed in the browser.
+* `this.$context.isServer` – `true` if code is being executed on the server.
 * `this.$context.userAgent` – the current user agent string of the environment.
 * `this.$context.cookie` – the current [cookie wrapper](#cookie) object.
 * `this.$context.location` – the current [URI](https://github.com/catberry/catberry-uri) object
@@ -213,23 +220,20 @@ that constains the current location.
 that contains the current referrer.
 * `this.$context.state` – the current set of parameters from the [route definition](#routing).
 * `this.$context.locator` – the [Service Locator](#service-locator) of the application.
-* `this.$context.redirect('String')` - redirects to a specified location string.
-* `this.$context.notFound()` - hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html).
-* `this.$context.changed()` – triggers the `changed` event for the current store. You can use this method whenever you want, Catberry handles it correctly.
-* `this.$context.getStoreData('storeName')` – gets a promise of another store's data, if `storeName` was the same as current it would be `null`.
-* `this.$context.sendAction('storeName', 'name', object)` – sends an action to a store by the name and returns a promise of the action handling result. If the store does not have a handler for this action the result will be always `null`.
-* `this.$context.sendBroadcastAction('name', object)` – the same as the previous one but the action will be sent to all stores that have a handler for this action. Returns a promise of `Array` of results.
+* `this.$context.redirect('String')` - redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
+* `this.$context.notFound()` - hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
+* `this.$context.changed()` – triggers the `changed` event for the current store.
+* `this.$context.getStoreData('storeName')` – gets a promise of another store's data. if `storeName` is the current store's name, this returns `null`.
+* `this.$context.sendAction('storeName', 'name', object)` – sends an action to a store by name and returns a promise of the action handling result. If the store does not have a handler for this action the result will be `null`.
+* `this.$context.sendBroadcastAction('name', object)` – like `this.$context.sendAction` however the action will be sent to all stores. The result will be a promise of that resolves into an `Array`.
 * `this.$context.setDependency('storeName')` – sets a dependency on another store's data. Every time the store-dependency changes, the current store is also triggered as changed.
-* `this.$context.unsetDependency('storeName')` – removes the dependency set by the previous method.
+* `this.$context.unsetDependency('storeName')` – removes the dependency set by `this.$context.setDependency`.
 
-Every time the router computes a new application state, it re-creates and re-assigns a context to each store, therefore, *do not save references to the `this.$context` objects*.
+Every time the router computes a new application state, it re-creates and re-assigns a context to each store, therefore, ***do not save references to `this.$context`***.
 
-Please keep in mind that if you're using `getStoreData('storeName')` method and another store's data as a part of the current store's data you must set that store as a dependency for the current store (`this.$context.setDependency('storeName')`), otherwise the cache of the current store won't be updated if the store-dependency is changed.
+**NB** When using data from other stores (e.g. through `this.$context.getStoreData`) you must set that store as a dependency (via `this.$context.setDependency`), or your store will not be updated as your store-dependency changes.
 
-For example, you have two stores `Country` and `CityList` and you're using `this.$context.getStoreData('Country')` in the `CityList`'s `load()` method as an additional data source. In this case, if the `Country` store was changed the `CityList` store would never be updated. To avoid this, just add a `this.$context.setDependency('Country')` line to the `CityList`'s constructor.
-
-Also, there is one more thing about setting a cookie and calling `redirect`/`notFound` methods.
-If you use these methods while rendering the `document` or `head` components the action will be accomplished using HTTP headers and status codes on the server, otherwise it would be rendered as inline `<script>` tags.
+For example, say you have two stores `Country` and `CityList`, and inside `CityList.load()` you're calling `this.$context.getStoreData('Country')`. In this case, when the `Country` is changed `CityList` will never be updated. To avoid this, add `this.$context.setDependency('Country')` to `CityList`'s constructor.
 
 ## Code example
 This is an example how your store's file would look like:
@@ -263,8 +267,8 @@ class Some {
 	 * @returns {Promise<Object>|Object|null|undefined} Loaded data.
 	 */
 	load() {
-		// Here you can do any HTTP requests using this._uhr.
-		// Please read details here https://github.com/catberry/catberry-uhr.
+		// Here you can perform HTTP requests using this._uhr.
+		// For more info see: https://github.com/catberry/catberry-uhr.
 	}
 
 	/**
@@ -274,7 +278,7 @@ class Some {
 	handleSomeAction() {
 		// Here you can call this.$context.changed() if you're sure
 		// that the remote data on the server has been changed.
-		// You can additionally have many handle methods for other actions.
+		// You can additionally have many more handler methods.
 	};
 }
 
