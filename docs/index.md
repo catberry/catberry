@@ -6,6 +6,7 @@
 * [Get started](#get-started)
 * [Isomorphic/Universal applications](#isomorphicuniversal-applications)
 * [Flux](#flux)
+* [Shared `$context`](#shared-context)
 * [Stores](#stores)
 	* [Store's interface](#stores-interface)
 	* [Store's context](#stores-context)
@@ -158,6 +159,28 @@ The store dispatcher works in such way that once a store has been called to load
 
 **[↑ back to top](#table-of-contents)**
 
+# Shared Context
+Catberry sets as the property `$context` for every instance of each `store` and `cat-component`.
+
+`$context` has at least the following properties and methods, and is extended specifically for `stores` and `components`:
+
+* `this.$context.isBrowser` – `true` if code is being executed in the browser.
+* `this.$context.isServer` – `true` if code is being executed on the server.
+* `this.$context.userAgent` – the current user agent string of the environment.
+* `this.$context.cookie` – the current [cookie wrapper](#cookie) object.
+* `this.$context.location` – the current [URI](https://github.com/catberry/catberry-uri) object
+that constains the current location.
+* `this.$context.referrer` – the current [URI](https://github.com/catberry/catberry-uri) object
+that contains the current referrer.
+* `this.$context.locator` – the [Service Locator](#service-locator) of the application.
+* `this.$context.redirect('String')` - redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
+* `this.$context.notFound()` - hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
+* `this.$context.sendBroadcastAction('name', object)` – like `this.$context.sendAction` (see [store's context](#stores-context) and [cat-component's context](#cat-components-context)) however the action will be sent to all stores. The result will be a promise of that resolves into an `Array`.
+
+**NB** Every time the router computes a new application state, it re-creates and re-assigns a context to each store, therefore, ***do not save references to `this.$context`***.
+
+**[↑ back to top](#table-of-contents)**
+
 # Stores
 A `store` is a module that loads data from a remote resource using routing parameters. It also can handle action messages from cat-components or other stores and send requests to the remote resource changing data. It can also emit a `changed` event whenever it decides that data on the remote resource has changed and the application should reload it.
 
@@ -205,31 +228,14 @@ For example, you can name a store's method `handleFormSubmit` and when a compone
 Please, keep in mind that stores are universal and their source code is being executed in both server and browser environments. Therefore you can not use environment-specific global objects or functions like `window`, `process` or other DOM methods.
 
 ## Store's context
-Each store has a context; which Catberry sets as the property `$context`
-in every instance of each store.
+A store's [`$context`](#shared-context) is extended with the following properties & methods:
 
-`$context` has following properties and methods:
-
-* `this.$context.isBrowser` – `true` if code is being executed in the browser.
-* `this.$context.isServer` – `true` if code is being executed on the server.
-* `this.$context.userAgent` – the current user agent string of the environment.
-* `this.$context.cookie` – the current [cookie wrapper](#cookie) object.
-* `this.$context.location` – the current [URI](https://github.com/catberry/catberry-uri) object
-that constains the current location.
-* `this.$context.referrer` – the current [URI](https://github.com/catberry/catberry-uri) object
-that contains the current referrer.
 * `this.$context.state` – the current set of parameters from the [route definition](#routing).
-* `this.$context.locator` – the [Service Locator](#service-locator) of the application.
-* `this.$context.redirect('String')` - redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
-* `this.$context.notFound()` - hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
-* `this.$context.changed()` – triggers the `changed` event for the current store.
 * `this.$context.getStoreData('storeName')` – gets a promise of another store's data. if `storeName` is the current store's name, this returns `null`.
-* `this.$context.sendAction('storeName', 'name', object)` – sends an action to a store by name and returns a promise of the action handling result. If the store does not have a handler for this action the result will be `null`.
-* `this.$context.sendBroadcastAction('name', object)` – like `this.$context.sendAction` however the action will be sent to all stores. The result will be a promise of that resolves into an `Array`.
+* `this.$context.sendAction('storeName', 'name', object)` – sends an action to a store by name and returns a promise of the handler's result. If the store does not have a handler for this action then the result will be `null`.
+* `this.$context.changed()` – triggers the `changed` event for the current store.
 * `this.$context.setDependency('storeName')` – sets a dependency on another store's data. Every time the store-dependency changes, the current store is also triggered as changed.
 * `this.$context.unsetDependency('storeName')` – removes the dependency set by `this.$context.setDependency`.
-
-Every time the router computes a new application state, it re-creates and re-assigns a context to each store, therefore, ***do not save references to `this.$context`***.
 
 **NB** When using data from other stores (e.g. through `this.$context.getStoreData`) you must set that store as a dependency (via `this.$context.setDependency`), or your store will not be updated as your store-dependency changes.
 
@@ -372,32 +378,16 @@ correctly and then the `unbind` method will be called (if it's declared).
 Please, keep in mind that the cat-component's constructor and `render` methods are being executed in both server and browser environments because the cat-components are universal. Therefore you can not use environment-specific global objects or functions like `window`, `process` or DOM methods.
 
 ## Cat-component's context
-Every component always has a context. Catberry sets the property `$context`
-to every instance of each store. It has following properties and methods.
+Every component's [`$context`](#shared-context) is extended with the following properties & methods:
 
-* `this.$context.isBrowser` – `true` if the source code is being executed in the browser environment.
-* `this.$context.isServer` – `true` if the source code is being executed in the server environment.
-* `this.$context.userAgent` – the current user agent string of the environment.
-* `this.$context.cookie` – the current [cookie wrapper](#cookie) object.
-* `this.$context.location` – the current [URI](https://github.com/catberry/catberry-uri) object that constains the current location.
-* `this.$context.referrer` – the current [URI](https://github.com/catberry/catberry-uri) object that contains the current referrer.
-* `this.$context.locator` – the [Service Locator](#service-locator) of the application.
-* `this.$context.redirect('String')` - redirects to a specified location string.
-* `this.$context.notFound()` - hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html).
-* `this.$context.getStoreData()` – gets a promise of bound store's data, if store does not exist rejects the promise.
-* `this.$context.sendAction('name', object)` – sends an action to the bound store and returns a promise of the action handling result. If the store does not have a handler for this action the result will be always `null`.
-* `this.$context.sendBroadcastAction('name', object)` – the same as the previous one but the action will be sent to all stores that have a handler for this action. Returns a promise of `Array` of results.
+* `this.$context.getStoreData()` – gets a promise of component's bound store's data. If the store does not exist, the promise is rejected.
+* `this.$context.sendAction('name', object)` – sends an action to the bound store and returns a promise of the handler's result. If the store does not have a handler for this action then the result will be `null`.
 * `this.$context.element` – the current DOM element that represents the current component.
 * `this.$context.attributes` – the set of attributes which component's DOM element has at the moment.
 * `this.$context.getComponentById('id')` – gets another component *object* by its ID.
 * `this.$context.getComponentByElement(domElement)` – gets another component's *object* by its DOM element.
 * `this.$context.createComponent('tagName', attributesObject)` – creates a new component's instance and returns a promise of its DOM element.
 * `this.$context.collectGarbage()` – collects all components which have been created using the `createComponent('tagName', attributesObject)` method and are not attached to the DOM at the moment.
-
-Every time the router computes a new application state, it re-creates and re-assigns a context to each store, therefore, *do not save references to the `this.$context` objects*.
-
-Also, there is one more thing about setting a cookie and calling `redirect`/`notFound` methods.
-If you use these methods while rendering the `document` or `head` components the action will be accomplished using HTTP headers and status codes on the server, otherwise it would be rendered as inline `<script>` tags.
 
 ## Code example
 This is an example how your component's logic file would look like:
