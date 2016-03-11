@@ -3,106 +3,210 @@
 [![Build Status](https://travis-ci.org/catberry/catberry.png?branch=master)](https://travis-ci.org/catberry/catberry) [![codecov.io](http://codecov.io/github/catberry/catberry/coverage.svg?branch=master)](http://codecov.io/github/catberry/catberry?branch=master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/catberry/main?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
 
-[![NPM](https://nodei.co/npm/catberry.png)](https://nodei.co/npm/catberry/)
-
 <p align="center">
   <img src="https://raw.githubusercontent.com/catberry/catberry/master/docs/images/logo.png" />
 </p>
 
-Catberry was developed to help in creating ["isomorphic" Web applications](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#isomorphic-applications).
-Isomorphic applications are apps that use the same codebase to run from both
-server and client-side environments.
+## What the cat is that?
 
-This means you write the code only once, and deploy it the way you want.
-Catberry handles all the differences between these two environments.
+Catberry was developed to help create ["isomorphic/Universal" Web applications](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#isomorphicuniversal-applications).
 
-You will get
-[Single Page Application](http://en.wikipedia.org/wiki/Single-page_application)
-using browser's
-[History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
-And back-end that renders exactly the same page on the server.
+Long story short, isomorphic/universal applications are apps that use the same codebase on both the server and client environments to render what the client would see as a "[Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)".
 
-Here you can find full
-[Catberry Documentation](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md).
+## TLDR;
 
-To get started with an example, please proceed to
-[Get Started Guide](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#get-started).
+Install [Catberry CLI](https://www.npmjs.com/package/catberry-cli) using following command:
 
-If you want to try TodoMVC application, proceed to [this link](https://github.com/catberry/catberry-todomvc).
+```bash
+npm install -g catberry-cli
+```
 
-## Advantages
-* [Flux](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#flux) architecture
-* [Cat-components](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#cat-components) (like [web-components by Google](http://webcomponents.org/) but isomorphic)
-* You do not need to write any code for registration or definition of
-[cat-components](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#cat-components) or
-[stores](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#stores),
-Catberry discovers them automatically on startup
-* Fast and efficient server-side [progressive rendering engine](http://www.phpied.com/progressive-rendering-via-multiple-flushes/) based on
-[node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors)
-* [Dust](https://github.com/catberry/catberry-dust),
-[Handlebars](https://github.com/catberry/catberry-handlebars) and
-[Jade](https://github.com/catberry/catberry-jade) template engines
-* No Virtual DOM – you can use any other library with Catberry without conflicts
+Use Catberry CLI to create an empty project with [Handlebars](http://handlebarsjs.com/) support like this:
+
+```bash
+catberry init empty-handlebars
+```
+
+Or an example application that works using GitHub API:
+
+```bash
+catberry init example
+```
+
+Also, you can get a list of all templates:
+
+```bash
+catberry init ?
+```
+
+## Useful links
+
+* [Catberry Documentation](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md)
+* [Get Started Guide](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#get-started)
+* [Officially supported plugins](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#https://github.com/catberry/catberry/blob/%23221-es6-docs/docs/index.md#list-of-officially-supported-plugins)
+* [Catberry's homepage](http://catberry.org) and its [source code](https://github.com/catberry/catberry-homepage)
+* [Todo application](https://github.com/catberry/catberry-todomvc)
+* [Example application](https://github.com/catberry/catberry-cli/tree/master/templates/example)
+
+## Why should I use that?
+
+### Architecture
+
+* The entire architecture of the framework is built using the [Service Locator](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#service-locator) pattern -- which helps to manage module dependencies and [create plugins](https://github.com/catberry/catberry/) -- and [Flux](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#flux), for the data layer
+* [Cat-components](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#cat-components) – similar to [web-components](http://webcomponents.org/) but organized as directories, can be rendered on the server and published/installed as NPM packages
+* Catberry builds a bundle for running the application in a browser as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)
+* [ES2015/ES6 support](https://nodejs.org/en/docs/es6/) -- native on the server/Node.js and using [Babel](http://babeljs.io/) for a browser
+* The whole framework's API uses [Promises](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+* Framework itself is an [express](https://github.com/visionmedia/express)/[connect](https://github.com/senchalabs/connect) middleware, which means you can use it with other [middlewares](http://expressjs.com/en/guide/using-middleware.html)
+
+### Rendering
+
+* Fast and efficient [progressive rendering engine](http://www.phpied.com/progressive-rendering-via-multiple-flushes/) based on
+[node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) on the server
+* Browser rendering does not block the [Event Loop](https://developer.mozilla.org/en/docs/Web/JavaScript/EventLoop), which means your app's UI will never be frozen
+* [Handlebars](https://github.com/catberry/catberry-handlebars), [Dust](https://github.com/catberry/catberry-dust) and
+[Jade](https://github.com/catberry/catberry-jade) template engines are [officially supported](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#template-engines) (and you can implement your own provider to support any other)
 * Efficient DOM event listening using [event delegation](http://davidwalsh.name/event-delegate)
-are officially supported (and you can implement own provider for others)
-* You will get [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)
-automatically
-* You will get back-end that renders exactly the same page for search engines
-and shared links
-* You will write code in the server-side style
-(using [node modules system](http://nodejs.org/api/modules.html#modules_modules)) and [npm](https://www.npmjs.org/)
-* Entire architecture of the framework is built using
-[Service Locator](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#service-locator)
-pattern and
-[Dependency Injection](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md#dependency-injection)
-* Framework itself is an
-[express](https://github.com/visionmedia/express)/[connect](https://github.com/senchalabs/connect)
-middleware, it means you can use it with any other middlewares
 
-For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/7.1.2/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md).
 
-Also, you can see [finished example application](https://github.com/catberry/catberry-cli/tree/master/templates/example).
+### Typical Cat-component example
+
+```javascript
+'use strict';
+
+class CoolComponent {
+
+	/**
+	 * Creates a new instance of the "CoolComponent" component.
+	 * @param {ServiceLocator} locator The service locator for resolving dependencies.
+	 */
+	constructor(locator) {
+		// you can resolve any dependency from the locator.
+	}
+
+	/**
+	 * Gets data for the template.
+	 * This method is optional.
+	 * @returns {Promise<Object>|Object|null|undefined} Data for the template.
+	 */
+	render() {
+		return this.$context.getStoreData();
+	}
+
+	/**
+	 * Returns event binding settings for the component.
+	 * This method is optional.
+	 * @returns {Promise<Object>|Object|null|undefined} Binding settings.
+	 */
+	bind() {
+		return {
+			'a.clickable': () => window.alert('Ouch!');
+		}
+	}
+
+	/**
+	 * Cleans up everything that has NOT been set by .bind() method.
+	 * This method is optional.
+	 * @returns {Promise|undefined} Promise of nothing.
+	 */
+	unbind() {
+		// nothing to do here we have used bind properly
+	}
+}
+
+module.exports = Some;
+```
+
+The component is used as a custom tag:
+
+```html
+<cat-cool id="unique-value" cat-store="group/CoolStore"></cat-cool>
+```
+
+### Typical Store example
+
+```javascript
+'use strict';
+
+class CoolStore {
+	/**
+	 * Creates a new instance of the "CoolStore" store.
+	 * @param {ServiceLocator} locator The service locator for resolving dependencies.
+	 */
+	constructor(locator) {
+
+		/**
+		 * Current universal HTTP request for environment-independent requests.
+		 * @type {UHR}
+		 * @private
+		 */
+		this._uhr = locator.resolve('uhr');
+
+		/**
+		 * Current lifetime of data (in milliseconds) that is returned by this store.
+		 * @type {number} Lifetime in milliseconds.
+		 */
+		this.$lifetime = 60000;
+	}
+
+	/**
+	 * Loads data from a remote source.
+	 * @returns {Promise<Object>|Object|null|undefined} Loaded data.
+	 */
+	load() {
+		// Here you can do any HTTP requests using this._uhr.
+		// Please read details here https://github.com/catberry/catberry-uhr.
+	}
+
+	/**
+	 * Handles an action named "some-action" from any component or store.
+	 * @returns {Promise<Object>|Object|null|undefined} Response to the component/store.
+	 */
+	handleSomeAction() {
+		// Here you can call this.$context.changed() if you're sure'
+		// that the remote data on the server has been changed.
+		// You can additionally have many handle methods for other actions.
+	};
+}
+
+module.exports = Some;
+```
 
 ## Browser Support
-Catberry uses [ECMAScript 5](http://www.ecma-international.org/ecma-262/5.1/)
-and some HTML5 features like [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history)
-therefore it does not support old browsers at all. Catberry can render pages
-for any browser at the server, but Catberry's browser script does not work
-as [SPA](http://en.wikipedia.org/wiki/Single-page_application) in old browsers.
+While Catberry is capable of rendering pages for any browser on the server, due to the use of certain HTML5 features, like the [History API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history), only partial support of old browsers is possible for the client-side JavaScript application.
 
-The main goal of Catberry Framework is to use the full power of new technologies
-and provide user with the best experience.
+The main goal of the Catberry Framework is to use the full power of new technologies and provide a user with the best possible experience.
 
-Actually a user gets HTML page from the server only once and all the rest of the time
-the whole page is rendered in a browser receiving only pure data from some
-API service(s). Thanks to Catberry's very fast page rendering engine,
-user receives refreshed page as fast as API server could provide data for it.
+In fact, a user gets an HTML page from the server only once and all the rest of the time the whole page is changing in a browser receiving only pure data from API service(s) used with the application.
+
+Thanks to Catberry's progressive rendering engine, user receives a page from the server component by component as fast as each component renders its template not waiting for the whole page is built.
 
 All supported browsers are listed below:
 
 | Browser			| Version		|
-|-------------------|---------------|
-| IE				| 9 (partial non-[SPA](http://en.wikipedia.org/wiki/Single-page_application)), 10+	|
-| IE Mobile			| 10+			|
-| Firefox 			| 4+			|
-| Firefox Android	| 29+			|
-| Chrome			| 19+			|
-| Chrome Android	| 35+			|
-| Android Browser	| 2.2+, 4.2+	|
-| Safari			| 6+			|
-| iOS Safari		| 5+			|
-| Opera				| 12+			|
-| Opera Mobile		| 11.1+			|
-| Blackberry Browser| 7+			|
+|-------------|-----------|
+| IE | 9 (partial non-[SPA](http://en.wikipedia.org/wiki/Single-page_application)), 10+ |
+| IE Mobile | 10+ |
+| Firefox | 4+ |
+| Firefox Android | 29+ |
+| Chrome | 19+ |
+| Chrome Android | 35+ |
+| Android Browser | 2.2+, 4.2+ |
+| Safari | 6+ |
+| iOS Safari | 5+ |
+| Opera | 12+ |
+| Opera Mobile | 11.1+ |
+| Blackberry Browser| 7+ |
 
 ## Contributing
 
 There are a lot of ways to contribute into Catberry:
 
 * Give it a star
-* Join the [Gitter](https://gitter.im/catberry/catberry) room and leave a feedback or help with answering users' questions
+* Join the [Gitter](https://gitter.im/catberry/main) room and leave a feedback or help with answering users' questions
 * [Submit a bug or a feature request](https://github.com/catberry/catberry/issues)
-* [Submit a PR](https://github.com/catberry/catberry/blob/7.1.2/CONTRIBUTING.md)
+* [Submit a PR](https://github.com/catberry/catberry/blob/8.0.0-dev/CONTRIBUTING.md)
 * If you like the logo, you might want to buy a Catberry [T-Shirt](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=t-shirt) or a [sticker](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=sticker)
 
 Denis Rechkunov <denis.rechkunov@gmail.com>
