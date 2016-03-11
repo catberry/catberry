@@ -18,13 +18,12 @@ const components = [
 ];
 
 const routeDefinitions = '__routeDefinitions' || [];
+
 const Catberry = require('./node_modules/catberry/browser/Catberry.js');
-const Logger = require('./node_modules/catberry/browser/Logger.js');
 const BootstrapperBase = require('./node_modules/catberry/lib/base/BootstrapperBase.js');
 const StoreDispatcher = require('./node_modules/catberry/lib/StoreDispatcher');
 const ModuleApiProvider = require('./node_modules/catberry/browser/providers/ModuleApiProvider');
 const CookieWrapper = require('./node_modules/catberry/browser/CookieWrapper');
-const Promise = require('promise');
 
 class Bootstrapper extends BootstrapperBase {
 
@@ -54,51 +53,12 @@ class Bootstrapper extends BootstrapperBase {
 
 		locator.registerInstance('window', window);
 
-		const loggerConfig = configObject.logger || {};
-		const logger = new Logger(loggerConfig.levels);
-		locator.registerInstance('logger', logger);
-
-		window.onerror = function errorHandler(msg, uri, line) {
-			logger.fatal(`${uri}:${line} ${msg}`);
-			return true;
-		};
-
-		const eventBus = locator.resolve('eventBus');
-		this.wrapEventsWithLogger(configObject, eventBus, logger);
-
 		routeDefinitions.forEach(routeDefinition =>
 			locator.registerInstance('routeDefinition', routeDefinition));
 
 		stores.forEach(store => locator.registerInstance('store', store));
 
 		components.forEach(component => locator.registerInstance('component', component));
-	}
-
-	/**
-	 * Wraps an event bus with log messages.
-	 * @param {Object} config The application config.
-	 * @param {EventEmitter} eventBus The Event Emitter that implements event bus.
-	 * @param {Logger} logger The logger for writing messages.
-	 * @protected
-	 */
-	wrapEventsWithLogger(config, eventBus, logger) {
-		super.wrapEventsWithLogger(config, eventBus, logger);
-
-		const isRelease = Boolean(config.isRelease);
-		if (isRelease) {
-			return;
-		}
-		eventBus
-			.on('documentUpdated', args =>
-				logger.debug(`Document updated (${args.length} store(s) changed)`))
-			.on('componentBound', args => {
-				const id = args.id ? `#${args.id}` : '';
-				logger.debug(`Component "${args.element.tagName}${id}" is bound`);
-			})
-			.on('componentUnbound', args => {
-				const id = args.id ? `#${args.id}` : '';
-				logger.debug(`Component "${args.element.tagName}${id}" is unbound`);
-			});
 	}
 }
 

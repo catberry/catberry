@@ -5,7 +5,6 @@ const path = require('path');
 const fs = require('fs');
 const events = require('events');
 const ServiceLocator = require('catberry-locator');
-const Logger = require('../../mocks/Logger');
 const StoreFinder = require('../../../lib/finders/StoreFinder');
 
 const CASE_PATH = path.join(
@@ -28,7 +27,6 @@ describe('lib/finders/StoreFinder', function() {
 		locator.registerInstance('serviceLocator', locator);
 		locator.registerInstance('eventBus', new events.EventEmitter());
 		locator.register('storeFinder', StoreFinder);
-		locator.register('logger', Logger);
 	});
 
 	describe('#find', function() {
