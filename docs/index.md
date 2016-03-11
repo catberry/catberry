@@ -882,7 +882,12 @@ Here is a list of Catberry events:
 | Event					| When happens									| Arguments																									|
 |---------------|-------------------------------|-----------------------------------------------------------|
 | ready | Catberry has finished the initialization | no |
-| error | an error happened | `Error` object |
+| trace | Trace message was sent | `String` |
+| debug | Debug message was sent | `String` |
+| info | Information message was sent | `String` |
+| warn | Warning message was sent | `String` |
+| error | Error message was sent | `String|Error` |
+| fatal | Fatal error message was sent | `String|Error` |
 | storeLoaded | each store is loaded | `{name: String, path: String, constructor: function}` |
 | componentLoaded | each component is loaded | `{name: String, properties: Object, constructor: function, template: Object, errorTemplate: Object}` |
 | allStoresLoaded | all stores are loaded | Loaded stores by their names |
@@ -904,6 +909,8 @@ List of the server-only events:
 | storeFound | each store is found | `{name: String, path: String}` |
 | componentFound | each component is found | `{name: String, path: String, properties: Object}` |
 | bundleBuilt | the browser bundle is built | `{hrTime: [number, number], time: Number, path: String}` |
+| bundleChanged | the browser bundle was changed | `{changedFiles: ['path1', 'pathN'], path: String}` |
+| bootsrapperBuilt | the browser bootstrapper is built | `{hrTime: [number, number], time: Number, template: String}` |
 
 List of the browser-only events:
 
