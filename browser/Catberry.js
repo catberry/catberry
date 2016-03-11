@@ -2,6 +2,12 @@
 
 const CatberryBase = require('../lib/base/CatberryBase');
 
+const Promise = require('promise');
+// if browser still does not have promises then add it.
+if (!('Promise' in window)) {
+	window.Promise = Promise;
+}
+
 class Catberry extends CatberryBase {
 
 	/**

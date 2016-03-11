@@ -6,7 +6,6 @@ const events = require('events');
 const jsdom = require('jsdom');
 
 const StoreDispatcher = require('../../lib/StoreDispatcher');
-const Logger = require('../mocks/Logger');
 const ContextFactory = require('../../lib/ContextFactory');
 const ModuleApiProvider = require('../../lib/providers/ModuleApiProvider');
 const CookieWrapper = require('../../browser/CookieWrapper');
@@ -1218,7 +1217,6 @@ function createLocator(config, components, stores) {
 	locator.register('moduleApiProvider', ModuleApiProvider);
 	locator.register('cookieWrapper', CookieWrapper);
 	locator.register('storeDispatcher', StoreDispatcher);
-	locator.register('logger', Logger);
 	locator.registerInstance('serviceLocator', locator);
 	locator.registerInstance('config', config);
 	const eventBus = new events.EventEmitter();

@@ -5,7 +5,6 @@ const events = require('events');
 const ServiceLocator = require('catberry-locator');
 const ComponentLoader = require('../../../browser/loaders/ComponentLoader');
 const ComponentFinder = require('../../mocks/finders/ComponentFinder');
-const Logger = require('../../mocks/Logger');
 const componentMocks = require('../../mocks/components');
 
 /* eslint prefer-arrow-callback:0 */
@@ -317,7 +316,6 @@ describe('browser/loaders/ComponentLoader', function() {
 		locator.registerInstance('templateProvider', templateProvider);
 
 		locator.register('componentLoader', ComponentLoader);
-		locator.register('logger', Logger);
 		return locator;
 	}
 });
