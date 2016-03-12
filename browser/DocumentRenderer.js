@@ -750,122 +750,72 @@ class DocumentRenderer extends DocumentRendererBase {
 
 	/**
 	 * Merges new and existed head elements and applies only difference.
+	 * The problem here is that we can't re-create or change script and style tags,
+	 * because it causes blinking and JavaScript re-initialization. Therefore such
+	 * element must be immutable in the HEAD.
 	 * @param {Element} head HEAD DOM element.
 	 * @param {Element} newHead New HEAD element.
 	 * @private
 	 */
-	/* eslint complexity: 0 */
 	_mergeHead(head, newHead) {
 		if (!newHead) {
 			return;
 		}
 
-		const map = this._getHeadMap(head.childNodes);
-		const sameMetaElements = Object.create(null);
-		let i = 0;
+		const headSet = Object.create(null);
 
-		while (i < newHead.childNodes.length) {
-			const current = newHead.childNodes[i++];
-			const key = this._getNodeKey(current);
-
-			if (!(current.nodeName in map)) {
-				map[current.nodeName] = Object.create(null);
+		// get unique key for every child element in the current HEAD
+		for (let i = 0; i < head.children.length; i++) {
+			if (!isTagImmutable(head.children[i])) {
+				continue;
 			}
+			const key = this._getElementKey(head.children[i]);
+			headSet[key] = true;
+		}
 
-			switch (current.nodeName) {
-			// these elements can be only replaced
-				case TAG_NAMES.TITLE:
-				case TAG_NAMES.BASE:
-				case TAG_NAMES.NOSCRIPT:
-					const oldItem = head.getElementsByTagName(current.nodeName)[0];
-					if (oldItem) {
-						head.replaceChild(current, oldItem);
-					} else {
-						head.appendChild(current);
-					}
-				// when we do replace or append current is removed from newHead
-				// therefore we need to decrement index
-					i--;
-					break;
-
-			// these elements can not be deleted from head
-			// therefore we just add new elements that differs from existed
-				case TAG_NAMES.STYLE:
-				case TAG_NAMES.LINK:
-				case TAG_NAMES.SCRIPT:
-					if (!(key in map[current.nodeName])) {
-						head.appendChild(current);
-						i--;
-					}
-					break;
-				// meta and other elements can be deleted
-				// but we should not delete and append same elements
-				default:
-					if (key in map[current.nodeName]) {
-						sameMetaElements[key] = true;
-					} else {
-						head.appendChild(current);
-						i--;
-					}
-					break;
+		// then remove from the new DOM all the element which we already have
+		// in the current DOM, to skip morphing them
+		for (let i = 0; i < newHead.children.length; i++) {
+			const key = this._getElementKey(newHead.children[i]);
+			if (key in headSet) {
+				newHead.removeChild(newHead.children[i]);
+				i--;
 			}
 		}
 
-		if (TAG_NAMES.META in map) {
-			// remove meta tags which a not in a new head state
-			Object.keys(map[TAG_NAMES.META])
-				.forEach(metaKey => {
-					if (metaKey in sameMetaElements) {
-						return;
-					}
-
-					head.removeChild(map[TAG_NAMES.META][metaKey]);
-				});
-		}
-	}
-
-	/**
-	 * Gets map of all HEAD's elements.
-	 * @param {NodeList} headChildren Head children DOM nodes.
-	 * @returns {Object} Map of HEAD's elements.
-	 * @private
-	 */
-	_getHeadMap(headChildren) {
-		// Create map of <meta>, <link>, <style> and <script> tags
-		// by unique keys that contain attributes and content
-		const map = Object.create(null);
-
-		for (let i = 0; i < headChildren.length; i++) {
-			const current = headChildren[i];
-			if (!(current.nodeName in map)) {
-				map[current.nodeName] = Object.create(null);
-			}
-			map[current.nodeName][this._getNodeKey(current)] = current;
-		}
-		return map;
+		morphdom(head, newHead, {
+			childrenOnly: true,
+			// in case we have an immutable tag with changed attribute
+			// script with changed "src" for instance
+			// we have to put it at the end and not morhping an existing one
+			// morphdom will put it at the end for us
+			onBeforeMorphElChildren: (newElement, oldElement) => !isTagImmutable(oldElement),
+			// we can remove all elements except immutable ones
+			onBeforeNodeDiscarded: node => !isTagImmutable(node)
+		});
 	}
 
 	/**
 	 * Gets an unique element key using element's attributes and its content.
-	 * @param {Node} node HTML element.
+	 * @param {Element} element HTML element.
 	 * @returns {string} Unique key for the element.
 	 * @private
 	 */
-	_getNodeKey(node) {
-		const attributes = [];
-
-		if (node.nodeType !== NODE_TYPES.ELEMENT_NODE) {
-			return node.nodeValue || '';
+	_getElementKey(element) {
+		if (element.nodeType !== NODE_TYPES.ELEMENT_NODE) {
+			return '';
 		}
 
-		if (node.hasAttributes()) {
-			for (let i = 0; i < node.attributes.length; i++) {
-				const current = node.attributes[i];
-				attributes.push(`${current.name}=${current.value}`);
+		// the only difference with element.outerHTML is that all attributes are sorted
+		const attributes = [];
+		if (element.hasAttributes()) {
+			for (let i = 0; i < element.attributes.length; i++) {
+				const current = element.attributes[i];
+				attributes.push(`${current.name}="${current.value}"`);
 			}
 		}
 
-		return `${attributes.sort().join('|')}>${node.textContent}`;
+		return `<${element.nodeName} ${attributes.sort().join(' ')}>${element.textContent}</${element.nodeName}>`;
 	}
 
 	/**
@@ -1163,6 +1113,20 @@ function createCustomEvent(event, currentTargetGetter) {
 	Object.seal(catEvent);
 	Object.freeze(catEvent);
 	return catEvent;
+}
+
+/**
+ * Checks if we can mutate the specified HTML tag.
+ * @param {Element} element The DOM element.
+ * @returns {boolean} true if element should not be mutated.
+ */
+function isTagImmutable(element) {
+	// these 3 kinds of tags once loaded can not be removed
+	// otherwise it will cause style or script reloading
+	return element.nodeName === TAG_NAMES.SCRIPT ||
+		element.nodeName === TAG_NAMES.STYLE ||
+		element.nodeName === TAG_NAMES.LINK &&
+		element.getAttribute('rel') === 'stylesheet';
 }
 
 module.exports = DocumentRenderer;
