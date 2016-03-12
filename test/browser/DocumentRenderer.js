@@ -156,6 +156,9 @@ describe('browser/DocumentRenderer', function() {
 								element.innerHTML.trim(), preparedTestCase.expectedHTML.trim())
 							)
 							.catch(error => {
+								if (error instanceof assert.AssertionError) {
+									throw error;
+								}
 								if (preparedTestCase.errorMessage) {
 									assert.strictEqual(error.message, preparedTestCase.errorMessage);
 								} else {
