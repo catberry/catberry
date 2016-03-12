@@ -42,11 +42,6 @@ class Bootstrapper extends BootstrapperBase {
 	configure(configObject, locator) {
 		super.configure(configObject, locator);
 
-		// if browser still does not have promises then add it.
-		if (!('Promise' in window)) {
-			window.Promise = Promise;
-		}
-
 		locator.register('storeDispatcher', StoreDispatcher, true);
 		locator.register('moduleApiProvider', ModuleApiProvider, true);
 		locator.register('cookieWrapper', CookieWrapper, true);
