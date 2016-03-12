@@ -43,7 +43,7 @@ catberry init ?
 
 * [Catberry Documentation](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md)
 * [Get Started Guide](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#get-started)
-* [Officially supported plugins](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#https://github.com/catberry/catberry/blob/%23221-es6-docs/docs/index.md#list-of-officially-supported-plugins)
+* [Plugins and Tools](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#plugins-and-tools)
 * [Catberry's homepage](http://catberry.org) and its [source code](https://github.com/catberry/catberry-homepage)
 * [Todo application](https://github.com/catberry/catberry-todomvc)
 * [Example application](https://github.com/catberry/catberry-cli/tree/master/templates/example)
@@ -101,7 +101,8 @@ class CoolComponent {
 	 */
 	bind() {
 		return {
-			'a.clickable': () => window.alert('Ouch!');
+		    // CSS selector
+		    '.clickable': () => window.alert('Ouch!');
 		}
 	}
 

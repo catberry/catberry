@@ -39,7 +39,7 @@
 	* [Component transformation API](#component-transformation-api)
 	* [Post-build action API](#post-build-action-api)
 	* [Browserify transformation and plugin API](#browserify-transformation-and-plugin-api)
-	* [List of officially supported plugins](#list-of-officially-supported-plugins)
+* [Plugins and tools](#plugins-and-tools)
 
 # Get Started
 First, you need to install the [CLI](https://github.com/catberry/catberry-cli):
@@ -353,11 +353,11 @@ Here is an example of an object the `bind()` method could return.
 bind() {
 	return {
 		click: {
-			'a.clickable': this._clickHandler,
-			'div#some': this._someDivHandler
+			'.clickable': this._clickHandler,
+			'#some-div': this._someDivHandler
 		},
 		hover: {
-			'a.clickable': this._clickableHoverHandler
+			'.clickable': this._clickableHoverHandler
 		}
 	};
 }
@@ -413,7 +413,7 @@ class Some {
 	 */
 	bind() {
 		return {
-			'a.clickable': () => window.alert('Ouch!');
+			'.clickable': () => window.alert('Ouch!');
 		}
 	}
 
@@ -1117,12 +1117,28 @@ locator.registerInstance('browserifyPlugin', {
 );
 ```
 
+# Plugins and Tools
+
 ## List of officially supported plugins
 
+* [catberry-handlebars](https://github.com/catberry/catberry-handlebars) – Catberry adapter for Handlebars template engine
+* [catberry-jade](https://github.com/catberry/catberry-jade) – Catberry adapter for Jade template engine
+* [catberry-dust](https://github.com/catberry/catberry-dust) – Catberry adapter for Dust template engine
 * [catberry-assets](https://github.com/catberry/catberry-assets) – The plugin that builds assets for each component using Gulp
 * [catberry-l10n](https://github.com/catberry/catberry-l10n) – The localization plugin
+* [catberry-l10n-handlebars-helper](https://github.com/catberry/catberry-l10n-handlebars-helper) – Handlebars helper for Catberry localization plugin
+* [catberry-l10n-dust-helper](https://github.com/catberry/catberry-l10n-dust-helper) – Dust helper for Catberry localization plugin
 * [catberry-uhr](https://github.com/catberry/catberry-uhr) – The universal HTTP(S) request implementation
 * [catberry-logger](https://github.com/catberry/catberry-logger) – The stupid isomorphic console logger
 * [catberry-oauth2-client](https://github.com/catberry/catberry-oauth2-client) – The OAuth 2.0 client plugin that allows your stores to work with the RESTful API using OAuth 2.0.
+
+## Tools
+
+* [catberry-debugger](https://github.com/catberry/catberry-debugger) – Chrome Dev Tools extension
+* [catberry-idea-plugin](https://github.com/catberry/catberry-idea-plugin) – Intellij platform plugin
+
+## Other
+
+* [catberry-uri](https://github.com/catberry/catberry-uri) – URI parser implementation that has been developed strictly according to RFC 3986
 
 **[↑ back to top](#table-of-contents)**
