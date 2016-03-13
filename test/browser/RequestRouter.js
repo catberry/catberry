@@ -1,897 +1,471 @@
-/*
- * catberry
- *
- * Copyright (c) 2014 Denis Rechkunov and project contributors.
- *
- * catberry's license follows:
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * This license applies to all parts of catberry that are not externally
- * maintained libraries.
- */
-
 'use strict';
 
-var assert = require('assert'),
-	events = require('events'),
-	jsdom = require('jsdom'),
-	Logger = require('../mocks/Logger'),
-	UniversalMock = require('../mocks/UniversalMock'),
-	ServiceLocator = require('catberry-locator'),
-	StateProvider = require('../../lib/providers/StateProvider'),
-	ContextFactory = require('../../lib/ContextFactory'),
-	CookieWrapper = require('../../browser/CookieWrapper'),
-	RequestRouter = require('../../browser/RequestRouter');
+const assert = require('assert');
+const events = require('events');
+const jsdom = require('jsdom');
+const UniversalMock = require('../mocks/UniversalMock');
+const ServiceLocator = require('catberry-locator');
+const StateProvider = require('../../lib/providers/StateProvider');
+const ContextFactory = require('../../lib/ContextFactory');
+const CookieWrapper = require('../../browser/CookieWrapper');
+const RequestRouter = require('../../browser/RequestRouter');
+const testCases = require('../cases/browser/RequestRouter.json');
+const testUtils = require('../utils');
 
-describe('browser/RequestRouter', function () {
-	describe('#route', function () {
-		it('should catch internal link click and change state',
-			function (done) {
-				var locator = createLocator(),
-					documentRenderer = locator.resolve('documentRenderer'),
-					eventBus = locator.resolve('eventBus'),
-					isChecked = false,
-					link = '/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
+	/* eslint prefer-arrow-callback:0 */
+	/* eslint max-nested-callbacks:0 */
+	/* eslint require-jsdoc:0 */
+describe('browser/RequestRouter', function() {
+	var locator, documentRenderer, eventBus;
 
-				locator.registerInstance('routeDefinition', {
-					expression: '/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]',
-					map: function (state) {
-						if (state.second) {
-							state.second.hello = 'world';
-						}
-						return state;
-					}
-				});
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof (context), 'object');
-					assert.strictEqual(
-						context.location.toString(),
-						'http://local' + link
-					);
-					assert.strictEqual(
-						documentRenderer.state.first.first, 'firstValue');
-					assert.strictEqual(
-						documentRenderer.state.second.second, 'secondValue');
-					assert.strictEqual(
-						documentRenderer.state.first.global, 'globalValue');
-					assert.strictEqual(
-						documentRenderer.state.second.global, 'globalValue');
-					assert.strictEqual(
-						documentRenderer.state.second.hello, 'world');
-					isChecked = true;
-				});
+	beforeEach(function() {
+		locator = new ServiceLocator();
 
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location.replace('http://local/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(isChecked, true);
-							assert.strictEqual(window.location.toString(),
-								'http://local' + link);
-							assert.strictEqual(window.history.length, 2);
-							done();
-						}, 10);
-					}
-				});
+		eventBus = new events.EventEmitter();
+		locator.registerInstance('eventBus', eventBus);
+		locator.registerInstance('serviceLocator', locator);
+		locator.register('cookieWrapper', CookieWrapper);
+		documentRenderer = {
+			initWithState: (state, context) => documentRenderer.render(state, context),
+			render: (state, context) => {
+				const last = documentRenderer.context;
+				documentRenderer.state = state;
+				documentRenderer.context = context;
+				if (last) {
+					eventBus.emit('documentRendered', context);
+				}
+				return Promise.resolve();
 			}
-		);
+		};
+		locator.registerInstance('documentRenderer', documentRenderer);
+		locator.registerInstance('moduleApiProvider', new UniversalMock(['redirect']));
+		locator.register('stateProvider', StateProvider);
+		locator.register('contextFactory', ContextFactory);
+	});
 
-		it('should get state from URI only once while changing state',
-			function (done) {
-				var locator = createLocator(),
-					documentRenderer = locator.resolve('documentRenderer'),
-					eventBus = locator.resolve('eventBus'),
-					counter = 0,
-					link = '/some/hello';
+	function clickTest(options) {
+		// name, location, html, clickSelector, clickOptions
+		it(options.name, function(done) {
+			var isRouted = false;
+			var counter = 0;
 
-				locator.registerInstance('routeDefinition', {
-					expression: '/some/:param[first]',
-					map: function (state) {
-						counter++;
-						return state;
-					}
-				});
-				eventBus.on('error', done);
+			locator.registerInstance('routeDefinition', {
+				expression: '/some/:global1[first, second]?global2=:global2[first, second]&first=:first[first]&second=:second[second]',
+				map: state => {
+					counter++;
+					return state;
+				}
+			});
 
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location.replace('http://local/some');
-						locator.resolveInstance(RequestRouter);
+			locator.registerInstance('routeDefinition', '/some/');
+			locator.registerInstance('routeDefinition', '/some/test1/test2');
 
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
+			const expectedLocation = 'http://local/some/global1Value?global2=global2Value&first=firstValue&second=secondValue';
+			const expectedState = {
+				first: {
+					first: 'firstValue',
+					global1: 'global1Value',
+					global2: 'global2Value'
+				},
+				second: {
+					second: 'secondValue',
+					global1: 'global1Value',
+					global2: 'global2Value'
+				}
+			};
 
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(counter, 1);
-							assert.strictEqual(window.location.toString(),
-								'http://local' + link);
-							assert.strictEqual(window.history.length, 2);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
+			eventBus.on('error', done);
+			eventBus.once('documentRendered', context => {
+				try {
+					assert.strictEqual(context.location.toString(), expectedLocation);
+					assert.deepEqual(documentRenderer.state, expectedState);
+					isRouted = true;
+				} catch (e) {
+					done(e);
+				}
+			});
 
-		it('should catch click on item inside link and change state',
-			function (done) {
-				var locator = createLocator(),
-					documentRenderer = locator.resolve('documentRenderer'),
-					eventBus = locator.resolve('eventBus'),
-					isChecked = false,
-					link = '/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
+			jsdom.env({
+				url: options.location || 'http://local',
+				html: options.html,
+				done: (errors, window) => {
+					const clickOptions = options.clickOptions || {
+						bubbles: true,
+						cancelable: true,
+						button: 0
+					};
+					clickOptions.view = window;
 
-				locator.registerInstance('routeDefinition', {
-					expression: '/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]',
-					map: function (state) {
-						if (state.second) {
-							state.second.hello = 'world';
-						}
-						return state;
-					}
-				});
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof (context), 'object');
-					assert.strictEqual(
-						context.location.toString(),
-						'http://local' + link
-					);
-					assert.strictEqual(
-						documentRenderer.state.first.first, 'firstValue');
-					assert.strictEqual(
-						documentRenderer.state.second.second, 'secondValue');
-					assert.strictEqual(
-						documentRenderer.state.first.global, 'globalValue');
-					assert.strictEqual(
-						documentRenderer.state.second.global, 'globalValue');
-					assert.strictEqual(
-						documentRenderer.state.second.hello, 'world');
-					isChecked = true;
-				});
+					const clickSelector = options.clickSelector || 'a';
 
-				jsdom.env({
-					html: '<a href="' + link + '"><span><div></div></span></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location.replace('http://local/some');
-						locator.resolveInstance(RequestRouter);
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					counter = 0;
+					testUtils.click(window.document.querySelector(clickSelector), clickOptions);
 
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('div')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(isChecked, true);
-							assert.strictEqual(window.location.toString(),
-								'http://local' + link);
-							assert.strictEqual(window.history.length, 2);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should catch link click and change state if link starts with //',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					isChecked = false,
-					link = '//local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.strictEqual(
-						documentRenderer.state.first.first, 'firstValue'
-					);
-					assert.strictEqual(
-						documentRenderer.state.second.second, 'secondValue'
-					);
-					assert.strictEqual(
-						documentRenderer.state.first.global, 'globalValue'
-					);
-					assert.strictEqual(
-						documentRenderer.state.second.global, 'globalValue'
-					);
-					isChecked = true;
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('https://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(isChecked, true);
-							assert.strictEqual(
-								window.location.toString(),
-								'https:' + link);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should properly handle relative URIs with .. and change state',
-			function (done) {
-				var locator = createLocator(),
-					documentRenderer = locator.resolve('documentRenderer'),
-					eventBus = locator.resolve('eventBus'),
-					isChecked = false,
-					link = '../../some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof (context), 'object');
-					assert.strictEqual(
-						context.location.toString(),
-						'http://local:9090/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue'
-					);
-					assert.strictEqual(
-						documentRenderer.state.first.first, 'firstValue');
-					assert.strictEqual(
-						documentRenderer.state.second.second, 'secondValue');
-					assert.strictEqual(
-						documentRenderer.state.first.global, 'globalValue');
-					assert.strictEqual(
-						documentRenderer.state.second.global, 'globalValue');
-					isChecked = true;
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location.replace('http://local:9090/a/b');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(isChecked, true);
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local:9090/some/' +
-								'?global=globalValue' +
-								'&first=firstValue' +
-								'&second=secondValue'
-							);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should properly handle relative URIs without .. and change state',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					isChecked = false,
-					link = 'some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition', {
-					expression: /\/some$/,
-					map: function () {
-						return {
-							first: {
-								first: 'firstValue'
-							},
-							second: {
-								second: 'secondValue'
+					testUtils.wait(1)
+						.then(() => {
+							if (options.shouldNot) {
+								assert.strictEqual(isRouted, false);
+							} else {
+								assert.strictEqual(window.location.toString(), expectedLocation);
+								assert.strictEqual(counter, 1);
+								assert.strictEqual(window.history.length, 2);
+								assert.strictEqual(isRouted, true);
 							}
-						};
-					}
-				});
+						})
+						.then(done)
+						.catch(done);
+				}
+			});
+		});
+	}
 
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function (context) {
-					assert.strictEqual(typeof (context), 'object');
-					assert.strictEqual(
-						context.location.toString(),
-						'http://local:9090/a/b/' + link
-					);
-					assert.strictEqual(
-						documentRenderer.state.first.first, 'firstValue');
-					assert.strictEqual(
-						documentRenderer.state.second.second, 'secondValue');
-					isChecked = true;
-				});
+	describe('#route', function() {
+		testCases.route.forEach(testCase => clickTest(testCase));
+	});
 
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location.replace('http://local:9090/a/b/');
-						locator.resolveInstance(RequestRouter);
+	describe('#go', function() {
+		it('should properly handle an error while clicking a link', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => Promise.reject(new Error('TestError')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', error => {
+				assert.strictEqual(error.message, 'TestError');
+				done();
+			});
 
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="http://local/some?first=x"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					testUtils.click(window.document.querySelector('a'), clickOptions);
+				}
+			});
+		});
 
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(isChecked, true);
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local:9090/a/b/' + link);
+		it('should properly handle an error while going back in the history', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => Promise.reject(new Error('TestError')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', error => {
+				assert.strictEqual(error.message, 'TestError');
+				done();
+			});
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.history.pushState({}, '', 'http://local/some?first=x');
+					const router = new RequestRouter(locator);
+					window.history.back();
+				}
+			});
+		});
+
+		it('should properly handle an error while wrapping the document', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => Promise.resolve(),
+				initWithState: () => Promise.reject(new Error('TestError'))
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', error => {
+				assert.strictEqual(error.message, 'TestError');
+				done();
+			});
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.history.pushState({}, '', 'http://local/some?first=x');
+					const router = new RequestRouter(locator);
+				}
+			});
+		});
+
+		it('should do nothing if only URI fragment is changing while clicking', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="#fragment"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					testUtils.click(window.document.querySelector('a'), clickOptions);
+					testUtils.wait(10).then(done);
+				}
+			});
+		});
+
+		it('should do nothing if only URI fragment is changing', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					router.go('http://local/some?first=z#fragment')
+						.then(done)
+						.catch(done);
+				}
+			});
+		});
+
+		it('should do nothing if history is not supported while clicking', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="http://local/some?first=x"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+
+					window.history.pushState = undefined;
+
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					testUtils.click(window.document.querySelector('a'), clickOptions);
+					testUtils.wait(10).then(done);
+				}
+			});
+		});
+
+		it('should do nothing if defaultPrevented while clicking', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: '<a href="http://local/some?first=x"></a>',
+				done: (errors, window) => {
+					const clickOptions = {
+						bubbles: true,
+						cancelable: true,
+						view: window,
+						button: 0
+					};
+
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					const element = window.document.querySelector('a');
+					element.addEventListener('click', event => event.preventDefault());
+					testUtils.click(element, clickOptions);
+					testUtils.wait(10).then(done);
+				}
+			});
+		});
+
+		it('should assign a new location if the state is null', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.location.assign = location => {
+						try {
+							assert.strictEqual(location, 'http://local');
 							done();
-						}, 10);
+						} catch (e) {
+							done(e);
+						}
+					};
+
+					const router = new RequestRouter(locator);
+					router.go('http://local')
+						.catch(done);
+				}
+			});
+		});
+
+		it('should reload page if the state is null', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/wrong',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					window.location.reload = () => done();
+
+					const router = new RequestRouter(locator);
+				}
+			});
+		});
+
+		it('should set previous state if "back" is called', function(done) {
+			locator.registerInstance('routeDefinition',
+				'/some?global=:global[first, second]&first=:first[first]&second=:second[second]'
+			);
+
+			const expectedState = [
+				{
+					first: {
+						first: '0',
+						global: '0'
+					},
+					second: {
+						second: '0',
+						global: '0'
 					}
-				});
-			}
-		);
-
-		it('should not change state if link changes host',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					link = 'http://local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-					'should not be triggered');
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local2.com/some');
-						window.location.assign = function (linkToGo) {
-							assert.strictEqual(linkToGo, link);
-							done();
-						};
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
+				},
+				{
+					first: {
+						first: '1',
+						global: '1'
+					},
+					second: {
+						second: '1',
+						global: '1'
 					}
-				});
-			}
-		);
-
-		it('should not change state if link has "target" attribute',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					link = 'http://local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-					'should not be triggered');
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '" target="_blank"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local1.com/some'
-							);
-							done();
-						}, 10);
+				},
+				{
+					first: {
+						first: '2',
+						global: '2'
+					},
+					second: {
+						second: '2',
+						global: '2'
 					}
-				});
-			}
-		);
+				}
+			];
 
-		it('should not change state if click on element ' +
-			'that is not inside the link',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					link = 'http://local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
+			const locations = [
+				'http://local/some?global=0&first=0&second=0',
+				'http://local/some?global=1&first=1&second=1',
+				'http://local/some?global=2&first=2&second=2'
+			];
 
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
+			eventBus.on('error', done);
 
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-					'should not be triggered');
-				});
+			const initialLocation = 'http://local/some?global=x&first=x&second=x';
+			const initialState = {
+				first: {
+					first: 'x',
+					global: 'x'
+				},
+				second: {
+					second: 'x',
+					global: 'x'
+				}
+			};
+			jsdom.env({
+				url: initialLocation,
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
 
-				jsdom.env({
-					html: '<a href="' + link + '"></a>' +
-					'<span><div></div></span>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('div')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local1.com/some'
-							);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should not change state if link has been clicked ' +
-			'by middle mouse button',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					link = 'http://local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-					'should not be triggered');
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 1
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local1.com/some'
-							);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should not change state if link has been clicked ' +
-			'with Control',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					link = 'http://local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-						'should not be triggered');
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							ctrlKey: true,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local1.com/some'
-							);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should not change state if link has been clicked ' +
-			'with Alt',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					link = 'http://local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-						'should not be triggered');
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							altKey: true,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local1.com/some'
-							);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should not change state if link has been clicked ' +
-			'with Shift',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer'),
-					link = 'http://local1.com/some/' +
-						'?global=globalValue' +
-						'&first=firstValue' +
-						'&second=secondValue';
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-						'should not be triggered');
-				});
-
-				jsdom.env({
-					html: '<a href="' + link + '"></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							shiftKey: true,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local1.com/some'
-							);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
-
-		it('should not change state if link does not have "href" attribute',
-			function (done) {
-				var locator = createLocator(),
-					eventBus = locator.resolve('eventBus'),
-					documentRenderer = locator.resolve('documentRenderer');
-
-				locator.registerInstance('routeDefinition',
-					'/some/' +
-					'?global=:global[first,second]' +
-					'&first=:first[first]' +
-					'&second=:second[second]'
-				);
-
-				eventBus.on('error', done);
-				eventBus.once('documentRendered', function () {
-					assert.fail('If link changes page this event ' +
-					'should not be triggered');
-				});
-
-				jsdom.env({
-					html: '<a></a>',
-					done: function (errors, window) {
-						locator.registerInstance('window', window);
-						window.location
-							.replace('http://local1.com/some');
-						locator.resolveInstance(RequestRouter);
-
-						var event = new window.MouseEvent('click', {
-							bubbles: true,
-							cancelable: true,
-							view: window,
-							button: 0
-						});
-
-						window.document
-							.getElementsByTagName('a')[0]
-							.dispatchEvent(event);
-						setTimeout(function () {
-							assert.strictEqual(
-								window.location.toString(),
-								'http://local1.com/some'
-							);
-							done();
-						}, 10);
-					}
-				});
-			}
-		);
+					router.go(locations[0])
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[0]);
+							assert.strictEqual(window.history.length, 2);
+							assert.deepEqual(documentRenderer.state, expectedState[0]);
+							return router.go(locations[1]);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[1]);
+							assert.strictEqual(window.history.length, 3);
+							assert.deepEqual(documentRenderer.state, expectedState[1]);
+							return router.go(locations[2]);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[2]);
+							assert.strictEqual(window.history.length, 4);
+							assert.deepEqual(documentRenderer.state, expectedState[2]);
+							window.history.back();
+							return testUtils.wait(10);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[1]);
+							assert.deepEqual(documentRenderer.state, expectedState[1]);
+							window.history.back();
+							return testUtils.wait(10);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), locations[0]);
+							assert.deepEqual(documentRenderer.state, expectedState[0]);
+							window.history.back();
+							return testUtils.wait(10);
+						})
+						.then(() => {
+							assert.strictEqual(window.location.toString(), initialLocation);
+							assert.deepEqual(documentRenderer.state, initialState);
+						})
+						.then(done)
+						.catch(done);
+				}
+			});
+		});
 	});
 });
-
-function createLocator() {
-	var locator = new ServiceLocator();
-
-	var eventBus = new events.EventEmitter();
-	locator.registerInstance('eventBus', eventBus);
-	locator.registerInstance('serviceLocator', locator);
-	locator.register('logger', Logger);
-	locator.register('cookieWrapper', CookieWrapper);
-	var documentRenderer = {
-		initWithState: function (state, context) {
-			return documentRenderer.render(state, context);
-		},
-		render: function (state, context) {
-			var last = documentRenderer.context;
-			documentRenderer.state = state;
-			documentRenderer.context = context;
-			if (last) {
-				eventBus.emit('documentRendered', context);
-			}
-			return Promise.resolve();
-		}
-	};
-	locator.registerInstance('documentRenderer', documentRenderer);
-	locator.registerInstance('moduleApiProvider',
-		new UniversalMock(['redirect']));
-	locator.register('stateProvider', StateProvider);
-	locator.register('contextFactory', ContextFactory);
-	return locator;
-}
