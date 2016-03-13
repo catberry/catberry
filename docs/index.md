@@ -101,7 +101,7 @@ npm run debug-win
 
 if you're using Windows.
 
-The application will output on the console which port it's listening to -- [http://localhost:3000](http://localhost:3000) by default.
+The application will output on the console which port it's listening to – [http://localhost:3000](http://localhost:3000) by default.
 
 Now that you have your very first Catberry application, go ahead and create your own [Stores](#stores) and
 [Cat-components](#cat-components).
@@ -131,12 +131,12 @@ By now you should be an expert in setting up the Catberry Framework, go ahead an
 # Isomorphic/Universal applications
 TL;DR of some of the immediate benefits solved by isomorphic/universal applications:
 
-* _Search-engine crawlable single page application_ -- the same page can be rendered as easily on the server as in the browser.
-* _*D.R.Y* templating & logic_ -- since universal modules are written only once and in JavaScript, you never have to repeat yourself or maintain the same logic in two separate code-bases.
+* _Search-engine crawlable single page application_ – the same page can be rendered as easily on the server as in the browser.
+* _*D.R.Y* templating & logic_ – since universal modules are written only once and in JavaScript, you never have to repeat yourself or maintain the same logic in two separate code-bases.
 
 _Isomorphic/universal applications_ are built such that given modules can be used identically on the server and/or client.
 
-Take, for example, code used for rendering pages. It could be used first on the server--for SEO, shared links, fast initialization, etc.--and then in the browser, or entirely in the browser, as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application), no server rendering required.
+Take, for example, code used for rendering pages. It could be used first on the server – for SEO, shared links, fast initialization, etc. – and then in the browser, or entirely in the browser, as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application), no server rendering required.
 
 There is an awesome [Airbnb blog post](http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/) that explains the idea behind isomorphic JavaScript applications and what they constitute.
 
@@ -147,7 +147,7 @@ Catberry is an isomorphic framework for building front-end apps using universal 
 **[↑ back to top](#table-of-contents)**
 
 # Flux
-Catberry uses a [Flux](https://facebook.github.io/flux/docs/overview.html)-like architecture, which defines the use of [stores](#stores)--data sources--and views/components that get & render data from stores. Catberry uses [cat-components](#cat-components) for these views. This is a robust and high-performance architecture that allows you to create large, as well as complex applications with many data dependencies.
+Catberry uses a [Flux](https://facebook.github.io/flux/docs/overview.html) – like architecture, which defines the use of [stores](#stores) – data sources – and views/components that get & render data from stores. Catberry uses [cat-components](#cat-components) for these views. This is a robust and high-performance architecture that allows you to create large, as well as complex applications with many data dependencies.
 
 Asynchronous workflow is controlled by using [Promises](https://www.promisejs.org/). Catberry uses the native `Promise` in the browser or in Node.js (V8). If global type `Promise` is not found, the framework will define it for you using the ["Bare bones Promises/A+ implementation"](https://www.npmjs.org/package/promise).
 
@@ -173,8 +173,8 @@ that constains the current location.
 * `this.$context.referrer` – the current [URI](https://github.com/catberry/catberry-uri) object
 that contains the current referrer.
 * `this.$context.locator` – the [Service Locator](#service-locator) of the application.
-* `this.$context.redirect('String')` - redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
-* `this.$context.notFound()` - hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
+* `this.$context.redirect('String')` – redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
+* `this.$context.notFound()` – hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
 * `this.$context.sendBroadcastAction('name', object)` – like `this.$context.sendAction` (see [store's context](#stores-context) and [cat-component's context](#cat-components-context)) however the action will be sent to all stores. The result will be a promise of that resolves into an `Array`.
 
 **NB** Every time the router computes a new application state, it re-creates and re-assigns a context to each store, therefore, ***do not save references to `this.$context`***.
@@ -221,7 +221,7 @@ Optionally, you may define the following methods and properties in the class/pro
 * `load()` – loads data from a remote resource and returns it or a Promise.
 * `handle<SomeActionNameHere>(args)` – handles an action and returns a result or a Promise.
 
-Handlers can be used to submit data to a remote resource here or simply change the state within the store--in which case, you would have to emit your own `changed` event via `this.$context.changed()`.
+Handlers can be used to submit data to a remote resource here or simply change the state within the store – in which case, you would have to emit your own `changed` event via `this.$context.changed()`.
 
 For example, you can name a store's method `handleFormSubmit` and when a component or another store sends an action to the store with a name like: `form-submit`, `form_submit`, `FORM_SUBMIT`, `formSubmit`, or `FormSubmit`, it will trigger that stores' `handleFormSubmit` method.
 
@@ -296,7 +296,7 @@ module.exports = Some;
 # Cat-components
 You might think that cat-components are whiskers, paws, or even tails, but that's not always so.
 
-A `cat-component` is an universal implementation of [Web-Component](http://webcomponents.org/)--a mix of features declared in the web-components specification and features specific to the Catberry framework--designed to work on both server and client, and publishable as a [NPM dependency](https://docs.npmjs.com/files/package.json#dependencies).
+A `cat-component` is an universal implementation of [Web-Component](http://webcomponents.org/)–a mix of features declared in the web-components specification and features specific to the Catberry framework–designed to work on both server and client, and publishable as a [NPM dependency](https://docs.npmjs.com/files/package.json#dependencies).
 
 Each `cat-component` is declared as a directory with the `cat-component.json` file by default. But you can change this via [config](#config). When Catberry initializes the application it recursively searches for such directories starting with your project root, and then via first-level dependencies in the `./node_modules` directory.
 
@@ -651,10 +651,10 @@ Your Catberry application probably has the `./server.js` file like this:
 ```javascript
 const catberry = require('catberry');
 const RestApiClient = require('./lib/RestApiClient');
-const connect = require('connect');
+const express = require('express');
 const config = require('./server-config');
 const cat = catberry.create(config);
-const app = connect();
+const app = express();
 
 // when you have created an instance of the Catberry application
 // you can register anything you want in the Service Locator.
