@@ -1,0 +1,114 @@
+{
+	"route": [
+		{
+			"name": "should catch internal link click and change state",
+			"location": "http://local/some/global1Value",
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a>"
+		},
+		{
+			"name": "should catch click on item inside link and change state",
+			"location": "http://local/some/global1Value",
+			"clickSelector": "div",
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"><div>test</div></a>"
+		},
+		{
+			"name": "should catch link click and change state if link starts with //",
+			"location": "http://local/some/global1Value",
+			"html": "<a href=\"//local/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a>"
+		},
+		{
+			"name": "should properly handle relative URIs with .. and change state",
+			"location": "http://local/some/test1/test2",
+			"html": "<a href=\"../../../some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a>"
+		},
+		{
+			"name": "should properly handle relative URIs without .. and change state",
+			"location": "http://local/some/",
+			"html": "<a href=\"global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a>"
+		},
+		{
+			"name": "should not change state if link changes host",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"html": "<a href=\"http://local2/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a>"
+		},
+		{
+			"name": "should not change state if link has \"target\" attribute",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\" target=\"_blank\"></a>"
+		},
+		{
+			"name": "should not change state if link does not have \"href\" attribute",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"html": "<a></a>"
+		},
+		{
+			"name": "should not change state if click on element that is not inside the link",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"clickSelector": "div",
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a><div>test</div>"
+		},
+		{
+			"name": "should not change state if link has been clicked by middle mouse button",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"clickOptions": {
+				"bubbles": true,
+				"cancelable": true,
+				"button": 1
+			},
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a><div>test</div>"
+		},
+		{
+			"name": "should not change state if link has been clicked with Control",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"clickOptions": {
+				"bubbles": true,
+				"cancelable": true,
+				"ctrlKey": true,
+				"button": 0
+			},
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a><div>test</div>"
+		},
+		{
+			"name": "should not change state if link has been clicked with Alt",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"clickOptions": {
+				"bubbles": true,
+				"cancelable": true,
+				"altKey": true,
+				"button": 0
+			},
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a><div>test</div>"
+		},
+		{
+			"name": "should not change state if link has been clicked with Shift",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"clickOptions": {
+				"bubbles": true,
+				"cancelable": true,
+				"shiftKey": true,
+				"button": 0
+			},
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a><div>test</div>"
+		},
+		{
+			"name": "should not change state if link has been clicked with Meta",
+			"shouldNot": true,
+			"location": "http://local/some/global1Value",
+			"clickOptions": {
+				"bubbles": true,
+				"cancelable": true,
+				"metaKey": true,
+				"button": 0
+			},
+			"html": "<a href=\"/some/global1Value?global2=global2Value&first=firstValue&second=secondValue\"></a><div>test</div>"
+		}
+	]
+}

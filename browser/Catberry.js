@@ -1,80 +1,57 @@
-/*
- * catberry
- *
- * Copyright (c) 2014 Denis Rechkunov and project contributors.
- *
- * catberry's license follows:
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * This license applies to all parts of catberry that are not externally
- * maintained libraries.
- */
-
 'use strict';
 
-module.exports = Catberry;
+const CatberryBase = require('../lib/base/CatberryBase');
 
-var util = require('util'),
-	CatberryBase = require('../lib/base/CatberryBase');
-
-util.inherits(Catberry, CatberryBase);
-
-/**
- * Creates new instance of the browser version of Catberry.
- * @constructor
- * @extends CatberryBase
- */
-function Catberry() {
-	CatberryBase.call(this);
+const Promise = require('promise');
+// if browser still does not have promises then add it.
+if (!('Promise' in window)) {
+	window.Promise = Promise;
 }
 
-/**
- * Current request router.
- * @type {RequestRouter}
- * @private
- */
-Catberry.prototype._router = null;
+class Catberry extends CatberryBase {
 
-/**
- * Wraps current HTML document with Catberry event handlers.
- */
-Catberry.prototype.wrapDocument = function () {
-	this._router = this.locator.resolve('requestRouter');
-};
+	/**
+	 * Creates new instance of the browser version of Catberry.
+	 */
+	constructor() {
+		super();
 
-/**
- * Starts Catberry application when DOM is ready.
- * @returns {Promise} Promise for nothing.
- */
-Catberry.prototype.startWhenReady = function () {
-	if (window.catberry) {
-		return Promise.resolve();
+		/**
+		 * Current request router.
+		 * @type {RequestRouter}
+		 * @private
+		 */
+		this._router = null;
 	}
-	var self = this;
 
-	return new Promise(function (fulfill) {
-		window.document.addEventListener('DOMContentLoaded', function () {
-			self.wrapDocument();
-			window.catberry = self;
-			fulfill();
+	/**
+	 * Wraps current HTML document with Catberry event handlers.
+	 */
+	wrapDocument() {
+		this._router = this.locator.resolve('requestRouter');
+	}
+
+	/**
+	 * Starts Catberry application when DOM is ready.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	startWhenReady() {
+		if (window.catberry) {
+			return Promise.resolve();
+		}
+
+		return new Promise((fulfill, reject) => {
+			window.document.addEventListener('DOMContentLoaded', () => {
+				try {
+					this.wrapDocument();
+					window.catberry = this;
+					fulfill();
+				} catch (e) {
+					reject(e);
+				}
+			});
 		});
-	});
-};
+	}
+}
+
+module.exports = Catberry;
