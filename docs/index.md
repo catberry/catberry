@@ -470,7 +470,7 @@ Typically, project structure looks like this:
 ```
 
 If you want to see a finished application as an example then please proceed to the
-[example directory](https://github.com/catberry/catberry-cli/tree/master/templates/example).
+[example directory](https://github.com/catberry/catberry-example).
 
 **[↑ back to top](#table-of-contents)**
 
