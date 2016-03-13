@@ -52,10 +52,10 @@ catberry init ?
 
 ### Architecture
 
-* The entire architecture of the framework is built using the [Service Locator](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#service-locator) pattern -- which helps to manage module dependencies and [create plugins](https://github.com/catberry/catberry/) -- and [Flux](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#flux), for the data layer
+* The entire architecture of the framework is built using the [Service Locator](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#service-locator) pattern – which helps to manage module dependencies and [create plugins](https://github.com/catberry/catberry/) – and [Flux](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#flux), for the data layer
 * [Cat-components](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#cat-components) – similar to [web-components](http://webcomponents.org/) but organized as directories, can be rendered on the server and published/installed as NPM packages
 * Catberry builds a bundle for running the application in a browser as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)
-* [ES2015/ES6 support](https://nodejs.org/en/docs/es6/) -- native on the server/Node.js and using [Babel](http://babeljs.io/) for a browser
+* [ES2015/ES6 support](https://nodejs.org/en/docs/es6/) – native on the server/Node.js and using [Babel](http://babeljs.io/) for a browser
 * The whole framework's API uses [Promises](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 * Framework itself is an [express](https://github.com/visionmedia/express)/[connect](https://github.com/senchalabs/connect) middleware, which means you can use it with other [middlewares](http://expressjs.com/en/guide/using-middleware.html)
 
