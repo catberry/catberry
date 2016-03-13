@@ -9,7 +9,7 @@
 
 ## What the cat is that?
 
-Catberry was developed to help create ["isomorphic/Universal" Web applications](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#isomorphicuniversal-applications).
+Catberry was developed to help create ["isomorphic/Universal" Web applications](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md#isomorphicuniversal-applications).
 
 Long story short, isomorphic/universal applications are apps that use the same codebase on both the server and client environments to render what the client would see as a "[Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)".
 
@@ -41,9 +41,9 @@ catberry init ?
 
 ## Useful links
 
-* [Catberry Documentation](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md)
-* [Get Started Guide](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#get-started)
-* [Plugins and Tools](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#plugins-and-tools)
+* [Catberry Documentation](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md)
+* [Get Started Guide](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md#get-started)
+* [Plugins and Tools](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md#plugins-and-tools)
 * [Catberry's homepage](http://catberry.org) and its [source code](https://github.com/catberry/catberry-homepage)
 * [Todo application](https://github.com/catberry/catberry-todomvc)
 * [Example application](https://github.com/catberry/catberry-example)
@@ -52,8 +52,8 @@ catberry init ?
 
 ### Architecture
 
-* The entire architecture of the framework is built using the [Service Locator](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#service-locator) pattern – which helps to manage module dependencies and [create plugins](https://github.com/catberry/catberry/) – and [Flux](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#flux), for the data layer
-* [Cat-components](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#cat-components) – similar to [web-components](http://webcomponents.org/) but organized as directories, can be rendered on the server and published/installed as NPM packages
+* The entire architecture of the framework is built using the [Service Locator](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md#service-locator) pattern – which helps to manage module dependencies and [create plugins](https://github.com/catberry/catberry/) – and [Flux](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md#flux), for the data layer
+* [Cat-components](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md#cat-components) – similar to [web-components](http://webcomponents.org/) but organized as directories, can be rendered on the server and published/installed as NPM packages
 * Catberry builds a bundle for running the application in a browser as a [Single Page Application](http://en.wikipedia.org/wiki/Single_Page_Application)
 * [ES2015/ES6 support](https://nodejs.org/en/docs/es6/) – native on the server/Node.js and using [Babel](http://babeljs.io/) for a browser
 * The whole framework's API uses [Promises](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise)
@@ -65,10 +65,10 @@ catberry init ?
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) on the server
 * Browser rendering does not block the [Event Loop](https://developer.mozilla.org/en/docs/Web/JavaScript/EventLoop), which means your app's UI will never be frozen
 * [Handlebars](https://github.com/catberry/catberry-handlebars), [Dust](https://github.com/catberry/catberry-dust) and
-[Jade](https://github.com/catberry/catberry-jade) template engines are [officially supported](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#template-engines) (and you can implement your own provider to support any other)
+[Jade](https://github.com/catberry/catberry-jade) template engines are [officially supported](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md#template-engines) (and you can implement your own provider to support any other)
 * Efficient DOM event listening using [event delegation](http://davidwalsh.name/event-delegate)
 
-For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md).
+For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/8.0.0/docs/index.md).
 
 ### Typical Cat-component example
 
@@ -207,7 +207,7 @@ There are a lot of ways to contribute into Catberry:
 * Give it a star
 * Join the [Gitter](https://gitter.im/catberry/main) room and leave a feedback or help with answering users' questions
 * [Submit a bug or a feature request](https://github.com/catberry/catberry/issues)
-* [Submit a PR](https://github.com/catberry/catberry/blob/8.0.0-dev/CONTRIBUTING.md)
+* [Submit a PR](https://github.com/catberry/catberry/blob/8.0.0/CONTRIBUTING.md)
 * If you like the logo, you might want to buy a Catberry [T-Shirt](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=t-shirt) or a [sticker](http://www.redbubble.com/people/catberryjs/works/14439373-catberry-js-framework-logo?p=sticker)
 
 Denis Rechkunov <denis.rechkunov@gmail.com>
