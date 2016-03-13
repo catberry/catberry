@@ -46,7 +46,7 @@ catberry init ?
 * [Plugins and Tools](https://github.com/catberry/catberry/blob/8.0.0-dev/docs/index.md#plugins-and-tools)
 * [Catberry's homepage](http://catberry.org) and its [source code](https://github.com/catberry/catberry-homepage)
 * [Todo application](https://github.com/catberry/catberry-todomvc)
-* [Example application](https://github.com/catberry/catberry-cli/tree/master/templates/example)
+* [Example application](https://github.com/catberry/catberry-example)
 
 ## Why should I use that?
 
