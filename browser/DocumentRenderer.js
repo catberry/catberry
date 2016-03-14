@@ -664,7 +664,7 @@ class DocumentRenderer extends DocumentRendererBase {
 				}
 
 				if (!this._config.isRelease && error instanceof Error) {
-					errorHelper.prettyPrint(error, this._window.navigator.userAgent);
+					return errorHelper.prettyPrint(error, this._window.navigator.userAgent);
 				} else if (component.errorTemplate) {
 					return component.errorTemplate.render(error);
 				}
