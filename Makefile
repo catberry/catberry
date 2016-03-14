@@ -1,5 +1,5 @@
 
-SOURCES = ./lib ./browser ./test/mocks
+SOURCES = ./
 TESTS = ./test/lib ./test/browser
 
 all: lint test
