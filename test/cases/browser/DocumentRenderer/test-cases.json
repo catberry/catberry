@@ -101,8 +101,23 @@
 			"elementHTML": "complex-head.html",
 			"expectedHTML": "merged-head.html"
 		},
-
-
+		{
+			"name": "should not change HEAD component if new set of elements the same",
+			"config": {
+				"isRelease": true
+			},
+			"tagName": "head",
+			"components": {
+				"head": {
+					"name": "head",
+					"constructor": "AsyncComponent",
+					"template": "complex-head3.html"
+				}
+			},
+			"html": "stub.html",
+			"elementHTML": "complex-head3.html",
+			"expectedHTML": "merged-head2.html"
+		},
 		{
 			"name": "should render error template instead the content when error in release mode",
 			"config": {

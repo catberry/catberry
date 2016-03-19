@@ -764,35 +764,30 @@ class DocumentRenderer extends DocumentRendererBase {
 
 		const headSet = Object.create(null);
 
-		// get unique key for every child element in the current HEAD
-		for (let i = 0; i < head.children.length; i++) {
-			if (!isTagImmutable(head.children[i])) {
+		// remove all nodes from the current HEAD except immutable ones
+		for (let i = 0; i < head.childNodes.length; i++) {
+			const current = head.childNodes[i];
+			if (!isTagImmutable(current)) {
+				head.removeChild(current);
+				i--;
 				continue;
 			}
-			const key = this._getElementKey(head.children[i]);
-			headSet[key] = true;
+			// we need to collect keys for immutable elements to handle
+			// attributes reordering
+			headSet[this._getElementKey(current)] = true;
 		}
 
-		// then remove from the new DOM all the element which we already have
-		// in the current DOM, to skip morphing them
-		for (let i = 0; i < newHead.children.length; i++) {
-			const key = this._getElementKey(newHead.children[i]);
-			if (key in headSet) {
-				newHead.removeChild(newHead.children[i]);
-				i--;
+		for (let i = 0; i < newHead.childNodes.length; i++) {
+			const current = newHead.childNodes[i];
+			if (current.nodeType !== NODE_TYPES.ELEMENT_NODE ||
+					this._getElementKey(current) in headSet) {
+				continue;
 			}
+			head.appendChild(current);
+			// when we append existing child to another parent it removes
+			// the node from a previous parent
+			i--;
 		}
-
-		morphdom(head, newHead, {
-			childrenOnly: true,
-			// in case we have an immutable tag with changed attribute
-			// script with changed "src" for instance
-			// we have to put it at the end and not morhping an existing one
-			// morphdom will put it at the end for us
-			onBeforeMorphElChildren: (newElement, oldElement) => !isTagImmutable(oldElement),
-			// we can remove all elements except immutable ones
-			onBeforeNodeDiscarded: node => !isTagImmutable(node)
-		});
 	}
 
 	/**
@@ -802,17 +797,17 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @private
 	 */
 	_getElementKey(element) {
-		if (element.nodeType !== NODE_TYPES.ELEMENT_NODE) {
-			return '';
-		}
-
-		// the only difference with element.outerHTML is that all attributes are sorted
+		// some immutable elements have several valuable attributes
+		// these attributes define the element identity
 		const attributes = [];
-		if (element.hasAttributes()) {
-			for (let i = 0; i < element.attributes.length; i++) {
-				const current = element.attributes[i];
-				attributes.push(`${current.name}="${current.value}"`);
-			}
+
+		switch (element.nodeName) {
+			case TAG_NAMES.LINK:
+				attributes.push(`href=${element.getAttribute('href')}`);
+				break;
+			case TAG_NAMES.SCRIPT:
+				attributes.push(`src=${element.getAttribute('src')}`);
+				break;
 		}
 
 		return `<${element.nodeName} ${attributes.sort().join(' ')}>${element.textContent}</${element.nodeName}>`;
