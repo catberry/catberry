@@ -59,32 +59,6 @@
 			"expectedHTML": "nested-components.html"
 		},
 		{
-			"name": "should render nested components with cycles",
-			"tagName": "cat-test1",
-			"attributes": {
-				"id": "unique"
-			},
-			"components": {
-				"test1": {
-					"name": "test1",
-					"constructor": "AsyncComponent",
-					"template": "nested1.html"
-				},
-				"test2": {
-					"name": "test2",
-					"constructor": "SyncComponent",
-					"template": "nested2.html"
-				},
-				"test3": {
-					"name": "test3",
-					"constructor": "AsyncComponent",
-					"template": "nested3-cycle.html"
-				}
-			},
-			"html": "stub.html",
-			"expectedHTML": "nested-components-with-cycles.html"
-		},
-		{
 			"name": "should merge HEAD component with new rendered HTML",
 			"config": {
 				"isRelease": true
@@ -207,23 +181,6 @@
 			"attributes": {
 				"id": "unique"
 			},
-			"html": "stub.html",
-			"expectedHTML": ""
-		},
-		{
-			"name": "should do nothing if there is no Element's ID",
-			"config": {
-				"isRelease": true
-			},
-			"tagName": "cat-test",
-			"components": {
-				"test": {
-					"name": "test",
-					"constructor": "SyncComponent",
-					"template": "simple-component.html"
-				}
-			},
-			"errorMessage": "test",
 			"html": "stub.html",
 			"expectedHTML": ""
 		}
