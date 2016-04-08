@@ -58,30 +58,6 @@
 			"expectedHTML": "components-without-stores.html"
 		},
 		{
-			"name": "should skip components without ids and with the same ids",
-			"config": {
-				"isRelease": true
-			},
-			"components": {
-				"document": {
-					"name": "document",
-					"constructor": "AsyncComponent",
-					"template": "document-with-wrong-ids.html"
-				},
-				"comp": {
-					"name": "comp",
-					"constructor": "AsyncComponent",
-					"template": "component.html"
-				},
-				"async-comp": {
-					"name": "async-comp",
-					"constructor": "AsyncComponent",
-					"template": "component.html"
-				}
-			},
-			"expectedHTML": "components-with-wrong-components.html"
-		},
-		{
 			"name": "should properly render components with stores",
 			"config": {
 				"isRelease": true
