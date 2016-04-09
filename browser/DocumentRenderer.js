@@ -1,6 +1,7 @@
 'use strict';
 
 const morphdom = require('morphdom');
+const uuid = require('uuid');
 const errorHelper = require('../lib/helpers/errorHelper');
 const moduleHelper = require('../lib/helpers/moduleHelper');
 const hrTimeHelper = require('../lib/helpers/hrTimeHelper');
@@ -193,16 +194,10 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @param {Object?} renderingContext Rendering context for group rendering.
 	 */
 	renderComponent(element, renderingContext) {
-
 		return this._getPromiseForReadyState()
 			.then(() => {
 				const id = this._getId(element);
 				const componentName = moduleHelper.getOriginalComponentName(element.tagName);
-
-				if (!id) {
-					this._eventBus.emit('warn', `Component "${componentName}" does not have an ID, skipping...`);
-					return null;
-				}
 
 				if (!renderingContext) {
 					renderingContext = this._createRenderingContext([]);
@@ -212,13 +207,6 @@ class DocumentRenderer extends DocumentRendererBase {
 				const hadChildren = element.hasChildNodes();
 				const component = renderingContext.components[componentName];
 				if (!component) {
-					return null;
-				}
-
-				if (id in renderingContext.renderedIds) {
-					this._eventBus.emit('warn',
-						`The duplicated ID "${id}" has been found, skipping component "${componentName}"...`
-					);
 					return null;
 				}
 
@@ -311,11 +299,12 @@ class DocumentRenderer extends DocumentRendererBase {
 
 	/**
 	 * Gets a component instance by ID.
-	 * @param {string} id Component ID.
+	 * @param {string} id Component's element ID.
 	 * @returns {Object|null} Component instance.
 	 */
 	getComponentById(id) {
-		return this._componentInstances[id] || null;
+		const element = this._window.document.getElementById(id);
+		return this.getComponentByElement(element);
 	}
 
 	/**
@@ -327,8 +316,11 @@ class DocumentRenderer extends DocumentRendererBase {
 		if (!element) {
 			return null;
 		}
-		const id = this._getId(element);
-		return this.getComponentById(id);
+		const id = element[moduleHelper.COMPONENT_ID];
+		if (!id) {
+			return null;
+		}
+		return this._componentInstances[id] || null;
 	}
 
 	/**
@@ -346,12 +338,13 @@ class DocumentRenderer extends DocumentRendererBase {
 						if (SPECIAL_IDS.hasOwnProperty(id)) {
 							return;
 						}
-						const element = this._window.document.getElementById(id);
-						if (element) {
+
+						const element = this._componentElements[id];
+						if (this._window.document.body.contains(element)) {
 							return;
 						}
 
-						const promise = this._unbindComponent(this._componentElements[id])
+						const promise = this._unbindComponent(element)
 							.then(() => this._removeComponent(id));
 						promises.push(promise);
 					});
@@ -385,12 +378,6 @@ class DocumentRenderer extends DocumentRendererBase {
 				}
 
 				const safeTagName = moduleHelper.getTagNameForComponentName(componentName);
-
-				const id = attributes[moduleHelper.ATTRIBUTE_ID];
-				if (!id || id in this._componentInstances) {
-					return Promise.reject(new Error('The ID is not specified or already used'));
-				}
-
 				const element = this._window.document.createElement(safeTagName);
 				Object.keys(attributes)
 					.forEach(attributeName => {
@@ -418,7 +405,7 @@ class DocumentRenderer extends DocumentRendererBase {
 
 				// if someone added an element with the same ID during the
 				// rendering process
-				if (this._window.document.getElementById(id) !== null) {
+				if (this._window.document.body.contains(this._componentElements[id])) {
 					return;
 				}
 
@@ -480,7 +467,7 @@ class DocumentRenderer extends DocumentRendererBase {
 			.then(() => {
 				this._eventBus.emit('componentUnbound', {
 					element,
-					id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
+					id: element.id || null
 				});
 			})
 			.catch(reason => this._eventBus.emit('error', reason));
@@ -516,7 +503,7 @@ class DocumentRenderer extends DocumentRendererBase {
 				if (!bindings || typeof (bindings) !== 'object') {
 					this._eventBus.emit('componentBound', {
 						element,
-						id: !SPECIAL_IDS.hasOwnProperty(id) ? id : null
+						id: element.id || null
 					});
 					return;
 				}
@@ -548,7 +535,7 @@ class DocumentRenderer extends DocumentRendererBase {
 					});
 				this._eventBus.emit('componentBound', {
 					element,
-					id
+					id: element.id || null
 				});
 			});
 	}
@@ -712,7 +699,7 @@ class DocumentRenderer extends DocumentRendererBase {
 				this._currentChangedStores[name] = true;
 			});
 
-			// we should update contexts of the stores with the new routing context
+			// we should update contexts of the components with the new routing context
 			this._currentRoutingContext = this._awaitingRouting.routingContext;
 			Object.keys(this._componentInstances)
 				.forEach(id => {
@@ -824,15 +811,12 @@ class DocumentRenderer extends DocumentRendererBase {
 
 		return Promise.resolve()
 			.then(() => {
-				const id = this._getId(current);
-				if (!id) {
-					return null;
-				}
-
 				const componentName = moduleHelper.getOriginalComponentName(current.nodeName);
 				if (!(componentName in components)) {
 					return null;
 				}
+
+				const id = this._getId(current);
 				const ComponentConstructor = components[componentName].constructor;
 				ComponentConstructor.prototype.$context = this._getComponentContext(
 					components[componentName], current
@@ -930,7 +914,7 @@ class DocumentRenderer extends DocumentRendererBase {
 			.forEach(storeName => {
 				storeNamesSet[storeName] = true;
 				componentElements[storeName] = this._window.document
-					.querySelectorAll(`[${moduleHelper.ATTRIBUTE_ID}][${moduleHelper.ATTRIBUTE_STORE}="${storeName}"]`);
+					.querySelectorAll(`[${moduleHelper.ATTRIBUTE_STORE}="${storeName}"]`);
 			});
 
 		if (moduleHelper.HEAD_COMPONENT_NAME in components && headStore in storeNamesSet) {
@@ -1018,10 +1002,20 @@ class DocumentRenderer extends DocumentRendererBase {
 		if (element === this._window.document.documentElement) {
 			return SPECIAL_IDS.$$document;
 		}
+
 		if (element === this._window.document.head) {
 			return SPECIAL_IDS.$$head;
 		}
-		return element.getAttribute(moduleHelper.ATTRIBUTE_ID);
+
+		// if the element does not have an ID we create it
+		if (!element[moduleHelper.COMPONENT_ID]) {
+			element[moduleHelper.COMPONENT_ID] = uuid.v4();
+			// deal with possible collisions
+			while (element[moduleHelper.COMPONENT_ID] in this._componentInstances) {
+				element[moduleHelper.COMPONENT_ID] = uuid.v4();
+			}
+		}
+		return element[moduleHelper.COMPONENT_ID];
 	}
 
 	/**

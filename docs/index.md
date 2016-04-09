@@ -325,15 +325,14 @@ An example `cat-component.json` could look like this:
 In the example above, the tag name of your component would be `cat-cool`, and may be used like:
 
 ```html
-<cat-cool id="unique-value" cat-store="group/store1" some-additional="value" ></cat-cool>
+<cat-cool cat-store="group/store1" some-additional="value" ></cat-cool>
 ```
 
 Important things to note:
-* Every component's tag must have an unique `id` attribute, otherwise it will not rendered and throw an error.
 * Setting the `cat-store` attribute connects the `store` to the `cat-component`, which means as the `store` is changed, the `cat-component` will be re-rendered automatically.
 * You can set any additional attribute you want and use it inside the component.
 * You must always use opening and closing tags (i.e. no self-closing tags). The majority of the browsers do not support self-closing custom tags correctly.
-* Nested components (using `cat-component`s inside component templates) are supported but still require unique IDs. **The best practice is to build IDs of nested components using the current component's ID as a prefix**.
+* Nested components (using `cat-component`s inside component templates) are supported
 
 There are two reserved component names that are used in an unusual way:
 * `document` – the root template of the entire application (doctype, html, body, etc.). It can not depend on any store, thus the `cat-store` attribute is ignored.
@@ -376,7 +375,7 @@ Every component's [`$context`](#shared-context) is extended with the following p
 * `this.$context.sendAction('name', object)` – sends an action to the bound store and returns a promise of the handler's result. If the store does not have a handler for this action then the result will be `null`.
 * `this.$context.element` – the current DOM element that represents the current component.
 * `this.$context.attributes` – the set of attributes which component's DOM element has at the moment.
-* `this.$context.getComponentById('id')` – gets another component *object* by its ID.
+* `this.$context.getComponentById('id')` – gets another component *object* by ID of its element.
 * `this.$context.getComponentByElement(domElement)` – gets another component's *object* by its DOM element.
 * `this.$context.createComponent('tagName', attributesObject)` – creates a new component's instance and returns a promise of its DOM element.
 * `this.$context.collectGarbage()` – collects all components which have been created using the `createComponent('tagName', attributesObject)` method and are not attached to the DOM at the moment.
