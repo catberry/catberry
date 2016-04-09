@@ -701,12 +701,12 @@ describe('browser/DocumentRenderer', function() {
 				test1: {
 					name: 'test1',
 					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1-w-id.html`)
 				},
 				test2: {
 					name: 'test2',
 					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id.html`)
 				},
 				test3: {
 					name: 'test3',
@@ -774,12 +774,12 @@ describe('browser/DocumentRenderer', function() {
 				test1: {
 					name: 'test1',
 					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1-w-id.html`)
 				},
 				test2: {
 					name: 'test2',
 					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id.html`)
 				},
 				test3: {
 					name: 'test3',
@@ -919,12 +919,12 @@ describe('browser/DocumentRenderer', function() {
 				test1: {
 					name: 'test1',
 					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1-w-id.html`)
 				},
 				test2: {
 					name: 'test2',
 					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id.html`)
 				},
 				test3: {
 					name: 'test3',
@@ -1036,63 +1036,6 @@ describe('browser/DocumentRenderer', function() {
 			});
 		});
 
-		it('should reject promise if ID is not specified', function(done) {
-			const components = {
-				test: {
-					name: 'test',
-					constructor: componentMocks.AsyncComponent,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
-				}
-			};
-
-			const locator = createLocator({}, components);
-
-			jsdom.env({
-				html: ' ',
-				done: (errors, window) => {
-					locator.registerInstance('window', window);
-					const renderer = new DocumentRenderer(locator);
-					renderer.createComponent('cat-test', {})
-						.then(() => assert.fail('Should fail'))
-						.catch(reason =>
-							assert.strictEqual(reason.message, 'The ID is not specified or already used'))
-						.then(done)
-						.catch(done);
-				}
-			});
-		});
-
-		it('should reject promise if ID is already used', function(done) {
-			const components = {
-				test: {
-					name: 'test',
-					constructor: componentMocks.AsyncComponent,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
-				}
-			};
-
-			const locator = createLocator({}, components);
-
-			jsdom.env({
-				html: ' ',
-				done: (errors, window) => {
-					locator.registerInstance('window', window);
-					const renderer = new DocumentRenderer(locator);
-					renderer.createComponent('cat-test', {
-						id: 'some'
-					})
-						.then(() => renderer.createComponent('cat-test', {
-							id: 'some'
-						}))
-						.then(() => assert.fail('Should fail'))
-						.catch(reason =>
-							assert.strictEqual(reason.message, 'The ID is not specified or already used'))
-						.then(done)
-						.catch(done);
-				}
-			});
-		});
-
 		it('should reject promise if tag name is not a string', function(done) {
 			const locator = createLocator({}, {});
 
@@ -1180,8 +1123,7 @@ describe('browser/DocumentRenderer', function() {
 						.then(elements => {
 							window.document.body.appendChild(elements[2]);
 							const areInstances = elements.every(el => {
-								const id = el.getAttribute('id');
-								const instance = renderer.getComponentById(id);
+								const instance = renderer.getComponentByElement(el);
 								return instance instanceof componentMocks.AsyncComponent;
 							});
 							assert.strictEqual(areInstances, true);
