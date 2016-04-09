@@ -293,7 +293,7 @@ describe('lib/DocumentRenderer', function() {
 			const routingContext = createRoutingContext({}, {}, components);
 			const response = routingContext.middleware.response;
 			const documentRenderer = routingContext.locator.resolve('documentRenderer');
-			const expectToHave = '<cat-comp id="1">' +
+			const expectToHave = '<cat-comp>' +
 				'<script>window.location.hash = \'\';</script>';
 
 			documentRenderer.render({}, routingContext);
@@ -328,7 +328,7 @@ describe('lib/DocumentRenderer', function() {
 			const routingContext = createRoutingContext({}, {}, components);
 			const response = routingContext.middleware.response;
 			const documentRenderer = routingContext.locator.resolve('documentRenderer');
-			const expectToHave = '<cat-comp id="1">' +
+			const expectToHave = '<cat-comp>' +
 				'<script>window.location.assign(\'/to/garden\');</script>';
 
 			documentRenderer.render({}, routingContext);
@@ -366,7 +366,7 @@ describe('lib/DocumentRenderer', function() {
 			const routingContext = createRoutingContext({}, {}, components);
 			const response = routingContext.middleware.response;
 			const documentRenderer = routingContext.locator.resolve('documentRenderer');
-			const expectToHave = '<cat-comp id=\"1\">' +
+			const expectToHave = '<cat-comp>' +
 					'<script>window.document.cookie = \'key=value\';</script>';
 
 			documentRenderer.render({}, routingContext);
