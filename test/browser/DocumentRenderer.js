@@ -711,6 +711,11 @@ describe('browser/DocumentRenderer', function() {
 				test3: {
 					name: 'test3',
 					constructor: Component1,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id-and-store.html`)
+				},
+				test4: {
+					name: 'test4',
+					constructor: Component1,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
 			};
@@ -746,10 +751,13 @@ describe('browser/DocumentRenderer', function() {
 							store3: {}
 						}, {})
 						.then(() => {
-							assert.strictEqual(renders.length, 3);
-							assert.strictEqual(renders[0], 'test1-1');
-							assert.strictEqual(renders[1], 'test1-2');
-							assert.strictEqual(renders[2], 'test2-1');
+							assert.deepEqual(renders, [
+								'test1-1',
+								'test1-2',
+								'test2-1',
+								'test3-1',
+								'test3-1'
+							]);
 						})
 						.then(done)
 						.catch(done);
