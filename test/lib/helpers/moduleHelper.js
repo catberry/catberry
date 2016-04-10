@@ -64,7 +64,7 @@ describe('lib/helpers/moduleHelper', function() {
 	describe('#getOriginalComponentName', function() {
 		it('should return a name without the prefix', function() {
 			const originalName = moduleHelper.getOriginalComponentName(
-				`${moduleHelper.COMPONENT_PREFIX}some`
+				`${moduleHelper.COMPONENT_TAG_PREFIX}SOME`
 			);
 			assert.strictEqual(originalName, 'some');
 		});
@@ -79,7 +79,7 @@ describe('lib/helpers/moduleHelper', function() {
 		it('should return a name with the prefix', function() {
 			const tagName = moduleHelper.getTagNameForComponentName('some');
 			assert.strictEqual(
-				tagName, `${moduleHelper.COMPONENT_PREFIX.toUpperCase()}SOME`
+				tagName, `${moduleHelper.COMPONENT_TAG_PREFIX}SOME`
 			);
 		});
 
@@ -91,7 +91,7 @@ describe('lib/helpers/moduleHelper', function() {
 		it('should return a name "HTML" without the prefix for document', function() {
 			const tagName = moduleHelper.getTagNameForComponentName('document');
 			assert.strictEqual(
-				tagName, moduleHelper.DOCUMENT_ELEMENT_NAME.toUpperCase()
+				tagName, moduleHelper.DOCUMENT_TAG_NAME
 			);
 		});
 
