@@ -12,21 +12,10 @@ const SPECIAL_IDS = {
 	$$document: '$$document'
 };
 const TAG_NAMES = {
-	TITLE: 'TITLE',
-	HTML: 'HTML',
 	HEAD: 'HEAD',
-	BASE: 'BASE',
 	STYLE: 'STYLE',
 	SCRIPT: 'SCRIPT',
-	NOSCRIPT: 'NOSCRIPT',
-	META: 'META',
 	LINK: 'LINK'
-};
-const NODE_TYPES = {
-	ELEMENT_NODE: 1,
-	TEXT_NODE: 3,
-	PROCESSING_INSTRUCTION_NODE: 7,
-	COMMENT_NODE: 8
 };
 
 // http://www.w3.org/TR/2015/WD-uievents-20150319/#event-types-list
@@ -152,8 +141,10 @@ class DocumentRenderer extends DocumentRendererBase {
 				const elements = this._findComponentElements(
 					this._window.document.documentElement, components, true
 				);
-				elements.unshift(this._window.document.head);
+
+				// the document component is not represented by its element in DOM
 				elements.unshift(this._window.document.documentElement);
+
 				return this._initialWrap(components, elements);
 			});
 	}
@@ -204,7 +195,7 @@ class DocumentRenderer extends DocumentRendererBase {
 					renderingContext.rootIds[id] = true;
 				}
 
-				const hadChildren = element.hasChildNodes();
+				const hadChildren = (element.children.length > 0);
 				const component = renderingContext.components[componentName];
 				if (!component) {
 					return null;
@@ -212,7 +203,7 @@ class DocumentRenderer extends DocumentRendererBase {
 
 				renderingContext.renderedIds[id] = true;
 
-				var instance = this._componentInstances[id];
+				let instance = this._componentInstances[id];
 				if (!instance) {
 					component.constructor.prototype.$context =
 						this._getComponentContext(component, element);
@@ -257,7 +248,7 @@ class DocumentRenderer extends DocumentRendererBase {
 							return [];
 						}
 
-						const tmpElement = this._createTemporaryElement(element);
+						const tmpElement = element.cloneNode(false);
 						tmpElement.innerHTML = html;
 
 						if (isHead) {
@@ -380,9 +371,7 @@ class DocumentRenderer extends DocumentRendererBase {
 				const safeTagName = moduleHelper.getTagNameForComponentName(componentName);
 				const element = this._window.document.createElement(safeTagName);
 				Object.keys(attributes)
-					.forEach(attributeName => {
-						element.setAttribute(attributeName, attributes[attributeName]);
-					});
+					.forEach(attributeName => element.setAttribute(attributeName, attributes[attributeName]));
 
 				return this.renderComponent(element)
 					.then(() => element);
@@ -400,12 +389,6 @@ class DocumentRenderer extends DocumentRendererBase {
 				// this component has been rendered again and we do not need to
 				// remove it.
 				if (id in renderingContext.renderedIds) {
-					return;
-				}
-
-				// if someone added an element with the same ID during the
-				// rendering process
-				if (this._window.document.body.contains(this._componentElements[id])) {
 					return;
 				}
 
@@ -568,21 +551,32 @@ class DocumentRenderer extends DocumentRendererBase {
 			while (element.parentElement && element !== componentRoot) {
 				element = element.parentElement;
 				targetMatches = getMatchesMethod(element);
-				for (let i = 0; i < selectors.length; i++) {
-					const selector = selectors[i];
-					if (!targetMatches(selector)) {
-						continue;
-					}
-					isHandled = true;
-					selectorHandlers[selector](dispatchedEvent);
-					break;
-				}
-
+				isHandled = this._tryDispatchEvent(
+					selectors, targetMatches, selectorHandlers, dispatchedEvent
+				);
 				if (isHandled) {
 					break;
 				}
 			}
 		};
+	}
+
+	/**
+	 * Tries to dispatch an event.
+	 * @param {Array} selectors The list of supported selectors.
+	 * @param {Function} matchPredicate The function to check if selector matches.
+	 * @param {Object} handlers The set of handlers for events.
+	 * @param {Event} event The DOM event object.
+	 * @private
+	 */
+	_tryDispatchEvent(selectors, matchPredicate, handlers, event) {
+		return selectors.some(selector => {
+			if (!matchPredicate(selector)) {
+				return false;
+			}
+			handlers[selector](event);
+			return true;
+		});
 	}
 
 	/**
@@ -592,9 +586,10 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @private
 	 */
 	_isComponent(components, element) {
-		const currentNodeName = element.nodeName;
-		return moduleHelper.COMPONENT_PREFIX_REGEXP.test(currentNodeName) &&
-			(moduleHelper.getOriginalComponentName(currentNodeName) in components);
+		if (!moduleHelper.isComponentNode(element)) {
+			return false;
+		}
+		return moduleHelper.getOriginalComponentName(element.nodeName) in components;
 	}
 
 	/**
@@ -609,25 +604,19 @@ class DocumentRenderer extends DocumentRendererBase {
 		const queue = [element];
 
 		while (queue.length > 0) {
-			const currentChildren = queue.shift().childNodes;
-			for (let i = 0; i < currentChildren.length; i++) {
-				const currentChild = currentChildren[i];
-				// we need only Element nodes
-				if (currentChild.nodeType !== 1) {
-					continue;
-				}
-
+			const currentChildren = queue.shift().children;
+			Array.prototype.forEach.call(currentChildren, currentChild => {
 				// and they should be components
 				if (!this._isComponent(components, currentChild)) {
 					queue.push(currentChild);
-					continue;
+					return;
 				}
 
 				if (goInComponents) {
 					queue.push(currentChild);
 				}
 				elements.push(currentChild);
-			}
+			});
 		}
 		return elements;
 	}
@@ -740,8 +729,8 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * The problem here is that we can't re-create or change script and style tags,
 	 * because it causes blinking and JavaScript re-initialization. Therefore such
 	 * element must be immutable in the HEAD.
-	 * @param {Element} head HEAD DOM element.
-	 * @param {Element} newHead New HEAD element.
+	 * @param {Node} head HEAD DOM element.
+	 * @param {Node} newHead New HEAD element.
 	 * @private
 	 */
 	_mergeHead(head, newHead) {
@@ -764,10 +753,9 @@ class DocumentRenderer extends DocumentRendererBase {
 			headSet[this._getElementKey(current)] = true;
 		}
 
-		for (let i = 0; i < newHead.childNodes.length; i++) {
-			const current = newHead.childNodes[i];
-			if (current.nodeType !== NODE_TYPES.ELEMENT_NODE ||
-					this._getElementKey(current) in headSet) {
+		for (let i = 0; i < newHead.children.length; i++) {
+			const current = newHead.children[i];
+			if (this._getElementKey(current) in headSet) {
 				continue;
 			}
 			head.appendChild(current);
@@ -909,31 +897,55 @@ class DocumentRenderer extends DocumentRendererBase {
 		const rootsSet = Object.create(null);
 		const roots = [];
 
-		// we should find all components and then looking for roots
+		// we should find all components and then look for roots
 		changedStoreNames
 			.forEach(storeName => {
 				storeNamesSet[storeName] = true;
-				componentElements[storeName] = this._window.document
+				const elements = this._window.document
 					.querySelectorAll(`[${moduleHelper.ATTRIBUTE_STORE}="${storeName}"]`);
+				if (elements.length === 0) {
+					return;
+				}
+				componentElements[storeName] = elements;
 			});
 
-		if (moduleHelper.HEAD_COMPONENT_NAME in components && headStore in storeNamesSet) {
+		if (headStore in storeNamesSet && moduleHelper.HEAD_COMPONENT_NAME in components) {
 			rootsSet[this._getId(this._window.document.head)] = true;
 			roots.push(this._window.document.head);
 		}
 
 		changedStoreNames
 			.forEach(storeName => {
-				for (let i = 0; i < componentElements[storeName].length; i++) {
-					const current = componentElements[storeName][i];
+				if (!(storeName in componentElements)) {
+					return;
+				}
+
+				// we can optimize and don't go the same path twice
+				const visitedIds = Object.create(null);
+
+				Array.prototype.forEach.call(componentElements[storeName], current => {
+					if (!moduleHelper.isComponentNode(current)) {
+						return;
+					}
+
 					let currentRoot = current;
 					let lastRoot = currentRoot;
 					let lastRootId = this._getId(current);
+					if (lastRootId in visitedIds) {
+						return;
+					}
+					visitedIds[lastRootId] = true;
 
 					while (currentRoot.parentElement) {
 						currentRoot = currentRoot.parentElement;
 
+						// if we go the same route we visited before we can
+						// proceed with the next element
 						const currentId = this._getId(currentRoot);
+						if (currentId in visitedIds) {
+							return;
+						}
+
 						const currentStore = currentRoot.getAttribute(moduleHelper.ATTRIBUTE_STORE);
 						const currentComponentName = moduleHelper.getOriginalComponentName(currentRoot.tagName);
 
@@ -942,7 +954,8 @@ class DocumentRenderer extends DocumentRendererBase {
 							continue;
 						}
 
-						// is not an active component
+						// this component element does not have an
+						// implementation, skipping....
 						if (!(currentComponentName in components)) {
 							continue;
 						}
@@ -951,12 +964,13 @@ class DocumentRenderer extends DocumentRendererBase {
 						lastRootId = currentId;
 					}
 
+					// we don't want the same root element twice
 					if (lastRootId in rootsSet) {
-						continue;
+						return;
 					}
 					rootsSet[lastRootId] = true;
 					roots.push(lastRoot);
-				}
+				});
 			});
 
 		return roots;
@@ -1017,22 +1031,6 @@ class DocumentRenderer extends DocumentRendererBase {
 		}
 		return element[moduleHelper.COMPONENT_ID];
 	}
-
-	/**
-	 * Creates a temporary clone of the element.
-	 * @param {Element} element DOM element.
-	 * @returns {Element} Clone element.
-	 * @private
-	 */
-	_createTemporaryElement(element) {
-		const tmp = this._window.document.createElement(element.tagName);
-
-		for (let i = 0; i < element.attributes.length; i++) {
-			const current = element.attributes[i];
-			tmp.setAttribute(current.name, current.value);
-		}
-		return tmp;
-	}
 }
 
 /**
@@ -1042,10 +1040,9 @@ class DocumentRenderer extends DocumentRendererBase {
  */
 function attributesToObject(attributes) {
 	const result = Object.create(null);
-	for (let i = 0; i < attributes.length; i++) {
-		const current = attributes[i];
+	Array.prototype.forEach.call(attributes, current => {
 		result[current.name] = current.value;
-	}
+	});
 	return result;
 }
 
