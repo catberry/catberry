@@ -605,6 +605,10 @@ class DocumentRenderer extends DocumentRendererBase {
 
 		while (queue.length > 0) {
 			const currentChildren = queue.shift().children;
+			if (!currentChildren) {
+				continue;
+			}
+
 			Array.prototype.forEach.call(currentChildren, currentChild => {
 				// and they should be components
 				if (!this._isComponent(components, currentChild)) {
