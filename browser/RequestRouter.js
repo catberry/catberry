@@ -96,67 +96,66 @@ class RequestRouter {
 	}
 
 	/**
-	 * Routes a browser render request.
-	 * @param {URI} newLocation New location.
-	 * @returns {Promise} Promise for nothing.
-	 */
-	route(newLocation) {
-		// because now location was not change yet and
-		// different browsers handle `popstate` differently
-		// we need to do route in next iteration of event loop
-		return Promise.resolve()
-			.then(() => {
-				const state = this._stateProvider.getStateByUri(newLocation);
-				const newLocationString = newLocation.toString();
-
-				if (!state) {
-					this._window.location.assign(newLocationString);
-					return null;
-				}
-
-				// if only URI fragment is changed
-				const newQuery = newLocation.query ?
-						newLocation.query.toString() : null;
-				const currentQuery = this._location.query ?
-						this._location.query.toString() : null;
-				if (newLocation.path === this._location.path && newQuery === currentQuery) {
-					this._location = newLocation;
-					return null;
-				}
-				this._location = newLocation;
-				return this._changeState(state);
-			});
-	}
-
-	/**
 	 * Sets an application state for the specified URI.
 	 * @param {string} locationString URI to go.
+	 * @param {boolean?} isHistoryAction If it's a back or forward history action.
 	 * @returns {Promise} Promise for nothing.
 	 */
-	go(locationString) {
-		return Promise.resolve()
-			.then(() => {
-				const newLocation = (new URI(locationString)).resolveRelative(this._location);
-				const newLocationString = newLocation.toString();
-				const currentAuthority = this._location.authority ?
-						this._location.authority.toString() : null;
-				const newAuthority = newLocation.authority ?
-						newLocation.authority.toString() : null;
+	/* eslint complexity: 0 */
+	go(locationString, isHistoryAction) {
 
-				// we must check if this is an external link before map URI
-				// to internal application state
-				if (!this._isHistorySupported ||
-					newLocation.scheme !== this._location.scheme ||
-					newAuthority !== currentAuthority) {
-					this._window.location.assign(newLocationString);
-					return null;
-				}
+		// we must immediately change the URL, therefore this method is synchronous
+		try {
+			const newLocation = (new URI(locationString)).resolveRelative(this._location);
+			const newLocationString = newLocation.toString();
 
-				return this.route(newLocation)
-					.then(() => this._window.history.pushState(
-						this._state, '', this._location.toString()
-					));
-			});
+			if (!this._isHistorySupported) {
+				this._window.location.assign(newLocationString);
+				return Promise.resolve();
+			}
+
+			const state = this._stateProvider.getStateByUri(newLocation);
+			if (!state) {
+				this._window.location.assign(newLocationString);
+				return Promise.resolve();
+			}
+
+			const currentAuthority = this._location.authority ?
+				this._location.authority.toString() : null;
+			const newAuthority = newLocation.authority ?
+				newLocation.authority.toString() : null;
+
+			// we must check if this is an external link before map URI
+			// to internal application state
+			if (newLocation.scheme !== this._location.scheme ||
+				newAuthority !== currentAuthority) {
+				this._window.location.assign(newLocationString);
+				return Promise.resolve();
+			}
+
+			// if only URI fragment is changed
+			const newQuery = newLocation.query ?
+				newLocation.query.toString() : null;
+			const currentQuery = this._location.query ?
+				this._location.query.toString() : null;
+
+			if (newLocation.path === this._location.path &&
+				newQuery === currentQuery) {
+				this._location = newLocation;
+				return Promise.resolve();
+			}
+
+			this._state = state;
+			this._referrer = this._location;
+			this._location = newLocation;
+
+			if (!isHistoryAction) {
+				this._window.history.pushState(state, '', newLocationString);
+			}
+			return this._changeState(state);
+		} catch (e) {
+			return Promise.reject(e);
+		}
 	}
 
 	/**
@@ -168,17 +167,17 @@ class RequestRouter {
 	_changeState(state) {
 		return Promise.resolve()
 			.then(() => {
-				const routingContext = this._contextFactory.create({
-					referrer: this._referrer || this._window.document.referrer,
-					location: this._location,
-					userAgent: this._window.navigator.userAgent
-				});
-
 				// for "not found" state
 				if (state === null) {
 					this._window.location.reload();
 					return null;
 				}
+
+				const routingContext = this._contextFactory.create({
+					referrer: this._referrer || this._window.document.referrer,
+					location: this._location,
+					userAgent: this._window.navigator.userAgent
+				});
 
 				if (!this._isStateInitialized) {
 					this._isStateInitialized = true;
@@ -186,10 +185,6 @@ class RequestRouter {
 				}
 
 				return this._documentRenderer.render(state, routingContext);
-			})
-			.then(() => {
-				this._state = state;
-				this._referrer = this._location;
 			});
 	}
 
@@ -202,8 +197,12 @@ class RequestRouter {
 			return;
 		}
 
+		// because now location was not change yet and
+		// different browsers handle `popstate` differently
+		// we need to do route in next iteration of event loop
 		this._window.addEventListener('popstate', () =>
-			this.route(new URI(this._window.location.toString()))
+			Promise.resolve()
+				.then(() => this.go(this._window.location.toString(), true))
 				.catch(reason => this._handleError(reason))
 		);
 
