@@ -1152,6 +1152,869 @@ describe('browser/DocumentRenderer', function() {
 			});
 		});
 	});
+
+	describe('search methods', function() {
+
+		describe('#getComponentByElement', function() {
+
+			it('should find a component by element', function(done) {
+				let element = null;
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentByElement(element);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+	<cat-test2 id="to-find"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						element = window.document.getElementById('to-find');
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => assert.strictEqual(found instanceof Component2, true))
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should return null if the component is not found by element', function(done) {
+				let element = null;
+				let found = undefined;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentByElement(element);
+					}
+				}
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+	<cat-test2 id="wrong"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						element = window.document.getElementById('to-find');
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => assert.strictEqual(found, null))
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+		});
+
+		describe('#getComponentById', function() {
+
+			it('should find a component by ID', function(done) {
+				const id = 'uniqueId';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentById(id);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+	<cat-test2 id="${id}"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => assert.strictEqual(found instanceof Component2, true))
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should return null if the component is not found by ID', function(done) {
+				const id = 'uniqueId';
+				let found = undefined;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentById(id);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+	<cat-test2 id="wrong"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => assert.strictEqual(found, null))
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should return null if the element found by ID is not a component', function(done) {
+				const id = 'to-find';
+				let found = undefined;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentById(id);
+					}
+				}
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+	<cat-test3 id="${id}"></cat-test3>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => assert.strictEqual(found, null))
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+		});
+
+		describe('#getComponentsByTagName', function() {
+			it('should find components by a tag name', function(done) {
+				const tagName = 'cat-test2';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentsByTagName(tagName);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+
+	<cat-test2></cat-test2>
+	<cat-test2></cat-test2>
+	<cat-test2></cat-test2>
+	<cat-test2></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 4);
+								assert.strictEqual(found.every(item => item instanceof Component2), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should find components by a tag name in a parent', function(done) {
+				const tagName = 'cat-test2';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentsByTagName(tagName, this);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1>
+		<cat-test2 class="nested"></cat-test2>
+		<cat-test2 class="nested"></cat-test2>
+	</cat-test1>
+
+	<cat-test2></cat-test2>
+	<cat-test2></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 2);
+								assert.strictEqual(found.every(item =>
+									item instanceof Component2 && item.$context.element.className === 'nested'
+								), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should filter elements which are not components', function(done) {
+				const tagName = 'cat-test2';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentsByTagName(tagName);
+					}
+				}
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+
+	<cat-test2></cat-test2>
+	<cat-test2></cat-test2>
+	<cat-test2></cat-test2>
+	<cat-test2></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 0);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+		});
+
+		describe('#getComponentsByClassName', function() {
+			it('should find components by a class name', function(done) {
+				const className = 'to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentsByClassName(className);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 4);
+								assert.strictEqual(found.every(
+									item => item instanceof Component2 && item.$context.element.className === 'to-find'
+								), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should find components by a class name in a parent', function(done) {
+				const className = 'to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentsByClassName(className, this);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1>
+		<cat-test2 class="${className} nested"></cat-test2>
+		<cat-test2 class="${className} nested"></cat-test2>
+	</cat-test1>
+
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 2);
+								assert.strictEqual(found.every(item =>
+									item instanceof Component2 && item.$context.element.className === `${className} nested`
+								), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should filter elements which are not components', function(done) {
+				const className = 'to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.getComponentsByClassName(className);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test3 class="${className}"></cat-test3>
+	<cat-test3 class="${className}"></cat-test3>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 2);
+								assert.strictEqual(found.every(item =>
+									item instanceof Component2 && item.$context.name === 'test2'
+								), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+		});
+
+		describe('#queryComponentSelector', function() {
+			it('should find a component by a selector', function(done) {
+				const selector = '#to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.queryComponentSelector(selector);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+
+	<cat-test2 id="some"></cat-test2>
+	<cat-test2 id="to-find"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Component2, true);
+								assert.strictEqual(found.$context.element.id, 'to-find');
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should find a component by a selector in a parent', function(done) {
+				const selector = '#to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.queryComponentSelector(selector, this);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1>
+		<cat-test2 id="to-find" class="nested"></cat-test2>
+		<cat-test2></cat-test2>
+	</cat-test1>
+
+	<cat-test2 id="to-find"></cat-test2>
+	<cat-test2></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Component2, true);
+								assert.strictEqual(found.$context.element.className, 'nested');
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should return null if the element found by class is not a component', function(done) {
+				const selector = '.to-find';
+				let found = undefined;
+				class Component1 {
+					bind() {
+						found = this.$context.queryComponentSelector(selector);
+					}
+				}
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+	<cat-test3 class="to-find"></cat-test3>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => assert.strictEqual(found, null))
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+		});
+
+		describe('#queryComponentSelectorAll', function() {
+			it('should find components by a selector', function(done) {
+				const className = 'to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.queryComponentSelectorAll(`.${className}`);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 4);
+								assert.strictEqual(found.every(
+									item => item instanceof Component2 && item.$context.element.className === 'to-find'
+								), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should find components by a selector in a parent', function(done) {
+				const className = 'to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.queryComponentSelectorAll(`.${className}`, this);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1>
+		<cat-test2 class="${className} nested"></cat-test2>
+		<cat-test2 class="${className} nested"></cat-test2>
+	</cat-test1>
+
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 2);
+								assert.strictEqual(found.every(item =>
+									item instanceof Component2 && item.$context.element.className === `${className} nested`
+								), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should filter elements which are not components', function(done) {
+				const className = 'to-find';
+				let found = null;
+				class Component1 {
+					bind() {
+						found = this.$context.queryComponentSelectorAll(`.${className}`);
+					}
+				}
+				class Component2 { }
+
+				const components = {
+					test1: {
+						name: 'test1',
+						constructor: Component1,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					},
+					test2: {
+						name: 'test2',
+						constructor: Component2,
+						template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
+					}
+				};
+
+				const locator = createLocator({}, components, {});
+				const html = `
+<html>
+<body>
+	<cat-test1></cat-test1>
+
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test2 class="${className}"></cat-test2>
+	<cat-test3 class="${className}"></cat-test3>
+	<cat-test3 class="${className}"></cat-test3>
+</body>
+</html>`;
+
+				jsdom.env({
+					html,
+					done: (errors, window) => {
+						locator.registerInstance('window', window);
+						const renderer = new DocumentRenderer(locator);
+						renderer.initWithState({}, {})
+							.then(() => {
+								assert.strictEqual(found instanceof Array, true);
+								assert.strictEqual(found.length, 2);
+								assert.strictEqual(found.every(item =>
+									item instanceof Component2 && item.$context.name === 'test2'
+								), true);
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+		});
+	});
 });
 
 function createLocator(config, components, stores) {

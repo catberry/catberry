@@ -377,6 +377,10 @@ Every component's [`$context`](#shared-context) is extended with the following p
 * `this.$context.attributes` – the set of attributes which component's DOM element has at the moment.
 * `this.$context.getComponentById('id')` – gets another component *object* by ID of its element.
 * `this.$context.getComponentByElement(domElement)` – gets another component's *object* by its DOM element.
+* `this.$context.getComponentsByTagName('tag-name', parentComponent)` – gets a component *object* list by the tag name. `parentComponent` – a parent component *object* for looking among nested components only (optional).
+* `this.$context.getComponentsByClassName('class-name', parentComponent)` – gets a component *object* list by the class name. `parentComponent` – a parent component *object* for looking among nested components only (optional).
+* `this.$context.queryComponentSelector('selector', parentComponent)` – gets a component *object* by the selector. `parentComponent` – a parent component *object* for looking among nested components only (optional).
+* `this.$context.queryComponentSelectorAll('selector', parentComponent)` – gets a component *object* list by the selector. `parentComponent` – a parent component *object* for looking among nested components only (optional).
 * `this.$context.createComponent('tagName', attributesObject)` – creates a new component's instance and returns a promise of its DOM element.
 * `this.$context.collectGarbage()` – collects all components which have been created using the `createComponent('tagName', attributesObject)` method and are not attached to the DOM at the moment.
 
