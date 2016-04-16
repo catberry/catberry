@@ -258,7 +258,7 @@ class DocumentRenderer extends DocumentRendererBase {
 
 						morphdom(element, tmpElement, {
 							onBeforeMorphElChildren: foundElement =>
-								foundElement === element || !this._isComponent(
+								foundElement === element || !this._isComponentElement(
 									renderingContext.components, foundElement
 								)
 						});
@@ -296,6 +296,54 @@ class DocumentRenderer extends DocumentRendererBase {
 	getComponentById(id) {
 		const element = this._window.document.getElementById(id);
 		return this.getComponentByElement(element);
+	}
+
+	/**
+	 * Does query for a component by the selector.
+	 * @param {string} selector Selector for the query.
+	 * @param {Object?} parentComponent Parent component object.
+	 * @returns {Object} The found component object.
+	 */
+	queryComponentSelector(selector, parentComponent) {
+		const parent = this._isComponentObject(parentComponent) ?
+			parentComponent.$context.element : this._window.document;
+		return this.getComponentByElement(parent.querySelector(selector));
+	}
+
+	/**
+	 * Does query for all components by the selector.
+	 * @param {string} selector Selector for the query.
+	 * @param {Object?} parentComponent Parent component object.
+	 * @returns {Array} The found component object list.
+	 */
+	queryComponentSelectorAll(selector, parentComponent) {
+		const parent = this._isComponentObject(parentComponent) ?
+			parentComponent.$context.element : this._window.document;
+		return this._mapElementsToComponents(parent.querySelectorAll(selector));
+	}
+
+	/**
+	 * Gets all components by the tag name.
+	 * @param {string} tagName Tag name of the components.
+	 * @param {Object?} parentComponent Parent component object.
+	 * @returns {Array} The found component object list.
+	 */
+	getComponentsByTagName(tagName, parentComponent) {
+		const parent = this._isComponentObject(parentComponent) ?
+			parentComponent.$context.element : this._window.document;
+		return this._mapElementsToComponents(parent.getElementsByTagName(tagName));
+	}
+
+	/**
+	 * Gets all components by the class name.
+	 * @param {string} className Class name of the components.
+	 * @param {Object?} parentComponent Parent component object.
+	 * @returns {Array} The found component object list.
+	 */
+	getComponentsByClassName(className, parentComponent) {
+		const parent = this._isComponentObject(parentComponent) ?
+			parentComponent.$context.element : this._window.document;
+		return this._mapElementsToComponents(parent.getElementsByClassName(className));
 	}
 
 	/**
@@ -585,11 +633,41 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @param {Element} element DOM element.
 	 * @private
 	 */
-	_isComponent(components, element) {
+	_isComponentElement(components, element) {
 		if (!moduleHelper.isComponentNode(element)) {
 			return false;
 		}
 		return moduleHelper.getOriginalComponentName(element.nodeName) in components;
+	}
+
+	/**
+	 * Checks if the specified object is a component.
+	 * @param {Object} obj The component object.
+	 * @returns {boolean}
+	 * @private
+	 */
+	_isComponentObject(obj) {
+		return obj && obj.$context &&
+			typeof (obj.$context) === 'object' &&
+			obj.$context.element instanceof this._window.Element;
+	}
+
+	/**
+	 * Maps found elements to component objects filtering non-component elements.
+	 * @param {HTMLCollection|NodeList} elements Elements collection.
+	 * @returns {Array} Array of the component objects.
+	 * @private
+	 */
+	_mapElementsToComponents(elements) {
+		const results = [];
+		Array.prototype.forEach
+			.call(elements, element => {
+				const component = this.getComponentByElement(element);
+				if (component) {
+					results.push(component);
+				}
+			});
+		return results;
 	}
 
 	/**
@@ -611,7 +689,7 @@ class DocumentRenderer extends DocumentRendererBase {
 
 			Array.prototype.forEach.call(currentChildren, currentChild => {
 				// and they should be components
-				if (!this._isComponent(components, currentChild)) {
+				if (!this._isComponentElement(components, currentChild)) {
 					queue.push(currentChild);
 					return;
 				}
@@ -867,12 +945,32 @@ class DocumentRenderer extends DocumentRendererBase {
 		});
 
 		componentContext.element = element;
-		componentContext.getComponentById = id => this.getComponentById(id);
-		componentContext.getComponentByElement = element =>
-			this.getComponentByElement(element);
+
+		// search methods
+		componentContext.getComponentById =
+			id => this.getComponentById(id);
+
+		componentContext.getComponentByElement =
+			element => this.getComponentByElement(element);
+
+		componentContext.getComponentsByTagName =
+			(tagName, parent) => this.getComponentsByTagName(tagName, parent);
+
+		componentContext.getComponentsByClassName =
+			(className, parent) => this.getComponentsByClassName(className, parent);
+
+		componentContext.queryComponentSelector =
+			(selector, parent) => this.queryComponentSelector(selector, parent);
+
+		componentContext.queryComponentSelectorAll =
+			(selector, parent) => this.queryComponentSelectorAll(selector, parent);
+
+		// create/remove
 		componentContext.createComponent = (tagName, attributes) =>
 			this.createComponent(tagName, attributes);
 		componentContext.collectGarbage = () => this.collectGarbage();
+
+		// store methods
 		componentContext.getStoreData = () => {
 			const currentStoreName = element.getAttribute(moduleHelper.ATTRIBUTE_STORE);
 			return this._storeDispatcher.getStoreData(currentStoreName);
