@@ -234,9 +234,6 @@ class DocumentRenderer extends DocumentRendererBase {
 					})
 					.catch(reason => this._eventBus.emit('error', reason))
 					.then(() => {
-						if (instance.$context.element !== element) {
-							instance.$context = this._getComponentContext(component, element);
-						}
 						const renderMethod = moduleHelper.getMethodToInvoke(instance, 'render');
 						return moduleHelper.getSafePromise(renderMethod);
 					})
