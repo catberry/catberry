@@ -336,7 +336,7 @@ class DocumentRenderer extends DocumentRendererBase {
 
 	/**
 	 * Gets all components by the class name.
-	 * @param {string} tagName Tag name of the components.
+	 * @param {string} className Class name of the components.
 	 * @param {Object?} parentComponent Parent component object.
 	 * @returns {Array} The found component object list.
 	 */
