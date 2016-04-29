@@ -60,6 +60,46 @@
 			}
 		},
 		{
+			"name": "should return the correct state for correct URI and store names which contains slash",
+			"routes": [
+				"/state/:arg1[group1/Store1, group2/Store2]/:arg2[group2/Store2]?a=:arg3[group1/Store1]&b=:arg4[group3/Store3]"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": {
+				"group1/Store1": {
+					"arg1": "val1",
+					"arg3": "val3"
+				},
+				"group2/Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"group3/Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
+			"name": "should return the correct state for correct URI and store names which contains dashes",
+			"routes": [
+				"/state/:arg1[group-1/Store1, group-2/Store2]/:arg2[group-2/Store2]?a=:arg3[group-1/Store1]&b=:arg4[group-3/Store3]"
+			],
+			"uri": "/state/val1/val2?a=val3&b=val4",
+			"expectedState": {
+				"group-1/Store1": {
+					"arg1": "val1",
+					"arg3": "val3"
+				},
+				"group-2/Store2": {
+					"arg1": "val1",
+					"arg2": "val2"
+				},
+				"group-3/Store3": {
+					"arg4": "val4"
+				}
+			}
+		},
+		{
 			"name": "should return the state if one query string parameter is not specified",
 			"routes": [
 				"/state/:arg1[Store1, Store2]/:arg2[Store2]?a=:arg3[Store1]&b=:arg4[Store3]"
