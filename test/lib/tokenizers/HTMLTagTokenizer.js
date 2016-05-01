@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const tests = require('../../cases/lib/streams/HTMLTagTokenizer.json');
+const tests = require('../../cases/lib/tokenizers/HTMLTagTokenizer.json');
 const HTMLTagTokenizer = require('../../../lib/tokenizers/HTMLTagTokenizer');
 
 /* eslint prefer-arrow-callback:0 */
