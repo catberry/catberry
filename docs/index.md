@@ -1142,24 +1142,31 @@ locator.registerInstance('browserifyPlugin', {
 
 ## Live Reloading
 
-Whilst Catberry doesn't have a built in live-reloading mechanism, it trivial to add it to your project by following these steps:
+Whilst Catberry doesn't have a built-in live-reloading mechanism, it's trivial to add it to your project by following these steps:
 
 ### Server side live reloading
 
 * `npm install -g nodemon`
 * Change `package.json` file to run `nodaemon` instead of `node` by changing
-	* `debug` command to: `node ./build.js & nodemon --watch server --watch build.js --watch routes.js ./server.js`
-	* `debug-win` command to: `powershell -Command \"Start-Process -NoNewWindow nodemon ./build.js; Start-Process -NoNewWindow -Wait  -ArgumentList '--watch server --watch build.js --watch routes.js  ./server.js' nodemon\"`
+	* `debug` command to:
+	```shell
+	node ./build.js & nodemon --watch server --watch build.js --watch routes.js ./server.js
+	```
+	* `debug-win` command to:
+	```shell
+	powershell -Command \"Start-Process -NoNewWindow nodemon ./build.js; Start-Process -NoNewWindow -Wait  -ArgumentList '--watch server --watch build.js --watch routes.js  ./server.js' nodemon\"
+	```
 	
 ### Client side live reloading
 * `npm install -S express-livereload`
 * Modify `server.js` and place the following code below `const app = express();`:
-```
+```javascript
 var livereload = require('express-livereload');
 livereload(app);
 ```  
-* Add the following line to `head.hbs`:
-```
+
+* Add the following line to the `head` template:
+```html
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js"></' + 'script>')</script>
 ```
 
