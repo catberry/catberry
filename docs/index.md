@@ -1140,6 +1140,31 @@ locator.registerInstance('browserifyPlugin', {
 * [catberry-debugger](https://github.com/catberry/catberry-debugger) – Chrome Dev Tools extension
 * [catberry-idea-plugin](https://github.com/catberry/catberry-idea-plugin) – Intellij platform plugin
 
+## Live Reloading
+
+Whilst Catberry doesn't have a built in live-reloading mechanism, it trivial to add it to your project by following these steps:
+
+### Server side live reloading
+
+* `npm install -g nodemon`
+* Change `package.json` file to run `nodaemon` instead of `node` by changing
+	* `debug` command to: `nodemon ./build.js & nodemon --watch server --watch build.js --watch routes.js ./server.js`
+	* `debug-win` command to: `powershell -Command \"Start-Process -NoNewWindow nodemon ./build.js; Start-Process -NoNewWindow -Wait  -ArgumentList '--watch server --watch build.js --watch routes.js  ./server.js' nodemon\"`
+	
+### Client side live reloading
+* `npm install -S express-livereload`
+* Modify `server.js` and place the following code below `const app = express();`:
+```
+var livereload = require('express-livereload');
+livereload(app);
+```  
+* Add the following line to `head.hbs`:
+```
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js"></' + 'script>')</script>
+```
+
+That's it! Now when you change the client side code - the web page will reload and when you edit the server - node will restart.
+
 ## Other
 
 * [catberry-uri](https://github.com/catberry/catberry-uri) – URI parser implementation that has been developed strictly according to RFC 3986
