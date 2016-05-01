@@ -1159,10 +1159,12 @@ Whilst Catberry doesn't have a built-in live-reloading mechanism, it's trivial t
 	
 ### Client side live reloading
 * `npm install -S express-livereload`
-* Modify `server.js` and place the following code below `const app = express();`:
+* Modify `server.js` and place the following code below `const app = express();`
 ```javascript
-var livereload = require('express-livereload');
-livereload(app);
+if(!config.isRelease){
+	const livereload = require('express-livereload');
+	livereload(app);
+}
 ```  
 
 * Add the following line to the `head` template:
