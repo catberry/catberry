@@ -335,7 +335,7 @@
 			}
 		},
 		{
-			"name": "should support overriding path parameters by query string parameters",
+			"name": "should support collecting several values into the list",
 			"routes": [
 				"/state/:arg1[Store1, Store2]/:arg3[Store1]?a=:arg3[Store1]&b=:arg4[Store3]"
 			],
@@ -343,7 +343,10 @@
 			"expectedState": {
 				"Store1": {
 					"arg1": "val1",
-					"arg3": "valX"
+					"arg3": [
+						"val2",
+						"valX"
+					]
 				},
 				"Store2": {
 					"arg1": "val1"
@@ -396,7 +399,7 @@
 		{
 			"name": "should support partial parameters and the empty value",
 			"routes": [
-				"/state/w:arg1[Store1, Store2]q/q:arg2[Store2]s?a=a:arg3[Store1]z&b=x:arg4[Store3]y"
+				"/state:noop/w:arg1[Store1, Store2]q/q:arg2[Store2]s?a=a:arg3[Store1]z&b=x:arg4[Store3]y"
 			],
 			"uri": "/state/wq/qs?a=az&b=xy",
 			"expectedState": {
@@ -425,6 +428,21 @@
 				},
 				"Store2": {
 					"arg1": "val1",
+					"arg2": "val2"
+				}
+			}
+		},
+		{
+			"name": "should support parameters without values in query",
+			"routes": [
+				"/state?a:arg1[Store1]&b:arg2[Store2]=x:arg3[Store3]&b=some"
+			],
+			"uri": "/state?aval1&bval2",
+			"expectedState": {
+				"Store1": {
+					"arg1": "val1"
+				},
+				"Store2": {
 					"arg2": "val2"
 				}
 			}

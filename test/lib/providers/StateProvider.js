@@ -41,6 +41,15 @@ describe('lib/providers/StateProvider', function() {
 				param: '/some/value'
 			});
 		});
+
+		it('should throw an error in case of wrong syntax', function() {
+			const locator = createLocator([
+				'/:wrong[some'
+			]);
+			assert.throws(() => {
+				const provider = new StateProvider(locator);
+			}, /Illegal/);
+		});
 	});
 });
 
