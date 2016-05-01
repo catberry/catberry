@@ -1148,7 +1148,7 @@ Whilst Catberry doesn't have a built in live-reloading mechanism, it trivial to 
 
 * `npm install -g nodemon`
 * Change `package.json` file to run `nodaemon` instead of `node` by changing
-	* `debug` command to: `nodemon ./build.js & nodemon --watch server --watch build.js --watch routes.js ./server.js`
+	* `debug` command to: `node ./build.js & nodemon --watch server --watch build.js --watch routes.js ./server.js`
 	* `debug-win` command to: `powershell -Command \"Start-Process -NoNewWindow nodemon ./build.js; Start-Process -NoNewWindow -Wait  -ArgumentList '--watch server --watch build.js --watch routes.js  ./server.js' nodemon\"`
 	
 ### Client side live reloading
