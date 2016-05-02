@@ -4,13 +4,15 @@ const assert = require('assert');
 const events = require('events');
 const URI = require('catberry-uri').URI;
 const testCases = require('../../cases/lib/providers/StateProvider.json');
+const RouterParser = require('../../../lib/tokenizers/RouteParser');
+const routeParser = new RouterParser();
 const ServiceLocator = require('catberry-locator');
-const StateProvider = require('../../../lib/providers/StateProvider');
+const StateProvider = require('../../../browser/providers/StateProvider');
 
 /* eslint prefer-arrow-callback:0 */
 /* eslint max-nested-callbacks:0 */
 /* eslint require-jsdoc:0 */
-describe('lib/providers/StateProvider', function() {
+describe('browser/providers/StateProvider', function() {
 	describe('#getStateByUri', function() {
 		testCases.getStateByUri.forEach(testCase => {
 
@@ -41,26 +43,22 @@ describe('lib/providers/StateProvider', function() {
 				param: '/some/value'
 			});
 		});
-
-		it('should throw an error in case of wrong syntax', function() {
-			const locator = createLocator([
-				'/:wrong[some'
-			]);
-			assert.throws(() => {
-				const provider = new StateProvider(locator);
-			}, /Illegal/);
-		});
 	});
 });
 
 function createLocator(routeDefinitions) {
 	var locator = new ServiceLocator();
 	locator.registerInstance('serviceLocator', locator);
-	routeDefinitions.forEach(function(routeDefinition) {
+	routeDefinitions.forEach(routeDefinition => {
+		locator.registerInstance('routeDefinition', routeDefinition);
+		if (typeof (routeDefinition) === 'string') {
+			locator.registerInstance('routeDescriptor', routeParser.parseRouteExpression(routeDefinition));
+			return;
+		}
 		if (typeof (routeDefinition) === 'object' && typeof (routeDefinition.expression) === 'string') {
 			routeDefinition.map = state => state;
+			locator.registerInstance('routeDescriptor', routeParser.parseRouteExpression(routeDefinition.expression));
 		}
-		locator.registerInstance('routeDefinition', routeDefinition);
 	});
 
 	return locator;

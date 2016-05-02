@@ -2,12 +2,12 @@
 
 const assert = require('assert');
 const testCases = require('../../cases/lib/helpers/routeHelper.json');
-const routeHelper = require('../../../lib/helpers/routeHelper');
+const routeHelper = require('../../../lib/helpers/uriHelper');
 
 /* eslint prefer-arrow-callback:0 */
 /* eslint max-nested-callbacks:0 */
 /* eslint require-jsdoc:0 */
-describe('lib/helpers/routeHelper', function() {
+describe('lib/helpers/uriHelper', function() {
 	describe('#removeEndSlash', function() {
 		testCases.removeEndSlash.forEach(testCase => {
 			it(testCase.name, function() {

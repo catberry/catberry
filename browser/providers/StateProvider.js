@@ -1,7 +1,6 @@
 'use strict';
 
-const StateProviderBase = require('../base/StateProviderBase');
-const RouteParser = require('../tokenizers/RouteParser');
+const StateProviderBase = require('../../lib/base/StateProviderBase');
 
 /**
  * Implements the state provider for the server environment.
@@ -17,9 +16,8 @@ class StateProvider extends StateProviderBase {
 	 */
 	_getRouteDescriptors(serviceLocator) {
 		const descriptors = [];
-		const parser = new RouteParser();
 
-		var routeDefinitions;
+		let routeDefinitions;
 
 		try {
 			routeDefinitions = serviceLocator.resolveAll('routeDefinition');
@@ -27,11 +25,22 @@ class StateProvider extends StateProviderBase {
 			routeDefinitions = [];
 		}
 
+		const routeDescriptors = Object.create(null);
+
+		try {
+			serviceLocator.resolveAll('routeDescriptor')
+				.forEach(descriptor => {
+					routeDescriptors[descriptor.expression] = descriptor;
+				});
+		} catch (e) {
+			// nothing to do
+		}
+
 		routeDefinitions
 			.forEach(route => {
 				// just colon-parametrized string
 				if (typeof (route) === 'string') {
-					descriptors.push(parser.parseRouteExpression(route));
+					descriptors.push(routeDescriptors[route]);
 					return;
 				}
 
@@ -39,7 +48,7 @@ class StateProvider extends StateProviderBase {
 				if (typeof (route) === 'object' &&
 						typeof (route.expression) === 'string') {
 
-					const descriptor = parser.parseRouteExpression(route.expression);
+					const descriptor = routeDescriptors[route.expression];
 
 					if (route.map instanceof Function) {
 						descriptor.map = route.map;
@@ -56,6 +65,7 @@ class StateProvider extends StateProviderBase {
 					descriptors.push(route);
 				}
 			});
+
 		return descriptors;
 	}
 }
