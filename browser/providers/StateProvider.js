@@ -50,6 +50,10 @@ class StateProvider extends StateProviderBase {
 
 					const descriptor = routeDescriptors[route.expression];
 
+					if (typeof (route.name) === 'string') {
+						descriptor.name = route.name;
+					}
+
 					if (route.map instanceof Function) {
 						descriptor.map = route.map;
 					}
