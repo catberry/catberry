@@ -39,6 +39,13 @@ describe('browser/providers/ModuleApiProvider', function() {
 			assert.strictEqual(api.redirect('/some1') instanceof Promise, true);
 		});
 	});
+
+	describe('#getRouteURI', function() {
+		it('should call state provider', function() {
+			assert.strictEqual(api.getRouteURI('name', {some: 'value'}), 'testURI:name:{"some":"value"}');
+		});
+	});
+
 	describe('#clearFragment', function() {
 		it('should clear URI hash', function(done) {
 			requestRouter.on('clearFragment', function(args) {
@@ -86,6 +93,11 @@ function createLocator() {
 	]);
 	requestRouter.decorateMethod('go', () => Promise.resolve());
 	locator.registerInstance('requestRouter', requestRouter);
+	locator.registerInstance('stateProvider', {
+		getRouteURI(name, parameters) {
+			return `testURI:${name}:${JSON.stringify(parameters)}`;
+		}
+	});
 
 	const templateProvider = new UniversalMock(['render']);
 	templateProvider.decorateMethod('render', () => Promise.resolve());
