@@ -51,6 +51,26 @@ describe('lib/providers/StateProvider', function() {
 			}, /Illegal/);
 		});
 	});
+
+	describe('#getRouteURI', function() {
+		testCases.getRouteURI.forEach(testCase => {
+
+			it(testCase.name, function() {
+				const locator = createLocator(testCase.routes);
+				const provider = new StateProvider(locator);
+
+				if (testCase.expectedError) {
+					assert.throws(
+						() => provider.getRouteURI(testCase.arguments.name, testCase.arguments.parameters),
+						error => error.message === testCase.expectedError
+					);
+				} else {
+					const uri = provider.getRouteURI(testCase.arguments.name, testCase.arguments.parameters);
+					assert.strictEqual(uri, testCase.expectedURI);
+				}
+			});
+		});
+	});
 });
 
 function createLocator(routeDefinitions) {

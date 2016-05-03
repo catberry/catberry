@@ -475,5 +475,184 @@
 			"uri": "/state/val1/val2?a=val3&b=val4",
 			"expectedState": null
 		}
+	],
+	"getRouteURI": [
+		{
+			"name": "should throw an error when there is no such route",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/:section[Store1, Store2]/:subsection[Store2]"
+				}
+			],
+			"arguments": {
+				"name": "wrong",
+				"parameters": {
+					"section": "test-section",
+					"subsection": "test-subsection"
+				}
+			},
+			"expectedError": "There is no such route called \"wrong\""
+		},
+		{
+			"name": "should throw an error when a path parameter has an array value",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/:section[Store1, Store2]/:subsection[Store2]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"section": ["test-section"],
+					"subsection": "test-subsection"
+				}
+			},
+			"expectedError": "Array value is not supported for the parameter \"section\""
+		},
+		{
+			"name": "should throw an error when a quern name parameter has an array value",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/some?:qParam1[Store2]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"qParam1": ["test-section"]
+				}
+			},
+			"expectedError": "Array value is not supported for the parameter \"qParam1\""
+		},
+		{
+			"name": "should paste an empty string when there is no parameter in the path",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/:section[Store1, Store2]/:subsection[Store2]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"subsection": "test-subsection"
+				}
+			},
+			"expectedURI": "//test-subsection"
+		},
+		{
+			"name": "should return URI for path parameters",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/:section[Store1, Store2]/:subsection[Store2]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"section": "test-section",
+					"subsection": "test-subsection"
+				}
+			},
+			"expectedURI": "/test-section/test-subsection"
+		},
+		{
+			"name": "should encode path parameters",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/:section[Store1, Store2]/:subsection[Store2]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"section": "test/section",
+					"subsection": "test/subsection"
+				}
+			},
+			"expectedURI": "/test%2Fsection/test%2Fsubsection"
+		},
+		{
+			"name": "should return URI for path and query parameters",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/:param1[Store1, Store2]/:param2[Store2]?:qParam1[Store2]=value&query=:qParam2[Store2]&:qParam3[Store3]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"param1": "value1",
+					"param2": "value2",
+					"qParam1": "qValue1",
+					"qParam2": "qValue2",
+					"qParam3": "qValue3"
+				}
+			},
+			"expectedURI": "/value1/value2?qValue1=value&query=qValue2&qValue3"
+		},
+		{
+			"name": "should return URI for path and query parameters surrounded by text",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/pa:param1[Store1]th1/pa:param2[Store2]th2?que:qParam1[Store2]ry1=value&query=va:qParam2[Store2]lue1&que:qParam3[Store3]ry2&que:qParam4[Store4]ry3=val:qParam5[Store5]ue2"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"param1": "!value1!",
+					"param2": "!value2!",
+					"qParam1": "!qValue1!",
+					"qParam2": "!qValue2!",
+					"qParam3": "!qValue3!",
+					"qParam4": "!qValue4!",
+					"qParam5": ["!qValue5-1!", "!qValue5-2!", "!qValue5-3!"]
+				}
+			},
+			"expectedURI": "/pa!value1!th1/pa!value2!th2?que!qValue1!ry1=value&query=va!qValue2!lue1&que!qValue3!ry2&que!qValue4!ry3=val!qValue5-1!ue2&que!qValue4!ry3=val!qValue5-2!ue2&que!qValue4!ry3=val!qValue5-3!ue2"
+		},
+		{
+			"name": "should return URI for path and query parameters with array values",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/some?:qParam1[Store2]=:qParam2[Store2]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"qParam1": "qValue1",
+					"qParam2": ["qValue2-1", "qValue2-2", "qValue2-3"]
+				}
+			},
+			"expectedURI": "/some?qValue1=qValue2-1&qValue1=qValue2-2&qValue1=qValue2-3"
+		},
+		{
+			"name": "should return URI for path and optional query parameters",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/:param1[Store1, Store2]/:param2[Store2]?:qParam1[Store2]=value&query=:qParam2[Store2]&:qParam3[Store3]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {
+					"param1": "value1",
+					"param2": "value2",
+					"qParam2": "qValue2"
+				}
+			},
+			"expectedURI": "/value1/value2?query=qValue2"
+		}
 	]
 }
