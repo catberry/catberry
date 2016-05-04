@@ -70,6 +70,7 @@
 		"./lib/Catberry.js": "./browser/Catberry.js",
 		"./lib/CookieWrapper.js": "./browser/CookieWrapper.js",
 		"./lib/providers/ModuleApiProvider.js": "./browser/providers/ModuleApiProvider.js",
+		"./lib/providers/StateProvider.js": "./browser/providers/StateProvider.js",
 		"./lib/loaders/ComponentLoader.js": "./browser/loaders/ComponentLoader.js",
 		"./lib/loaders/StoreLoader.js": "./browser/loaders/StoreLoader.js",
 		"./lib/DocumentRenderer.js": "./browser/DocumentRenderer.js",

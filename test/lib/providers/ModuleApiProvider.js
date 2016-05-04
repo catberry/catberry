@@ -23,6 +23,11 @@ describe('lib/providers/ModuleApiProvider', function() {
 
 		locator.register('cookieWrapper', CookieWrapper);
 		locator.registerInstance('serviceLocator', locator);
+		locator.registerInstance('stateProvider', {
+			getRouteURI(name, parameters) {
+				return `testURI:${name}:${JSON.stringify(parameters)}`;
+			}
+		});
 		locator.registerInstance('eventBus', new events.EventEmitter());
 		api = new ModuleApiProvider(locator);
 	});
@@ -126,6 +131,12 @@ describe('lib/providers/ModuleApiProvider', function() {
 				.then(() => assert.strictEqual(api.actions.redirectedTo, '/some2'))
 				.then(done)
 				.catch(done);
+		});
+	});
+
+	describe('#getRouteURI', function() {
+		it('should call state provider', function() {
+			assert.strictEqual(api.getRouteURI('name', {some: 'value'}), 'testURI:name:{"some":"value"}');
 		});
 	});
 
