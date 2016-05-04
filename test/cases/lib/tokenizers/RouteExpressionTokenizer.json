@@ -1,0 +1,462 @@
+{
+	"cases": [
+		{
+			"description": "should return ILLEGAL on empty parameter name",
+			"parameterString": ":",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on wrong parameter name",
+			"parameterString": ":9wrong",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "9"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on store list without end",
+			"parameterString": ":param[",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on store list without names",
+			"parameterString": ":param[,]",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "ILLEGAL",
+					"value": ","
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on store list without the second name",
+			"parameterString": ":param[store,]",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "store"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "]"
+				}
+			]
+		},
+		{
+			"description": "should return ILLEGAL on wrong store name in the list",
+			"parameterString": ":param[st#ore]",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "st"
+				},
+				{
+					"name": "ILLEGAL",
+					"value": "#"
+				}
+			]
+		},
+		{
+			"description": "should return END on empty string",
+			"parameterString": "",
+			"expected": [
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should return TEXT on parameter's prefix and postfix",
+			"parameterString": "prefix:param[store]postfix",
+			"expected": [
+				{
+					"name": "TEXT",
+					"value": "prefix"
+				},
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "store"
+				},
+				{
+					"name": "STORE_LIST_END",
+					"value": "]"
+				},
+				{
+					"name": "TEXT",
+					"value": "postfix"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should properly tokenize a parameter without list",
+			"parameterString": ":param",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should property tokenize several parameters without lists separated by text",
+			"parameterString": ":param1,:param2",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param1"
+				},
+				{
+					"name": "TEXT",
+					"value": ","
+				},
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param2"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should properly tokenize a parameter with the empty list",
+			"parameterString": ":param[]",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_END",
+					"value": "]"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should properly tokenize a parameter with one store on the list",
+			"parameterString": ":param[very-cool/Store-Name]",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "very-cool/Store-Name"
+				},
+				{
+					"name": "STORE_LIST_END",
+					"value": "]"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should properly tokenize a parameter with several stores on the list",
+			"parameterString": ":param[very-cool/Store-Name,another-cool/Store_name2,the-coolest/Store_name3]",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "very-cool/Store-Name"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "another-cool/Store_name2"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "the-coolest/Store_name3"
+				},
+				{
+					"name": "STORE_LIST_END",
+					"value": "]"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should properly tokenize several parameters with stores on the list surrounded by text",
+			"parameterString": "start-:param1[store1,store2,store3]-:param2[store4,store5]-end",
+			"expected": [
+				{
+					"name": "TEXT",
+					"value": "start-"
+				},
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param1"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "store1"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "store2"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "store3"
+				},
+				{
+					"name": "STORE_LIST_END",
+					"value": "]"
+				},
+				{
+					"name": "TEXT",
+					"value": "-"
+				},
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param2"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "store4"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "store5"
+				},
+				{
+					"name": "STORE_LIST_END",
+					"value": "]"
+				},
+				{
+					"name": "TEXT",
+					"value": "-end"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		},
+		{
+			"description": "should properly tokenize a parameter with several stores on the list and whitespaces",
+			"parameterString": ":param[     very-cool/Store-Name,\t\tanother-cool/Store_name2,\n\r\nthe-coolest/Store_name3]",
+			"expected": [
+				{
+					"name": "PARAMETER_START",
+					"value": ":"
+				},
+				{
+					"name": "PARAMETER_NAME",
+					"value": "param"
+				},
+				{
+					"name": "STORE_LIST_START",
+					"value": "["
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "very-cool/Store-Name"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "another-cool/Store_name2"
+				},
+				{
+					"name": "STORE_LIST_COMMA",
+					"value": ","
+				},
+				{
+					"name": "STORE_LIST_ITEM",
+					"value": "the-coolest/Store_name3"
+				},
+				{
+					"name": "STORE_LIST_END",
+					"value": "]"
+				},
+				{
+					"name": "END",
+					"value": ""
+				}
+			]
+		}
+	]
+}
