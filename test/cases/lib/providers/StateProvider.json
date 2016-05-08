@@ -653,6 +653,33 @@
 				}
 			},
 			"expectedURI": "/value1/value2?query=qValue2"
+		},
+		{
+			"name": "should return URI without query string if parameters=undefined for optional parameters",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/some?:qParam1[Store2]=value&query=:qParam2[Store2]&:qParam3[Store3]"
+				}
+			],
+			"arguments": {
+				"name": "test"
+			},
+			"expectedURI": "/some"
+		},
+		{
+			"name": "should return URI without query parameter if the value was not specified",
+			"routes": [
+				{
+					"name": "test",
+					"expression": "/some?qParam=:qValue[Store]"
+				}
+			],
+			"arguments": {
+				"name": "test",
+				"parameters": {}
+			},
+			"expectedURI": "/some"
 		}
 	]
 }
