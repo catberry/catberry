@@ -18,6 +18,7 @@ const components = [
 ];
 
 const routeDefinitions = '__routeDefinitions' || [];
+const routeDescriptors = '__routes' || [];
 
 const Catberry = require('./node_modules/catberry/browser/Catberry.js');
 const BootstrapperBase = require('./node_modules/catberry/lib/base/BootstrapperBase.js');
@@ -50,6 +51,9 @@ class Bootstrapper extends BootstrapperBase {
 
 		routeDefinitions.forEach(routeDefinition =>
 			locator.registerInstance('routeDefinition', routeDefinition));
+
+		routeDescriptors.forEach(routeDescriptor =>
+			locator.registerInstance('routeDescriptor', routeDescriptor));
 
 		stores.forEach(store => locator.registerInstance('store', store));
 

@@ -581,6 +581,35 @@ describe('lib/StoreDispatcher', function() {
 					done();
 				});
 		});
+
+		it('should trigger warning if the store does not exist', function(done) {
+			const stores = {
+				store: {
+					name: 'store',
+					constructor: storeMocks.SyncDataStore
+				}
+			};
+			const locator = createLocator(stores);
+			const eventBus = locator.resolve('eventBus');
+			const dispatcher = locator.resolve('storeDispatcher');
+
+			const initState = {
+				wrong: {}
+			};
+
+			eventBus
+				.once('error', done)
+				.once('warn', message => {
+					try {
+						assert.strictEqual(message, 'Store "wrong" does not exist (might be a typo in a route)');
+						done();
+					} catch (e) {
+						done(e);
+					}
+				});
+
+			dispatcher.setState(initState, context);
+		});
 	});
 
 	describe('#sendAction', function() {
