@@ -18,6 +18,7 @@
 * [Example of application structure](#example-of-the-application-structure)
 * [Routing](#routing)
 	* [Colon-marked parameters in a string](#colon-marked-parameters-in-a-string)
+	* [Named routes and URI generation](#named-routes-and-uri-generation)
 	* [Colon-marked parameters with additional 'map' function](#colon-marked-parameters-with-an-additional-map-function)
 	* [Regular expression](#regular-expression)
 * [Catberry services](#catberry-services)
@@ -173,6 +174,7 @@ that constains the current location.
 * `this.$context.referrer` – the current [URI](https://github.com/catberry/catberry-uri) object
 that contains the current referrer.
 * `this.$context.locator` – the [Service Locator](#service-locator) of the application.
+* `this.$context.getRouteURI('routeName', { parameter: 'value' })` – generates a URI string pasting parameter values to the specified route expression (must have a name). If a route parameter is used as a query value in URI you can use Array as a value for it. See examples in the [Routing](#named-routes-and-uri-generation) section.
 * `this.$context.redirect('String')` – redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
 * `this.$context.notFound()` – hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
 * `this.$context.sendBroadcastAction('name', object)` – like `this.$context.sendAction` (see [store's context](#stores-context) and [cat-component's context](#cat-components-context)) however the action will be sent to all stores. The result will be a promise of that resolves into an `Array`.
@@ -496,6 +498,54 @@ All parameters should be marked with the colon at the beginning and optionally f
 In the previous example, `id` value would be set to stores `store1` and `store2`; and the `parameter` value would be set only to the store `store1`.
 
 Please keep in mind that a parameter's **name** in a route definition must satisfy the regular expression `[$A-Z_][\\dA-Z_$]*` and a parameter's **value** should satisfy the regular expression `[^\\\/&?=]*`.
+
+Any parameter in a path segment, query name or query value can be surrounded by text and other parameters, like this:
+
+```
+/item-:id[store1,store2]/actions?some-:queryName1[store1]-:queryName2[store2]=cool-:parameter[store1]
+```
+
+## Named routes and URI generation
+You can give the route a name for using the `this.$context.getRouteURI('routeName', parameters)` method. This method pastes parameter values in a route expression instead of "colon-marked parameter" syntax. As a result, you have a URI which can be used in links inside the templates for routing inside the app.
+
+For instance, you have a route definition:
+
+```
+{
+  name: 'myRoute',
+  expression: '/some/:id[store1,store2]/actions?someParameter=:parameter[store1]'
+}
+```
+
+And you're calling the method with following parameters:
+
+```javascript
+this.$context.getRouteURI('myRoute', {
+  id: 'uniqueId',
+  parameter: 'someValue'
+});
+```
+
+It would return:
+
+```
+/some/uniqueId/actions?someParameter=someValue
+```
+
+Also, if you have a parameter as a query string value like we do in this particular example (`:parameter[store1]`), you can specify an Array as a value like this:
+
+```javascript
+this.$context.getRouteURI('myRoute', {
+  id: 'uniqueId',
+  parameter: ['first', 'second', 'third']
+});
+```
+
+This one would return:
+
+```
+/some/uniqueId/actions?someParameter=first&someParameter=second&someParameter=third
+```
 
 ## Colon-marked parameters with an additional `map` function
 Also, you can define the mapper object, that allows you to modify the application state object before it will be processed by Catberry.
@@ -1139,6 +1189,40 @@ locator.registerInstance('browserifyPlugin', {
 
 * [catberry-debugger](https://github.com/catberry/catberry-debugger) – Chrome Dev Tools extension
 * [catberry-idea-plugin](https://github.com/catberry/catberry-idea-plugin) – Intellij platform plugin
+
+## Live Reloading
+
+Whilst Catberry doesn't have a built-in live-reloading mechanism, it's trivial to add it to your project by following these steps:
+
+### Server side live reloading
+
+* `npm install -g nodemon`
+* Change `package.json` file to run `nodaemon` instead of `node` by changing
+	* `debug` command to:
+	```shell
+	node ./build.js & nodemon --watch server --watch build.js --watch routes.js ./server.js
+	```
+	* `debug-win` command to:
+	```shell
+	powershell -Command \"Start-Process -NoNewWindow nodemon ./build.js; Start-Process -NoNewWindow -Wait  -ArgumentList '--watch server --watch build.js --watch routes.js  ./server.js' nodemon\"
+	```
+	
+### Client side live reloading
+* `npm install -S express-livereload`
+* Modify `server.js` and place the following code below `const app = express();`
+```javascript
+if(!config.isRelease){
+	const livereload = require('express-livereload');
+	livereload(app);
+}
+```  
+
+* Add the following line to the `head` template:
+```html
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js"></' + 'script>')</script>
+```
+
+That's it! Now when you change the client side code - the web page will reload and when you edit the server - node will restart.
 
 ## Other
 
