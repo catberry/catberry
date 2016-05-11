@@ -395,12 +395,12 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @returns {Promise<Element>} Promise for HTML element with the rendered component.
 	 */
 	createComponent(tagName, attributes) {
-		if (typeof (tagName) !== 'string' || !attributes ||
-			typeof (attributes) !== 'object') {
+		if (typeof (tagName) !== 'string') {
 			return Promise.reject(
-				new Error('Tag name should be a string and attributes should be an object')
+				new Error('The tag name must be a string')
 			);
 		}
+		attributes = attributes || Object.create(null);
 
 		return this._getPromiseForReadyState()
 			.then(() => {
