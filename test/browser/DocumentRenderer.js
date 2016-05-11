@@ -1010,7 +1010,7 @@ describe('browser/DocumentRenderer', function() {
 						locator.registerInstance('window', window);
 						var element = null;
 						const renderer = new DocumentRenderer(locator);
-						renderer.createComponent(preparedTestCase.tagName, preparedTestCase.attributes || {})
+						renderer.createComponent(preparedTestCase.tagName, preparedTestCase.attributes)
 							.then(el => {
 								element = el;
 								assert.strictEqual(element.innerHTML.trim(), preparedTestCase.expectedHTML.trim());
@@ -1059,7 +1059,7 @@ describe('browser/DocumentRenderer', function() {
 						.catch(reason =>
 							assert.strictEqual(
 								reason.message,
-								'Tag name should be a string and attributes should be an object')
+								'The tag name must be a string')
 							)
 						.then(done)
 						.catch(done);
@@ -1067,26 +1067,6 @@ describe('browser/DocumentRenderer', function() {
 			});
 		});
 
-		it('should reject promise if attributes set is not an object', function(done) {
-			const locator = createLocator({}, {});
-
-			jsdom.env({
-				html: ' ',
-				done: (errors, window) => {
-					locator.registerInstance('window', window);
-					const renderer = new DocumentRenderer(locator);
-					renderer.createComponent('cat-test', 100500)
-						.then(() => assert.fail('Should fail'))
-						.catch(reason =>
-							assert.strictEqual(
-								reason.message,
-								'Tag name should be a string and attributes should be an object')
-							)
-						.then(done)
-						.catch(done);
-				}
-			});
-		});
 	});
 
 	describe('#collectGarbage', function() {
