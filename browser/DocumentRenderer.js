@@ -366,30 +366,41 @@ class DocumentRenderer extends DocumentRendererBase {
 	collectGarbage() {
 		return this._getPromiseForReadyState()
 			.then(() => {
-				const promises = [];
+				const context = {
+					roots: [],
+					components: this._componentLoader.getComponentsByNames()
+				};
+
 				Object.keys(this._componentElements)
 					.forEach(id => {
+						// we should not remove special elements like HEAD
 						if (SPECIAL_IDS.hasOwnProperty(id)) {
 							return;
 						}
 
-						const element = this._componentElements[id];
-						if (this._window.document.body.contains(element)) {
-							return;
+						let current = this._componentElements[id];
+						while (current !== this._window.document.documentElement) {
+							// the component is situated in a detached DOM subtree
+							if (current.parentElement === null) {
+								context.roots.push(current);
+								break;
+							}
+							// the component is another component's descendant
+							if (this._isComponentElement(context.components, current.parentElement)) {
+								break;
+							}
+							current = current.parentElement;
 						}
-
-						const promise = this._unbindComponent(element)
-							.then(() => this._removeComponent(id));
-						promises.push(promise);
 					});
-				return Promise.all(promises);
+
+				return this._removeDetachedComponents(context);
 			});
 	}
 
 	/**
 	 * Creates and renders a component element.
 	 * @param {string} tagName Name of the HTML tag.
-	 * @param {Object} attributes Element attributes.
+	 * @param {Object?} attributes Element attributes.
 	 * @returns {Promise<Element>} Promise for HTML element with the rendered component.
 	 */
 	createComponent(tagName, attributes) {
@@ -437,6 +448,33 @@ class DocumentRenderer extends DocumentRendererBase {
 
 				this._removeComponent(id);
 			});
+	}
+
+	/**
+	 * Removes detached subtrees from the components set.
+	 * @param {{roots: Array, components: Object}} context Operation context.
+	 * @returns {Promise} Promise for finished removal
+	 * @private
+	 */
+	_removeDetachedComponents(context) {
+		if (context.roots.length === 0) {
+			return Promise.resolve();
+		}
+		const root = context.roots.pop();
+		return this._traverseComponents([root], context.components, element => this._removeDetachedComponent(element))
+			.then(() => this._removeDetachedComponents(context));
+	}
+
+	/**
+	 * Removes detached component.
+	 * @param {Element} element Element of the detached component.
+	 * @returns {Promise} Promise for the removed component.
+	 * @private
+	 */
+	_removeDetachedComponent(element) {
+		const id = this._getId(element);
+		return this._unbindComponent(element)
+			.then(() => this._removeComponent(id));
 	}
 
 	/**

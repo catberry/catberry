@@ -204,7 +204,7 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should bind all events from bind method', function(done) {
-			class Component1 {
+			class TestComponent {
 				render() {
 					return this.$context.name;
 				}
@@ -212,22 +212,7 @@ describe('browser/DocumentRenderer', function() {
 					return {
 						click: {
 							'a.clickable': event => {
-								event.target.innerHTML += 'Component1';
-							}
-						}
-					};
-				}
-			}
-
-			class Component2 {
-				render() {
-					return this.$context.name;
-				}
-				bind() {
-					return {
-						click: {
-							'a.clickable': event => {
-								event.currentTarget.innerHTML = 'Component2';
+								event.target.innerHTML += `inner:${this.$context.name}`;
 							}
 						}
 					};
@@ -237,12 +222,12 @@ describe('browser/DocumentRenderer', function() {
 			const components = {
 				test1: {
 					name: 'test1',
-					constructor: Component1,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable1.html`)
 				},
 				test2: {
 					name: 'test2',
-					constructor: Component2,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable2.html`)
 				}
 			};
@@ -256,7 +241,6 @@ describe('browser/DocumentRenderer', function() {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
 					const element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
 						.then(() => {
 							const links = element.querySelectorAll('a.clickable');
@@ -441,47 +425,40 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should unbind all events and call unbind', function(done) {
-			const bindCounters = {
-				first: 0,
-				second: 0
-			};
-			const unbindCounters = {
-				first: 0,
-				second: 0
-			};
-			class Component1 {
-				render() {
-					return this.$context.name;
-				}
-				bind() {
-					bindCounters.first++;
-				}
-				unbind() {
-					unbindCounters.first++;
-				}
-			}
+			const binds = [];
+			const unbinds = [];
+			const clicks = [];
 
-			class Component2 {
+			class TestComponent {
 				render() {
 					return this.$context.name;
 				}
 				bind() {
-					bindCounters.second++;
+					binds.push(this.$context.name);
+					return {
+						click: {
+							'a.clickable': e => this.onClick(e)
+						}
+					};
 				}
 				unbind() {
-					unbindCounters.second++;
+					unbinds.push(this.$context.name);
+				}
+				onClick(e) {
+					e.stopPropagation();
+					clicks.push(this.$context.name);
 				}
 			}
 
 			const components = {
 				test1: {
 					name: 'test1',
-					constructor: Component1,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable1.html`)
 				},
 				test2: {
 					name: 'test2',
-					constructor: Component2,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable2.html`)
 				}
 			};
@@ -494,11 +471,20 @@ describe('browser/DocumentRenderer', function() {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
 					const element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
 						.then(() => {
-							return renderer.renderComponent(element);
+							const toClick = element.querySelectorAll('a.clickable');
+							for (let i = 0; i < toClick.length; i++) {
+								testUtils.click(toClick[i], {
+									view: window,
+									bubbles: true,
+									cancelable: true,
+									button: 0
+								});
+							}
+							return testUtils.wait(1);
 						})
+						.then(() => renderer.collectGarbage())
 						.then(() => {
 							const toClick = element.querySelectorAll('a.clickable');
 							for (let i = 0; i < toClick.length; i++) {
@@ -512,8 +498,18 @@ describe('browser/DocumentRenderer', function() {
 							return testUtils.wait(1);
 						})
 						.then(() => {
-							assert.deepEqual(bindCounters, {first: 2, second: 2});
-							assert.deepEqual(unbindCounters, {first: 1, second: 1});
+							assert.deepEqual(binds, [
+								'test2',
+								'test1'
+							]);
+							assert.deepEqual(unbinds, [
+								'test2',
+								'test1'
+							]);
+							assert.deepEqual(clicks, [
+								'test1',
+								'test2'
+							]);
 						})
 						.then(done)
 						.catch(done);
@@ -1037,20 +1033,28 @@ describe('browser/DocumentRenderer', function() {
 
 	describe('#collectGarbage', function() {
 		it('should unlink component if it is not in DOM', function(done) {
+
+			const unbinds = [];
+			class TestComponent extends componentMocks.AsyncComponent {
+				unbind() {
+					unbinds.push(this.$context.name);
+				}
+			}
+
 			const components = {
 				test1: {
 					name: 'test1',
-					constructor: componentMocks.AsyncComponent,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
 				test2: {
 					name: 'test2',
-					constructor: componentMocks.AsyncComponent,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
+					constructor: TestComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				},
 				test3: {
 					name: 'test3',
-					constructor: componentMocks.AsyncComponent,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
 			};
@@ -1062,20 +1066,16 @@ describe('browser/DocumentRenderer', function() {
 				done: (errors, window) => {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
-					const element = window.document.createElement('cat-test3');
-					element.setAttribute('id', 'unique1');
-					window.document.body.appendChild(element);
+					let componentElements = null;
+
 					Promise.all([
-						renderer.renderComponent(element).then(() => element),
-						renderer.createComponent('cat-test1', {
-							id: 'unique2'
-						}),
-						renderer.createComponent('cat-test3', {
-							id: 'unique3'
-						})
+						renderer.createComponent('cat-test1'),
+						renderer.createComponent('cat-test2'),
+						renderer.createComponent('cat-test3')
 					])
 						.then(elements => {
-							window.document.body.appendChild(elements[2]);
+							componentElements = elements;
+							window.document.body.appendChild(elements[1]);
 							const areInstances = elements.every(el => {
 								const instance = renderer.getComponentByElement(el);
 								return instance instanceof componentMocks.AsyncComponent;
@@ -1084,13 +1084,20 @@ describe('browser/DocumentRenderer', function() {
 							return renderer.collectGarbage();
 						})
 						.then(() => {
-							const instance1 = renderer.getComponentById('unique1');
-							const instance2 = renderer.getComponentById('unique2');
-							const instance3 = renderer.getComponentById('unique3');
+							const instance1 = renderer.getComponentByElement(componentElements[0]);
+							const instance2 = renderer.getComponentByElement(componentElements[1]);
+							const instance3 = renderer.getComponentByElement(componentElements[2]);
 
-							assert.strictEqual(instance1 instanceof componentMocks.AsyncComponent, true);
-							assert.strictEqual(instance2, null);
-							assert.strictEqual(instance3 instanceof componentMocks.AsyncComponent, true);
+							assert.strictEqual(instance1, null);
+							assert.strictEqual(instance2 instanceof TestComponent, true);
+							assert.strictEqual(instance3, null);
+
+							assert.deepEqual(unbinds, [
+								'test3',
+								'test3',
+								'test2',
+								'test1'
+							]);
 						})
 						.then(done)
 						.catch(done);
