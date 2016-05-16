@@ -17,6 +17,19 @@
 			"expectedHTML": "test-simple-component.html"
 		},
 		{
+			"name": "should render component if the attributes are not specified",
+			"tagName": "cat-test",
+			"components": {
+				"test": {
+					"name": "test",
+					"constructor": "SyncComponent",
+					"template": "simple-component.html"
+				}
+			},
+			"html": "stub.html",
+			"expectedHTML": "test-simple-component.html"
+		},
+		{
 			"name": "should render asynchronous component into HTML element",
 			"tagName": "cat-test",
 			"attributes": {
