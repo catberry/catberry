@@ -138,15 +138,13 @@ class DocumentRenderer extends DocumentRendererBase {
 			})
 			.then(() => {
 				const components = this._componentLoader.getComponentsByNames();
-				const elements = this._findComponentElements(
-					this._window.document.documentElement, components, true
-				);
-
-				// the document component is not represented by its element in DOM
-				elements.unshift(this._window.document.documentElement);
-
-				return this._initialWrap(components, elements);
-			});
+				const documentElement = this._window.document.documentElement;
+				const action = element => this._initializeComponent(element, components);
+				return this._traverseComponents([documentElement], components, action);
+			})
+			.then(() => this._eventBus.emit(
+				'documentRendered', this._currentRoutingContext
+			));
 	}
 
 	/**
@@ -260,8 +258,8 @@ class DocumentRenderer extends DocumentRendererBase {
 								)
 						});
 
-						const promises = this._findComponentElements(
-							element, renderingContext.components, false
+						const promises = this._findNestedComponents(
+							element, renderingContext.components
 						)
 							.map(child => this.renderComponent(child, renderingContext));
 
@@ -368,30 +366,41 @@ class DocumentRenderer extends DocumentRendererBase {
 	collectGarbage() {
 		return this._getPromiseForReadyState()
 			.then(() => {
-				const promises = [];
+				const context = {
+					roots: [],
+					components: this._componentLoader.getComponentsByNames()
+				};
+
 				Object.keys(this._componentElements)
 					.forEach(id => {
+						// we should not remove special elements like HEAD
 						if (SPECIAL_IDS.hasOwnProperty(id)) {
 							return;
 						}
 
-						const element = this._componentElements[id];
-						if (this._window.document.body.contains(element)) {
-							return;
+						let current = this._componentElements[id];
+						while (current !== this._window.document.documentElement) {
+							// the component is situated in a detached DOM subtree
+							if (current.parentElement === null) {
+								context.roots.push(current);
+								break;
+							}
+							// the component is another component's descendant
+							if (this._isComponentElement(context.components, current.parentElement)) {
+								break;
+							}
+							current = current.parentElement;
 						}
-
-						const promise = this._unbindComponent(element)
-							.then(() => this._removeComponent(id));
-						promises.push(promise);
 					});
-				return Promise.all(promises);
+
+				return this._removeDetachedComponents(context);
 			});
 	}
 
 	/**
 	 * Creates and renders a component element.
 	 * @param {string} tagName Name of the HTML tag.
-	 * @param {Object} attributes Element attributes.
+	 * @param {Object?} attributes Element attributes.
 	 * @returns {Promise<Element>} Promise for HTML element with the rendered component.
 	 */
 	createComponent(tagName, attributes) {
@@ -437,8 +446,35 @@ class DocumentRenderer extends DocumentRendererBase {
 					return;
 				}
 
-				this._removeComponent(id);
+				this._removeComponentById(id);
 			});
+	}
+
+	/**
+	 * Removes detached subtrees from the components set.
+	 * @param {{roots: Array, components: Object}} context Operation context.
+	 * @returns {Promise} Promise for finished removal
+	 * @private
+	 */
+	_removeDetachedComponents(context) {
+		if (context.roots.length === 0) {
+			return Promise.resolve();
+		}
+		const root = context.roots.pop();
+		return this._traverseComponents([root], context.components, element => this._removeDetachedComponent(element))
+			.then(() => this._removeDetachedComponents(context));
+	}
+
+	/**
+	 * Removes detached component.
+	 * @param {Element} element Element of the detached component.
+	 * @returns {Promise} Promise for the removed component.
+	 * @private
+	 */
+	_removeDetachedComponent(element) {
+		const id = this._getId(element);
+		return this._unbindComponent(element)
+			.then(() => this._removeComponentById(id));
 	}
 
 	/**
@@ -449,20 +485,12 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @private
 	 */
 	_unbindAll(element, renderingContext) {
-		const rootId = this._getId(element);
-		const promises = [];
-
-		this._findComponentElements(element, renderingContext.components, true)
-			.forEach(innerElement => {
-				const id = this._getId(innerElement);
-				renderingContext.unboundIds[id] = true;
-				promises.push(this._unbindComponent(innerElement));
-			});
-
-		renderingContext.unboundIds[rootId] = true;
-		promises.push(this._unbindComponent(element));
-
-		return Promise.all(promises);
+		const action = innerElement => {
+			const id = this._getId(innerElement);
+			renderingContext.unboundIds[id] = true;
+			return this._unbindComponent(innerElement);
+		};
+		return this._traverseComponents([element], renderingContext.components, action);
 	}
 
 	/**
@@ -506,7 +534,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @param {string} id Component's ID
 	 * @private
 	 */
-	_removeComponent(id) {
+	_removeComponentById(id) {
 		delete this._componentElements[id];
 		delete this._componentInstances[id];
 		delete this._componentBindings[id];
@@ -668,16 +696,35 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Finds all descendant components of the specified component element.
-	 * @param {Element} element Root component's HTML element to begin search with.
-	 * @param {Object} components Map of components by their names.
-	 * @param {boolean} goInComponents Go inside nested components.
+	 * Does asynchronous traversal through the components hierarchy.
+	 * @param {Array} elements Elements to start the search.
+	 * @param {Object} components Current set of components.
+	 * @param {function} action Action for every component.
+	 * @returns {Promise} Promise for the finished traversal.
 	 * @private
 	 */
-	_findComponentElements(element, components, goInComponents) {
-		const elements = [];
-		const queue = [element];
+	_traverseComponents(elements, components, action) {
+		if (elements.length === 0) {
+			return Promise.resolve();
+		}
 
+		const root = elements.shift();
+		elements = elements.concat(this._findNestedComponents(root, components));
+		return this._traverseComponents(elements, components, action)
+			.then(() => action(root));
+	}
+
+	/**
+	 * Finds all descendant components of the specified component root.
+	 * @param {Element} root Root component's HTML root to begin search with.
+	 * @param {Object} components Map of components by their names.
+	 * @private
+	 */
+	_findNestedComponents(root, components) {
+		const elements = [];
+		const queue = [root];
+
+		// does breadth-first search inside the root element
 		while (queue.length > 0) {
 			const currentChildren = queue.shift().children;
 			if (!currentChildren) {
@@ -691,9 +738,6 @@ class DocumentRenderer extends DocumentRendererBase {
 					return;
 				}
 
-				if (goInComponents) {
-					queue.push(currentChild);
-				}
 				elements.push(currentChild);
 			});
 		}
@@ -868,51 +912,40 @@ class DocumentRenderer extends DocumentRendererBase {
 	}
 
 	/**
-	 * Does initial wrapping for every component on the page.
-	 * @param {Object} components Current components map by their names.
-	 * @param {Array} elements Elements list.
+	 * Initializes the element as a component.
+	 * @param {Element} element The component's element.
+	 * @param {Object} components Current set of components.
+	 * @returns {Promise} Promise for the done initialization.
 	 * @private
 	 */
-	_initialWrap(components, elements) {
-		const current = elements.pop();
-
+	_initializeComponent(element, components) {
 		return Promise.resolve()
 			.then(() => {
-				const componentName = moduleHelper.getOriginalComponentName(current.nodeName);
+				const componentName = moduleHelper.getOriginalComponentName(element.nodeName);
 				if (!(componentName in components)) {
 					return null;
 				}
 
-				const id = this._getId(current);
+				const id = this._getId(element);
 				const ComponentConstructor = components[componentName].constructor;
 				ComponentConstructor.prototype.$context = this._getComponentContext(
-					components[componentName], current
+					components[componentName], element
 				);
 
 				const instance = new ComponentConstructor(this._serviceLocator);
 				instance.$context = ComponentConstructor.prototype.$context;
-				this._componentElements[id] = current;
+				this._componentElements[id] = element;
 				this._componentInstances[id] = instance;
 				// initialize the store of the component
 				this._storeDispatcher.getStore(
-					current.getAttribute(moduleHelper.ATTRIBUTE_STORE)
+					element.getAttribute(moduleHelper.ATTRIBUTE_STORE)
 				);
 				this._eventBus.emit('componentRendered', {
 					name: componentName,
 					attributes: instance.$context.attributes,
 					context: instance.$context
 				});
-				return this._bindComponent(current);
-			})
-			.then(() => {
-				if (elements.length > 0) {
-					return this._initialWrap(components, elements);
-				}
-
-				this._eventBus.emit(
-					'documentRendered', this._currentRoutingContext
-				);
-				return null;
+				return this._bindComponent(element);
 			});
 	}
 
