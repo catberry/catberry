@@ -446,7 +446,7 @@ class DocumentRenderer extends DocumentRendererBase {
 					return;
 				}
 
-				this._removeComponent(id);
+				this._removeComponentById(id);
 			});
 	}
 
@@ -474,7 +474,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	_removeDetachedComponent(element) {
 		const id = this._getId(element);
 		return this._unbindComponent(element)
-			.then(() => this._removeComponent(id));
+			.then(() => this._removeComponentById(id));
 	}
 
 	/**
@@ -534,7 +534,7 @@ class DocumentRenderer extends DocumentRendererBase {
 	 * @param {string} id Component's ID
 	 * @private
 	 */
-	_removeComponent(id) {
+	_removeComponentById(id) {
 		delete this._componentElements[id];
 		delete this._componentInstances[id];
 		delete this._componentBindings[id];
