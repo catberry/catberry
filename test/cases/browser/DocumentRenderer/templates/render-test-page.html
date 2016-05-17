@@ -1,0 +1,21 @@
+<cat-test1 id="root">
+    <span>Hello from root</span>
+    <cat-test2 id="in-test1-1" cat-store="store2">
+        <span>Hello from in-test1-1
+            <cat-wrong id="wrong-1" cat-store="store1">
+                <cat-test3 id="in-test2-1" cat-store="store1">
+                    <div>Hello from in-test2-1
+                        <cat-test5 id="in-test3-1" cat-store="store2">
+                            in-test3-1<br><div>Hello, World!</div>
+                        </cat-test5>
+                    </div>
+                </cat-test3>
+            </cat-wrong>
+        </span>
+    </cat-test2>
+    <cat-test4 id="in-test1-2" cat-store="store1">
+        <div>Hello from in-test1-2
+            <cat-test5 id="in-test4-1" cat-store="store2"></cat-test5>
+        </div>
+    </cat-test4>
+</cat-test1>
