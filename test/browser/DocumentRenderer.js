@@ -204,7 +204,7 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should bind all events from bind method', function(done) {
-			class Component1 {
+			class TestComponent {
 				render() {
 					return this.$context.name;
 				}
@@ -212,22 +212,7 @@ describe('browser/DocumentRenderer', function() {
 					return {
 						click: {
 							'a.clickable': event => {
-								event.target.innerHTML += 'Component1';
-							}
-						}
-					};
-				}
-			}
-
-			class Component2 {
-				render() {
-					return this.$context.name;
-				}
-				bind() {
-					return {
-						click: {
-							'a.clickable': event => {
-								event.currentTarget.innerHTML = 'Component2';
+								event.target.innerHTML += `inner:${this.$context.name}`;
 							}
 						}
 					};
@@ -237,12 +222,12 @@ describe('browser/DocumentRenderer', function() {
 			const components = {
 				test1: {
 					name: 'test1',
-					constructor: Component1,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable1.html`)
 				},
 				test2: {
 					name: 'test2',
-					constructor: Component2,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable2.html`)
 				}
 			};
@@ -256,7 +241,6 @@ describe('browser/DocumentRenderer', function() {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
 					const element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique1');
 					renderer.renderComponent(element)
 						.then(() => {
 							const links = element.querySelectorAll('a.clickable');
@@ -441,47 +425,40 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should unbind all events and call unbind', function(done) {
-			const bindCounters = {
-				first: 0,
-				second: 0
-			};
-			const unbindCounters = {
-				first: 0,
-				second: 0
-			};
-			class Component1 {
-				render() {
-					return this.$context.name;
-				}
-				bind() {
-					bindCounters.first++;
-				}
-				unbind() {
-					unbindCounters.first++;
-				}
-			}
+			const binds = [];
+			const unbinds = [];
+			const clicks = [];
 
-			class Component2 {
+			class TestComponent {
 				render() {
 					return this.$context.name;
 				}
 				bind() {
-					bindCounters.second++;
+					binds.push(this.$context.name);
+					return {
+						click: {
+							'a.clickable': e => this.onClick(e)
+						}
+					};
 				}
 				unbind() {
-					unbindCounters.second++;
+					unbinds.push(this.$context.name);
+				}
+				onClick(e) {
+					e.stopPropagation();
+					clicks.push(this.$context.name);
 				}
 			}
 
 			const components = {
 				test1: {
 					name: 'test1',
-					constructor: Component1,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable1.html`)
 				},
 				test2: {
 					name: 'test2',
-					constructor: Component2,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}clickable2.html`)
 				}
 			};
@@ -494,11 +471,20 @@ describe('browser/DocumentRenderer', function() {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
 					const element = window.document.createElement('cat-test1');
-					element.setAttribute('id', 'unique');
 					renderer.renderComponent(element)
 						.then(() => {
-							return renderer.renderComponent(element);
+							const toClick = element.querySelectorAll('a.clickable');
+							for (let i = 0; i < toClick.length; i++) {
+								testUtils.click(toClick[i], {
+									view: window,
+									bubbles: true,
+									cancelable: true,
+									button: 0
+								});
+							}
+							return testUtils.wait(1);
 						})
+						.then(() => renderer.collectGarbage())
 						.then(() => {
 							const toClick = element.querySelectorAll('a.clickable');
 							for (let i = 0; i < toClick.length; i++) {
@@ -512,8 +498,18 @@ describe('browser/DocumentRenderer', function() {
 							return testUtils.wait(1);
 						})
 						.then(() => {
-							assert.deepEqual(bindCounters, {first: 2, second: 2});
-							assert.deepEqual(unbindCounters, {first: 1, second: 1});
+							assert.deepEqual(binds, [
+								'test2',
+								'test1'
+							]);
+							assert.deepEqual(unbinds, [
+								'test2',
+								'test1'
+							]);
+							assert.deepEqual(clicks, [
+								'test1',
+								'test2'
+							]);
 						})
 						.then(done)
 						.catch(done);
@@ -688,39 +684,56 @@ describe('browser/DocumentRenderer', function() {
 	});
 
 	describe('#render', function() {
-		it('should update all components that depend on changed stores', function(done) {
-			const renders = [];
-			class Component1 {
-				render() {
-					renders.push(this.$context.attributes.id);
-					return this.$context.name;
-				}
-			}
 
-			const components = {
+		let renders, unbinds, binds, locator, components, stores;
+		const html = testUtils.getHTML(`${TEMPLATES_DIR}render-test-page.html`);
+
+		class TestComponent {
+			render() {
+				renders.push(this.$context.attributes.id);
+				return this.$context.name;
+			}
+			bind() {
+				binds.push(this.$context.attributes.id);
+			}
+			unbind() {
+				unbinds.push(this.$context.attributes.id);
+			}
+		}
+
+		beforeEach(function() {
+			renders = [];
+			binds = [];
+			unbinds = [];
+
+			components = {
 				test1: {
 					name: 'test1',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1-w-id.html`)
+					constructor: TestComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}render-test-comp1.html`)
 				},
 				test2: {
 					name: 'test2',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id.html`)
+					constructor: TestComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}render-test-comp2.html`)
 				},
 				test3: {
 					name: 'test3',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id-and-store.html`)
+					constructor: TestComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}render-test-comp3.html`)
 				},
 				test4: {
 					name: 'test4',
-					constructor: Component1,
+					constructor: TestComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}render-test-comp4.html`)
+				},
+				test5: {
+					name: 'test5',
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
 			};
-
-			const stores = {
+			stores = {
 				store1: {
 					name: 'store1',
 					constructor: storeMocks.AsyncDataStore
@@ -735,28 +748,52 @@ describe('browser/DocumentRenderer', function() {
 				}
 			};
 
-			const locator = createLocator({}, components, stores);
-			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
+			locator = createLocator({}, components, stores);
+		});
 
+		it('should update all components that depend on changed stores', function(done) {
 			jsdom.env({
 				html,
 				done: (errors, window) => {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
-					renderer.initWithState({}, {});
-					renderer
-						.render({
+					renderer.initWithState({}, {})
+						.then(() => binds.push('==separator=='))
+						.then(() => renderer.render({
 							store1: {},
 							store2: {},
 							store3: {}
-						}, {})
+						}, {}))
 						.then(() => {
 							assert.deepEqual(renders, [
-								'test1-1',
-								'test1-2',
-								'test2-1',
-								'test3-1',
-								'test3-1'
+								'in-test1-2',
+								'in-test1-1',
+								'in-test4-1',
+								'in-test2-1',
+								'in-test3-1'
+							]);
+
+							assert.deepEqual(binds, [
+								'in-test3-1',
+								'in-test4-1',
+								'in-test2-1',
+								'in-test1-2',
+								'in-test1-1',
+								'root',
+								'==separator==',
+								'in-test4-1',
+								'in-test1-2',
+								'in-test3-1',
+								'in-test2-1',
+								'in-test1-1'
+							]);
+
+							assert.deepEqual(unbinds, [
+								'in-test3-1',
+								'in-test4-1',
+								'in-test2-1',
+								'in-test1-2',
+								'in-test1-1'
 							]);
 						})
 						.then(done)
@@ -766,78 +803,61 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should update all components that depend on changed store by .changed() method', function(done) {
-			const renders = [];
-			class Component1 {
+			class ActionComponent extends TestComponent {
 				constructor() {
-					testUtils.wait(1)
-						.then(() => this.$context.sendAction('test'));
-				}
-				render() {
-					renders.push(this.$context.attributes.id);
-					return this.$context.name;
+					super();
+					this.$context.sendAction('test');
 				}
 			}
-
-			const components = {
-				test1: {
-					name: 'test1',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1-w-id.html`)
-				},
-				test2: {
-					name: 'test2',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id.html`)
-				},
-				test3: {
-					name: 'test3',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
-				}
-			};
-
 			class TimerStore {
 				handleTest() {
-					testUtils.wait(1)
+					testUtils.wait(5)
 						.then(() => this.$context.changed());
 				}
 			}
 
-			const stores = {
-				store1: {
-					name: 'store1',
-					constructor: TimerStore
-				},
-				store2: {
-					name: 'store2',
-					constructor: TimerStore
-				},
-				store3: {
-					name: 'store3',
-					constructor: TimerStore
-				}
-			};
-
-			const locator = createLocator({}, components, stores);
-			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
+			components.test2.constructor = ActionComponent;
+			stores.store2.constructor = TimerStore;
 
 			jsdom.env({
 				html,
 				done: (errors, window) => {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
-					renderer.initWithState({}, {});
-					renderer
-						.render({
-							store1: {},
-							store2: {},
-							store3: {}
-						}, {})
+					renderer.initWithState({
+						store1: {},
+						store2: {},
+						store3: {}
+					}, {})
+						.then(() => binds.push('==separator=='))
+						.then(() => testUtils.wait(10))
 						.then(() => {
-							assert.strictEqual(renders.length, 3);
-							assert.strictEqual(renders[0], 'test1-1');
-							assert.strictEqual(renders[1], 'test1-2');
-							assert.strictEqual(renders[2], 'test2-1');
+							assert.deepEqual(renders, [
+								'in-test4-1',
+								'in-test1-1',
+								'in-test2-1',
+								'in-test3-1'
+							]);
+
+							assert.deepEqual(binds, [
+								'in-test3-1',
+								'in-test4-1',
+								'in-test2-1',
+								'in-test1-2',
+								'in-test1-1',
+								'root',
+								'==separator==',
+								'in-test4-1',
+								'in-test3-1',
+								'in-test2-1',
+								'in-test1-1'
+							]);
+
+							assert.deepEqual(unbinds, [
+								'in-test3-1',
+								'in-test2-1',
+								'in-test1-1'
+							]);
 						})
 						.then(done)
 						.catch(done);
@@ -846,68 +866,27 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should do nothing if nothing changes', function(done) {
-			const renders = [];
-			class Component1 {
-				constructor() {
-					testUtils.wait(1)
-						.then(() => this.$context.sendAction('test'));
-				}
-				render() {
-					renders.push(this.$context.attributes.id);
-					return this.$context.name;
-				}
-			}
-
-			const components = {
-				test1: {
-					name: 'test1',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
-				},
-				test2: {
-					name: 'test2',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
-				},
-				test3: {
-					name: 'test3',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
-				}
-			};
-
-			const stores = {
-				store1: {
-					name: 'store1',
-					constructor: storeMocks.AsyncDataStore
-				},
-				store2: {
-					name: 'store2',
-					constructor: storeMocks.AsyncDataStore
-				},
-				store3: {
-					name: 'store3',
-					constructor: storeMocks.AsyncDataStore
-				}
-			};
-
-			const locator = createLocator({}, components, stores);
-			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
-			const state = {
-				store1: {},
-				store2: {},
-				store3: {}
-			};
-
 			jsdom.env({
 				html,
 				done: (errors, window) => {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
-					renderer.initWithState(state, {});
-					renderer
-						.render(state, {})
-						.then(() => assert.strictEqual(renders.length, 0))
+					renderer.initWithState({
+						store1: {},
+						store2: {},
+						store3: {}
+					}, {})
+						.then(() => binds.push('==separator=='))
+						.then(() => renderer.render({
+							store1: {},
+							store2: {},
+							store3: {}
+						}, {}))
+						.then(() => {
+							assert.strictEqual(renders.length, 0);
+							assert.strictEqual(unbinds.length, 0);
+							assert.strictEqual(binds[binds.length - 1], '==separator==');
+						})
 						.then(done)
 						.catch(done);
 				}
@@ -915,75 +894,58 @@ describe('browser/DocumentRenderer', function() {
 		});
 
 		it('should not do rendering concurrently', function(done) {
-			const renders = [];
-			class Component1 {
-				render() {
-					renders.push(this.$context.attributes.id);
-					return this.$context.name;
-				}
-			}
-
-			const components = {
-				test1: {
-					name: 'test1',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1-w-id.html`)
-				},
-				test2: {
-					name: 'test2',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2-w-id.html`)
-				},
-				test3: {
-					name: 'test3',
-					constructor: Component1,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
-				}
-			};
-
-			const stores = {
-				store1: {
-					name: 'store1',
-					constructor: storeMocks.AsyncDataStore
-				},
-				store2: {
-					name: 'store2',
-					constructor: storeMocks.AsyncDataStore
-				},
-				store3: {
-					name: 'store3',
-					constructor: storeMocks.AsyncDataStore
-				}
-			};
-
-			const locator = createLocator({}, components, stores);
-			const html = testUtils.getHTML(`${TEMPLATES_DIR}complex-with-stores.html`);
-
 			jsdom.env({
 				html,
 				done: (errors, window) => {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
-					renderer.initWithState({}, {});
-					Promise.all([
-						renderer.render({
-							store1: {}
-						}, {}),
-						renderer.render({
-							store1: {},
-							store2: {}
-						}, {}),
-						renderer.render({
-							store1: {},
-							store2: {},
-							store3: {}
-						}, {})
-					])
+					renderer.initWithState({}, {})
+						.then(() => binds.push('==separator=='))
+						.then(() => Promise.all([
+							renderer.render({
+								store1: {}
+							}, {}),
+							renderer.render({
+								store1: {},
+								store2: {}
+							}, {}),
+							renderer.render({
+								store1: {},
+								store2: {},
+								store3: {}
+							}, {})
+						]))
 						.then(() => {
-							assert.strictEqual(renders.length, 3);
-							assert.strictEqual(renders[0], 'test1-1');
-							assert.strictEqual(renders[1], 'test1-2');
-							assert.strictEqual(renders[2], 'test2-1');
+							assert.deepEqual(renders, [
+								'in-test1-2',
+								'in-test1-1',
+								'in-test4-1',
+								'in-test2-1',
+								'in-test3-1'
+							]);
+
+							assert.deepEqual(binds, [
+								'in-test3-1',
+								'in-test4-1',
+								'in-test2-1',
+								'in-test1-2',
+								'in-test1-1',
+								'root',
+								'==separator==',
+								'in-test4-1',
+								'in-test1-2',
+								'in-test3-1',
+								'in-test2-1',
+								'in-test1-1'
+							]);
+
+							assert.deepEqual(unbinds, [
+								'in-test3-1',
+								'in-test4-1',
+								'in-test2-1',
+								'in-test1-2',
+								'in-test1-1'
+							]);
 						})
 						.then(done)
 						.catch(done);
@@ -1071,20 +1033,28 @@ describe('browser/DocumentRenderer', function() {
 
 	describe('#collectGarbage', function() {
 		it('should unlink component if it is not in DOM', function(done) {
+
+			const unbinds = [];
+			class TestComponent extends componentMocks.AsyncComponent {
+				unbind() {
+					unbinds.push(this.$context.name);
+				}
+			}
+
 			const components = {
 				test1: {
 					name: 'test1',
-					constructor: componentMocks.AsyncComponent,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested1.html`)
 				},
 				test2: {
 					name: 'test2',
-					constructor: componentMocks.AsyncComponent,
-					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}nested2.html`)
+					constructor: TestComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				},
 				test3: {
 					name: 'test3',
-					constructor: componentMocks.AsyncComponent,
+					constructor: TestComponent,
 					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}simple-component.html`)
 				}
 			};
@@ -1096,20 +1066,16 @@ describe('browser/DocumentRenderer', function() {
 				done: (errors, window) => {
 					locator.registerInstance('window', window);
 					const renderer = new DocumentRenderer(locator);
-					const element = window.document.createElement('cat-test3');
-					element.setAttribute('id', 'unique1');
-					window.document.body.appendChild(element);
+					let componentElements = null;
+
 					Promise.all([
-						renderer.renderComponent(element).then(() => element),
-						renderer.createComponent('cat-test1', {
-							id: 'unique2'
-						}),
-						renderer.createComponent('cat-test3', {
-							id: 'unique3'
-						})
+						renderer.createComponent('cat-test1'),
+						renderer.createComponent('cat-test2'),
+						renderer.createComponent('cat-test3')
 					])
 						.then(elements => {
-							window.document.body.appendChild(elements[2]);
+							componentElements = elements;
+							window.document.body.appendChild(elements[1]);
 							const areInstances = elements.every(el => {
 								const instance = renderer.getComponentByElement(el);
 								return instance instanceof componentMocks.AsyncComponent;
@@ -1118,13 +1084,20 @@ describe('browser/DocumentRenderer', function() {
 							return renderer.collectGarbage();
 						})
 						.then(() => {
-							const instance1 = renderer.getComponentById('unique1');
-							const instance2 = renderer.getComponentById('unique2');
-							const instance3 = renderer.getComponentById('unique3');
+							const instance1 = renderer.getComponentByElement(componentElements[0]);
+							const instance2 = renderer.getComponentByElement(componentElements[1]);
+							const instance3 = renderer.getComponentByElement(componentElements[2]);
 
-							assert.strictEqual(instance1 instanceof componentMocks.AsyncComponent, true);
-							assert.strictEqual(instance2, null);
-							assert.strictEqual(instance3 instanceof componentMocks.AsyncComponent, true);
+							assert.strictEqual(instance1, null);
+							assert.strictEqual(instance2 instanceof TestComponent, true);
+							assert.strictEqual(instance3, null);
+
+							assert.deepEqual(unbinds, [
+								'test3',
+								'test3',
+								'test2',
+								'test1'
+							]);
 						})
 						.then(done)
 						.catch(done);
