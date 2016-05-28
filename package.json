@@ -1,112 +1,112 @@
 {
-	"name": "catberry",
-	"version": "8.4.0",
-	"author": {
-		"name": "Denis Rechkunov",
-		"email": "denis.rechkunov@gmail.com"
-	},
-	"description": "Catberry is an isomorphic framework for building universal front-end apps using components, Flux architecture and progressive rendering.",
-	"homepage": "https://github.com/catberry/catberry",
-	"keywords": [
-		"progressive rendering",
-		"Web",
-		"isomorphic",
-		"framework",
-		"middleware",
-		"connect",
-		"express",
-		"component",
-		"Flux"
-	],
-	"bugs": {
-		"url": "https://github.com/catberry/catberry/issues",
-		"email": "denis.rechkunov@gmail.com"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/catberry/catberry.git"
-	},
-	"directories":{
-		"doc": "docs"
-	},
-	"contributors": [
-		{
-			"name": "Denis Rechkunov",
-			"email": "denis.rechkunov@gmail.com"
-		},
-		{
-			"name": "Julia Rechkunova",
-			"email": "julia.rechkunova@gmail.com"
-		},
-		{
-			"name": "Jonathan Pollack",
-			"email": "jonathan.pollack@deliveryhero.com"
-		},
-		{
-			"name": "Pavel Sokolov",
-			"email": "mass3ff3ct@mail.ru"
-		},
-		{
-			"name": "Dmitry Vasilyev",
-			"email": "vaseker@yandex-team.ru"
-		},
-		{
-			"name": "Maxim Chetverikov",
-			"email": "ma.chetverikov@gmail.com"
-		},
-		{
-			"name": "Julia Kostyukova",
-			"email": "kostyukova.julia@gmail.com"
-		},
-		{
-			"name": "Mansur Gabidullin",
-			"email": "mansur.gabidullin@gmail.com"
-		}
-	],
-
-	"main": "./index",
-	"browser": {
-		"./lib/Bootstrapper.js": "__BrowserBundle.js",
-		"./lib/Catberry.js": "./browser/Catberry.js",
-		"./lib/CookieWrapper.js": "./browser/CookieWrapper.js",
-		"./lib/providers/ModuleApiProvider.js": "./browser/providers/ModuleApiProvider.js",
-		"./lib/providers/StateProvider.js": "./browser/providers/StateProvider.js",
-		"./lib/loaders/ComponentLoader.js": "./browser/loaders/ComponentLoader.js",
-		"./lib/loaders/StoreLoader.js": "./browser/loaders/StoreLoader.js",
-		"./lib/DocumentRenderer.js": "./browser/DocumentRenderer.js",
-		"./lib/RequestRouter.js": "./browser/RequestRouter.js",
-		"./lib/helpers/hrTimeHelper.js": "./browser/helpers/hrTimeHelper.js"
-	},
-	"dependencies": {
-		"mkdirp": "~0.5.1",
-		"glob": "^7.0.0",
-		"chokidar": "^1.4.3",
-		"catberry-locator": "^2.1.0",
-		"catberry-uri": "^3.1.0",
-		"pretty-hrtime": "^1.0.2",
-		"browser-process-hrtime": "~0.1.2",
-		"entities": "^1.1.1",
-		"watchify": "^3.7.0",
-		"babelify": "^7.2.0",
-		"babel-preset-es2015-ie": "^6.6.1",
-		"uglify-js": "^2.6.2",
-		"browserify": "^13.0.0",
-		"promise": "^7.1.1",
-		"morphdom": "^1.1.2",
-		"uuid": "^2.0.1"
-	},
-	"devDependencies": {
-		"istanbul": "~0.4.2",
-		"codecov": "^1.0.1",
-		"jsdom": "^8.0.4",
-		"mocha": "^2.4.5",
-		"eslint": "^2.2.0"
-	},
-	"engines": {
-		"node": ">=4"
-	},
-	"scripts": {
-		"test": "make"
-	},
-	"license": "MIT"
+  "name": "catberry",
+  "version": "8.4.0",
+  "author": {
+    "name": "Denis Rechkunov",
+    "email": "denis.rechkunov@gmail.com"
+  },
+  "description": "Catberry is an isomorphic framework for building universal front-end apps using components, Flux architecture and progressive rendering.",
+  "homepage": "https://github.com/catberry/catberry",
+  "keywords": [
+    "progressive rendering",
+    "Web",
+    "isomorphic",
+    "framework",
+    "middleware",
+    "connect",
+    "express",
+    "component",
+    "Flux"
+  ],
+  "bugs": {
+    "url": "https://github.com/catberry/catberry/issues",
+    "email": "denis.rechkunov@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/catberry/catberry.git"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "contributors": [
+    {
+      "name": "Denis Rechkunov",
+      "email": "denis.rechkunov@gmail.com"
+    },
+    {
+      "name": "Julia Rechkunova",
+      "email": "julia.rechkunova@gmail.com"
+    },
+    {
+      "name": "Jonathan Pollack",
+      "email": "jonathan.pollack@deliveryhero.com"
+    },
+    {
+      "name": "Pavel Sokolov",
+      "email": "mass3ff3ct@mail.ru"
+    },
+    {
+      "name": "Dmitry Vasilyev",
+      "email": "vaseker@yandex-team.ru"
+    },
+    {
+      "name": "Maxim Chetverikov",
+      "email": "ma.chetverikov@gmail.com"
+    },
+    {
+      "name": "Julia Kostyukova",
+      "email": "kostyukova.julia@gmail.com"
+    },
+    {
+      "name": "Mansur Gabidullin",
+      "email": "mansur.gabidullin@gmail.com"
+    }
+  ],
+  "main": "./index",
+  "browser": {
+    "./lib/Bootstrapper.js": "__BrowserBundle.js",
+    "./lib/Catberry.js": "./browser/Catberry.js",
+    "./lib/CookieWrapper.js": "./browser/CookieWrapper.js",
+    "./lib/providers/ModuleApiProvider.js": "./browser/providers/ModuleApiProvider.js",
+    "./lib/providers/StateProvider.js": "./browser/providers/StateProvider.js",
+    "./lib/loaders/ComponentLoader.js": "./browser/loaders/ComponentLoader.js",
+    "./lib/loaders/StoreLoader.js": "./browser/loaders/StoreLoader.js",
+    "./lib/DocumentRenderer.js": "./browser/DocumentRenderer.js",
+    "./lib/RequestRouter.js": "./browser/RequestRouter.js",
+    "./lib/helpers/hrTimeHelper.js": "./browser/helpers/hrTimeHelper.js"
+  },
+  "dependencies": {
+    "babel-preset-es2015-ie": "^6.6.1",
+    "babelify": "^7.2.0",
+    "browser-process-hrtime": "~0.1.2",
+    "browserify": "^13.0.0",
+    "catberry-locator": "^2.1.0",
+    "catberry-uri": "^3.1.0",
+    "chokidar": "^1.4.3",
+    "entities": "^1.1.1",
+    "glob": "^7.0.0",
+    "mkdirp": "~0.5.1",
+    "morphdom": "^1.1.2",
+    "pretty-hrtime": "^1.0.2",
+    "promise": "^7.1.1",
+    "uglify-js": "^2.6.2",
+    "uuid": "^2.0.1",
+    "watchify": "^3.7.0"
+  },
+  "devDependencies": {
+		"fs-extra": "^0.30.0",
+    "istanbul": "~0.4.2",
+    "codecov": "^1.0.1",
+    "jsdom": "^8.0.4",
+    "mocha": "^2.4.5",
+    "eslint": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "test": "make"
+  },
+  "license": "MIT"
 }

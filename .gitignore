@@ -9,3 +9,4 @@ coverage
 .Trashes
 ehthumbs.db
 Thumbs.db
+test/**/__tmp__*
