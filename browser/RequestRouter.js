@@ -109,39 +109,36 @@ class RequestRouter {
 			const newLocation = (new URI(locationString)).resolveRelative(this._location);
 			const newLocationString = newLocation.toString();
 
-			if (!this._isHistorySupported) {
+			const currentAuthority = this._location.authority ?
+				this._location.authority.toString() : null;
+			const newAuthority = newLocation.authority ?
+				newLocation.authority.toString() : null;
+
+			// we must check if history API is supported or if this is an external link
+			// before mapping URI to internal application state
+			if (!this._isHistorySupported ||
+				newLocation.scheme !== this._location.scheme ||
+				newAuthority !== currentAuthority) {
 				this._window.location.assign(newLocationString);
+				return Promise.resolve();
+			}
+
+			// if only URI fragment is changed we don't need to update
+			// the whole state of the app
+			const newQuery = newLocation.query ?
+				newLocation.query.toString() : null;
+			const currentQuery = this._location.query ?
+				this._location.query.toString() : null;
+
+			if (newLocation.path === this._location.path &&	newQuery === currentQuery) {
+				this._location = newLocation;
+				this._window.location.hash = this._location.fragment || '';
 				return Promise.resolve();
 			}
 
 			const state = this._stateProvider.getStateByUri(newLocation);
 			if (!state) {
 				this._window.location.assign(newLocationString);
-				return Promise.resolve();
-			}
-
-			const currentAuthority = this._location.authority ?
-				this._location.authority.toString() : null;
-			const newAuthority = newLocation.authority ?
-				newLocation.authority.toString() : null;
-
-			// we must check if this is an external link before map URI
-			// to internal application state
-			if (newLocation.scheme !== this._location.scheme ||
-				newAuthority !== currentAuthority) {
-				this._window.location.assign(newLocationString);
-				return Promise.resolve();
-			}
-
-			// if only URI fragment is changed
-			const newQuery = newLocation.query ?
-				newLocation.query.toString() : null;
-			const currentQuery = this._location.query ?
-				this._location.query.toString() : null;
-
-			if (newLocation.path === this._location.path &&
-				newQuery === currentQuery) {
-				this._location = newLocation;
 				return Promise.resolve();
 			}
 
@@ -152,6 +149,7 @@ class RequestRouter {
 			if (!isHistoryAction) {
 				this._window.history.pushState(state, '', newLocationString);
 			}
+
 			return this._changeState(state);
 		} catch (e) {
 			return Promise.reject(e);
@@ -242,9 +240,6 @@ class RequestRouter {
 
 		const locationString = element.getAttribute(HREF_ATTRIBUTE_NAME);
 		if (!locationString) {
-			return;
-		}
-		if (locationString[0] === '#') {
 			return;
 		}
 
