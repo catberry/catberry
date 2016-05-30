@@ -156,7 +156,7 @@ describe('browser/RequestRouter', function() {
 				});
 			});
 
-			it('should do nothing if only URI fragment is changing while clicking', function(done) {
+			it('should properly handle URI fragment setting while clicking', function(done) {
 				locator.unregister('documentRenderer');
 				locator.registerInstance('documentRenderer', {
 					render: () => done(new Error('Should not route')),
@@ -178,7 +178,44 @@ describe('browser/RequestRouter', function() {
 						locator.registerInstance('window', window);
 						const router = new RequestRouter(locator);
 						testUtils.click(window.document.querySelector('a'), clickOptions);
-						testUtils.wait(10).then(done);
+						testUtils.wait(10)
+							.then(() => {
+								assert.strictEqual(window.document.location.toString(), 'http://local/some?first=z#fragment');
+							})
+							.then(done)
+							.catch(done);
+					}
+				});
+			});
+
+			it('should properly handle URI fragment removal while clicking', function(done) {
+				locator.unregister('documentRenderer');
+				locator.registerInstance('documentRenderer', {
+					render: () => done(new Error('Should not route')),
+					initWithState: () => Promise.resolve()
+				});
+				locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+				eventBus.once('error', done);
+
+				jsdom.env({
+					url: 'http://local/some?first=z#fragment',
+					html: '<a href="/some?first=z"></a>',
+					done: (errors, window) => {
+						const clickOptions = {
+							bubbles: true,
+							cancelable: true,
+							view: window,
+							button: 0
+						};
+						locator.registerInstance('window', window);
+						const router = new RequestRouter(locator);
+						testUtils.click(window.document.querySelector('a'), clickOptions);
+						testUtils.wait(10)
+							.then(() => {
+								assert.strictEqual(window.document.location.toString(), 'http://local/some?first=z');
+							})
+							.then(done)
+							.catch(done);
 					}
 				});
 			});
@@ -441,7 +478,7 @@ describe('browser/RequestRouter', function() {
 			});
 		});
 
-		it('should do nothing if only URI fragment is changing', function(done) {
+		it('should properly handle URI fragment setting', function(done) {
 			locator.unregister('documentRenderer');
 			locator.registerInstance('documentRenderer', {
 				render: () => done(new Error('Should not route')),
@@ -457,6 +494,34 @@ describe('browser/RequestRouter', function() {
 					locator.registerInstance('window', window);
 					const router = new RequestRouter(locator);
 					router.go('http://local/some?first=z#fragment')
+						.then(() => {
+							assert.strictEqual(window.document.location.toString(), 'http://local/some?first=z#fragment');
+						})
+						.then(done)
+						.catch(done);
+				}
+			});
+		});
+
+		it('should properly handle URI fragment removal', function(done) {
+			locator.unregister('documentRenderer');
+			locator.registerInstance('documentRenderer', {
+				render: () => done(new Error('Should not route')),
+				initWithState: () => Promise.resolve()
+			});
+			locator.registerInstance('routeDefinition', '/some?first=:first[first]');
+			eventBus.once('error', done);
+
+			jsdom.env({
+				url: 'http://local/some?first=z#fragment',
+				html: ' ',
+				done: (errors, window) => {
+					locator.registerInstance('window', window);
+					const router = new RequestRouter(locator);
+					router.go('http://local/some?first=z')
+						.then(() => {
+							assert.strictEqual(window.document.location.toString(), 'http://local/some?first=z');
+						})
 						.then(done)
 						.catch(done);
 				}
