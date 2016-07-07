@@ -26,7 +26,7 @@ describe('lib/providers/StateProvider', function() {
 		it('should get the state using regular expression', function() {
 			const locator = createLocator([
 				{
-					expression: /^\/some\/(.+)$/i,
+					expression: /^\/some\/(.+)?some$/i,
 					map: uri => {
 						return {
 							param: uri.path
@@ -35,7 +35,7 @@ describe('lib/providers/StateProvider', function() {
 				}
 			]);
 			const provider = new StateProvider(locator);
-			const uri = new URI('/some/value');
+			const uri = new URI('http://localhost:9090/some/value?some');
 			const state = provider.getStateByUri(uri);
 			assert.deepEqual(state, {
 				param: '/some/value'
