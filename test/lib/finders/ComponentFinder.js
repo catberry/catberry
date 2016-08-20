@@ -35,7 +35,7 @@ describe('lib/finders/ComponentFinder', function() {
 				componentsGlob: 'test/**/test-cat-component.json'
 			});
 			const finder = locator.resolve('componentFinder');
-			return finder
+			finder
 				.find()
 				.then(found => assert.deepEqual(found, EXPECTED))
 				.then(done)
@@ -52,7 +52,7 @@ describe('lib/finders/ComponentFinder', function() {
 				]
 			});
 			const finder = locator.resolve('componentFinder');
-			return finder
+			finder
 				.find()
 				.then(found => assert.deepEqual(found, EXPECTED))
 				.then(done)
