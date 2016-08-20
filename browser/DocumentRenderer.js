@@ -608,7 +608,7 @@ class DocumentRenderer extends DocumentRendererBase {
 		return event => {
 			var element = event.target;
 			const dispatchedEvent = createCustomEvent(event, () => element);
-			var targetMatches = getMatchesMethod(element);
+			var targetMatches = this._getMatchesMethod(element);
 			var isHandled = selectors.some(selector => {
 				if (targetMatches(selector)) {
 					selectorHandlers[selector](dispatchedEvent);
@@ -621,9 +621,11 @@ class DocumentRenderer extends DocumentRendererBase {
 				return;
 			}
 
-			while (element.parentElement && element !== componentRoot) {
-				element = element.parentElement;
-				targetMatches = getMatchesMethod(element);
+			// we can't use parentElement here, because
+			// internal SVG elements don't have this property in IE
+			while (element.parentNode && element !== componentRoot) {
+				element = element.parentNode;
+				targetMatches = this._getMatchesMethod(element);
 				isHandled = this._tryDispatchEvent(
 					selectors, targetMatches, selectorHandlers, dispatchedEvent
 				);
@@ -1163,6 +1165,25 @@ class DocumentRenderer extends DocumentRendererBase {
 		}
 		return element[moduleHelper.COMPONENT_ID];
 	}
+
+	/**
+	 * Gets a cross-browser "matches" method for the element.
+	 * @param {Element} element HTML element.
+	 * @returns {Function} "matches" method.
+	 * @private
+	 */
+	_getMatchesMethod(element) {
+		const method = (
+			element.matches ||
+			element.webkitMatchesSelector ||
+			element.mozMatchesSelector ||
+			element.oMatchesSelector ||
+			element.msMatchesSelector ||
+			(selector => matches(this._window, element, selector))
+		);
+
+		return method.bind(element);
+	}
 }
 
 /**
@@ -1179,18 +1200,16 @@ function attributesToObject(attributes) {
 }
 
 /**
- * Gets a cross-browser "matches" method for the element.
- * @param {Element} element HTML element.
- * @returns {Function} "matches" method.
+ * Matches the specified element to the selector (fallback).
+ * @param {Window} currentWindow Current browser window.
+ * @param {Element} element DOM element.
+ * @param {string} selector Selector for matching.
+ * @returns {boolean} Does the element match.
  */
-function getMatchesMethod(element) {
-	const method = (element.matches ||
-		element.webkitMatchesSelector ||
-		element.mozMatchesSelector ||
-		element.oMatchesSelector ||
-		element.msMatchesSelector);
-
-	return method.bind(element);
+function matches(currentWindow, element, selector) {
+	const ownerDocument = element.document || element.ownerDocument || currentWindow.document;
+	const matched = ownerDocument.querySelectorAll(selector);
+	return Array.prototype.some.call(matched, item => item === element);
 }
 
 /**
