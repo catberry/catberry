@@ -462,5 +462,5 @@ describe('lib/finders/ComponentFinder', () => {
 });
 
 function getTemporaryPath() {
-	return path.join(CASE_PATH, `__tmp_${uuid.v4()}`);
+	return path.join(CASE_PATH, `__tmp__${uuid.v4()}`);
 }
