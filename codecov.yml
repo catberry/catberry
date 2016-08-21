@@ -1,0 +1,14 @@
+comment:
+  layout: header, changes, diff, sunburst
+coverage:
+  notify:
+    gitter:
+      default:
+        threshold: '0'
+        url: https://webhooks.gitter.im/e/e0fbec98c76c1614706a
+    webhook:
+      default:
+        threshold: '0'
+        url: https://webhooks.gitter.im/e/4d9a9af137bfbc20d8f2
+  status:
+    changes: false
