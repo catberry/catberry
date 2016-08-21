@@ -1,0 +1,7 @@
+{
+	"name": "another",
+	"logic": "./index.js",
+	"template": "test1.html",
+	"errorTemplate": "error.html",
+	"additional" : "some"
+}
