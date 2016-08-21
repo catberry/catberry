@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "8.4.2",
+	"version": "8.5.0",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -92,15 +92,17 @@
 		"uglify-js": "^2.6.2",
 		"browserify": "^13.0.0",
 		"promise": "^7.1.1",
-		"morphdom": "^1.1.2",
+		"morphdom": "^2.0.4",
 		"uuid": "^2.0.1"
 	},
 	"devDependencies": {
 		"istanbul": "~0.4.2",
 		"codecov": "^1.0.1",
-		"jsdom": "^8.0.4",
-		"mocha": "^2.4.5",
-		"eslint": "^2.2.0"
+		"jsdom": "^9.4.2",
+		"mocha": "^3.0.2",
+		"eslint": "^3.3.1",
+		"ncp": "^2.0.0",
+		"rimraf": "^2.5.4"
 	},
 	"engines": {
 		"node": ">=4"
