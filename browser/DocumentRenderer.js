@@ -252,7 +252,7 @@ class DocumentRenderer extends DocumentRendererBase {
 						}
 
 						morphdom(element, tmpElement, {
-							onBeforeElUpdated: foundElement =>
+							onBeforeElChildrenUpdated: foundElement =>
 								foundElement === element || !this._isComponentElement(
 									renderingContext.components, foundElement
 								)
