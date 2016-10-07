@@ -139,6 +139,48 @@ describe('lib/DocumentRenderer', function() {
 				});
 		});
 
+		it('should set code 301 and Location if permanent redirection in HEAD occurs', function(done) {
+			class Head {
+				render() {
+					this.$context.permRedirect('/to/garden');
+				}
+			}
+
+			const components = {
+				document: {
+					name: 'document',
+					constructor: componentMocks.AsyncComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}document-with-head.html`)
+				},
+				head: {
+					name: 'head',
+					constructor: Head,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}head.html`)
+				},
+				'async-comp': {
+					name: 'async-comp',
+					constructor: componentMocks.AsyncComponent,
+					template: testUtils.createTemplateObject(`${TEMPLATES_DIR}component.html`)
+				}
+			};
+
+			const routingContext = createRoutingContext({}, {}, components);
+			const response = routingContext.middleware.response;
+			const documentRenderer = routingContext.locator.resolve('documentRenderer');
+
+			documentRenderer.render({}, routingContext);
+			response
+				.on('error', done)
+				.on('finish', () => {
+					assert.strictEqual(response.result, '');
+					assert.strictEqual(response.status, 301);
+					assert.strictEqual(
+						response.setHeaders.Location, '/to/garden'
+					);
+					done();
+				});
+		});
+
 		it('should set header if set cookie in HEAD', function(done) {
 			class Head {
 				render() {
