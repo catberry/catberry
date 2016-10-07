@@ -139,7 +139,7 @@ describe('lib/DocumentRenderer', function() {
 				});
 		});
 
-		it('should set code 301 and Location if redirect in HEAD', function(done) {
+		it('should set code 301 and Location if permanent redirection in HEAD occurs', function(done) {
 			class Head {
 				render() {
 					this.$context.permRedirect('/to/garden');
