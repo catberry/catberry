@@ -175,7 +175,8 @@ that constains the current location.
 that contains the current referrer.
 * `this.$context.locator` – the [Service Locator](#service-locator) of the application.
 * `this.$context.getRouteURI('routeName', { parameter: 'value' })` – generates a URI string pasting parameter values to the specified route expression (must have a name). If a route parameter is used as a query value in URI you can use Array as a value for it. See examples in the [Routing](#named-routes-and-uri-generation) section.
-* `this.$context.redirect('String')` – redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
+* `this.$context.redirect('String')` – redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag. This method uses HTTP status code 302 on server.
+* `this.$context.permRedirect('String')` – Does exactly the same as this.$context.redirect('url') but uses HTTP status code 301 instead of 302.
 * `this.$context.notFound()` – hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
 * `this.$context.sendBroadcastAction('name', object)` – like `this.$context.sendAction` (see [store's context](#stores-context) and [cat-component's context](#cat-components-context)) however the action will be sent to all stores. The result will be a promise of that resolves into an `Array`.
 
