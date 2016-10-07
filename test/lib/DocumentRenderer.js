@@ -142,7 +142,7 @@ describe('lib/DocumentRenderer', function() {
 		it('should set code 301 and Location if redirect in HEAD', function(done) {
 			class Head {
 				render() {
-					this.$context.redirect('/to/garden', 301);
+					this.$context.permRedirect('/to/garden');
 				}
 			}
 
