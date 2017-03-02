@@ -1,6 +1,6 @@
 {
 	"name": "catberry",
-	"version": "8.6.0",
+	"version": "8.6.1",
 	"author": {
 		"name": "Denis Rechkunov",
 		"email": "denis.rechkunov@gmail.com"
@@ -96,7 +96,7 @@
 		"uglify-js": "^2.6.2",
 		"browserify": "^13.0.0",
 		"promise": "^7.1.1",
-		"morphdom": "^2.0.4",
+		"morphdom": "~2.2.0",
 		"uuid": "^2.0.1"
 	},
 	"devDependencies": {
