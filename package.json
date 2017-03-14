@@ -70,7 +70,7 @@
 
 	"main": "./index",
 	"browser": {
-		"./lib/Bootstrapper.js": "__BrowserBundle.js",
+		"./lib/Bootstrapper.js": "./browser/Bootstrapper.js",
 		"./lib/Catberry.js": "./browser/Catberry.js",
 		"./lib/CookieWrapper.js": "./browser/CookieWrapper.js",
 		"./lib/providers/ModuleApiProvider.js": "./browser/providers/ModuleApiProvider.js",
