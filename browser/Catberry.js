@@ -28,6 +28,19 @@ class Catberry extends CatberryBase {
 	 * Wraps current HTML document with Catberry event handlers.
 	 */
 	wrapDocument() {
+		const appDefinitions = require('appDefinitions');
+		appDefinitions.routeDefinitions
+			.forEach(routeDefinition => this.locator.registerInstance('routeDefinition', routeDefinition));
+
+		appDefinitions.routeDescriptors
+			.forEach(routeDescriptor => this.locator.registerInstance('routeDescriptor', routeDescriptor));
+
+		appDefinitions.stores
+			.forEach(store => this.locator.registerInstance('store', store));
+
+		appDefinitions.components
+			.forEach(component => this.locator.registerInstance('component', component));
+
 		this._router = this.locator.resolve('requestRouter');
 	}
 
