@@ -1,30 +1,10 @@
-/**
- * This file is a template and it is used only for some string replaces
- * by BrowserBundleBuilder module. It does not work by itself.
- */
-
 'use strict';
 
-const stores = [
-
-/** __stores **/
-
-];
-
-const components = [
-
-/** __components **/
-
-];
-
-const routeDefinitions = '__routeDefinitions' || [];
-const routeDescriptors = '__routes' || [];
-
-const Catberry = require('./node_modules/catberry/browser/Catberry.js');
-const BootstrapperBase = require('./node_modules/catberry/lib/base/BootstrapperBase.js');
-const StoreDispatcher = require('./node_modules/catberry/lib/StoreDispatcher');
-const ModuleApiProvider = require('./node_modules/catberry/browser/providers/ModuleApiProvider');
-const CookieWrapper = require('./node_modules/catberry/browser/CookieWrapper');
+const Catberry = require('./Catberry.js');
+const BootstrapperBase = require('../lib/base/BootstrapperBase');
+const StoreDispatcher = require('../lib/StoreDispatcher');
+const ModuleApiProvider = require('./providers/ModuleApiProvider');
+const CookieWrapper = require('./CookieWrapper');
 
 class Bootstrapper extends BootstrapperBase {
 
@@ -48,16 +28,6 @@ class Bootstrapper extends BootstrapperBase {
 		locator.register('cookieWrapper', CookieWrapper, true);
 
 		locator.registerInstance('window', window);
-
-		routeDefinitions.forEach(routeDefinition =>
-			locator.registerInstance('routeDefinition', routeDefinition));
-
-		routeDescriptors.forEach(routeDescriptor =>
-			locator.registerInstance('routeDescriptor', routeDescriptor));
-
-		stores.forEach(store => locator.registerInstance('store', store));
-
-		components.forEach(component => locator.registerInstance('component', component));
 	}
 }
 
