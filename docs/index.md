@@ -178,7 +178,6 @@ that contains the current referrer.
 * `this.$context.redirect('String')` – redirects to a specified location string. If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag. This method uses HTTP status code 302 on server.
 * `this.$context.permRedirect('String')` – Does exactly the same as `this.$context.redirect('url')` but uses HTTP status code 301 for permanent redirection.
 * `this.$context.notFound()` – hands over request handling to the next [express/connect middleware](http://expressjs.com/en/guide/using-middleware.html). If used while rendering the `document` or `head` component, this action will be accomplished using HTTP headers and status codes on the server, else via an inline `<script>` tag.
-* `this.$context.sendBroadcastAction('name', object)` – like `this.$context.sendAction` (see [store's context](#stores-context) and [cat-component's context](#cat-components-context)) however the action will be sent to all stores. The result will be a promise of that resolves into an `Array`.
 
 **NB** Every time the router computes a new application state, it re-creates and re-assigns a context to each store, therefore, ***do not save references to `this.$context`***.
 
@@ -1155,7 +1154,7 @@ The transformation example:
 ```javascript
 locator.registerInstance('browserifyTransformation', {
   transform(filePath, options) {
-    return transformStream;
+	return transformStream;
   },
   options: { /* the transform options will be passed to the browserify */ }
 );
@@ -1165,7 +1164,7 @@ The plugin example:
 ```javascript
 locator.registerInstance('browserifyPlugin', {
   plugin(bundlerObject, options) {
-    return transformStream;
+	return transformStream;
   },
   options: { /* the plugin options will be passed to the browserify */ }
 );
@@ -1207,7 +1206,7 @@ Whilst Catberry doesn't have a built-in live-reloading mechanism, it's trivial t
 	```shell
 	powershell -Command \"Start-Process -NoNewWindow nodemon ./build.js; Start-Process -NoNewWindow -Wait  -ArgumentList '--watch server --watch build.js --watch routes.js  ./server.js' nodemon\"
 	```
-	
+
 ### Client side live reloading
 * `npm install -S express-livereload`
 * Modify `server.js` and place the following code below `const app = express();`
@@ -1216,7 +1215,7 @@ if(!config.isRelease){
 	const livereload = require('express-livereload');
 	livereload(app);
 }
-```  
+```
 
 * Add the following line to the `head` template:
 ```html
