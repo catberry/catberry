@@ -465,7 +465,8 @@ Typically, project structure looks like this:
 ./lib/
  # this directory is a default destination for browser bundle building
 ./public/
-	bundle.js
+	app.js
+	externals.js
  # entry script for the browser environment
 ./browser.js
  # route definitions
@@ -787,7 +788,8 @@ Catberry uses the following parameters from it:
 * `storesGlob` - the glob expression for discovering stores (`**/*.js` by default).
 * `storesDirectory` – the relative path to the directory with stores (`./catberry_stores` by default).
 * `publicDirectoryPath` – the path to the public directory (`./public` by default).
-* `bundleFilename` – the name of the browser bundle file (`bundle.js` by default).
+* `appBundleFilename` – the name of the browser bundle file for the app (`app.js` by default).
+* `externalsBundleFilename` – the name of the browser bundle file for external libraries (any required library from `node_modules` directory) (`externals.js` by default).
 
 **[↑ back to top](#table-of-contents)**
 
@@ -856,6 +858,18 @@ In fact, the [Catberry CLI](#cli) does it for you, see its [readme]([Catberry CL
 **[↑ back to top](#table-of-contents)**
 
 # Browser bundle
+The browser bundle always consists of 2 parts:
+
+* `externals.js` - bundle with all external dependencies (from `node_modules`) including catberry itself
+* `app.js` - files from your project directory excluding `node_modules`: stores, components, routes, etc.
+
+The separation was done with the idea that your dependencies don't change too often but your application does. In order to publish new app features without introducing new dependencies you can just update the `app.js` file and keep the previous version of `externals.js` which would keep the cached file in all browsers of your users. In most cases `externals.js` is much larger in size, so this separation makes it possible to handle updates in a more efficient way.
+
+In order to use the bundles, you need to manually add the necessary script tags for both files to your templates. **The order is important**:
+
+1. `externals.js`
+2. `app.js`
+
 The Catberry application object has a `build` method that is used like following:
 
 ```javascript
@@ -884,7 +898,7 @@ There are some rules according to browserify limitations:
 * If you want to exclude a server-side package from the browser bundle or replace it with the browser version just use the browserify's `browser` field in the `package.json` file as it is described [here](http://github.com/substack/node-browserify#packagejson).
 
 ## Code Watching and Reloading
-By default, Catberry works in the debug mode and it means that changing of stores or cat-components in the application's source code automatically rebuilds the browser bundle and reloads the modules on the server.
+By default, Catberry works in the debug mode and it means that changing of stores or cat-components in the application's source code automatically rebuilds the browser bundle and reloads the modules on the server. Changing dependencies from `node_modules` has no effect, you have to re-run your application every time you add or remove an external dependency.
 You can switch the application to release mode passing `isRelease: true` parameter into the config object like this:
 
 ```javascript
@@ -961,9 +975,10 @@ List of the server-only events:
 |-------------|-----------------------|-------------------------------------|
 | storeFound | each store is found | `{name: String, path: String}` |
 | componentFound | each component is found | `{name: String, path: String, properties: Object}` |
-| bundleBuilt | the browser bundle is built | `{hrTime: [number, number], time: Number, path: String}` |
-| bundleChanged | the browser bundle was changed | `{changedFiles: ['path1', 'pathN'], path: String}` |
-| bootsrapperBuilt | the browser bootstrapper is built | `{hrTime: [number, number], time: Number, template: String}` |
+| appBundleBuilt | the browser bundle for the app is built | `{hrTime: [number, number], time: Number, path: String}` |
+| externalsBundleBuilt | the browser bundle for externals is built | `{hrTime: [number, number], time: Number, path: String}` |
+| appBundleChanged | the browser bundle was changed | `{changedFiles: ['path1', 'pathN'], path: String}` |
+| appDefinitionsBuilt | the app definitions file is built | `{hrTime: [number, number], time: Number, template: String}` |
 
 List of the browser-only events:
 
