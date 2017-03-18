@@ -101,8 +101,8 @@ class CoolComponent {
 	 */
 	bind() {
 		return {
-		    // CSS selector
-		    '.clickable': () => window.alert('Ouch!');
+			// CSS selector
+			'.clickable': () => window.alert('Ouch!');
 		}
 	}
 
@@ -187,8 +187,8 @@ All supported browsers are listed below:
 
 | Browser			| Version		|
 |-------------|-----------|
-| IE | 9 (partial non-[SPA](http://en.wikipedia.org/wiki/Single-page_application)), 10+ |
-| IE Mobile | 10+ |
+| IE | 9-10 (w/o client part, only server rendering), 11+ |
+| IE Mobile | 11+ |
 | Firefox | 4+ |
 | Firefox Android | 29+ |
 | Chrome | 19+ |
