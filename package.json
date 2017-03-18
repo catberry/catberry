@@ -109,7 +109,7 @@
 		"rimraf": "^2.5.4"
 	},
 	"engines": {
-		"node": ">=4"
+		"node": ">=6.10"
 	},
 	"scripts": {
 		"test": "make"
