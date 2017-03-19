@@ -65,7 +65,7 @@ catberry init ?
 [node.js streams](http://nodejs.org/api/stream.html#stream_api_for_stream_implementors) on the server
 * Browser rendering does not block the [Event Loop](https://developer.mozilla.org/en/docs/Web/JavaScript/EventLoop), which means your app's UI will never be frozen
 * [Handlebars](https://github.com/catberry/catberry-handlebars), [Dust](https://github.com/catberry/catberry-dust) and
-[Jade](https://github.com/catberry/catberry-jade) template engines are [officially supported](https://github.com/catberry/catberry/blob/8.6.1/docs/index.md#template-engines) (and you can implement your own provider to support any other)
+[Pug](https://github.com/catberry/catberry-pug) template engines are [officially supported](https://github.com/catberry/catberry/blob/8.6.1/docs/index.md#template-engines) (and you can implement your own provider to support any other)
 * Efficient DOM event listening using [event delegation](http://davidwalsh.name/event-delegate)
 
 For more details please proceed to [Catberry Documentation](https://github.com/catberry/catberry/blob/8.6.1/docs/index.md).
