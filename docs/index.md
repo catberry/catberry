@@ -60,7 +60,7 @@ Finally, initialize your new project with one of the following Catberry template
 * `example` - the project that works with the GitHub API and demonstrates how to implement such kind of isomorphic/universal application using the Catberry Framework.
 * `empty-handlebars` - the empty project using the [Handlebars](http://handlebarsjs.com/) template engine.
 * `empty-dust` - the empty project using the [Dust](https://github.com/catberry/catberry-dust) template engine.
-* `empty-jade` - the empty project using the [Jade](http://jade-lang.com/) template engine.
+* `empty-pug` - the empty project using the [Pug](https://pugjs.org/) template engine.
 
 ```bash
 catberry init <template-name>
@@ -842,7 +842,7 @@ Catberry supports any template engine that has the "precompiling to string" feat
 Officially supported:
 * [Dust](https://github.com/catberry/catberry-dust)
 * [Handlebars](https://github.com/catberry/catberry-handlebars)
-* [Jade](https://github.com/catberry/catberry-jade)
+* [Pug](https://github.com/catberry/catberry-pug)
 
 You can also create your own adapter for any template engine, just take a look at the existing one for [Handlebars](https://github.com/catberry/catberry-handlebars).
 
@@ -1190,7 +1190,7 @@ locator.registerInstance('browserifyPlugin', {
 ## List of officially supported plugins
 
 * [catberry-handlebars](https://github.com/catberry/catberry-handlebars) – Catberry adapter for Handlebars template engine
-* [catberry-jade](https://github.com/catberry/catberry-jade) – Catberry adapter for Jade template engine
+* [catberry-pug](https://github.com/catberry/catberry-pug) – Catberry adapter for Pug template engine
 * [catberry-dust](https://github.com/catberry/catberry-dust) – Catberry adapter for Dust template engine
 * [catberry-assets](https://github.com/catberry/catberry-assets) – The plugin that builds assets for each component using Gulp
 * [catberry-l10n](https://github.com/catberry/catberry-l10n) – The localization plugin
