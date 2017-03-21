@@ -26,25 +26,61 @@ describe('browser/loaders/ComponentLoader', function() {
 				properties: {
 					name: 'first-cool',
 					logic: './logic.js',
-					errorTemplate: './templates/error.html',
-					template: './templates/template.html'
+					errorTemplate: './templates/error.html1',
+					template: './templates/template.html1'
 				},
-				templateSource: 'Hello, world!',
-				errorTemplateSource: 'Error occurs :('
+				templateProviderName: 'html1',
+				errorTemplateProviderName: 'html1',
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: 'Error occurs :('
 			},
 			second: {
 				constructor: componentMocks.AsyncComponent,
 				name: 'second',
 				properties: {
 					logic: './index.js',
-					template: './template.html'
+					template: './template.html2'
 				},
-				templateSource: 'Hello from second!',
-				errorTemplateSource: null
+				templateProviderName: 'html2',
+				errorTemplateProviderName: null,
+				compiledTemplate: 'Hello from second!',
+				compiledErrorTemplate: null
+			},
+			third: {
+				constructor: componentMocks.AsyncComponent,
+				name: 'third',
+				properties: {
+					logic: './index.js',
+					template: './template.html1',
+					errorTemplate: './error.html2'
+				},
+				templateProviderName: 'html1',
+				errorTemplateProviderName: 'html2',
+				compiledTemplate: 'Hello from third!',
+				compiledErrorTemplate: 'Error from third!'
 			}
+
 		};
 
 		registerComponents(components);
+		locator.unregister('templateProvider');
+
+		const templates = {};
+		locator.registerInstance('templateProvider', {
+			getName: () => 'html1',
+			render: name => Promise.resolve(`html1: ${templates[name]}`),
+			registerCompiled: (name, source) => {
+				templates[name] = source;
+			}
+		});
+		locator.registerInstance('templateProvider', {
+			getName: () => 'html2',
+			render: name => Promise.resolve(`html2: ${templates[name]}`),
+			registerCompiled: (name, source) => {
+				templates[name] = source;
+			}
+		});
+
 		const loader = locator.resolve('componentLoader');
 
 		loader
@@ -52,7 +88,7 @@ describe('browser/loaders/ComponentLoader', function() {
 			.then(loadedComponents => {
 				assert.strictEqual(loadedComponents, loader.getComponentsByNames());
 				// can't use deepEqual because of templates
-				assert.strictEqual(Object.keys(loadedComponents).length, 2);
+				assert.strictEqual(Object.keys(loadedComponents).length, 3);
 				Object.keys(loadedComponents).forEach(key => {
 					const actual = loadedComponents[key];
 					const expected = components[key];
@@ -62,14 +98,18 @@ describe('browser/loaders/ComponentLoader', function() {
 				});
 
 				const expected = [
-					'Hello, world!',
-					'Error occurs :(',
-					'Hello from second!'
+					'html1: Hello, world!',
+					'html1: Error occurs :(',
+					'html2: Hello from second!',
+					'html1: Hello from third!',
+					'html2: Error from third!'
 				];
 				return Promise.all([
 					loadedComponents['first-cool'].template.render(),
 					loadedComponents['first-cool'].errorTemplate.render(),
-					loadedComponents.second.template.render()
+					loadedComponents.second.template.render(),
+					loadedComponents.third.template.render(),
+					loadedComponents.third.errorTemplate.render()
 				])
 					.then(rendered => assert.deepEqual(rendered, expected));
 			})
@@ -83,16 +123,73 @@ describe('browser/loaders/ComponentLoader', function() {
 				constructor: componentMocks.SyncComponent,
 				name: 'first-cool',
 				properties: {},
-				templateSource: 'Hello, world!',
-				errorTemplateSource: 'Error occurs :('
+				templateProviderName: 'html',
+				errorTemplateProviderName: 'html',
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: 'Error occurs :('
 			}
 		};
 
 		registerComponents(components);
-		locator.unregister('remplateProvider');
+		locator.unregister('templateProvider');
 		locator.registerInstance('templateProvider', {
 			register: () => Promise.reject(new Error('TestError'))
 		});
+		const loader = locator.resolve('componentLoader');
+
+		loader
+			.load()
+			.then(loadedComponents => assert.deepEqual(loadedComponents, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should not load component if there is no template provider', function(done) {
+		const components = {
+			'first-cool': {
+				constructor: componentMocks.SyncComponent,
+				name: 'first-cool',
+				properties: {},
+				templateProviderName: 'html',
+				errorTemplateProviderName: 'html',
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: 'Error occurs :('
+			}
+		};
+
+		registerComponents(components);
+		locator.unregister('templateProvider');
+
+		const loader = locator.resolve('componentLoader');
+
+		loader
+			.load()
+			.then(loadedComponents => assert.deepEqual(loadedComponents, {}))
+			.then(done)
+			.catch(done);
+	});
+
+	it('should not load component if there is no suitable template provider', function(done) {
+		const components = {
+			'first-cool': {
+				constructor: componentMocks.SyncComponent,
+				name: 'first-cool',
+				properties: {},
+				templateProviderName: 'html',
+				errorTemplateProviderName: 'html',
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: 'Error occurs :('
+			}
+		};
+
+		registerComponents(components);
+		locator.unregister('templateProvider');
+		locator.registerInstance('templateProvider', {
+			getName: () => 'wrong',
+			registerCompiled: () => {},
+			render: () => {}
+		});
+
 		const loader = locator.resolve('componentLoader');
 
 		loader
@@ -135,15 +232,19 @@ describe('browser/loaders/ComponentLoader', function() {
 				constructor: componentMocks.SyncComponent,
 				name: 'first-cool',
 				properties: {},
-				templateSource: 'Hello, world!',
-				errorTemplateSource: null
+				templateProviderName: 'html',
+				errorTemplateProviderName: 'html',
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: null
 			},
 			second: {
 				constructor: componentMocks.AsyncComponent,
 				name: 'second',
 				properties: {},
-				templateSource: 'Hello from second!',
-				errorTemplateSource: null
+				templateProviderName: 'html',
+				errorTemplateProviderName: null,
+				compiledTemplate: 'Hello from second!',
+				compiledErrorTemplate: null
 			}
 		};
 
@@ -179,15 +280,19 @@ describe('browser/loaders/ComponentLoader', function() {
 				constructor: componentMocks.SyncComponent,
 				name: 'first-cool',
 				properties: {},
-				templateSource: 'Hello, world!',
-				errorTemplateSource: null
+				templateProviderName: 'html',
+				errorTemplateProviderName: null,
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: null
 			},
 			second: {
 				constructor: componentMocks.AsyncComponent,
 				name: 'second',
 				properties: {},
-				templateSource: 'Hello from second!',
-				errorTemplateSource: null
+				templateProviderName: 'html',
+				errorTemplateProviderName: null,
+				compiledTemplate: 'Hello from second!',
+				compiledErrorTemplate: null
 			}
 		};
 
@@ -224,8 +329,10 @@ describe('browser/loaders/ComponentLoader', function() {
 				constructor: componentMocks.SyncComponent,
 				name: 'first-cool',
 				properties: {},
-				templateSource: 'Hello, world!',
-				errorTemplateSource: null
+				templateProviderName: 'html',
+				errorTemplateProviderName: null,
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: null
 			}
 		};
 
@@ -251,15 +358,19 @@ describe('browser/loaders/ComponentLoader', function() {
 				constructor: componentMocks.SyncComponent,
 				name: 'first-cool',
 				properties: {},
-				templateSource: 'Hello, world!',
-				errorTemplateSource: null
+				templateProviderName: 'html',
+				errorTemplateProviderName: null,
+				compiledTemplate: 'Hello, world!',
+				compiledErrorTemplate: null
 			},
 			second: {
 				constructor: componentMocks.AsyncComponent,
 				name: 'second',
 				properties: {},
-				templateSource: 'Hello from second!',
-				errorTemplateSource: null
+				templateProviderName: 'html',
+				errorTemplateProviderName: null,
+				compiledTemplate: 'Hello from second!',
+				compiledErrorTemplate: null
 			}
 		};
 
@@ -308,6 +419,7 @@ describe('browser/loaders/ComponentLoader', function() {
 
 		const templateProvider = {
 			templates: {},
+			getName: () => 'html',
 			render: name => Promise.resolve(templateProvider[name]),
 			registerCompiled: (name, source) => {
 				templateProvider[name] = source;
