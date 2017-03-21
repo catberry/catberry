@@ -8,7 +8,7 @@
 					"path": "test/cases/lib/loaders/ComponentLoader/first/first.json",
 					"properties": {
 						"logic": "./logic.js",
-						"errorTemplate": "./templates/error.html",
+						"errorTemplate": "./templates/error.htm",
 						"template": "./templates/template.html"
 					}
 				},
@@ -23,11 +23,11 @@
 			},
 			"expectedCount": 2,
 			"expectedTemplates": [
-				"Hello, world!",
-				"Hello from second!"
+				"HTML: Hello, world!",
+				"HTML: Hello from second!"
 			],
 			"expectedErrorTemplates": [
-				"Error occurs :(",
+				"HTM: Error occurs :(",
 				null
 			]
 		},
@@ -42,6 +42,30 @@
 						"template": "./template.html"
 					}
 				}
+			},
+			"expectedCount": 0
+		},
+		{
+		"name": "should not load if component has a unsupported template",
+			"components": {
+				"error5": {
+					"name": "error5",
+					"path": "test/cases/lib/loaders/ComponentLoader/Error5/error5.json",
+					"properties": {
+						"logic": "./index.js",
+						"template": "./template.wrong"
+					}
+				},
+				"error6": {
+					"name": "error6",
+					"path": "test/cases/lib/loaders/ComponentLoader/Error6/error6.json",
+					"properties": {
+						"logic": "./index.js",
+						"template": "./template.html",
+						"errorTemplate": "./error.wrong"
+					}
+				}
+
 			},
 			"expectedCount": 0
 		},

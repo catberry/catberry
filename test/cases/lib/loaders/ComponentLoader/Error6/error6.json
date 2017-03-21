@@ -1,0 +1,4 @@
+{
+	"template": "./template.html",
+	"errorTemplate": "./error.wrong"
+}

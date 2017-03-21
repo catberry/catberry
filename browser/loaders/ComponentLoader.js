@@ -1,6 +1,7 @@
 'use strict';
 
 const moduleHelper = require('../../lib/helpers/moduleHelper');
+const templateHelper = require('../../lib/helpers/templateHelper');
 const LoaderBase = require('../../lib/base/LoaderBase');
 
 class ComponentLoader extends LoaderBase {
@@ -33,11 +34,12 @@ class ComponentLoader extends LoaderBase {
 		this._eventBus = locator.resolve('eventBus');
 
 		/**
-		 * Current template provider.
-		 * @type {TemplateProvider}
+		 * Current template provider map.
+		 * @type {Object}
 		 * @private
 		 */
-		this._templateProvider = locator.resolve('templateProvider');
+		this._templateProvidersByNames = templateHelper
+			.resolveTemplateProvidersByNames(locator);
 
 		/**
 		 * Current map of loaded components by names.
@@ -98,20 +100,17 @@ class ComponentLoader extends LoaderBase {
 				if (!transformed) {
 					throw new Error(`Transformation for the "${componentDetails.name}" component returned a bad result`);
 				}
-				component = transformed;
-				this._templateProvider.registerCompiled(
-					component.name, component.templateSource
-				);
-				component.template = {
-					render: dataContext => this._templateProvider.render(component.name, dataContext)
-				};
-				if (typeof (component.errorTemplateSource) === 'string') {
-					const errorTemplateName = moduleHelper.getNameForErrorTemplate(component.name);
-					this._templateProvider.registerCompiled(errorTemplateName, component.errorTemplateSource);
-					component.errorTemplate = {
-						render: dataContext => this._templateProvider.render(errorTemplateName, dataContext)
-					};
+				component = Object.create(transformed);
+				component.templateProvider = this._templateProvidersByNames[component.templateProviderName];
+				component.errorTemplateProvider = this._templateProvidersByNames[component.errorTemplateProviderName];
+
+				if (!component.templateProvider &&
+						(component.errorTemplateProviderName && !component.errorTemplateProvider)) {
+					throw new Error(`Template provider required by the component "${component.name}" not found`);
 				}
+
+				templateHelper.registerTemplates(component);
+
 				this._eventBus.emit('componentLoaded', component);
 				return component;
 			})
