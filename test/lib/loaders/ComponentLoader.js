@@ -138,18 +138,32 @@ function createLocator(components) {
 	const eventBus = new events.EventEmitter();
 	eventBus.on('error', function() {});
 
-	const templateProvider = {
-		templates: {},
+	const HTMLTemplates = {};
+	const HTMLTemplateProvider = {
+		getName: () => 'html',
+		isTemplateSupported: filename => /html$/.test(filename),
 		compile: str => Promise.resolve(str),
-		render: name => Promise.resolve(templateProvider[name]),
+		render: name => Promise.resolve(`HTML: ${HTMLTemplates[name]}`),
 		registerCompiled: (name, source) => {
-			templateProvider[name] = source;
+			HTMLTemplates[name] = source;
+		}
+	};
+
+	const HTMTemplates = {};
+	const HTMTemplateProvider = {
+		getName: () => 'htm',
+		isTemplateSupported: filename => /htm$/.test(filename),
+		compile: str => Promise.resolve(str),
+		render: name => Promise.resolve(`HTM: ${HTMTemplates[name]}`),
+		registerCompiled: (name, source) => {
+			HTMTemplates[name] = source;
 		}
 	};
 
 	locator.registerInstance('eventBus', eventBus);
 	locator.registerInstance('componentFinder', new ComponentFinder(components));
-	locator.registerInstance('templateProvider', templateProvider);
+	locator.registerInstance('templateProvider', HTMLTemplateProvider);
+	locator.registerInstance('templateProvider', HTMTemplateProvider);
 	locator.register('contextFactory', ContextFactory);
 	locator.register('moduleApiProvider', ModuleApiProvider);
 	locator.register('cookieWrapper', CookieWrapper);
