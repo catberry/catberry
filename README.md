@@ -183,22 +183,7 @@ In fact, a user gets an HTML page from the server only once and all the rest of 
 
 Thanks to Catberry's progressive rendering engine, user receives a page from the server component by component as fast as each component renders its template not waiting for the whole page is built.
 
-All supported browsers are listed below:
-
-| Browser			| Version		|
-|-------------|-----------|
-| IE | 9-10 (w/o client part, only server rendering), 11+ |
-| IE Mobile | 11+ |
-| Firefox | 4+ |
-| Firefox Android | 29+ |
-| Chrome | 19+ |
-| Chrome Android | 35+ |
-| Android Browser | 2.2+, 4.2+ |
-| Safari | 6+ |
-| iOS Safari | 5+ |
-| Opera | 12+ |
-| Opera Mobile | 11.1+ |
-| Blackberry Browser| 7+ |
+Catberry supports 2 last versions of modern browsers and IE 11. It depends on Babel [babel-preset-env](https://github.com/babel/babel-preset-env) preset which config you can override putting a `.babelrc` file in your project.
 
 ## Contributing
 
