@@ -908,7 +908,7 @@ const cat = catberry.create({isRelease: true});
 
 As a summary, the difference between modes is:
 * Debug mode - everything is watched for changes, the browser bundle is automatically rebuilt and all the modules are re-initialized on the server.
-* Release mode - there is no watch for changes and all source code of the browser bundle is minified using [uglify-js](https://www.npmjs.org/package/uglify-js)
+* Release mode - there is no watch for changes and all source code of the browser bundle is minified using [Babili](https://github.com/babel/babili)
 
 **[↑ back to top](#table-of-contents)**
 
