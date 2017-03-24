@@ -39,10 +39,30 @@ describe('lib/streams/ComponentReadable', function() {
 			});
 		});
 	});
+
+	describe('#renderDocument', function() {
+		it('renders nothing when there is no document', function(done) {
+			const parser = new ComponentReadable(createContext());
+
+			parser.renderDocument();
+
+			var concat = '';
+			parser
+				.on('data', function(chunk) {
+					concat += chunk;
+				})
+				.on('end', function() {
+					assert.strictEqual(concat, '', 'Wrong HTML content');
+					done();
+				});
+		});
+	});
+
 });
 
 function createContext() {
 	return {
+		components: Object.create(null),
 		routingContext: {
 			middleware: {
 				response: new ServerResponse(),
