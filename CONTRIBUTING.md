@@ -28,7 +28,7 @@ Write clean and simple docs in the `docs/index.md` file (if exists) or describe
 the feature in `README.md` if the package doesn't have separate documentation.
 
 ## Submit a PR
-* PR should be submitted from a separate branch (use `git checkout -b "fix-123"`) to a `develop` branch
+* PR should be submitted from a separate branch (use `git checkout -b "fix-123"`) to a `master` branch
 * PR should not decrease the code coverage more than by 1%
 * PR's commit message should use present tense and be capitalized properly (i.e., `Fix #123: Add tests for RequestRouter.`)
 
