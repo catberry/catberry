@@ -134,6 +134,15 @@ describe('lib/providers/ModuleApiProvider', function() {
 		});
 	});
 
+	describe('#error', function(done) {
+		it('should return 500 HTTP status code', function() {
+			api.error(500)
+				.then(() => assert.strictEqual(api.actions.errorStatusCode, 500))
+				.then(done)
+				.catch(done);
+		});
+	});
+
 	describe('#getRouteURI', function() {
 		it('should call state provider', function() {
 			assert.strictEqual(api.getRouteURI('name', {some: 'value'}), 'testURI:name:{"some":"value"}');

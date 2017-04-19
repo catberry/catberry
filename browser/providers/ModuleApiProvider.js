@@ -40,6 +40,16 @@ class ModuleApiProvider extends ModuleApiProviderBase {
 	}
 
 	/**
+	 * Reloads the page for handling error page.
+	 * @returns {Promise} Promise for nothing.
+	 */
+	error() {
+		const window = this.locator.resolve('window');
+		window.location.reload();
+		return Promise.resolve();
+	}
+
+	/**
 	 * Redirects current page to specified URI.
 	 * @param {string} uriString URI to redirect.
 	 * @returns {Promise} Promise for nothing.
