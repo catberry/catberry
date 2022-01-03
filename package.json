@@ -3,7 +3,7 @@
 	"version": "9.0.0",
 	"author": {
 		"name": "Denis Rechkunov",
-		"email": "denis.rechkunov@gmail.com"
+		"email": "denis@rdner.de"
 	},
 	"description": "Catberry is an isomorphic framework for building universal front-end apps using components, Flux architecture and progressive rendering.",
 	"homepage": "https://github.com/catberry/catberry",
@@ -20,7 +20,7 @@
 	],
 	"bugs": {
 		"url": "https://github.com/catberry/catberry/issues",
-		"email": "denis.rechkunov@gmail.com"
+		"email": "denis@rdner.de"
 	},
 	"repository": {
 		"type": "git",
@@ -32,7 +32,7 @@
 	"contributors": [
 		{
 			"name": "Denis Rechkunov",
-			"email": "denis.rechkunov@gmail.com"
+			"email": "denis@rdner.de"
 		},
 		{
 			"name": "Julia Rechkunova",
